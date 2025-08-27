@@ -1,0 +1,13 @@
+DirectoryIndex index.php
+Options -Indexes
+AddType application/x-httpd-php .php
+AddHandler application/x-httpd-php .php
+
+# Allow access from all IPs
+Order Allow,Deny
+Allow from all
+
+# Enable CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"

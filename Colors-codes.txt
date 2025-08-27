@@ -1,0 +1,65 @@
+Your selected colors:
+
+    Text: #170202 - rgb(23, 2, 2) - hsl(0, 84%, 5%)
+    Background: #ffffff - rgb(255, 255, 255) - hsl(0, 0%, 100%)
+    Primary: #750000 - rgb(117, 0, 0) - hsl(0, 100%, 23%)
+    Secondary: #d11100 - rgb(209, 17, 0) - hsl(5, 100%, 41%)
+    Accent: #ff0000 - rgb(255, 0, 0) - hsl(0, 100%, 50%)
+
+Realtime Colors link for selected colors: https://www.realtimecolors.com/?colors=170202-ffffff-750000-d11100-ff0000&fonts=Poppins-Poppins
+
+Thanks for using RealtimeColors.com!
+
+when using plain css:
+--text: #170202;
+--background: #ffffff;
+--primary: #750000;
+--secondary: #d11100;
+--accent: #ff0000;
+
+with theme:
+:root[data-theme="light"] {
+  --text: #170202;
+  --background: #ffffff;
+  --primary: #750000;
+  --secondary: #d11100;
+  --accent: #ff0000;
+}
+:root[data-theme="dark"] {
+  --text: #fde8e8;
+  --background: #000000;
+  --primary: #ff8a8a;
+  --secondary: #ff3f2e;
+  --accent: #ff0000;
+}
+
+
+when using tailwind:
+tailwind.config.js
+colors: {
+ 'text': 'var(--text)',
+ 'background': 'var(--background)',
+ 'primary': 'var(--primary)',
+ 'secondary': 'var(--secondary)',
+ 'accent': 'var(--accent)',
+},
+
+with theme:
+main.css
+@layer base {
+  :root {
+    --text: #170202;
+    --background: #ffffff;
+    --primary: #750000;
+    --secondary: #d11100;
+    --accent: #ff0000;
+  }
+  .dark {
+    --text: #fde8e8;
+    --background: #000000;
+    --primary: #ff8a8a;
+    --secondary: #ff3f2e;
+    --accent: #ff0000;
+  }
+},
+

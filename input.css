@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --text: #170202;
+    --background: #ffe8e8;
+    --primary: #750000;
+    --secondary: #d11100;
+    --accent: #ff0000;
+  }
+
+  .dark {
+    --text: #fde8e8;
+    --background:#292121;
+    --primary: #ff8a8a;
+    --secondary: #ff3f2e;
+    --accent: #ff0000;
+  }
+}
+
+.active-underline {
+  position: relative;
+}
+.active-underline::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: #ff0000;
+  margin-top: 5px;
+  width: 100%;
+  opacity: 1;
+}
+
+@layer components {
+  /* Base button */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+
+  /* Primary */
+  .btn-primary {
+    @apply bg-primary text-background hover:bg-secondary;
+  }
+
+  /* Secondary */
+  .btn-secondary {
+    @apply border border-primary text-primary hover:bg-primary hover:text-background;
+  }
+
+  /* Tertiary (link style) */
+  .btn-tertiary {
+    @apply text-primary underline underline-offset-2 hover:text-secondary;
+  }
+}

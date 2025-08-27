@@ -1,0 +1,71 @@
+app/
+│── core/                          # Base classes shared by all modules
+│   ├── BaseController.php         # Common controller methods (render view, redirect, etc.)
+│   ├── BaseModel.php              # Common database methods (query, find, save, etc.)
+│   ├── Router.php                 # Handles request routing (URI → Module → Controller → Method)
+│   └── Helpers.php                # Utility/helper functions
+│
+│── modules/                       # Each role = module
+│   ├── user/
+│   │   ├── controllers/
+│   │   │   ├── DashboardController.php
+│   │   │   ├── RequestController.php   # Handles facility & vehicle requests
+│   │   │   └── ProfileController.php   # Handles user account/profile
+│   │   ├── models/
+│   │   │   ├── RequestModel.php        # DB queries for user requests
+│   │   │   └── UserModel.php           # User-specific DB queries
+│   │   ├── views/
+│   │   │   ├── dashboard.php           # Tailwind HTML for dashboard
+│   │   │   ├── request_form.php        # Tailwind form for facility/vehicle requests
+│   │   │   ├── request_list.php        # User's submitted requests
+│   │   │   └── profile.php             # User profile settings
+│   │   └── config/
+│   │       └── routes.php              # Routes for user module
+│   │
+│   ├── gsu_admin/
+│   │   ├── controllers/
+│   │   │   ├── DashboardController.php
+│   │   │   ├── RepairRequestController.php   # Facility repair management
+│   │   │   └── PersonnelController.php       # Manage GSU personnel
+│   │   ├── models/
+│   │   │   ├── RepairModel.php
+│   │   │   └── PersonnelModel.php
+│   │   ├── views/
+│   │   │   ├── dashboard.php
+│   │   │   ├── repair_requests.php
+│   │   │   ├── repair_detail.php
+│   │   │   └── personnel_list.php
+│   │   └── config/
+│   │       └── routes.php
+│   │
+│   ├── motorpool_admin/
+│   │   ├── controllers/
+│   │   │   ├── DashboardController.php
+│   │   │   ├── VehicleRequestController.php
+│   │   │   └── VehicleController.php        # Manage vehicle info
+│   │   ├── models/
+│   │   │   ├── VehicleModel.php
+│   │   │   └── VehicleRequestModel.php
+│   │   ├── views/
+│   │   │   ├── dashboard.php
+│   │   │   ├── vehicle_requests.php
+│   │   │   ├── vehicle_detail.php
+│   │   │   └── vehicle_list.php
+│   │   └── config/
+│   │       └── routes.php
+│   │
+│   └── superadmin/
+│       ├── controllers/
+│       │   ├── DashboardController.php
+│       │   ├── UserManagementController.php   # Manage all users
+│       │   └── ReportsController.php          # Generate system reports
+│       ├── models/
+│       │   ├── UserModel.php
+│       │   └── ReportModel.php
+│       ├── views/
+│       │   ├── dashboard.php
+│       │   ├── user_list.php
+│       │   ├── user_form.php
+│       │   └── reports.php
+│       └── config/
+│           └── routes.php
