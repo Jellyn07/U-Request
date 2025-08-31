@@ -1,6 +1,19 @@
 <?php
+session_start();
+
+$db_error = $_SESSION['db_error'] ?? '';
+unset($_SESSION['db_error']);
+
+$signup_error = $_SESSION['signup_error'] ?? '';
+unset($_SESSION['signup_error']);
+
+$signup_success = $_SESSION['signup_success'] ?? '';
+unset($_SESSION['signup_success']);
+
 require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../models/UserModel.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -9,6 +22,8 @@ require_once __DIR__ . '/../config/constants.php';
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/assets/js/alert.js"></script>
   </head>
 <body class="bg-primary text-text min-h-screen flex items-center justify-center dark:bg-gray-950">
   <div class="w-3/4 mt-20 bg-white rounded-lg dark:bg-gray-900 shadow-lg rounded-2xl p-8 space-y-6 border border-gray-200 dark:border-gray-800 flex flex-col justify-center">
@@ -19,7 +34,7 @@ require_once __DIR__ . '/../config/constants.php';
         <p class="text-text font-bold pl-2">CREATE ACCOUNT</p>
       </div>
 
-      <form method="post" action="login.php">
+      <form method="post" action="../controllers/SignupController.php" id="signupForm">
         <!-- Student/Staff ID -->
         <div class="form-group">
           <label for="studstaID" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Student/Staff ID:<span class="text-accent">*</span></label>
@@ -73,3 +88,17 @@ require_once __DIR__ . '/../config/constants.php';
     </div>
   </body>
 </html>
+
+  <script>
+      let signupError = <?= json_encode($signup_error) ?>;
+      let signupSuccess = <?= json_encode($signup_success) ?>;
+
+      if (signupError) {
+          showErrorA(signupError);
+      }
+      if (signupSuccess) {
+          showSuccessAlert(signupSuccess);
+      }
+
+
+    </script>
