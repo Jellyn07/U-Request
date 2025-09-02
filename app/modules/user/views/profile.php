@@ -1,4 +1,8 @@
 <?php
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
 require_once __DIR__ . '/../config/constants.php';
 ?>
 <!DOCTYPE html>
@@ -136,11 +140,12 @@ require_once __DIR__ . '/../config/constants.php';
                   </button>
                   
                   <button 
-                    type="button" 
+                    type="button"
+                    onclick="window.location.href='logout.php';"
                     class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   >
                     Logout
-                  </button>
+                </button>
                   
                   <button 
                     type="button" 

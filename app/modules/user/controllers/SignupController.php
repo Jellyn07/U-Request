@@ -13,6 +13,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $userModel = new UserModel();
 
+    // ✅ Function to validate names (no numbers allowed)
+    function isValidName($name) {
+        return preg_match("/^[a-zA-Z\s'-]+$/", $name);
+    }
+
+    // ✅ Function to validate USeP email
+    function isValidUsepEmail($email) {
+        return preg_match("/^[a-zA-Z0-9._%+-]+@usep\.edu\.ph$/", $email);
+    }
+
+    // ✅ First & Last name validation
+    if (!isValidName($fn) || !isValidName($ln)) {
+        $_SESSION['signup_error'] = "Names cannot contain numbers or invalid characters.";
+        header("Location: ../views/signup.php");
+        exit;
+    }
+
+    // ✅ Email domain validation
+    if (!isValidUsepEmail($email)) {
+        $_SESSION['signup_error'] = "Only @usep.edu.ph email addresses are allowed.";
+        header("Location: ../views/signup.php");
+        exit;
+    }
+
     // ✅ Password check
     if ($pass !== $rpass) {
         $_SESSION['signup_error'] = "Passwords do not match.";
@@ -31,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: ../views/signup.php");
         exit;
     }
-
 
     // ✅ Create new user
     $created = $userModel->createUser($ssid, $email, $fn, $ln, $pass);
