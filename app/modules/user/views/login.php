@@ -1,11 +1,17 @@
 <?php
 
 session_start();
+
+// if (!isset($_SESSION['email'])) {
+//     header("Location: login.php");
+//     exit;
+// }
+
 $login_error = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
 
-// $signup_success = $_SESSION['signup_success'] ?? '';
-// unset($_SESSION['signup_success']);
+$signup_success = $_SESSION['signup_success'] ?? '';
+unset($_SESSION['signup_success']);
 
 require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../models/UserModel.php';
