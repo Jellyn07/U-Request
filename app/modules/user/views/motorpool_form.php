@@ -10,7 +10,7 @@ require_once __DIR__ . '/../config/constants.php';
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   </head>
-  <body class="bg-primary">
+  <body class="bg-background">
     <form class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
     <div id="rrs-form">
       <div id="header" class="flex flex-col items-center justify-center mb-4">
@@ -21,70 +21,70 @@ require_once __DIR__ . '/../config/constants.php';
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        <label class="text-sm text-text mb-1">
           Purpose of Trip:
-          <span>*</span></label>
-        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-primary focus:border-solid focus:border-red-100 transition">
+          <span class="text-secondary">*</span></label>
+        <input type="text" class="input-field w-full">
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        <label class="text-sm text-text mb-1">
           Travel Destination:
           <span>*</span></label>
-        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+        <input type="text" class="input-field w-full">
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        <label class="text-sm text-text mb-1">
           Date of Travel:
           <span>*</span></label>
-        <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+        <input type="date" class="input-field w-full">
       </div>
 
       <div class="mb-4">
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+      <label class="text-sm text-text mb-1">
         Date of Return:
         <span>*</span></label>
-      <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      <input type="date" class="input-field w-full">
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        <label class="text-sm text-text mb-1">
           Time of Departure:
           <span>*</span></label>
-        <input type="time" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+        <input type="time" class="input-field w-full">
       </div>
 
       <div class="mb-4">
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+      <label class="text-sm text-text mb-1">
         Time of Return:
         <span>*</span></label>
-      <input type="time" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      <input type="time" class="input-field w-full">
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        <label class="text-sm text-text mb-1">
           Name of Passengers:
           <span>*</span></label>
         <div id="passenger-fields">
           <div class="flex gap-2 w-full passenger-row">
             <div class="flex flex-col w-1/2">
-              <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+              <label class="text-sm text-text mb-1">
                 First Name
               </label>
             </div>
             <div class="flex flex-col w-1/2">
-              <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+              <label class="text-sm text-text mb-1">
                 Last Name
               </label>
             </div>
           </div>
           <div class="flex gap-2 w-full passenger-row">
             <div class="flex flex-col w-1/2">
-              <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="first_name[]">
+              <input type="text" class="input-field" name="first_name[]">
             </div>
             <div class="flex flex-col w-1/2">
-              <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="last_name[]">
+              <input type="text" class="input-field" name="last_name[]">
             </div>
             <button type="button" id="add-passenger" onclick="addPassengerField()">
               <img src="<?php echo PUBLIC_URL; ?>/assets/img/plus.png" alt="Add Passenger" class="w-6 h-6">
@@ -94,10 +94,10 @@ require_once __DIR__ . '/../config/constants.php';
       </div>
       <br>
       <div class="flex flex-row items-center justify-center gap-4 mt-4">
-        <button type="button" class="inside-block bg-background text-primary p-2 rounded-md text-sm border border-primary" onclick="location.href='request.php'">
+        <button type="button" class="btn btn-secondary" onclick="location.href='request.php'">
           Back
         </button>
-        <button class="inside-block bg-secondary text-background p-2 rounded-md text-sm" type="submit" onclick="showReview()">
+        <button class="btn btn-primary" type="submit" onclick="showReview()">
           Review
         </button>
       </div>

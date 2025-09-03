@@ -1,7 +1,7 @@
 module.exports = {
   content: [
-    "./public/**/*.{php,html,js,ts,jsx,tsx}",
-    "./src/**/*.{php,html,js,ts,jsx,tsx}"
+    './app/**/*.php',
+    './public/**/*.php',
   ],
   safelist: [
     "flex",

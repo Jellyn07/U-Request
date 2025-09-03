@@ -34,7 +34,7 @@ require_once __DIR__ . '/../config/constants.php';
               Spotted something broken around campus? Let us know through a repair request so the GSU team can fix it right away.
             </p>
             <div class="flex justify-end">
-              <button class="inside-block bg-secondary text-background p-2 rounded-md text-sm" onclick="location.href='gsu_form.php'">Request Now</button>
+              <button type="button" class="btn btn-primary" onclick="location.href='gsu_form.php'">Request Now</button>
             </div>
           
         </article>
@@ -47,7 +47,7 @@ require_once __DIR__ . '/../config/constants.php';
               Need a ride for a school activity, event, or errand? Submit a vehicle request and the Motorpool team will help you get moving.
             </p>
             <div class="flex justify-end">
-              <button class="inside-block bg-secondary text-background p-2 rounded-md text-sm" onclick="location.href='motorpool_form.php'">Request Now</button>
+              <button type="button" class="btn btn-primary" onclick="location.href='motorpool_form.php'">Request Now</button>
             </div>
           
         </article>

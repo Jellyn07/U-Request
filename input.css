@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --text: #170202;
-    --background: #ffe8e8;
+    --background: #ffffff;
     --primary: #750000;
     --secondary: #d11100;
     --accent: #ff0000;
@@ -36,21 +36,26 @@
 @layer components {
   /* Base button */
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply px-4 py-2 transition-all duration-200;
   }
 
   /* Primary */
   .btn-primary {
-    @apply bg-primary text-background hover:bg-secondary;
+    @apply bg-secondary text-background rounded-md text-sm;
   }
 
   /* Secondary */
   .btn-secondary {
-    @apply border border-primary text-primary hover:bg-primary hover:text-background;
+    @apply bg-background text-primary rounded-md text-sm border border-primary;
   }
 
   /* Tertiary (link style) */
   .btn-tertiary {
     @apply text-primary underline underline-offset-2 hover:text-secondary;
+  }
+
+  /*text input field */
+  .input-field {
+    @apply px-3 py-2 rounded-lg border border-gray-700  text-text text-sm focus:border-secondary outline-none transition;
   }
 }

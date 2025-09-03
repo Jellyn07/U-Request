@@ -218,8 +218,14 @@ require_once __DIR__ . '/../config/constants.php';
                 <label for="dateNoticed">Date the Issue was Noticed:<span>*</span></label>
                 <input type="date" id="dateNoticed" name="dateNoticed" required>
             </div>
-            <button class="inside-block bg-background text-primary p-2 rounded-md text-sm border border-primary" onclick="location.href='request.php'">Back</button>
-            <button class="inside-block bg-secondary text-background p-2 rounded-md text-sm" type="submit" onclick="showReview()">Review</button>
+            <div class="flex flex-row items-center justify-center gap-4 mt-4">
+                <button type="button" class="btn btn-secondary" onclick="location.href='request.php'">
+                Back
+                </button>
+                <button class="btn btn-primary" type="submit" onclick="showReview()">
+                Review
+                </button>
+            </div>
         </div>
     </div>
     </form>
