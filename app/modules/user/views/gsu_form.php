@@ -67,16 +67,20 @@ require_once __DIR__ . '/../config/constants.php';
             <div class="form-last">
                 <label for="exLoc">Building Location:<span>*</span></label>
                 <select name="exLoc" id="exLoc" required>
-                    <option value="" selected disabled>Select a location</option>
-                    <option value="Main Gate">Main Gate</option>
-                    <option value="Exit Gate">Exit Gate</option>
+                    <option value="" selected disabled>Select a building location</option>
+                    <option>PECC GYM</option>
+                    <option>SOM/SCIENCE BUILDING</option>
+                    <option>ADMIN BUILDING</option>
+                    <option>LIBRARY BUILDING</option>
+                    <option>FTC BUILDING</option>
+                    <option>OTHERS</option>
                 </select>
             </div>
 
             <div class="form-last">
                 <label for="exLoc">Room Location:<span>*</span></label>
                 <select name="exLoc" id="exLoc" required>
-                    <option value="" selected disabled>Select a location</option>
+                    <option value="" selected disabled>Select a room location</option>
                     <optgroup label="PECC GYM">
                         <optgroup label="Ground Floor">
                             <option value="PECC GYM - Office of the Registrar">Office of the Registrar</option>
