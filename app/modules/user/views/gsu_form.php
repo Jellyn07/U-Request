@@ -13,11 +13,13 @@ require_once __DIR__ . '/../config/constants.php';
   <body class="bg-primary">
     <form name="make-request" action="make-request.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
     <div id="rrs-form">
-        <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 flex justify-center items-center">
-        <h4>REPAIR REQUEST FORM</h4>
+        <div id="header" class="flex flex-col items-center justify-center mb-4">
+        <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
+        <h4 class="text-center text-lg font-semibold">REPIR REQUEST FORM</h4>
+        </div>
         <div id="request-info">
             <label for="natureReq">Nature of Request:<span>*</span></label>
-            <div id="nature-request-group">
+            <div id="nature-request-group" class="grid grid-cols-3 grid-rows-3 gap-4">
                 <div class="nature-option">
                     <input type="radio" id="carpma" name="nature-request" value="Carpentry/Masonry">
                     <label for="carpma">Carpentry/Masonry</label>
@@ -221,5 +223,6 @@ require_once __DIR__ . '/../config/constants.php';
         </div>
     </div>
     </form>
+    <script src="/public/assets/js/user/forms.js"></script>
   </body>
 </html>

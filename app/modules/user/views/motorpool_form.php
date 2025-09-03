@@ -15,59 +15,95 @@ require_once __DIR__ . '/../config/constants.php';
     <div id="rrs-form">
       <div id="header" class="flex flex-col items-center justify-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
-        <h4 class="text-center text-lg font-semibold">VEHICLE REQUEST FORM</h4>
+        <h4 class="text-center text-lg font-semibold">
+          VEHICLE REQUEST FORM
+        </h4>
       </div>
 
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Date of Travel:<span>*</span></label>
-      <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"><br>
+      <div class="mb-4">
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+          Purpose of Trip:
+          <span>*</span></label>
+        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-primary focus:border-solid focus:border-red-100 transition">
+      </div>
 
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Date of Return:<span>*</span></label>
-      <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"><br>
+      <div class="mb-4">
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+          Travel Destination:
+          <span>*</span></label>
+        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      </div>
 
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Time of Departure:<span>*</span></label>
-      <input type="time" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"><br>
+      <div class="mb-4">
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+          Date of Travel:
+          <span>*</span></label>
+        <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      </div>
 
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Time of Return:<span>*</span></label>
-      <input type="time" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"><br>
+      <div class="mb-4">
+      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        Date of Return:
+        <span>*</span></label>
+      <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      </div>
 
-      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Name of Passengers:<span>*</span></label>
-      <div id="passenger-fields">
-        <div class="flex gap-2 w-full passenger-row">
-          <div class="flex flex-col w-1/2">
-            <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">First Name</label>
-            <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="first_name[]">
+      <div class="mb-4">
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+          Time of Departure:
+          <span>*</span></label>
+        <input type="time" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      </div>
+
+      <div class="mb-4">
+      <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+        Time of Return:
+        <span>*</span></label>
+      <input type="time" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+          Name of Passengers:
+          <span>*</span></label>
+        <div id="passenger-fields">
+          <div class="flex gap-2 w-full passenger-row">
+            <div class="flex flex-col w-1/2">
+              <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                First Name
+              </label>
+            </div>
+            <div class="flex flex-col w-1/2">
+              <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                Last Name
+              </label>
+            </div>
           </div>
-          <div class="flex flex-col w-1/2">
-            <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
-            <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="last_name[]">
+          <div class="flex gap-2 w-full passenger-row">
+            <div class="flex flex-col w-1/2">
+              <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="first_name[]">
+            </div>
+            <div class="flex flex-col w-1/2">
+              <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="last_name[]">
+            </div>
+            <button type="button" id="add-passenger" onclick="addPassengerField()">
+              <img src="<?php echo PUBLIC_URL; ?>/assets/img/plus.png" alt="Add Passenger" class="w-6 h-6">
+            </button>
           </div>
         </div>
       </div>
-      <div class="flex justify-end w-full mt-2">
-        <button type="button" id="add-passenger" class="bg-secondary text-white rounded-full w-8 h-8 flex items-center justify-center text-xl shadow" onclick="addPassengerField()">+</button>
-      </div>
       <br>
       <div class="flex flex-row items-center justify-center gap-4 mt-4">
-        <button type="button" class="inside-block bg-background text-primary p-2 rounded-md text-sm border border-primary" onclick="location.href='request.php'">Back</button>
-        <button class="inside-block bg-secondary text-background p-2 rounded-md text-sm" type="submit" onclick="showReview()">Review</button>
+        <button type="button" class="inside-block bg-background text-primary p-2 rounded-md text-sm border border-primary" onclick="location.href='request.php'">
+          Back
+        </button>
+        <button class="inside-block bg-secondary text-background p-2 rounded-md text-sm" type="submit" onclick="showReview()">
+          Review
+        </button>
       </div>
     </div>
-    <script>
-      function addPassengerField() {
-        const container = document.getElementById('passenger-fields');
-        const row = document.createElement('div');
-        row.className = 'flex gap-2 w-full passenger-row mt-2';
-        row.innerHTML = `
-          <div class="flex flex-col w-1/2">
-            <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="first_name[]">
-          </div>
-          <div class="flex flex-col w-1/2">
-            <input type="text" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" name="last_name[]">
-          </div>
-        `;
-        container.appendChild(row);
-      }
-    </script>
+
     </form>
+    <script src="/public/assets/js/user/forms.js"></script>
   </body>
 </html>
