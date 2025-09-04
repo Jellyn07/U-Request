@@ -23,49 +23,56 @@ require_once __DIR__ . '/../config/constants.php';
       <div class="mb-4">
         <label class="text-sm text-text mb-1">
           Purpose of Trip:
-          <span class="text-secondary">*</span></label>
-        <input type="text" class="input-field w-full">
+          <span class="text-accent">*</span>
+        </label>
+  <input type="text" class="input-field w-full" name="purpose_of_trip">
       </div>
 
       <div class="mb-4">
         <label class="text-sm text-text mb-1">
           Travel Destination:
-          <span>*</span></label>
-        <input type="text" class="input-field w-full">
+          <span class="text-accent">*</span>
+        </label>
+  <input type="text" class="input-field w-full" name="travel_destination">
       </div>
 
       <div class="mb-4">
         <label class="text-sm text-text mb-1">
           Date of Travel:
-          <span>*</span></label>
-        <input type="date" class="input-field w-full">
+          <span class="text-accent">*</span>
+        </label>
+  <input type="date" class="input-field w-full" name="date_of_travel">
       </div>
 
       <div class="mb-4">
       <label class="text-sm text-text mb-1">
         Date of Return:
-        <span>*</span></label>
-      <input type="date" class="input-field w-full">
+        <span class="text-accent">*</span>
+      </label>
+  <input type="date" class="input-field w-full" name="date_of_return">
       </div>
 
       <div class="mb-4">
         <label class="text-sm text-text mb-1">
           Time of Departure:
-          <span>*</span></label>
-        <input type="time" class="input-field w-full">
+          <span class="text-accent">*</span>
+        </label>
+  <input type="time" class="input-field w-full" name="time_of_departure">
       </div>
 
       <div class="mb-4">
       <label class="text-sm text-text mb-1">
         Time of Return:
-        <span>*</span></label>
-      <input type="time" class="input-field w-full">
+        <span class="text-accent">*</span>
+      </label>
+  <input type="time" class="input-field w-full" name="time_of_return">
       </div>
 
       <div class="mb-4">
         <label class="text-sm text-text mb-1">
           Name of Passengers:
-          <span>*</span></label>
+          <span class="text-accent">*</span>
+        </label>
         <div id="passenger-fields">
           <div class="flex gap-2 w-full passenger-row">
             <div class="flex flex-col w-1/2">
@@ -87,7 +94,8 @@ require_once __DIR__ . '/../config/constants.php';
               <input type="text" class="input-field" name="last_name[]">
             </div>
             <button type="button" id="add-passenger" onclick="addPassengerField()">
-              <img src="<?php echo PUBLIC_URL; ?>/assets/img/plus.png" alt="Add Passenger" class="w-6 h-6">
+              <!-- <img src="<?php echo PUBLIC_URL; ?>/assets/img/plus.png" alt="Add Passenger" class="w-6 h-6"> -->
+               <p class="text-xl">+</p>
             </button>
           </div>
         </div>
@@ -95,15 +103,15 @@ require_once __DIR__ . '/../config/constants.php';
       <br>
       <div class="flex flex-row items-center justify-center gap-4 mt-4">
         <button type="button" class="btn btn-secondary" onclick="location.href='request.php'">
-          Back
+          Cancel
         </button>
-        <button class="btn btn-primary" type="submit" onclick="showReview()">
-          Review
+        <button class="btn btn-primary" type="submit">
+          Submit
         </button>
       </div>
     </div>
-
     </form>
+
     <script src="/public/assets/js/user/forms.js"></script>
   </body>
 </html>
