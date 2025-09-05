@@ -43,13 +43,17 @@ require_once __DIR__ . '/../models/UserModel.php';
       <form method="post" action="../controllers/LoginController.php">
         <!-- Email -->
         <div>
-          <label for="email" class="text-sm text-text mb-1">USeP Email Address</label>
+          <label for="email" class="text-sm text-text mb-1">
+            USeP Email Address
+          </label>
           <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" required>
         </div>
 
         <!-- Password -->
         <div>
-          <label for="password" class="text-sm text-text mb-1">Password</label>
+          <label for="password" class="text-sm text-text mb-1">
+            Password
+          </label>
           <input type="password" id="password" name="password" class="w-full input-field" placeholder="atleast 8 characters" required>
         </div>
 
@@ -76,10 +80,16 @@ require_once __DIR__ . '/../models/UserModel.php';
   <div class="w-1/2 flex items-end justify-end relative z-10 text-white">
     <div class="text-right p-8">
       <p class="text-sm text-text/70">
-          <span class="block sm:inline">&copy; All rights reserved.</span>
-          <a class="inline-block text-text underline transition" href="#">Terms & Conditions</a>
+          <span class="block sm:inline">&copy; 
+            All rights reserved.
+          </span>
+          <a class="inline-block text-text underline transition" href="#">
+            Terms & Conditions
+          </a>
           <span class="text-text">&middot;</span>
-          <a class="inline-block text-text underline transition" href="#">Privacy Policy</a>
+          <a class="inline-block text-text underline transition" href="#">
+            Privacy Policy
+          </a>
         </p>
     </div>
   </div>
