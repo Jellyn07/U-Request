@@ -59,3 +59,23 @@
     @apply px-3 py-2 rounded-lg border border-gray-700  text-text text-sm focus:border-secondary outline-none transition;
   }
 }
+
+@layer utilities {
+  .clip-diagonal {
+    background: linear-gradient(105deg, white 50%, #ff0000 50%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .clip-diagonal1 {
+    background: linear-gradient(145deg, transparent 60%, #d11100  40%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .clip-diagonal2 {
+    background: linear-gradient(165deg, transparent 70%, #750000  30%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  /* .clip-diagonal {
+    clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+    background: url('/public/assets/img/background.jpg') no-repeat center center;
+    background-size: cover;
+  } */
+}
