@@ -41,7 +41,7 @@
 
   /* Primary */
   .btn-primary {
-    @apply bg-secondary text-background rounded-md text-sm;
+    @apply bg-secondary text-background rounded-md text-sm hover:bg-primary;
   }
 
   /* Secondary */
@@ -71,6 +71,19 @@
   }
   .clip-diagonal2 {
     background: linear-gradient(165deg, transparent 70%, #750000  30%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .clip-diagonal4 {
+    background: linear-gradient(255deg, white 50%, #ff0000 50%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .clip-diagonal5 {
+    background: linear-gradient(215deg, transparent 60%, #d11100  40%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .clip-diagonal6 {
+    background: linear-gradient(195deg, transparent 70%, #750000  30%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
   /* .clip-diagonal {

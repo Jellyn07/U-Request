@@ -25,60 +25,98 @@ require_once __DIR__ . '/../models/UserModel.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/alert.js"></script>
   </head>
-<body class="bg-primary text-text min-h-screen flex items-center justify-center dark:bg-gray-950">
-  <div class="w-3/4 mt-20 bg-white rounded-lg dark:bg-gray-900 shadow-lg rounded-2xl p-8 space-y-6 border border-gray-200 dark:border-gray-800 flex flex-col justify-center">
-    
+<body class="min-h-screen flex relative overflow-hidden">
+  <div class="w-1/2 flex items-end justify-left relative z-10 text-white">
+    <div class="text-right p-8">
+      <p class="text-sm text-white">
+          <span class="block sm:inline">&copy; 
+            All rights reserved.
+          </span>
+          <a class="inline-block text-text underline transition" href="#">
+            Terms & Conditions
+          </a>
+          <span class="text-text">&middot;</span>
+          <a class="inline-block text-text underline transition" href="#">
+            Privacy Policy
+          </a>
+        </p>
+    </div>
+  </div>
+  <div class="w-1/2 flex items-center justify-center relative z-10">
+    <div class="w-1/2 max-w-md bg-background">
       <!-- Logo + Title -->
       <div class="text-center">
-        <img src="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
-        <p class="text-text font-bold pl-2">CREATE ACCOUNT</p>
+        <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
+        <p class="text-2xl font-bold">
+          U<span class="text-accent">-</span>REQUEST
+        </p>
       </div>
 
       <form method="post" action="../controllers/SignupController.php" id="signupForm">
         <!-- Student/Staff ID -->
-        <div class="form-group">
-          <label for="studstaID" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Student/Staff ID:<span class="text-accent">*</span></label>
-          <input type="text" name="ssid" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required placeholder="2000-012345">
+        <div>
+          <label for="studstaID" class="text-sm text-text mb-1">
+            Student/Staff ID:
+            <span class="text-accent">*</span>
+          </label>
+          <input type="text" name="ssid" class="w-full input-field" required placeholder="2000-012345">
         </div>
 
         <!-- Email -->
         <div class="form-group">        
-          <label for="email" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Email:<span class="text-accent">*</span></label>
-          <input type="text" id="email" name="email" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required placeholder="your@usep.edu.ph">
+          <label for="email" class="text-sm text-text mb-1">
+            Email:
+            <span class="text-accent">*</span>
+          </label>
+          <input type="text" id="email" name="email" class="w-full input-field" required placeholder="your@usep.edu.ph">
         </div>
 
         <!-- First + Last Name side by side -->
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="fname" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">First Name:<span class="text-accent">*</span></label>
-            <input type="text" id="fname" name="fn" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+            <label for="fname" class="text-sm text-text mb-1">
+              First Name:
+              <span class="text-accent">*</span>
+            </label>
+            <input type="text" id="fname" name="fn" class="w-full input-field" required>
           </div>
           <div>
-            <label for="lname" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Last Name:<span class="text-accent">*</span></label>
-            <input type="text" id="lname" name="ln" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+            <label for="lname" class="text-sm text-text mb-1">
+              Last Name:
+              <span class="text-accent">*</span>
+            </label>
+            <input type="text" id="lname" name="ln" class="w-full input-field" required>
           </div>
         </div>
 
         <!-- Password -->
         <div class="form-group">        
-          <label for="password" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password:<span class="text-accent">*</span></label>
-          <input type="password" id="password" name="pass" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+          <label for="password" class="text-sm text-text mb-1">
+            Password:
+            <span class="text-accent">*</span>
+          </label>
+          <input type="password" id="password" name="pass" class="w-full input-field" required>
         </div>
 
         <!-- Re-enter Password -->
         <div class="form-group">     
-          <label for="repassword" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Re-enter Password:<span class="text-accent">*</span></label>                
-          <input type="password" id="repassword" name="rpass" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-background text-text focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+          <label for="repassword" class="text-sm text-text mb-1">
+            Re-enter Password:
+            <span class="text-accent">*</span>
+          </label>                
+          <input type="password" id="repassword" name="rpass" class="w-full input-field" required>
         </div>  
 
         <!-- Data Privacy -->
         <div class="flex items-start space-x-2">
-          <input type="checkbox" id="dp" name="dp" class="mt-1" required>
-          <a href="https://www.usep.edu.ph/usep-data-privacy-statement/" class="text-sm leading-5">By continuing to use the U-Request, you agree to the University of Southeastern Philippines' Data Privacy Statement.</a>     
+          <input type="checkbox" id="dp" name="dp" class="mt-1.5" required>
+          <a href="https://www.usep.edu.ph/usep-data-privacy-statement/" class="text-xs mt-1">
+            By using U-Request, you agree to the USeP Data Privacy Statement.
+          </a>     
         </div>
 
         <!-- Sign Up Button -->
-        <button type="submit" class="mt-3 w-full py-2 px-4 rounded-lg font-medium text-white bg-primary hover:bg-secondary transition shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        <button type="submit" class="btn btn-primary w-full mt-3" name="signup">
           Sign Up
         </button>
 
@@ -86,19 +124,23 @@ require_once __DIR__ . '/../models/UserModel.php';
         <p class="mt-2 text-center text-text text-sm">Do you have an account? <a href="login.php" class="text-primary hover:underline">Login</a></p>
       </form>
     </div>
+  </div>
+
+  <!-- Diagonal Background Layer -->
+  <div class="absolute inset-0 clip-diagonal4 z-0"></div>
+  <div class="absolute inset-0 clip-diagonal5"></div>
+  <div class="absolute inset-0 clip-diagonal6"></div>
+
   </body>
 </html>
+<script>
+  let signupError = <?= json_encode($signup_error) ?>;
+  let signupSuccess = <?= json_encode($signup_success) ?>;
 
-  <script>
-      let signupError = <?= json_encode($signup_error) ?>;
-      let signupSuccess = <?= json_encode($signup_success) ?>;
-
-      if (signupError) {
-          showErrorA(signupError);
-      }
-      if (signupSuccess) {
-          showSuccessAlert(signupSuccess);
-      }
-
-
-    </script>
+  if (signupError) {
+      showErrorA(signupError);
+  }
+  if (signupSuccess) {
+      showSuccessAlert(signupSuccess);
+  }
+</script>
