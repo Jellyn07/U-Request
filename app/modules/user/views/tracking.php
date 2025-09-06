@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../../config/constants.php';
       <div class="space-y-6">
         
         <!-- Repair Request Card -->
-        <article class="rounded-xl border border-gray-200 bg-white p-5 mx-40 shadow-sm hover:shadow-md transition">
+        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
           <!-- GIF at the top -->
           <div class="flex justify-start mb-3">
             <img src="/public/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
@@ -58,7 +58,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 
 
         <!-- Vehicle Request Card -->
-        <article class="rounded-xl border border-gray-200 bg-white p-5 mx-40 shadow-sm hover:shadow-md transition">
+        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
           <!-- GIF at the top -->
           <div class="flex justify-start mb-3">
             <img src="/public/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
@@ -86,7 +86,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 
 
         <!-- Another Repair Request -->
-        <article class="rounded-xl border border-gray-200 bg-white p-5 mx-40 shadow-sm hover:shadow-md transition">
+        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
           <!-- GIF at the top -->
           <div class="flex justify-start mb-3">
             <img src="/public/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 
 
         <!-- Another Vehicle Request -->
-        <article class="rounded-xl border border-gray-200 bg-white p-5 mx-40 shadow-sm hover:shadow-md transition">
+        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
           <!-- GIF at the top -->
           <div class="flex justify-start mb-3">
             <img src="/public/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
