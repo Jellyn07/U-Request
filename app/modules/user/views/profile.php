@@ -1,8 +1,14 @@
 <?php
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit;
-}
+// if (!isset($_SESSION['email'])) {
+//     header("Location: login.php");
+//     exit;
+// }
+
+// // Prevent browser from caching protected pages
+// header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+// header("Cache-Control: post-check=0, pre-check=0", false);
+// header("Pragma: no-cache");
+
 require_once __DIR__ . '/../config/constants.php';
 ?>
 <!DOCTYPE html>
@@ -119,7 +125,7 @@ require_once __DIR__ . '/../config/constants.php';
                   />
                 </div>
 
-                <div>
+                <!-- <div>
                   <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                   <textarea 
                     id="address" 
@@ -128,7 +134,7 @@ require_once __DIR__ . '/../config/constants.php';
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     placeholder="Enter your address"
                   ></textarea>
-                </div>
+                </div> -->
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
