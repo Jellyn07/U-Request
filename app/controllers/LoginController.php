@@ -24,12 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             exit;
         } else {
             $_SESSION['login_error'] = "Failed to fetch user ID.";
-            header("Location: ../views/login.php");
+            header("Location: ../modules/user/views/login.php");
             exit;
         }
     } else {
         $_SESSION['login_error'] = "Invalid email or password.";
-        header("Location: ../views/login.php");
+        header("Location: ../modules/user/views/login.php");
         exit;
     }
 }
