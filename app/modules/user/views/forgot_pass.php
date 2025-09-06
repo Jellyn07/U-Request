@@ -22,7 +22,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/alert.js"></script>
   </head>
-<body class="min-h-screen flex relative overflow-hidden">
+<body class="bg-background min-h-screen flex relative overflow-hidden">
   <!-- White Section -->
   <div class="w-1/2 flex items-center justify-center relative z-10">
     <div class="w-1/2 max-w-md bg-background">

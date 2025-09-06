@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../../../config/constants.php';
 ?>
 <!DOCTYPE html>
@@ -7,187 +6,174 @@ require_once __DIR__ . '/../../../config/constants.php';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>U-Request</title>
+    <title>U-Request | My Profile</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   </head>
-  <body class="bg-gray-50">
+  <body class="bg-background min-h-screen flex flex-col">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
-    <main class="container mx-auto px-4 py-8">
-      <div class="max-w-6xl mx-auto">
-        
-        <div style="display: flex; flex-direction: row; gap: 2rem;">
-          <!-- Left Side - Profile Picture (Smaller) -->
-          <div style="width: 25%;">
-            <div class="bg-white rounded-lg shadow-md p-6">
-              <div class="flex flex-col items-center">
-                <div class="relative mb-4">
-                  <img 
-                    src="/public/assets/img/user-default.png" 
-                    alt="User Profile" 
-                    class="w-32 h-32 rounded-full object-cover border-4 border-red-600 shadow-lg" 
-                  />
-                  <button class="absolute bottom-0 right-0 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </button>
-                </div>
-                <div class="text-center mb-4">
-                  <p class="text-sm text-gray-500 mb-1">Email Address</p>
-                  <p class="font-medium text-gray-700">user@example.com</p>
-                </div>
-                
-                <!-- Change Profile Button -->
-                <button class="bg-primary text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                  Change Profile
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <!-- Right Side - User Details (Larger) -->
-          <div style="width: 75%;">
-            <div class="bg-white rounded-lg shadow-md p-6">
-              <h2 class="text-xl font-semibold mb-6 text-gray-800">Personal Information</h2>
-              
-              <form class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                    <input 
-                      type="text" 
-                      id="firstName" 
-                      name="firstName" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Enter your first name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                    <input 
-                      type="text" 
-                      id="lastName" 
-                      name="lastName" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Enter your last name"
-                    />
-                  </div>
-                </div>
+    <main class="container mx-auto px-4 py-10 flex-1">
+      <div class="max-w-4xl mx-auto space-y-8">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                    <input 
-                      type="tel" 
-                      id="phone" 
-                      name="phone" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label for="department" class="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                    <select 
-                      id="department" 
-                      name="department" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    >
-                      <option value="">Select department</option>
-                      <option value="it">Information Technology</option>
-                      <option value="hr">Human Resources</option>
-                      <option value="finance">Finance</option>
-                      <option value="operations">Operations</option>
-                      <option value="marketing">Marketing</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label for="position" class="block text-sm font-medium text-gray-700 mb-2">Position/Title</label>
-                  <input 
-                    type="text" 
-                    id="position" 
-                    name="position" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Enter your position or title"
-                  />
-                </div>
-
-                <!-- <div>
-                  <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                  <textarea 
-                    id="address" 
-                    name="address" 
-                    rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Enter your address"
-                  ></textarea>
-                </div> -->
-
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                  <button 
-                    type="submit" 
-                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                  >
-                    Save Changes
-                  </button>
-                  
-                  <button 
-                    type="button"
-                    onclick="window.location.href='/app/controllers/LogoutController.php';"
-                    class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  >
-                    Logout
-                </button>
-                  
-                  <button 
-                    type="button" 
-                    class="flex-1 bg-red-800 text-white py-2 px-4 rounded-md hover:bg-red-900 transition-colors focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2"
-                  >
-                    Delete Account
-                  </button>
-                </div>
-              </form>
-            </div>
+        <!-- Profile Picture -->
+        <div class="bg-background rounded-xl flex flex-col items-center">
+          <div class="relative">
+            <img 
+              src="/public/assets/img/user-default.png" 
+              alt="User Profile" 
+              class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
+              id="profile-preview"
+            />
+            <!-- Always visible edit button -->
+            <label for="profile_picture" title="Change Profile Picture" class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036
+                        a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
           </div>
         </div>
 
-        <style>
-          @media (min-width: 768px) {
-            .profile-container {
-              display: flex !important;
-              flex-direction: row !important;
-            }
-            .profile-left {
-              width: 25% !important;
-            }
-            .profile-right {
-              width: 75% !important;
-            }
-          }
-        </style>
 
-        <script>
-          // Add responsive classes to the container
-          document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('div[style*="display: flex"]');
-            if (container) {
-              container.classList.add('profile-container');
-            }
-            
-            const leftSection = container.querySelector('div:first-child');
-            const rightSection = container.querySelector('div:last-child');
-            
-            if (leftSection) leftSection.classList.add('profile-left');
-            if (rightSection) rightSection.classList.add('profile-right');
-          });
-        </script>
+        <!-- Identity Information -->
+        <div class="bg-background shadow-md rounded-xl p-6">
+          <h2 class="text-xl font-semibold mb-6">
+            Profile Information
+          </h2>
+          <form class="space-y-5">
+            <div>
+              <label class="text-sm text-text mb-1">
+                Student/Staff ID No.
+              </label>
+              <input type="text" value="2023-00060" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+            </div>
+
+            <div>
+              <label class="text-sm text-text mb-1">
+                USeP Email
+              </label>
+              <input type="email" value="jsgujol00060@usep.edu.ph" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-text mb-1">
+                  First Name
+                </label>
+                <input type="text" value="Junalyn" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              </div>
+              <div>
+                <label class="text-sm text-text mb-1">
+                  Last Name
+                </label>
+                <input type="text" value="Gujol" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              </div>
+            </div>
+
+            <div>
+              <label for="program" class="text-sm text-text mb-1">Program/Office</label>
+              <select id="dept" name="officeOrDept" class="w-full input-field">
+              <option disabled selected>Select Department/Office</option>
+                <optgroup label="Department">
+                    <option value="BEED">BEED</option>
+                    <option value="BSNED">BSNED</option>
+                    <option value="BECED">BECED</option>
+                    <option value="BSED">BSED</option>
+                    <option value="BSIT">BSIT</option>
+                    <option value="BTVTED">BTVTED</option>
+                    <option value="BSABE">BSABE</option>
+                </optgroup>
+                <optgroup label="OFFICES">
+                    <option value="OSAS">OSAS</option>
+                    <option value="CTET">CTET</option>
+                    <option value="SDMD">SDMD</option>
+                    <option value="CPU">CPU</option>
+                    <option value="Chancellor Office">Chancellor Office</option>
+                    <option value="Campus Library">Campus Library</option>
+                    <option value="Campus Clinic">Campus Clinic</option>
+                    <option value="Campus Register">Campus Register</option>
+                    <option value="Admin Office">Admin Office</option>
+                </optgroup>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Password Update -->
+        <div class="bg-white shadow-md rounded-xl p-6">
+          <h2 class="text-xl font-semibold mb-6">Update Password</h2>
+          <form class="space-y-5">
+            <div>
+              <label for="new_password" class="text-sm text-text mb-1">Old Password</label>
+              <input type="password" id="old_password" name="old_password" class="w-full input-field" placeholder="Enter new password"/>
+            </div>
+            <div>
+              <label for="new_password" class="text-sm text-text mb-1">New Password</label>
+              <input type="password" id="new_password" name="new_password" class="w-full input-field" placeholder="Enter new password"/>
+            </div>
+            <div>
+              <label for="confirm_password" class="text-sm text-text mb-1">Confirm Password</label>
+              <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" placeholder="Re-enter new password"/>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="btn btn-primary">
+                Save New Password
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Password Update -->
+        <div class="bg-white shadow-md rounded-xl p-6">
+          <h2 class="text-xl font-semibold mb-6">
+            Delete Account
+          </h2>
+          <form class="space-y-5">
+            <div>
+              <p class="text-sm text-text mb-1">
+                If you no longer wish to use U-Request, you can permanently delete your account.
+              </p>
+            </div>
+            <button type="submit" class="flex-1 btn btn-primary">
+              &#9888; Delete My Account
+            </button>
+          </form>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button 
+            type="button"
+            onclick="window.location.href='/app/controllers/LogoutController.php';"
+            class="flex-1 btn btn-secondary"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </main>
+
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
+
+    <script>
+      // Preview profile picture before upload
+      function previewProfile(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+          document.getElementById("profile-preview").src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    </script>
   </body>
 </html>

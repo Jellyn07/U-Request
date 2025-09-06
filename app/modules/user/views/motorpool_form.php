@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   </head>
   <body class="bg-background">
-    <form class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
+    <form id="vehicle-form" action="tracking.php" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
     <div id="rrs-form">
       <div id="header" class="flex flex-col items-center justify-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           Purpose of Trip:
           <span class="text-accent">*</span>
         </label>
-  <input type="text" class="input-field w-full" name="purpose_of_trip">
+  <input type="text" required class="input-field w-full" name="purpose_of_trip">
       </div>
 
       <div class="mb-4">
@@ -33,7 +33,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           Travel Destination:
           <span class="text-accent">*</span>
         </label>
-  <input type="text" class="input-field w-full" name="travel_destination">
+  <input type="text" required class="input-field w-full" name="travel_destination">
       </div>
 
       <div class="mb-4">
@@ -41,7 +41,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           Date of Travel:
           <span class="text-accent">*</span>
         </label>
-  <input type="date" class="input-field w-full" name="date_of_travel">
+  <input type="date" required class="input-field w-full" name="date_of_travel">
       </div>
 
       <div class="mb-4">
@@ -49,7 +49,7 @@ require_once __DIR__ . '/../../../config/constants.php';
         Date of Return:
         <span class="text-accent">*</span>
       </label>
-  <input type="date" class="input-field w-full" name="date_of_return">
+  <input type="date" required class="input-field w-full" name="date_of_return">
       </div>
 
       <div class="mb-4">
@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           Time of Departure:
           <span class="text-accent">*</span>
         </label>
-  <input type="time" class="input-field w-full" name="time_of_departure">
+  <input type="time" required class="input-field w-full" name="time_of_departure">
       </div>
 
       <div class="mb-4">
@@ -65,7 +65,7 @@ require_once __DIR__ . '/../../../config/constants.php';
         Time of Return:
         <span class="text-accent">*</span>
       </label>
-  <input type="time" class="input-field w-full" name="time_of_return">
+  <input type="time" required class="input-field w-full" name="time_of_return">
       </div>
 
       <div class="mb-4">
@@ -88,10 +88,10 @@ require_once __DIR__ . '/../../../config/constants.php';
           </div>
           <div class="flex gap-2 w-full passenger-row">
             <div class="flex flex-col w-1/2">
-              <input type="text" class="input-field" name="first_name[]">
+              <input type="text" required class="input-field" name="first_name[]">
             </div>
             <div class="flex flex-col w-1/2">
-              <input type="text" class="input-field" name="last_name[]">
+              <input type="text" required class="input-field" name="last_name[]">
             </div>
             <button type="button" id="add-passenger" onclick="addPassengerField()">
               <!-- <img src="<?php echo PUBLIC_URL; ?>/assets/img/plus.png" alt="Add Passenger" class="w-6 h-6"> -->
@@ -111,7 +111,7 @@ require_once __DIR__ . '/../../../config/constants.php';
       </div>
     </div>
     </form>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/user/forms.js"></script>
   </body>
 </html>

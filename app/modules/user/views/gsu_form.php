@@ -19,7 +19,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     <script src="/public/assets/js/user/forms.js"></script>
   </head>
   <body class="bg-background">
-    <form name="make-request" action="../../../controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
+    <form name="repair-request" action="<?php echo PUBLIC_URL; ?>/app/controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
     <div id="rrs-form">
         <div id="header" class="flex flex-col items-center justify-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
@@ -93,7 +93,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Photo:
                     <span class="text-accent">*</span>
                 </label>
-                <input type="file" id="img" name="picture" class="input-field w-full">
+                <input required type="file" id="img" name="picture" class="input-field w-full">
             </div>
             
             <div class="mb-4">
@@ -101,7 +101,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Date the Issue was Noticed:
                     <span class="text-accent">*</span>
                 </label>
-                <input type="date" id="dateNoticed" name="dateNoticed" class="input-field w-full" readonly>
+                <input type="date" id="dateNoticed" name="dateNoticed" class="input-field w-full" required>
             </div>
 
             <div>
@@ -169,7 +169,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Detailed Description of the Issue:
                     <span class="text-accent">*</span>
                 </label><br>
-                <textarea id="descrip" name="description" rows="3" class="input-field w-full" 
+                <textarea required id="descrip" name="description" rows="3" class="input-field w-full" 
                 placeholder="e.g., Water is leaking from the faucet in the Faculty Restroom near Room 205."></textarea>                
             </div>
 
@@ -185,6 +185,7 @@ require_once __DIR__ . '/../../../config/constants.php';
         </div>
     </div>
     </form>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/user/forms.js"></script>
   </body>
 </html>

@@ -1,7 +1,9 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
-<header class="bg-background text-text w-full mt-5">
+<!-- <header class="bg-background text-text w-full mt-5"> -->
+<!-- <header class="sticky top-0 z-50 bg-background text-text shadow p-3"> -->
+<header class="sticky top-0 z-50 bg-background text-text p-3">
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
     <div class="flex h-16 items-center justify-between w-full">
       <!-- Logo Left -->

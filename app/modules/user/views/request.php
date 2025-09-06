@@ -19,9 +19,9 @@ require_once __DIR__ . '/../../../config/constants.php';
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   </head>
-  <body class="bg-background text-text">
+  <body class="flex flex-col min-h-screen bg-background text-text">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
-    <main class="">
+    <main class="flex-1">
       <h1 class="text-lg font-bold mb-1 mt-8 md:flex flex-1 justify-center">Welcome to U-Request</h1>
       <p class="text-text mb-1 mt-1 md:flex flex-1 justify-center text-sm">How can we help you?</p>
       <div class="">
