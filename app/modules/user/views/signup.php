@@ -65,7 +65,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
         <!-- Email -->
         <div class="form-group">        
           <label for="email" class="text-sm text-text mb-1">
-            Email:
+            USeP Email:
             <span class="text-accent">*</span>
           </label>
           <input type="text" id="email" name="email" class="w-full input-field" required placeholder="your@usep.edu.ph">

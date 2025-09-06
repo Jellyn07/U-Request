@@ -2,11 +2,6 @@
 
 session_start();
 
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit;
-}
-
 $login_error = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
 
@@ -58,7 +53,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
         </div>
 
         <p class="text-right">
-          <a href="#" class="w-full text-right text-sm text-primary hover:underline">
+          <a href="forgot_pass.php" class="w-full text-right text-sm text-primary hover:underline">
             Forgot Password?
           </a>
         </p>
