@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../models/UserModel.php';
 
 $login_error = "";
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             $_SESSION['req_id'] = $req['req_id'];
             $_SESSION['email'] = $email;
 
-            header("Location: ../views/request.php");
+            header("Location: ../modules/user/views/request.php");
             exit;
         } else {
             $_SESSION['login_error'] = "Failed to fetch user ID.";

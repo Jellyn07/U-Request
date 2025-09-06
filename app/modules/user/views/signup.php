@@ -10,8 +10,8 @@ unset($_SESSION['signup_error']);
 $signup_success = $_SESSION['signup_success'] ?? '';
 unset($_SESSION['signup_success']);
 
-require_once __DIR__ . '/../config/constants.php';
-require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../models/UserModel.php';
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +52,7 @@ require_once __DIR__ . '/../models/UserModel.php';
         </p>
       </div>
 
-      <form method="post" action="../controllers/SignupController.php" id="signupForm">
+      <form method="post" action="../../../controllers/SignupController.php" id="signupForm">
         <!-- Student/Staff ID -->
         <div>
           <label for="studstaID" class="text-sm text-text mb-1">

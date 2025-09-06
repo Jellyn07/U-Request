@@ -1,6 +1,6 @@
 
 <?php
-require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../../../config/constants.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -9,7 +9,7 @@
 // header("Cache-Control: post-check=0, pre-check=0", false);
 // header("Pragma: no-cache");
 
-require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../../../config/constants.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -147,7 +147,7 @@ require_once __DIR__ . '/../config/constants.php';
                   
                   <button 
                     type="button"
-                    onclick="window.location.href='logout.php';"
+                    onclick="window.location.href='/app/controllers/LogoutController.php';"
                     class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   >
                     Logout
