@@ -22,10 +22,13 @@ require_once __DIR__ . '/../../../config/constants.php';
   <body class="flex flex-col min-h-screen bg-background text-text">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
     <main class="flex-1">
-      <h1 class="text-lg font-bold mb-1 mt-8 md:flex flex-1 justify-center">Welcome to U-Request</h1>
-      <p class="text-text mb-1 mt-1 md:flex flex-1 justify-center text-sm">How can we help you?</p>
+      <div class="text-center mt-8 mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Welcome to U-Request</h1>
+        <p class="text-sm text-gray-600 mt-1">How can we help you?</p>
+      </div>
+      <!-- Request Options -->
       <div class="">
-        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
+        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
             <img id="logo-img" src="/public/assets/img/mechanic1.gif" alt="Repair Logo" class="h-20 w-20">
             <h3 class="mt-0.5 text-lg font-medium text-gray-900">
               Repair Request
@@ -38,7 +41,7 @@ require_once __DIR__ . '/../../../config/constants.php';
             </div>
           
         </article>
-        <article class=" w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
+        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
             <img id="logo-img" src="/public/assets/img/minicar1.gif" alt="Repair Logo" class="h-20 w-20">
             <h3 class="mt-0.5 text-lg font-medium text-gray-900">
               Vehicle Request

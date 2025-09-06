@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           Purpose of Trip:
           <span class="text-accent">*</span>
         </label>
-  <input type="text" required class="input-field w-full" name="purpose_of_trip">
+  <input type="text" required class="input-field w-full" name="purpose_of_trip" placeholder="e.g., Field Trip to Davao City.">
       </div>
 
       <div class="mb-4">
