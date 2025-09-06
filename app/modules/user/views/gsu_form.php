@@ -1,5 +1,12 @@
 <?php
+session_start();
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
+$req_id = $_SESSION['req_id'];
 require_once __DIR__ . '/../../../config/constants.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,9 +16,10 @@ require_once __DIR__ . '/../../../config/constants.php';
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
+    <script src="/public/assets/js/user/forms.js"></script>
   </head>
   <body class="bg-background">
-    <form name="make-request" action="make-request.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
+    <form name="make-request" action="../../../controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
     <div id="rrs-form">
         <div id="header" class="flex flex-col items-center justify-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
@@ -19,7 +27,7 @@ require_once __DIR__ . '/../../../config/constants.php';
             REPAIR REQUEST FORM
         </h4>
         </div>
-
+          <input type="hidden" name="req_id" value="<?php echo htmlspecialchars($req_id); ?>">
             <div class="mb-4">
                 <label for="unit" class="text-sm text-text mb-1">
                     Unit:
@@ -43,7 +51,8 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Building Location:
                     <span class="text-accent">*</span>
                 </label>
-                <select name="exLoc" id="exLoc" required class="input-field w-full">
+                <input type="text" name="exLocb" id="exLoc" placeholder="eg. PECC" required class="input-field w-full">
+                <!-- <select name="exLoc" id="exLoc" required class="input-field w-full">
                     <option value="" selected disabled>Select a building location</option>
                     <option>PECC GYM</option>
                     <option>SOM/SCIENCE BUILDING</option>
@@ -51,7 +60,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     <option>LIBRARY BUILDING</option>
                     <option>FTC BUILDING</option>
                     <option>OTHERS</option>
-                </select>
+                </select> -->
             </div>
 
             <div class="mb-4">
@@ -59,7 +68,8 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Room Location:
                     <span class="text-accent">*</span>
                 </label>
-                <select name="exLoc" id="exLoc" required class="input-field w-full">
+                <input type="text" name="exLocr" id="exLoc" placeholder="eg. Clinic" required class="input-field w-full">
+                <!-- <select name="exLoc" id="exLoc" required class="input-field w-full">
                     <option value="" selected disabled>Select a room location</option>
                     <option value="Office of the Registrar">Office of the Registrar</option>
                     <option value="Dance Studio">Dance Studio</option>
@@ -75,7 +85,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     <option value="University Assessment and Guidance Center (UAGC)">University Assessment and Guidance Center (UAGC)</option>
                     <option value="Office of Student Affairs and Services (OSAS)">Office of Student Affairs and Services (OSAS)</option>
                     <option value="Campus Clinic">Campus Clinic</option>
-                </select>
+                </select> -->
             </div>
             
             <div class="mb-4">
@@ -86,12 +96,12 @@ require_once __DIR__ . '/../../../config/constants.php';
                 <input type="file" id="img" name="picture" class="input-field w-full">
             </div>
             
-            <div class="mb-4" >
+            <div class="mb-4">
                 <label for="dateNoticed" class="text-sm text-text mb-1">
                     Date the Issue was Noticed:
                     <span class="text-accent">*</span>
                 </label>
-                <input type="date" id="dateNoticed" name="dateNoticed" required class="input-field w-full">
+                <input type="date" id="dateNoticed" name="dateNoticed" class="input-field w-full" readonly>
             </div>
 
             <div>
@@ -168,7 +178,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                 <button type="button" class="btn btn-secondary" onclick="location.href='request.php'">
                     Cancel
                 </button>
-                <button class="btn btn-primary" type="submit" onclick="showReview()">
+                <button class="btn btn-primary" type="submit">
                     Submit
                 </button>
             </div>

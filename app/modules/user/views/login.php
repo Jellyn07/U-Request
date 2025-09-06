@@ -2,10 +2,10 @@
 
 session_start();
 
-// if (!isset($_SESSION['email'])) {
-//     header("Location: login.php");
-//     exit;
-// }
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
 
 $login_error = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);

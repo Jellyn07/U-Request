@@ -8,3 +8,5 @@ define('COMPONENTS_PATH', APP_PATH . '/components');
 
 // Adjust depending on your document root setup
 define('PUBLIC_URL', '/public');
+
+define('VIEWS_PATH', __DIR__ . '/../app/modules/user/views');

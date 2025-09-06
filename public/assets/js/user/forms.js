@@ -16,3 +16,5 @@ row.innerHTML = `
 `;
 container.appendChild(row);
 }
+
+document.getElementById("dateNoticed").value = new Date().toISOString().split('T')[0];
