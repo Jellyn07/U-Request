@@ -97,12 +97,20 @@ require_once __DIR__ . '/../../../config/constants.php';
             </div>
             
             <div class="mb-4">
-                <label for="dateNoticed" class="text-sm text-text mb-1">
-                    Date the Issue was Noticed:
-                    <span class="text-accent">*</span>
-                </label>
-                <input type="date" id="dateNoticed" name="dateNoticed" class="input-field w-full" required>
+            <label for="dateNoticed" class="text-sm text-text mb-1">
+                Date the Issue was Noticed:
+                <span class="text-accent">*</span>
+            </label>
+            <input 
+                type="date" 
+                id="dateNoticed" 
+                name="dateNoticed" 
+                class="input-field w-full" 
+                value="<?php echo date('Y-m-d'); ?>" 
+                readonly
+            >
             </div>
+
 
             <div>
                 <label for="natureReq" class="text-sm text-text mb-1">
