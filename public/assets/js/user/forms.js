@@ -57,7 +57,7 @@ document.getElementById("vehicle-form").addEventListener("submit", function(e) {
 
 // GSU FORM JAVASCRIPT
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector("form[name='gsu-request']");
+  const form = document.querySelector("form[name='repair-request']");
 
   form.addEventListener("submit", function (e) {
     e.preventDefault(); // stop normal submit
@@ -77,3 +77,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+// document.getElementById("dateNoticed").value = new Date().toISOString().split('T')[0];
+  document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("dateNoticed");
+    if (dateInput) {
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.max = today;   // set max
+      // Optional: auto-fill today
+      // dateInput.value = today;
+    }
+  });

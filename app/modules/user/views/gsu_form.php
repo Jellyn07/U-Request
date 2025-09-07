@@ -16,10 +16,10 @@ require_once __DIR__ . '/../../../config/constants.php';
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
-    <script src="/public/assets/js/user/forms.js"></script>
+  
   </head>
   <body class="bg-background">
-    <form name="repair-request" action="<?php echo PUBLIC_URL; ?>/app/controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
+    <form name="repair-request" action="../../../controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
     <div id="rrs-form">
         <div id="header" class="flex flex-col items-center justify-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
@@ -51,7 +51,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Building Location:
                     <span class="text-accent">*</span>
                 </label>
-                <input type="text" name="exLocb" id="exLoc" placeholder="eg. PECC" required class="input-field w-full">
+                <input type="text" name="exLocb" id="exLocb" placeholder="eg. PECC" required class="input-field w-full">
                 <!-- <select name="exLoc" id="exLoc" required class="input-field w-full">
                     <option value="" selected disabled>Select a building location</option>
                     <option>PECC GYM</option>
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                     Room Location:
                     <span class="text-accent">*</span>
                 </label>
-                <input type="text" name="exLocr" id="exLoc" placeholder="eg. Clinic" required class="input-field w-full">
+                <input type="text" name="exLocr" id="exLocr" placeholder="eg. Clinic" required class="input-field w-full">
                 <!-- <select name="exLoc" id="exLoc" required class="input-field w-full">
                     <option value="" selected disabled>Select a room location</option>
                     <option value="Office of the Registrar">Office of the Registrar</option>
@@ -186,6 +186,6 @@ require_once __DIR__ . '/../../../config/constants.php';
     </div>
     </form>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/public/assets/js/user/forms.js"></script>
+    <script src="<?php echo PUBLIC_URL; ?>/assets/js/user/forms.js"></script>
   </body>
 </html>

@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../core/BaseModel.php'; 
 
 class RequestModel extends BaseModel {
+    public $lastError = null;
+
     public function createRequest($tracking_id, $nature, $req_id, $description, $unit, $location, $dateNoticed, $filePath) {
         // Step 1: Insert into REQUEST
         $stmt = $this->db->prepare("
@@ -17,6 +19,7 @@ class RequestModel extends BaseModel {
         );
 
         if (!$stmt->execute()) {
+            $this->lastError = $stmt->error ?: $this->db->error;
             $stmt->close();
             return false; // ❌ Insert failed
         }
@@ -26,6 +29,7 @@ class RequestModel extends BaseModel {
         $stmt->close();
 
         if (!$request_id_int) {
+            $this->lastError = 'Failed to retrieve insert_id';
             return false; // ❌ Could not get insert ID
         }
 
@@ -37,6 +41,7 @@ class RequestModel extends BaseModel {
         $stmt2->bind_param("iiss", $request_id_int, $req_id, $req_status, $date_finished);
 
         if (!$stmt2->execute()) {
+            $this->lastError = $stmt2->error ?: $this->db->error;
             $stmt2->close();
             return false; // ❌ Assignment failed
         }

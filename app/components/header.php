@@ -39,7 +39,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                   <span class="block w-10 h-5 rounded-full border border-accent bg-background"></span>
                 </span>
               </button>
-              <form method="POST" action="login.php">
+              <form method="POST" onclick="window.location.href='/app/controllers/LogoutController.php';">
                 <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-accent hover:bg-secondary hover:text-white transition" role="menuitem">
                   <img src="/public/assets/img/logout.png" alt="User" class="size-4 object-cover overflow-hidden" />
                   Logout

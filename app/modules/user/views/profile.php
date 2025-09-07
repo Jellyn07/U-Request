@@ -1,5 +1,20 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/ProfileController.php';
+
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$controller = new ProfileController();
+
+// Get user ID from session
+$requester_email = $_SESSION['email'] ?? null;
+
+// Safely load profile; may be null if not found
+$profile = $requester_email ? $controller->getProfile($requester_email) : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,14 +64,14 @@ require_once __DIR__ . '/../../../config/constants.php';
               <label class="text-sm text-text mb-1">
                 Student/Staff ID No.
               </label>
-              <input type="text" value="2023-00060" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              <input type="text" value="<?php echo htmlspecialchars($profile['requester_id'] ?? ''); ?>" disabled  class="w-full input-field bg-gray-100 cursor-not-allowed"/>
             </div>
 
             <div>
               <label class="text-sm text-text mb-1">
                 USeP Email
               </label>
-              <input type="email" value="jsgujol00060@usep.edu.ph" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -64,13 +79,13 @@ require_once __DIR__ . '/../../../config/constants.php';
                 <label class="text-sm text-text mb-1">
                   First Name
                 </label>
-                <input type="text" value="Junalyn" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+                <input type="text" value="<?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
               </div>
               <div>
                 <label class="text-sm text-text mb-1">
                   Last Name
                 </label>
-                <input type="text" value="Gujol" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+                <input type="text" value="<?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
               </div>
             </div>
 

@@ -4,6 +4,7 @@ if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit;
 }
+$req_id = $_SESSION['req_id'];
 // Prevent browser from caching protected pages
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -59,3 +60,17 @@ require_once __DIR__ . '/../../../config/constants.php';
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
   </body>
 </html>
+
+<?php if (isset($_SESSION['alert'])): ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+    <script>
+        let alertData = <?php echo json_encode($_SESSION['alert']); ?>;
+        if (alertData.type === 'success') {
+            showRequestSuccess(alertData.message, alertData.redirect);
+        } else {
+            showRequestError(alertData.message, alertData.redirect);
+        }
+    </script>
+    <?php unset($_SESSION['alert']); ?>
+<?php endif; ?>
