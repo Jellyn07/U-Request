@@ -4,7 +4,12 @@ if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit;
 }
+
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/TrackingController.php';
+
+$trackingController = new TrackingController();
+$trackingList = $trackingController->listTracking($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +19,8 @@ require_once __DIR__ . '/../../../config/constants.php';
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/assets/js/alert.js"></script>
   </head>
   <body class="flex flex-col min-h-screen bg-background text-text">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
@@ -28,134 +35,69 @@ require_once __DIR__ . '/../../../config/constants.php';
 
       <!-- Tracking List -->
       <div class="space-y-6">
-        
-        <!-- Repair Request Card -->
-        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
-          <!-- GIF at the top -->
-          <div class="flex justify-start mb-3">
-            <img src="/public/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
-          </div>
+        <?php foreach ($trackingList as $track): ?>
+          <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
+            <!-- GIF at the top -->
+            <div class="flex justify-start mb-3">
+              <?php if (stripos($track['nature_request'], 'vehicle') !== false): ?>
+                <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
+              <?php else: ?>
+                <img src="<?php echo PUBLIC_URL; ?>/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
+              <?php endif; ?>
+            </div>
 
-          <!-- Content -->
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Tracking No.0001</h3>
-            <p class="mt-2 text-xs text-gray-700 line-clamp-2">
-              <span class="font-medium">Issue:</span> Water is leaking from the faucet in the Faculty Restroom near Room 205. The water keeps dripping even when turned off, and it has caused a small puddle on the floor.
-            </p>
-            <p class="mt-2 text-sm">
-              <span class="font-medium">Status:</span> 
-              <span class="inline-block rounded-full bg-yellow-100 text-yellow-700 px-2 py-0.5 text-xs font-medium">Pending</span>
-            </p>
-          </div>
+            <!-- Content -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800">
+                Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
+              </h3>
+              <p class="mt-2 text-xs text-gray-700 line-clamp-2">
+                <span class="font-medium">Description:</span>
+                <?php echo htmlspecialchars($track['request_desc']); ?>
+              </p>
+              <p class="mt-2 text-sm">
+                <span class="font-medium">Status:</span>
+                <?php
+                  $status = strtolower($track['req_status']);
+                  $statusClass = "bg-gray-100 text-gray-700";
+                  if ($status === "pending") {
+                      $statusClass = "bg-yellow-100 text-yellow-700";
+                  } elseif ($status === "approved") {
+                      $statusClass = "bg-green-100 text-green-700";
+                  } elseif ($status === "fixed") {
+                      $statusClass = "bg-green-100 text-green-700";
+                  } elseif ($status === "disapproved") {
+                      $statusClass = "bg-red-100 text-red-700";
+                  }
+                ?>
+                <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium <?php echo $statusClass; ?>">
+                  <?php echo htmlspecialchars($track['req_status']); ?>
+                </span>
+              </p>
+            </div>
 
-          <!-- Button -->
-          <div class="mt-4 text-right">
-            <a href="#" class="btn btn-primary" onclick="openDetails('repair', 1)">
+            <!-- Button -->
+            <div class="mt-4 text-right">
+            <button 
+              class="btn btn-primary" 
+              onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
               View Details
-            </a>
-          </div>
-        </article>
-
-
-        <!-- Vehicle Request Card -->
-        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
-          <!-- GIF at the top -->
-          <div class="flex justify-start mb-3">
-            <img src="/public/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
-          </div>
-
-          <!-- Content -->
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Tracking No.0002</h3>
-            <p class="mt-2 text-xs text-gray-700 line-clamp-2">
-              <span class="font-medium">Purpose:</span> Field Trip to Davao City for the College of Engineering students. The trip will include several company visits and an educational tour.
-            </p>
-            <p class="mt-2 text-sm">
-              <span class="font-medium">Status:</span> 
-              <span class="inline-block rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium">Approved</span>
-            </p>
-          </div>
-
-          <!-- Button -->
-          <div class="mt-4 text-right">
-            <a href="#" class="btn btn-primary" onclick="openDetails('vehicle', 2)">
-              View Details
-            </a>
-          </div>
-        </article>
-
-
-        <!-- Another Repair Request -->
-        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
-          <!-- GIF at the top -->
-          <div class="flex justify-start mb-3">
-            <img src="/public/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
-          </div>
-
-          <!-- Content -->
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Tracking No.0003</h3>
-            <p class="mt-2 text-xs text-gray-700 line-clamp-2">
-              <span class="font-medium">Issue:</span> Broken door hinge in the library study room. The door doesn’t close properly and may cause accidents if not fixed.
-            </p>
-            <p class="mt-2 text-sm">
-              <span class="font-medium">Status:</span> 
-              <span class="inline-block rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium">Fixed</span>
-            </p>
-          </div>
-
-          <!-- Button -->
-          <div class="mt-4 text-right">
-            <a href="#" class="btn btn-primary">
-              View Details
-            </a>
-          </div>
-        </article>
-
-
-        <!-- Another Vehicle Request -->
-        <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
-          <!-- GIF at the top -->
-          <div class="flex justify-start mb-3">
-            <img src="/public/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
-          </div>
-
-          <!-- Content -->
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Tracking No.0004</h3>
-            <p class="mt-2 text-xs text-gray-700 line-clamp-2">
-              <span class="font-medium">Purpose:</span> Transport service requested for faculty seminar in Tagum City.
-            </p>
-            <p class="mt-2 text-sm">
-              <span class="font-medium">Status:</span> 
-              <span class="inline-block rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-medium">Disapproved</span>
-            </p>
-          </div>
-
-          <!-- Button -->
-          <div class="mt-4 text-right">
-            <a href="#" class="btn btn-primary">
-              View Details
-            </a>
-          </div>
-        </article>
-
-
+            </button>
+            </div>
+          </article>
+        <?php endforeach; ?>
       </div>
 
-      <!-- Overlay -->
+      <!-- Overlay for details -->
       <div id="details-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
         <div class="bg-white w-3/4 max-h-[90vh] overflow-y-auto rounded-lg shadow-lg relative p-6">
           <!-- Close button -->
           <button onclick="closeDetails()" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl">&times;</button>
-          
-          <!-- Content will be injected dynamically -->
           <div id="details-content">
             <p class="text-center text-gray-500">Loading details...</p>
           </div>
         </div>
       </div>
-
     </main>
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
   </body>
