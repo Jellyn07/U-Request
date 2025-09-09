@@ -1,0 +1,91 @@
+
+
+CREATE TABLE vehicle_request (
+    control_no INT AUTO_INCREMENT PRIMARY KEY,
+    req_id INT UNSIGNED NOT NULL,
+    date_request DATETIME DEFAULT CURRENT_TIMESTAMP,
+    tracking_id VARCHAR(50) NOT NULL UNIQUE,
+    trip_purpose VARCHAR(100) NOT NULL,
+    travel_destination VARCHAR(255) NOT NULL,
+    travel_date DATE NOT NULL,
+    return_date DATE NOT NULL,
+    departure_time TIME NOT NULL,
+    return_time TIME NOT NULL,
+    CONSTRAINT fk_vehicle_request_requester
+        FOREIGN KEY (req_id) REFERENCES requester(req_id)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE passengers (
+	passenger_id INT auto_increment PRIMARY KEY,
+    firstName VARCHAR(50) NOT NULL,
+    lastName VARCHAR(50) NOT NULL
+);
+
+-- LINKING TABLE (Many-to-Many Relationship)
+CREATE TABLE vehicle_request_passengers (
+    control_no INT NOT NULL,
+    passenger_id INT NOT NULL,
+    PRIMARY KEY (control_no, passenger_id),
+    CONSTRAINT fk_request FOREIGN KEY (control_no) REFERENCES vehicle_request(control_no) ON DELETE CASCADE,
+    CONSTRAINT fk_passenger FOREIGN KEY (passenger_id) REFERENCES passengers(passenger_id) ON DELETE CASCADE
+);
+
+
+
+DELIMITER $$
+
+CREATE PROCEDURE spAddVehicleRequest (
+    IN p_req_id INT,
+    IN p_tracking_id VARCHAR(50),
+    IN p_trip_purpose VARCHAR(100),
+    IN p_travel_destination VARCHAR(255),
+    IN p_travel_date DATE,
+    IN p_return_date DATE,
+    IN p_departure_time TIME,
+    IN p_return_time TIME
+)
+BEGIN
+    INSERT INTO vehicle_request (
+        req_id, tracking_id, trip_purpose, travel_destination, travel_date, return_date, departure_time, return_time, date_request
+    ) VALUES (
+        p_req_id, p_tracking_id, p_trip_purpose, p_travel_destination, p_travel_date, p_return_date, p_departure_time, p_return_time, NOW()
+    );
+
+    -- Return the auto-generated control_no
+    SELECT LAST_INSERT_ID() AS control_no;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE spAddPassenger (
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50)
+)
+BEGIN
+    INSERT INTO passengers (firstName, lastName)
+    VALUES (p_firstName, p_lastName);
+
+    -- Return the new passenger_id
+    SELECT LAST_INSERT_ID() AS passenger_id;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE spVehicleRequestPassengers (
+    IN p_control_no INT,
+    IN p_passenger_id INT
+)
+BEGIN
+    INSERT INTO vehicle_request_passengers (control_no, passenger_id)
+    VALUES (p_control_no, p_passenger_id);
+END$$
+
+DELIMITER ;
+

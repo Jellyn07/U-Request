@@ -5,18 +5,19 @@ class VehicleRequestModel extends BaseModel {
     public $lastError = null;
 
     // 1. Add Vehicle Request
-    public function addVehicleRequest($tracking_id, $trip_purpose, $travel_destination, $travel_date, $return_date, $departure_time, $return_time) {
+    public function addVehicleRequest($req_id, $tracking_id, $trip_purpose, $travel_destination, $travel_date, $return_date, $departure_time, $return_time) {
         $stmt = $this->db->prepare("
-            CALL spAddVehicleRequest(?, ?, ?, ?, ?, ?, ?)
+            CALL spAddVehicleRequest(?, ?, ?, ?, ?, ?, ?, ?)
         ");
         if (!$stmt) {
             $this->lastError = $this->db->error;
             return false;
         }
 
+        // ✅ Now includes req_id (int)
         $stmt->bind_param(
-            "sssssss",
-            $tracking_id, $trip_purpose, $travel_destination,
+            "isssssss",
+            $req_id, $tracking_id, $trip_purpose, $travel_destination,
             $travel_date, $return_date, $departure_time, $return_time
         );
 

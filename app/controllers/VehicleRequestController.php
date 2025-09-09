@@ -2,11 +2,17 @@
 session_start();
 
 require_once __DIR__ . '/../config/constants.php';
-require_once __DIR__ . '/../models/RequestVehicleModel.php';
+require_once __DIR__ . '/../models/RequestVehicleModel.php'; // ✅ fixed filename
 
 error_log(print_r($_POST, true));
 try {
     $model = new VehicleRequestModel();
+
+    if (!isset($_SESSION['req_id'])) {
+        throw new Exception("Requester ID not found in session.");
+    }
+
+    $req_id = $_SESSION['req_id']; // ✅ linked to requester table
 
     // Vehicle request
     $tracking_id       = "TRK-" . date("Ymd") . "-" . substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"), 0, 5);
@@ -18,6 +24,7 @@ try {
     $time_of_return    = $_POST['time_of_return'];
 
     $control_no = $model->addVehicleRequest(
+        $req_id, // ✅ pass req_id
         $tracking_id,
         $purpose_of_trip,
         $travel_destination,
