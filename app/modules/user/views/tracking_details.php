@@ -24,16 +24,30 @@ if (!$details) {
   <p><b>Location:</b> <?php echo htmlspecialchars($details['location']); ?></p>
   <p><b>Status:</b> <?php echo htmlspecialchars($details['req_status']); ?></p>
   <p><b>Date Finished:</b> <?php echo $details['date_finished'] ?: "N/A"; ?></p>
-
+  <!-- <p><b>Attached Image:</b> <?php echo $details['image_path'] ?: "N/A"; ?></p> -->
   <?php if (!empty($details['image_path'])): ?>
-  <div class="mt-2">
-    <b>Attached Image:</b><br>
-    <img src="<?php echo PUBLIC_URL . $details['image_path']; ?>" 
-         alt="Request Image" 
-         class="mt-1 rounded-md border border-gray-200 max-h-48">
-  </div>
-<?php endif; ?>
+  <?php
+    $rawPath = (string) $details['image_path'];
+    $fileName = basename($rawPath);
 
+    // Build correct URL (works in browser)
+    $imageSrc = rtrim(PUBLIC_URL, '/') . '/uploads/' . $fileName;
+
+    // Build absolute path on server for file_exists()
+    $filePath = $_SERVER['DOCUMENT_ROOT'] . $imageSrc;
+  ?>
+  <?php if (file_exists($filePath)): ?>
+    <div class="mt-2">
+      <b>Attached Image:</b><br>
+      <img src="<?php echo htmlspecialchars($imageSrc, ENT_QUOTES); ?>" 
+           alt="Request Image" 
+           class="mt-1 rounded-md border border-gray-200 max-h-48">
+    </div>
+  <?php else: ?>
+    <p class="text-red-500 mt-2"><b>Image not found:</b> <?php echo htmlspecialchars($fileName); ?></p>
+    <p class="text-gray-500 text-xs">Checked at: <?php echo htmlspecialchars($filePath); ?></p>
+  <?php endif; ?>
+<?php endif; ?>
 
 
 </div>
