@@ -50,7 +50,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           Submit
         </button>
         <p class="w-full text-center mt-2">
-          <a href="login.php" class="text-primary text-sm hover:underline">
+          <a href="#" class="text-primary text-sm hover:underline">
             Return to Login
           </a>
         </p>
@@ -71,7 +71,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           Verify OTP
         </button>
         <p class="w-full text-center mt-2">
-          <a href="login.php" class="text-primary text-sm hover:underline">
+          <a href="#" class="text-primary text-sm hover:underline">
             Return to Login
           </a>
         </p>
@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           </label>
           <input type="password" id="confirm_password" name="confirm_password" class="mb-1 w-full input-field" required>
         </div>
-        <button type="submit" name="reset" onclick="location.href='login.php'" class="mt-3 w-full btn btn-primary">
+        <button type="submit" name="reset" class="mt-3 w-full btn btn-primary">
           Save New Password
         </button>
       </div>

@@ -1,15 +1,5 @@
 <?php
-
-session_start();
-
-$login_error = $_SESSION['login_error'] ?? '';
-unset($_SESSION['login_error']);
-
-$signup_success = $_SESSION['signup_success'] ?? '';
-unset($_SESSION['signup_success']);
-
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../models/UserModel.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,14 +13,29 @@ require_once __DIR__ . '/../../../models/UserModel.php';
     <script src="/public/assets/js/alert.js"></script>
   </head>
 <body class="min-h-screen flex relative overflow-hidden">
-  <!-- White Section -->
+  <div class="w-1/2 flex items-end justify-left relative z-10 text-white">
+    <div class="text-right p-8">
+      <p class="text-sm text-white">
+          <span class="block sm:inline">&copy; 
+            All rights reserved.
+          </span>
+          <a class="inline-block text-text underline transition" href="#">
+            Terms & Conditions
+          </a>
+          <span class="text-text">&middot;</span>
+          <a class="inline-block text-text underline transition" href="#">
+            Privacy Policy
+          </a>
+        </p>
+    </div>
+  </div>
   <div class="w-1/2 flex items-center justify-center relative z-10">
     <div class="w-1/2 max-w-md bg-background">
       <!-- Logo + Title -->
       <div class="text-center">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
-        <p class="text-2xl mb-3 font-bold">
-          U<span class="text-accent">-</span>REQUEST
+        <p class="text-2xl font-bold">
+            ADMIN PANEL
         </p>
       </div>
 
@@ -62,38 +67,15 @@ require_once __DIR__ . '/../../../models/UserModel.php';
         <button type="submit" name="signin" class="mt-3 w-full btn btn-primary">
           Login
         </button>
-
-        <p class="mt-1 text-center text-text text-sm">
-          Don't have an account? 
-          <a href="signup.php" class="text-primary hover:underline">Sign Up</a>
-        </p>
-      </form>
-    </div>
-  </div>
-
-  <!-- Red Section -->
-  <div class="w-1/2 flex items-end justify-end relative z-10 text-white">
-    <div class="text-right p-8">
-      <p class="text-sm text-text/70">
-          <span class="block sm:inline">&copy; 
-            All rights reserved.
-          </span>
-          <a class="inline-block text-text underline transition" href="#">
-            Terms & Conditions
-          </a>
-          <span class="text-text">&middot;</span>
-          <a class="inline-block text-text underline transition" href="#">
-            Privacy Policy
-          </a>
-        </p>
     </div>
   </div>
 
   <!-- Diagonal Background Layer -->
-  <div class="absolute inset-0 clip-diagonal z-0"></div>
-  <div class="absolute inset-0 clip-diagonal1"></div>
-  <div class="absolute inset-0 clip-diagonal2"></div>
-</body>
+  <div class="absolute inset-0 clip-diagonal4 z-0"></div>
+  <div class="absolute inset-0 clip-diagonal5"></div>
+  <div class="absolute inset-0 clip-diagonal6"></div>
+
+  </body>
 <script>
   const ADMIN_LOGIN = "/app/modules/shared/views/admin_login.php";
   const USER_LOGIN  = "/app/modules/user/views/login.php";
@@ -101,10 +83,3 @@ require_once __DIR__ . '/../../../models/UserModel.php';
 <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
 </html>
 
-<script>
-  // Pass PHP variable to JS
-  let loginError = <?= json_encode($login_error) ?>;
-  if (loginError) {
-      showErrorAlert(loginError);
-  }
-</script>

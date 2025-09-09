@@ -20,7 +20,7 @@ require_once __DIR__ . '/../../../config/constants.php';
   </head>
   <body class="bg-background">
     <form name="repair-request" action="../../../controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
-    <div id="rrs-form">
+    <div id="repair-form">
         <div id="header" class="flex flex-col items-center justify-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">
         <h4 class="text-center text-lg font-semibold">
@@ -186,7 +186,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                 <button type="button" class="btn btn-secondary" onclick="location.href='request.php'">
                     Cancel
                 </button>
-                <button class="btn btn-primary" type="submit">
+                <button id="submitBtn" class="btn btn-primary" type="submit">
                     Submit
                 </button>
             </div>

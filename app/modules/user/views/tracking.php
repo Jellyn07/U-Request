@@ -35,6 +35,7 @@ $trackingList = $trackingController->listTracking($_SESSION['email']);
 
       <!-- Tracking List -->
       <div class="space-y-6">
+        <?php if (!empty($trackingList)) { ?>
         <?php foreach ($trackingList as $track): ?>
           <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
             <!-- GIF at the top -->
@@ -86,6 +87,9 @@ $trackingList = $trackingController->listTracking($_SESSION['email']);
             </div>
           </article>
         <?php endforeach; ?>
+        <?php } else { ?>
+          <p class="text-center text-accent mt-20 text-sm">No tracking records found.</p>
+        <?php } ?>
       </div>
 
       <!-- Overlay for details -->

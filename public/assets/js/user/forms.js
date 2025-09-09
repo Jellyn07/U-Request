@@ -56,26 +56,42 @@ document.getElementById("vehicle-form").addEventListener("submit", function(e) {
 
 
 // GSU FORM JAVASCRIPT
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector("form[name='repair-request']");
+// document.addEventListener("DOMContentLoaded", function () {
+//   const form = document.querySelector("form[name='repair-form']");
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault(); // stop normal submit
+//   form.addEventListener("submit", function (e) {
+//     e.preventDefault(); // stop normal submit
 
+//     Swal.fire({
+//       title: "Submit Request?",
+//       text: "Please confirm before submitting your repair request.",
+//       icon: "warning",
+//       showCancelButton: true,
+//       confirmButtonColor: "#d33",
+//       cancelButtonColor: "#6c757d",
+//       confirmButtonText: "Yes, submit",
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         form.submit(); // send to RequestController.php
+//       }
+//     });
+//   });
+// });
+
+
+document.getElementById("submitBtn").addEventListener("click", function () {
     Swal.fire({
-      title: "Submit Request?",
-      text: "Please confirm before submitting your repair request.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#6c757d",
-      confirmButtonText: "Yes, submit",
+        title: "Are you sure?",
+        text: "Do you want to submit this repair request?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, submit",
+        cancelButtonText: "Cancel",
+        reverseButtons: true
     }).then((result) => {
-      if (result.isConfirmed) {
-        form.submit(); // send to RequestController.php
-      }
+        if (result.isConfirmed) {
+            // submit the form manually
+            document.forms["repair-request"].submit();
+        }
     });
-  });
 });
-
-
