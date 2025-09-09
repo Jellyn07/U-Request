@@ -44,15 +44,19 @@ class TrackingModel extends BaseModel {
                 t.request_desc,
                 r2.image_path
             FROM vw_rqtrack t
-            INNER JOIN requester r ON t.req_id = r.req_id
-            INNER JOIN request r2 ON t.req_id = r2.req_id
-            WHERE r.email = ? and t.tracking_id=r2.tracking_id
-            GROUP BY t.tracking_id;
+            INNER JOIN requester r 
+                ON t.req_id = r.req_id
+            LEFT JOIN request r2 
+                ON t.tracking_id = r2.tracking_id   
+            WHERE r.email = ? 
+            AND t.tracking_id = ?               
+            LIMIT 1;
         ";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("ss", $email, $tracking_id);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
+
 }
