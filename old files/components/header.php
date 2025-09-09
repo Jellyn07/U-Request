@@ -22,7 +22,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
       <div class="flex items-center gap-4">
         <div class="relative hidden md:block">
           <button id="profile-btn" type="button" class="flex items-center">
-            <img src="/public/assets/img/user-default.png" alt="User" class="size-10 object-cover overflow-hidden rounded-full border border-primary shadow-inner focus:outline-none" />
+            <img 
+              src="<?php echo htmlspecialchars($profile['profile_pic'] ?? '/U--Request/public/assets/img/user-default.png'); ?>" 
+              alt="User Profile" 
+              class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
+            />
             <p class="pl-3">Username</p>
           </button>
           

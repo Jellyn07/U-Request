@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../../app/config/constants.php';
+require_once __DIR__ . '/../controllers/ProfileController.php';
+
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!-- <header class="bg-background text-text w-full mt-5"> -->
@@ -24,8 +27,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
       <div class="flex items-center gap-4">
         <div class="relative hidden md:block">
           <button id="profile-btn" type="button" class="flex items-center">
-            <img src="/public/assets/img/user-default.png" alt="User" class="size-10 object-cover overflow-hidden rounded-full border border-primary shadow-inner focus:outline-none" />
-            <p class="pl-3">Username</p>
+            <div class="flex items-center">
+              <img 
+                src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
+                alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>" 
+                style="width: 3rem; height: 3rem;" 
+                class="rounded-full object-cover border-2 border-secondary shadow-sm mr-3"
+              />
+              <span>
+                <?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>
+                <?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>
+              </span>
+            </div>
           </button>
           
           <!-- Dropdown menu -->

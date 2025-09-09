@@ -30,28 +30,40 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
 
     <main class="container mx-auto px-4 py-10 flex-1">
       <div class="max-w-4xl mx-auto space-y-8">
-
         <!-- Profile Picture -->
-        <div class="bg-background rounded-xl flex flex-col items-center">
-          <div class="relative">
-            <img 
-              src="/public/assets/img/user-default.png" 
-              alt="User Profile" 
-              class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
-              id="profile-preview"
-            />
-            <!-- Always visible edit button -->
-            <label for="profile_picture" title="Change Profile Picture" class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036
-                        a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </label>
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
+        <form method="post" action="../../../controllers/ProfileController.php" enctype="multipart/form-data">
+          <div class="bg-background rounded-xl flex flex-col items-center">
+            <div class="relative">
+              <img 
+                src="<?php echo htmlspecialchars($profile['profile_pic'] ?? '/public/assets/img/user-default.png'); ?>" 
+                alt="User Profile" 
+                class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
+              />
+              <!-- Edit button -->
+              <label for="profile_picture" title="Change Profile Picture" 
+                class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036
+                          a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </label>
+              <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
+            </div>
           </div>
-        </div>
+          <div class="flex justify-end mt-4">
+            <button type="submit" name="action" value="upload_picture" class="btn btn-primary">
+              Save New Picture
+            </button>
+          </div>
+        </form>
+        <script>
+        function previewProfile(event) {
+          const output = document.getElementById('profile-preview');
+          output.src = URL.createObjectURL(event.target.files[0]);
+        }
+        </script>
+
 
 
         <!-- Identity Information -->
@@ -59,7 +71,9 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           <h2 class="text-xl font-semibold mb-6">
             Profile Information
           </h2>
-          <form class="space-y-5">
+          <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
+            <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+            <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
             <div>
               <label class="text-sm text-text mb-1">
                 Student/Staff ID No.
@@ -72,6 +86,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                 USeP Email
               </label>
               <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,19 +142,24 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         <!-- Password Update -->
         <div class="bg-white shadow-md rounded-xl p-6">
           <h2 class="text-xl font-semibold mb-6">Update Password</h2>
-          <form class="space-y-5">
+          <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
+            <input type="hidden" name="action" value="change_password">
+
             <div>
-              <label for="new_password" class="text-sm text-text mb-1">Old Password</label>
-              <input type="password" id="old_password" name="old_password" class="w-full input-field" placeholder="Enter new password"/>
+              <label for="old_password" class="text-sm text-text mb-1">Old Password</label>
+              <input type="password" id="old_password" name="old_password" class="w-full input-field" placeholder="Enter old password" required />
             </div>
+
             <div>
               <label for="new_password" class="text-sm text-text mb-1">New Password</label>
-              <input type="password" id="new_password" name="new_password" class="w-full input-field" placeholder="Enter new password"/>
+              <input type="password" id="new_password" name="new_password" class="w-full input-field" placeholder="Enter new password" required />
             </div>
+
             <div>
               <label for="confirm_password" class="text-sm text-text mb-1">Confirm Password</label>
-              <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" placeholder="Re-enter new password"/>
+              <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" placeholder="Re-enter new password" required />
             </div>
+
             <div class="flex justify-end">
               <button type="submit" class="btn btn-primary">
                 Save New Password
@@ -148,19 +168,25 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           </form>
         </div>
 
-        <!-- Password Update -->
+
+        Delete Account
         <div class="bg-white shadow-md rounded-xl p-6">
           <h2 class="text-xl font-semibold mb-6">
             Delete Account
           </h2>
-          <form class="space-y-5">
-            <div>
-              <p class="text-sm text-text mb-1">
+          <form method="post" action="../../../controllers/ProfileController.php">
+            <!-- Hidden email to identify user -->
+            <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email']); ?>">
+            <!-- Action identifier for the controller -->
+            <input type="hidden" name="action" value="delete_account">
+
+            <p class="text-sm text-text mb-1">
                 If you no longer wish to use U-Request, you can permanently delete your account.
-              </p>
-            </div>
-            <button type="submit" class="flex-1 btn btn-primary">
-              &#9888; Delete My Account
+            </p>
+
+            <button type="submit" class="flex-1 btn btn-primary"
+                    onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+                &#9888; Delete My Account
             </button>
           </form>
         </div>
