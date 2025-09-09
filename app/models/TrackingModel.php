@@ -34,23 +34,29 @@ class TrackingModel extends BaseModel {
     // Get single tracking details by email + tracking_id
     public function getTrackingDetails($tracking_id, $email) {
         $sql = "
-            SELECT t.tracking_id, 
-                   t.request_Type as nature_request, 
-                   t.location, 
-                   t.req_status, 
-                   t.date_finished, 
-                   t.req_id, 
-                   t.request_desc,
-                   r2.image_path
+            SELECT 
+                t.tracking_id,
+                t.request_Type AS nature_request,
+                t.location,
+                t.req_status,
+                t.date_finished,
+                t.req_id,
+                t.request_desc,
+                r2.image_path
             FROM vw_rqtrack t
-            INNER JOIN requester r ON t.req_id = r.req_id
-            INNER JOIN request r2 ON t.req_id = r2.req_id
-            WHERE t.tracking_id = ? AND r.email = ?
+            INNER JOIN requester r 
+                ON t.req_id = r.req_id
+            LEFT JOIN request r2 
+                ON t.tracking_id = r2.tracking_id   
+            WHERE r.email = ? 
+            AND t.tracking_id = ?               
+            LIMIT 1;
         ";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("ss", $tracking_id, $email);
+        $stmt->bind_param("ss", $email, $tracking_id);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
+
 }

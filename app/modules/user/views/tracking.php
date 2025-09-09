@@ -91,17 +91,6 @@ $trackingList = $trackingController->listTracking($_SESSION['email']);
           <p class="text-center text-accent mt-20 text-sm">No tracking records found.</p>
         <?php } ?>
       </div>
-
-      <!-- Overlay for details -->
-      <div id="details-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white w-3/4 max-h-[90vh] overflow-y-auto rounded-lg shadow-lg relative p-6">
-          <!-- Close button -->
-          <button onclick="closeDetails()" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl">&times;</button>
-          <div id="details-content">
-            <p class="text-center text-gray-500">Loading details...</p>
-          </div>
-        </div>
-      </div>
     </main>
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
   </body>
