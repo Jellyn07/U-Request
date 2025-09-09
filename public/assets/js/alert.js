@@ -56,4 +56,31 @@ function openDetails(trackingId) {
         });
       });
   }
-  
+
+function showRequestSuccess(message, redirect = null) {
+    Swal.fire({
+        icon: 'success',
+        title: 'Request Submitted',
+        text: message,
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'OK'
+    }).then(() => {
+        if (redirect) {
+            window.location.href = redirect;
+        }
+    });
+}
+
+function showRequestError(message, redirect = null) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Request Failed',
+        text: message,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Try Again'
+    }).then(() => {
+        if (redirect) {
+            window.location.href = redirect;
+        }
+    });
+}

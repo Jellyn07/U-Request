@@ -4,6 +4,10 @@ if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit;
 }
+if (isset($_SESSION['alert'])) {
+  $alert = $_SESSION['alert'];
+  unset($_SESSION['alert']); // prevent repeat alerts
+}
 $req_id = $_SESSION['req_id'];
 // Prevent browser from caching protected pages
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -61,16 +65,15 @@ require_once __DIR__ . '/../../../config/constants.php';
   </body>
 </html>
 
-<?php if (isset($_SESSION['alert'])): ?>
+<?php if (isset($alert)): ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
     <script>
-        let alertData = <?php echo json_encode($_SESSION['alert']); ?>;
+        let alertData = <?php echo json_encode($alert); ?>;
         if (alertData.type === 'success') {
-            showRequestSuccess(alertData.message, alertData.redirect);
+            showRequestSuccess(alertData.message);
         } else {
-            showRequestError(alertData.message, alertData.redirect);
+            showRequestError(alertData.message);
         }
     </script>
-    <?php unset($_SESSION['alert']); ?>
 <?php endif; ?>

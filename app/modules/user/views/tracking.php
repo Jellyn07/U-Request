@@ -10,6 +10,8 @@ require_once __DIR__ . '/../../../controllers/TrackingController.php';
 
 $trackingController = new TrackingController();
 $trackingList = $trackingController->listTracking($_SESSION['email']);
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
