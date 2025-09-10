@@ -29,15 +29,21 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     <?php include COMPONENTS_PATH . '/header.php'; ?>
 
     <main class="container mx-auto px-4 py-10 flex-1">
+      <script>
+      function previewProfile(event) {
+        const output = document.getElementById('profile-preview');
+        output.src = URL.createObjectURL(event.target.files[0]);
+      }
+      </script>
       <div class="max-w-4xl mx-auto space-y-8">
         <!-- Profile Picture -->
         <form method="post" action="../../../controllers/ProfileController.php" enctype="multipart/form-data">
           <div class="bg-background rounded-xl flex flex-col items-center">
             <div class="relative">
-              <img 
-                src="<?php echo htmlspecialchars($profile['profile_pic'] ?? '/public/assets/img/user-default.png'); ?>" 
-                alt="User Profile" 
-                class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
+              <img id="profile-preview"  
+                  src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
+                  alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
+                  class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
               />
               <!-- Edit button -->
               <label for="profile_picture" title="Change Profile Picture" 
@@ -57,14 +63,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
             </button>
           </div>
         </form>
-        <script>
-        function previewProfile(event) {
-          const output = document.getElementById('profile-preview');
-          output.src = URL.createObjectURL(event.target.files[0]);
-        }
-        </script>
-
-
+      </div>
 
         <!-- Identity Information -->
         <div class="bg-background shadow-md rounded-xl p-6">
@@ -106,8 +105,8 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
 
             <div>
               <label for="program" class="text-sm text-text mb-1">Program/Office</label>
-              <select id="dept" name="officeOrDept" class="w-full input-field">
-              <option disabled selected>Select Department/Office</option>
+              <select id="dept" name="officeOrDept" class="w-full input-field" >
+              <option disabled <?php echo empty($profile['officeOrDept']) ? 'selected' : ''; ?>>Select Department/Office</option>
                 <optgroup label="Department">
                     <option value="BEED">BEED</option>
                     <option value="BSNED">BSNED</option>
@@ -169,15 +168,15 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         </div>
 
 
-        Delete Account
+        <!-- Delete Account
         <div class="bg-white shadow-md rounded-xl p-6">
           <h2 class="text-xl font-semibold mb-6">
             Delete Account
           </h2>
           <form method="post" action="../../../controllers/ProfileController.php">
-            <!-- Hidden email to identify user -->
-            <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email']); ?>">
-            <!-- Action identifier for the controller -->
+            
+            <input type="hidden" name="requester_email">
+            
             <input type="hidden" name="action" value="delete_account">
 
             <p class="text-sm text-text mb-1">
@@ -189,7 +188,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                 &#9888; Delete My Account
             </button>
           </form>
-        </div>
+        </div> -->
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-3">

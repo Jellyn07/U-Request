@@ -1,7 +1,10 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../models/ProfileModel.php';
 require_once __DIR__ . '/../config/constants.php';
-require_once __DIR__ . "/../models/ProfileModel.php"; 
 
 class ProfileController {
     private $model;
@@ -11,13 +14,13 @@ class ProfileController {
     }
 
     // Load profile info
-    public function getProfile($requester_email) {
+        public function getProfile($requester_email) {
         return $this->model->getProfileByEmail($requester_email);
     }
 
     // Save department/office change
     public function saveOfficeOrDept($requester_email, $officeOrDept) {
-        return $this->model->updateOfficeOrDept($officeOrDept, $requester_email);
+        return $this->model->updateOfficeOrDept($requester_email, $officeOrDept);
     }
 
     // Save new profile picture
@@ -25,131 +28,112 @@ class ProfileController {
         return $this->model->updateProfilePicture($requester_email, $filePath);
     }
 
-    // Update Password
-    public function savePassword($email, $oldPassword, $newPassword) {
-        return $this->model->savePassword($email, $oldPassword, $newPassword);
+    // Save password update
+    public function savePassword($requester_email, $oldPassword, $newPassword) {
+    $profile = $this->model->getProfileByEmail($requester_email);
+
+    // Verify old password using encryption
+    if (!$this->model->verifyPassword($requester_email, $oldPassword)) {
+        return false; // old password incorrect
+    }
+
+    return $this->model->updatePassword($requester_email, $newPassword);
+}
+
+    // Delete account
+    public function deleteAccount($requester_id) {
+        return $this->model->deleteAccount($requester_id);
     }
 }
 
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+//Update Password
+// Update Password
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_password') {
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $controller = new ProfileController();
-        $requester_email = $_POST['requester_email'] ?? null;
+    $email = $_SESSION['email'];
+    $oldPassword = $_POST['old_password'] ?? '';
+    $newPassword = $_POST['new_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
 
-        // --- Office/Dept update ---
-        if (isset($_POST['officeOrDept'])) {
-        $officeOrDept = $_POST['officeOrDept'];
-        $requester_email = $_POST['requester_email'] ?? null;
+    $controller = new ProfileController();
 
-        $success = $controller->saveOfficeOrDept($requester_email, $officeOrDept);
-
-        if ($success) {
-            header("Location: /app/modules/user/views/profile.php?success=1");
+    if ($newPassword !== $confirmPassword) {
+        $_SESSION['error'] = "New passwords do not match.";
+    } else {
+        if ($controller->savePassword($email, $oldPassword, $newPassword)) {
+            $_SESSION['success'] = "Password updated successfully.";
         } else {
-            header("Location: /app/modules/user/views/profile.php?error=1");
-        }
-        exit();
+            $_SESSION['error'] = "Old password is incorrect or update failed.";
         }
     }
 
-    // --- Password update ---
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!$requester_email) {
-        header("Location: /app/modules/user/views/profile.php?error=not_logged_in");
-        exit();
-    }
+    header("Location: /app/modules/user/views/profile.php");
+    exit;
+}
 
-    // --- Picture update ---
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $controller = new ProfileController();
-        $requester_email = $_SESSION['email'] ?? null;
 
-        if (isset($_POST['action']) && $_POST['action'] === 'upload_picture') {
-            if (!empty($_FILES['profile_picture']['tmp_name'])) {
-                $targetDir = __DIR__ . "/../../public/uploads/";
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0777, true);
-                }
 
-                $fileName = uniqid() . "_" . basename($_FILES["profile_picture"]["name"]);
-                $targetFile = $targetDir . $fileName;
+//Update Pic
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'upload_picture') {
 
-                if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $targetFile)) {
-                    $dbPath = "/public/uploads/" . $fileName;
-                    $success = $controller->saveProfilePicture($requester_email, $dbPath);
+    $code = $_SESSION['email']; // assuming user ID is stored in session
 
-                    if ($success) {
-                        header("Location: /app/modules/user/views/profile.php?success=pic_updated");
-                    } else {
-                        header("Location: /app/modules/user/views/profile.php?error=db_update_failed");
-                    }
-                    exit();
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+
+        $fileTmpPath = $_FILES['profile_picture']['tmp_name'];
+        $fileName = $_FILES['profile_picture']['name'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+        if (in_array($fileExtension, $allowedExts)) {
+
+            $newFileName = $code . '_' . time() . '.' . $fileExtension;
+            $uploadFileDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/profile_pics/';
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
+            }
+            $destPath = $uploadFileDir . $newFileName;
+
+            if (move_uploaded_file($fileTmpPath, $destPath)) {
+                $relativePath = '/uploads/profile_pics/' . $newFileName;
+
+                // ✅ Use controller method instead of $model
+                $profileController = new ProfileController();
+                if ($profileController->saveProfilePicture($code, $relativePath)) {
+                    $_SESSION['success'] = "Profile picture updated successfully.";
                 } else {
-                    header("Location: /app/modules/user/views/profile.php?error=upload_failed");
-                    exit();
+                    $_SESSION['error'] = "Failed to update profile picture in database.";
                 }
             } else {
-                header("Location: /app/modules/user/views/profile.php?error=no_file");
-                exit();
+                $_SESSION['error'] = "Error moving the uploaded file.";
             }
-        }
-    }
-}
-
-class ProfileController1 {
-    private $model;
-
-    public function __construct() {
-        $this->model = new ProfileModel();
-    }
-
-    public function savePassword($email, $oldPassword, $newPassword) {
-        return $this->model->savePassword($email, $oldPassword, $newPassword);
-    }
-}
-
-$controller = new ProfileController();
-$requester_email = $_SESSION['email'] ?? null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!$requester_email) {
-        header("Location: /app/modules/user/views/profile.php?error=not_logged_in");
-        exit();
-    }
-
-    $action = $_POST['action'] ?? '';
-
-    // --- Password change ---
-    if ($action === 'change_password') {
-        $old = $_POST['old_password'] ?? '';
-        $new = $_POST['new_password'] ?? '';
-        $confirm = $_POST['confirm_password'] ?? '';
-
-        // 1. Check match
-        if ($new !== $confirm) {
-            header("Location: /app/modules/user/views/profile.php?error=Passwords+do+not+match");
-            exit();
-        }
-
-        // 2. Enforce stronger password rules
-        if (strlen($new) < 8) {
-            header("Location: /app/modules/user/views/profile.php?error=Password+must+be+at+least+8+characters");
-            exit();
-        }
-
-        // 3. Save password securely
-        $success = $controller->savePassword($requester_email, $old, $new);
-
-        if ($success) {
-            session_destroy(); // force re-login
-            header("Location: /app/modules/user/views/login.php?success=Password+updated");
         } else {
-            header("Location: /app/modules/user/views/profile.php?error=Old+password+incorrect");
+            $_SESSION['error'] = "Invalid file type. Allowed: " . implode(", ", $allowedExts);
         }
-        exit();
+    } else {
+        $_SESSION['error'] = "No file uploaded or upload error.";
     }
+
+    header("Location: /app/modules/user/views/profile.php");
+    exit;
+}
+
+//Update Office
+$controller = new ProfileController();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['officeOrDept'], $_POST['requester_email'])) {
+
+    $email = $_POST['requester_email'];
+    $officeOrDept = $_POST['officeOrDept'];
+
+    if ($controller->saveOfficeOrDept($email, $officeOrDept)) {
+        $_SESSION['success'] = "Department/Office updated successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to update Department/Office.";
+    }
+
+    header("Location: /app/modules/user/views/profile.php");
+    exit;
 }
 

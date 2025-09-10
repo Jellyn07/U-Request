@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../../app/config/constants.php';
 require_once __DIR__ . '/../controllers/ProfileController.php';
+require_once __DIR__ . '/../core/BaseModel.php';
+require_once __DIR__ . '/../models/ProfileModel.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>

@@ -147,7 +147,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 
       <div class="mb-4">
   <label class="flex items-start text-sm text-text mb-1">
-    <input 
+    <input required
       type="checkbox" 
       name="certify"
       class="mt-1 mr-2 h-4 w-4 text-accent border-gray-300 rounded focus:ring-accent"
