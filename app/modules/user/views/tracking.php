@@ -9,7 +9,8 @@ require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/TrackingController.php';
 
 $trackingController = new TrackingController();
-$trackingList = $trackingController->listTracking($_SESSION['email']);
+$repairList = $trackingController->listRepairTracking($_SESSION['email']);
+$vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
 
 
 ?>
@@ -35,26 +36,19 @@ $trackingList = $trackingController->listTracking($_SESSION['email']);
         </p>
       </div>
 
-      <!-- Tracking List -->
-      <div class="space-y-6">
-        <?php if (!empty($trackingList)) { ?>
-        <?php foreach ($trackingList as $track): ?>
-          <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
-            <!-- GIF at the top -->
-            <div class="flex justify-start mb-3">
-              <?php if (stripos($track['nature_request'], 'vehicle') !== false): ?>
-                <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
-              <?php else: ?>
+      <!-- ================= Repair Requests ================= -->
+      <div class="mt-10">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Repair Requests</h2>
+        <?php if (!empty($repairList)) { ?>
+          <?php foreach ($repairList as $track): ?>
+            <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
+              <div class="flex justify-start mb-3">
                 <img src="<?php echo PUBLIC_URL; ?>/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
-              <?php endif; ?>
-            </div>
-
-            <!-- Content -->
-            <div>
+              </div>
               <h3 class="text-lg font-semibold text-gray-800">
                 Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
               </h3>
-              <p class="mt-2 text-xs text-gray-700 line-clamp-2">
+              <p class="mt-2 text-xs text-gray-700">
                 <span class="font-medium">Description:</span>
                 <?php echo htmlspecialchars($track['request_desc']); ?>
               </p>
@@ -65,9 +59,7 @@ $trackingList = $trackingController->listTracking($_SESSION['email']);
                   $statusClass = "bg-gray-100 text-gray-700";
                   if ($status === "pending") {
                       $statusClass = "bg-yellow-100 text-yellow-700";
-                  } elseif ($status === "approved") {
-                      $statusClass = "bg-green-100 text-green-700";
-                  } elseif ($status === "fixed") {
+                  } elseif ($status === "approved" || $status === "fixed") {
                       $statusClass = "bg-green-100 text-green-700";
                   } elseif ($status === "disapproved") {
                       $statusClass = "bg-red-100 text-red-700";
@@ -77,21 +69,61 @@ $trackingList = $trackingController->listTracking($_SESSION['email']);
                   <?php echo htmlspecialchars($track['req_status']); ?>
                 </span>
               </p>
-            </div>
-            
-
-            <!-- Button -->
-            <div class="mt-4 text-right">
-            <button 
-              class="btn btn-primary" 
-              onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
-              View Details
-            </button>
-            </div>
-          </article>
-        <?php endforeach; ?>
+              <div class="mt-4 text-right">
+                <button class="btn btn-primary" onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
+                  View Details
+                </button>
+              </div>
+            </article>
+          <?php endforeach; ?>
         <?php } else { ?>
-          <p class="text-center text-accent mt-20 text-sm">No tracking records found.</p>
+          <p class="text-center text-accent mt-4 text-sm">No Repair Request</p>
+        <?php } ?>
+      </div>
+
+      <!-- ================= Vehicle Requests ================= -->
+      <div class="mt-10">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Vehicle Requests</h2>
+        <?php if (!empty($vehicleList)) { ?>
+          <?php foreach ($vehicleList as $track): ?>
+            <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
+              <div class="flex justify-start mb-3">
+                <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">
+                Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
+              </h3>
+              <p class="mt-2 text-xs text-gray-700">
+                <span class="font-medium">Trip Purpose:</span>
+                <?php echo htmlspecialchars($track['trip_purpose']); ?> 
+                (Destination: <?php echo htmlspecialchars($track['travel_destination']); ?>)
+              </p>
+              <p class="mt-2 text-sm">
+                <span class="font-medium">Status:</span>
+                <!-- <?php
+                  // $status = strtolower($track['travel_date']);
+                  // $statusClass = "bg-gray-100 text-gray-700";
+                  // if ($status === "pending") {
+                  //     $statusClass = "bg-yellow-100 text-yellow-700";
+                  // } elseif ($status === "approved") {
+                  //     $statusClass = "bg-green-100 text-green-700";
+                  // } elseif ($status === "disapproved") {
+                  //     $statusClass = "bg-red-100 text-red-700";
+                  // }
+                ?> -->
+                <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium <?php echo $statusClass; ?>">
+                  <?php echo htmlspecialchars($track['travel_date']); ?>
+                </span>
+              </p>
+              <div class="mt-4 text-right">
+                <button class="btn btn-primary" onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
+                  View Details
+                </button>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        <?php } else { ?>
+          <p class="text-center text-accent mt-4 text-sm">No Vehicle Request</p>
         <?php } ?>
       </div>
     </main>

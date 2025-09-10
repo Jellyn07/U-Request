@@ -80,6 +80,83 @@ class TrackingModel extends BaseModel {
         return $tracking;
     }
 
+    // Get repair tracking requests by email
+    public function getRepairTrackingByEmail($email) {
+        $sqlRepair = "
+            SELECT 
+                t.tracking_id,
+                t.request_Type AS nature_request,
+                t.location,
+                t.req_status,
+                t.date_finished,
+                t.req_id,
+                t.request_desc,
+                NULL AS trip_purpose,
+                NULL AS travel_destination,
+                NULL AS travel_date,
+                NULL AS return_date
+            FROM vw_rqtrack t
+            INNER JOIN requester r ON t.req_id = r.req_id
+            WHERE r.email = ?
+        ";
+        $stmt = $this->db->prepare($sqlRepair);
+        if ($stmt === false) {
+            error_log("getRepairTrackingByEmail prepare failed: " . $this->db->error);
+            return [];
+        }
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $tracking = [];
+        while ($row = $res->fetch_assoc()) {
+            $tracking[] = $row;
+        }
+        $stmt->close();
+
+        // Sort by tracking_id DESC
+        usort($tracking, function ($a, $b) {
+            return strcmp($b['tracking_id'], $a['tracking_id']);
+        });
+
+        return $tracking;
+    }
+
+    // Get vehicle tracking requests by email
+    public function getVehicleTrackingByEmail($email) {
+        $sqlVehicle = "
+            SELECT 
+                v.tracking_id,
+                v.travel_destination,
+                v.return_date,
+                v.trip_purpose,
+                v.travel_date,
+                v.return_date
+            FROM vehicle_request v
+            INNER JOIN requester r ON v.req_id = r.req_id
+            WHERE r.email = ?
+        ";
+        $stmt = $this->db->prepare($sqlVehicle);
+        if ($stmt === false) {
+            error_log("getVehicleTrackingByEmail prepare failed: " . $this->db->error);
+            return [];
+        }
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $tracking = [];
+        while ($row = $res->fetch_assoc()) {
+            $tracking[] = $row;
+        }
+        $stmt->close();
+
+        // Sort by tracking_id DESC
+        usort($tracking, function ($a, $b) {
+            return strcmp($b['tracking_id'], $a['tracking_id']);
+        });
+
+        return $tracking;
+    }
+
     // Get single tracking details by email + tracking_id
     public function getTrackingDetails($tracking_id, $email) {
         // 1) try repair/vw_rqtrack
@@ -115,39 +192,30 @@ class TrackingModel extends BaseModel {
         }
 
         // 2) try vehicle_request
-        $sqlVehicle = "
+            $sqlVehicle = "
             SELECT 
                 v.tracking_id,
-                'Vehicle Request' AS nature_request,
-                v.travel_destination AS location,
-                COALESCE(v.req_status, 'Pending') AS req_status,
-                v.return_date AS date_finished,
-                v.req_id,
-                CONCAT('Purpose: ', v.trip_purpose, ' | Destination: ', v.travel_destination) AS request_desc, -- ✅ add desc
-                v.trip_purpose,
                 v.travel_destination,
+                v.date_request,
+                v.trip_purpose,
                 v.travel_date,
                 v.return_date,
                 v.control_no
             FROM vehicle_request v
             INNER JOIN requester r ON v.req_id = r.req_id
             WHERE r.email = ? AND v.tracking_id = ?
-        ";
-
-        $stmt2 = $this->db->prepare($sqlVehicle);
-        if ($stmt2 === false) {
+            LIMIT 1
+            ";
+            $stmt2 = $this->db->prepare($sqlVehicle);
+            if ($stmt2 === false) {
             error_log("getTrackingDetails prepare (vehicle) failed: " . $this->db->error);
             return null;
-        }
-        $stmt2->bind_param("ss", $email, $tracking_id);
-        $stmt2->execute();
-        $res2 = $stmt2->get_result();
-        $vehicle = $res2->fetch_assoc();
-        $stmt2->close();
-
-        if (!$vehicle) {
-            return null;
-        }
+            }
+            $stmt2->bind_param("ss", $email, $tracking_id);
+            $stmt2->execute();
+            $res2 = $stmt2->get_result();
+            $vehicle = $res2->fetch_assoc();
+            $stmt2->close();
 
         // fetch passengers for this control_no
         $sqlPassengers = "
