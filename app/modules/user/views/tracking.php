@@ -112,7 +112,7 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
                   // }
                 ?> -->
                 <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium <?php echo $statusClass; ?>">
-                  <?php echo htmlspecialchars($track['travel_date']); ?>
+                  <?php echo htmlspecialchars('Pending'); ?>
                 </span>
               </p>
               <div class="mt-4 text-right">
