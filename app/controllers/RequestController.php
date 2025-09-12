@@ -73,6 +73,19 @@ class RequestController {
             }
         }
 
+        // --- ✅ Check for duplicates ---
+        $duplicate = $this->model->checkDuplicateRequest($unit, $location, $nature);
+        if ($duplicate) {
+            $_SESSION['alert'] = [
+                'type' => 'warning',
+                'title' => 'Duplicate Request',
+                'message' => 'A request with the same unit, location, and type already exists.',
+                'redirect' => "/app/modules/user/views/request.php"
+            ];
+            header("Location: ../modules/user/views/request.php");
+            exit;
+        }
+
 
         // Save to DB
         $request_id = $this->model->createRequest(

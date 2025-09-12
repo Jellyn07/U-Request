@@ -8,10 +8,7 @@ class RequestModel extends BaseModel {
     public function createRequest($tracking_id, $nature, $req_id, $description, $unit, $location, $dateNoticed, $filePath) {
         // Step 1: Insert into REQUEST
         $stmt = $this->db->prepare("
-            INSERT INTO REQUEST 
-            (tracking_id, request_Type, req_id, request_desc, unit, location, request_date, image_path)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ");
+            CALL spAddRequest(?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
             "ssisssss",
             $tracking_id, $nature, $req_id, $description,
@@ -50,4 +47,21 @@ class RequestModel extends BaseModel {
         // ✅ Return the new request_id
         return $request_id_int;
     }
+
+    public function checkDuplicateRequest($unit, $location, $nature) {
+        $sql = "
+            SELECT request_id 
+            FROM request 
+            WHERE unit = ? AND location = ? AND request_Type = ?
+            LIMIT 1
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("sss", $unit, $location, $nature);
+        $stmt->execute();
+    
+        $result = $stmt->get_result();
+        return $result->fetch_assoc(); // returns row if found, null if not
+    }
+    
+    
 }
