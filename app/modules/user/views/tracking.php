@@ -6,6 +6,7 @@ if (!isset($_SESSION['email'])) {
 }
 
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../config/auth.php';
 require_once __DIR__ . '/../../../controllers/TrackingController.php';
 
 $trackingController = new TrackingController();

@@ -6,6 +6,7 @@ if (!isset($_SESSION['email'])) {
 }
 $req_id = $_SESSION['req_id'];
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../config/auth.php';
 
 ?>
 <!DOCTYPE html>
