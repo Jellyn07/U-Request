@@ -2,11 +2,18 @@
 
 session_start();
 
-$login_error = $_SESSION['login_error'] ?? '';
-unset($_SESSION['login_error']);
+$login_error = '';
+if (isset($_SESSION['login_error'])) {
+    $login_error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
 
 $signup_success = $_SESSION['signup_success'] ?? '';
 unset($_SESSION['signup_success']);
+
+$old_email = $_SESSION['old_email'] ?? '';
+unset($_SESSION['old_email']);
+
 
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../models/UserModel.php';
@@ -41,7 +48,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           <label for="email" class="text-sm text-text mb-1">
             USeP Email Address
           </label>
-          <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" required>
+          <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" value="<?php echo htmlspecialchars($old_email); ?>"  required>
         </div>
 
         <!-- Password -->

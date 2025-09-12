@@ -54,7 +54,7 @@ class RequestModel extends BaseModel {
             FROM request 
             WHERE unit = ? AND location = ? AND request_Type = ?
             LIMIT 1
-        ";
+        "; // make a function to the db (secured)
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("sss", $unit, $location, $nature);
         $stmt->execute();
