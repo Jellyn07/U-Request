@@ -18,15 +18,44 @@ if (!$details) {
 ?>
 
 <div class="text-left space-y-2">
-  <p><b>Tracking No.:</b> <?php echo htmlspecialchars($details['tracking_id']); ?></p>
-
   <?php if (!empty($details['nature_request'])): ?>
-    <!-- Repair Request -->
-    <p><b>Nature:</b> <?php echo htmlspecialchars($details['nature_request']); ?></p>
-    <p><b>Description:</b> <?php echo htmlspecialchars($details['request_desc']); ?></p>
-    <p><b>Location:</b> <?php echo htmlspecialchars($details['location']); ?></p>
-    <p><b>Status:</b> <?php echo htmlspecialchars($details['req_status']); ?></p>
-    <p><b>Date Finished:</b> <?php echo $details['date_finished'] ?: "N/A"; ?></p>
+  <!-- Repair Request -->
+    <div class="flex gap-2 mb-2">
+    <label class="text-xs text-text mb-1">
+      Tracking No.:
+    </label>
+    <label class="text-xs text-text mb-1">
+      Nature of Request:
+    </label>
+    </div>
+    <div class="flex gap-2 mb-2">
+      <p class="view-field w-1/2"><?php echo htmlspecialchars($details['tracking_id']); ?></p>
+      <p class="view-field w-1/2"><?php echo htmlspecialchars($details['nature_request']); ?></p>
+    </div>
+    <div class="mb-2">
+      <label class="text-xs text-text mb-1">
+        Description:
+      </label>
+      <p class="view-field w-full"><?php echo htmlspecialchars($details['request_desc']); ?></p>
+    </div>
+    <div class="mb-2">
+      <label class="text-xs text-text mb-1">
+        Location:
+      </label>
+      <p class="view-field w-full"><?php echo htmlspecialchars($details['location']); ?></p>
+    </div>
+    <div class="flex gap-2 mb-2">
+      <label class="text-xs text-text mb-1">
+        Status:
+      </label>
+      <label class="text-xs text-text mb-1">
+        Date Finished:
+      </label>
+    </div>
+    <div class="flex gap-2 mb-2">
+      <p class="view-field w-1/2"><?php echo htmlspecialchars($details['req_status']); ?></p>
+      <p class="view-field w-1/2"><?php echo $details['date_finished'] ?: "N/A"; ?></p>
+    </div>
 
     <?php if (!empty($details['image_path'])): ?>
       <?php

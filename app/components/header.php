@@ -6,8 +6,16 @@ require_once __DIR__ . '/../models/ProfileModel.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
-<!-- <header class="bg-background text-text w-full mt-5"> -->
-<!-- <header class="sticky top-0 z-50 bg-background text-text shadow p-3"> -->
+<style>
+  .logout-icon {
+    content: url('/public/assets/img/logout.png');
+    transition: content 0.2s ease-in-out;
+  }
+
+  button:hover .logout-icon {
+    content: url('/public/assets/img/logout-white.png');
+  }
+</style>
 <header class="sticky top-0 z-50 bg-background text-text p-3">
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
     <div class="flex h-16 items-center justify-between w-full">
@@ -33,8 +41,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
               <img 
                 src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
                 alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>" 
-                style="width: 3rem; height: 3rem;" 
-                class="rounded-full object-cover border-2 border-secondary shadow-sm mr-3"
+                class="w-9 h-9 rounded-full object-cover border border-secondary shadow-sm mr-2" 
               />
               <span>
                 <?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>
@@ -47,16 +54,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <div id="profile-dropdown" class="absolute right-0 z-10 mt-2 w-48 rounded-md border bg-background shadow-lg hidden">
             <div class="p-2">
               <a href="profile.php" class="block rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-white transition" role="menuitem">My Profile</a>
-              <button id="dropdown-toggle-dark" type="button" class="flex items-center gap-2 w-full text-left rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-white transition" role="menuitem">
+              <!-- <button id="dropdown-toggle-dark" type="button" class="flex items-center gap-2 w-full text-left rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-white transition" role="menuitem">
                 <span id="dropdown-dark-toggle-label">Dark Mode</span>
                 <span class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
                   <span id="dropdown-dark-toggle-slider" class="absolute left-0 top-0 w-5 h-5 bg-background border border-accent rounded-full shadow transition-transform duration-200"></span>
                   <span class="block w-10 h-5 rounded-full border border-accent bg-background"></span>
                 </span>
-              </button>
+              </button> -->
               <form method="POST" onclick="window.location.href='/app/controllers/LogoutController.php';">
                 <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-accent hover:bg-secondary hover:text-white transition" role="menuitem">
-                  <img src="/public/assets/img/logout.png" alt="User" class="size-4 object-cover overflow-hidden" />
+                  <img src="/public/assets/img/logout.png" alt="User" class="size-4 object-cover overflow-hidden logout-icon" />
                   Logout
                 </button>
               </form>
@@ -80,13 +87,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li><a class="text-text transition hover:text-accent <?php echo $current_page === 'tracking.php' ? 'active-underline' : ''; ?>" href="/src/pages/user/tracking.php">Tracking</a></li>
         <li class="w-full border-t border-secondary my-2"></li>
         <li>
-          <button id="mobile-toggle-dark" type="button" class="flex items-center gap-2 w-full text-left rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-accent transition">
+          <!-- <button id="mobile-toggle-dark" type="button" class="flex items-center gap-2 w-full text-left rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-accent transition">
             <span id="mobile-dark-toggle-label">Dark Mode</span>
             <span class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
               <span id="mobile-dark-toggle-slider" class="absolute left-0 top-0 w-5 h-5 bg-background border border-secondary rounded-full shadow transition-transform duration-200"></span>
               <span class="block w-10 h-5 bg-accent rounded-full"></span>
             </span>
-          </button>
+          </button> -->
         </li>
         <li>
           <a href="#" class="block rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-accent transition">My Profile</a>

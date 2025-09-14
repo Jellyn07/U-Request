@@ -30,9 +30,9 @@ function openDetails(trackingId) {
       .then(response => response.text())
       .then(data => {
         Swal.fire({
-          title: '<span class="text-xl font-bold text-gray-800">Request Details</span>',
+          title: '<span class="text-lg font-bold text-text">Request Details</span>',
           html: `
-            <div class="text-left space-y-3">
+            <div class="text-left">
               ${data}
             </div>
           `,
@@ -42,7 +42,7 @@ function openDetails(trackingId) {
           background: '#fff',
           customClass: {
             popup: 'rounded-lg shadow-lg',
-            title: 'mb-4',
+            title: 'mb-2',
             htmlContainer: 'text-sm text-gray-700'
           }
         });

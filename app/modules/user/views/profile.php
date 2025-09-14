@@ -28,14 +28,14 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
   <body class="bg-background min-h-screen flex flex-col">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
 
-    <main class="container mx-auto px-4 py-10 flex-1">
+    <main class="w-1/2 container mx-auto px-4 py-10 flex-1">
       <script>
       function previewProfile(event) {
         const output = document.getElementById('profile-preview');
         output.src = URL.createObjectURL(event.target.files[0]);
       }
       </script>
-      <div class="max-w-4xl mx-auto space-y-8">
+      <div class="max-w-4xl mx-auto space-y-8 m-2">
         <!-- Profile Picture -->
         <form method="post" action="../../../controllers/ProfileController.php" enctype="multipart/form-data">
           <div class="bg-background rounded-xl flex flex-col items-center">
@@ -54,37 +54,36 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                           a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </label>
-              <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
+              <input type="file" id="profile_picture" value="upload_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
             </div>
           </div>
-          <div class="flex justify-end mt-4">
-            <button type="submit" name="action" value="upload_picture" class="btn btn-primary">
-              Save New Picture
+          <div class="flex justify-center my-2">
+            <button type="submit" name="action" value="upload_picture" class="btn btn-primary ">
+              Save Profile Picture
             </button>
           </div>
         </form>
       </div>
 
         <!-- Identity Information -->
-        <div class="bg-background shadow-md rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-6">
+        <div class="bg-background shadow-md rounded-xl p-6 mb-5 border border-gray-200">
+          <h2 class="text-xl font-semibold">
             Profile Information
           </h2>
           <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
-            <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
             <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
             <div>
               <label class="text-sm text-text mb-1">
                 Student/Staff ID No.
               </label>
-              <input type="text" value="<?php echo htmlspecialchars($profile['requester_id'] ?? ''); ?>" disabled  class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              <input type="text" value="<?php echo htmlspecialchars($profile['requester_id'] ?? ''); ?>" disabled  class="w-full view-field cursor-not-allowed"/>
             </div>
 
             <div>
               <label class="text-sm text-text mb-1">
                 USeP Email
               </label>
-              <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+              <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full view-field cursor-not-allowed"/>
               <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
             </div>
 
@@ -93,13 +92,13 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                 <label class="text-sm text-text mb-1">
                   First Name
                 </label>
-                <input type="text" value="<?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+                <input type="text" value="<?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>" disabled class="w-full view-field cursor-not-allowed"/>
               </div>
               <div>
                 <label class="text-sm text-text mb-1">
                   Last Name
                 </label>
-                <input type="text" value="<?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>" disabled class="w-full input-field bg-gray-100 cursor-not-allowed"/>
+                <input type="text" value="<?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>" disabled class="w-full view-field cursor-not-allowed"/>
               </div>
             </div>
 
@@ -139,8 +138,8 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         </div>
 
         <!-- Password Update -->
-        <div class="bg-white shadow-md rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-6">Update Password</h2>
+        <div class="bg-white shadow-md rounded-xl p-6 mb-5 border border-gray-200">
+          <h2 class="text-xl font-semibold">Update Password</h2>
           <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
             <input type="hidden" name="action" value="change_password">
 
