@@ -1,6 +1,11 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+
+$controller = new DashboardController();
+$year = $_GET['year'] ?? date('Y');
+$data = $controller->getDashboardData($year);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,24 +42,33 @@ require_once __DIR__ . '/../../../config/constants.php';
       <!-- Stats Cards -->
       <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Total Requests</h2>
-          <p class="text-xl font-bold text-primary" id="totalRequests">1,245</p>
+          <h2 class="text-gray-600 text-xs">Total Repair Requests</h2>
+          <p class="text-xl font-bold text-primary" id="totalrRequests">
+              <?= isset($data['summary']['total_rrequests']) ? $data['summary']['total_rrequests'] : 0 ?>
+          </p>
+
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Pending</h2>
-          <p class="text-xl font-bold text-yellow-500" id="pendingRequests">312</p>
+          <h2 class="text-gray-600 text-xs">Total Vehicle Request</h2>
+          <p class="text-xl font-bold text-yellow-500" id="totalrvRequests">
+          <?= isset($data['summary']['total_vrequests']) ? $data['summary']['total_vrequests'] : 0 ?>
+          </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Approved /  Finished</h2>
-          <p class="text-xl font-bold text-green-500" id="approvedRequests">890</p>
+          <h2 class="text-gray-600 text-xs">Total GSU Personnels</h2>
+          <p class="text-xl font-bold text-green-500" id="totalgPersonnel">
+          <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
+        </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Admins</h2>
+          <h2 class="text-gray-600 text-xs">Total Drivers</h2>
           <p class="text-xl font-bold text-secondary">3</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
           <h2 class="text-gray-600 text-xs">Users</h2>
-          <p class="text-xl font-bold text-secondary">527</p>
+          <p class="text-xl font-bold text-secondary">
+          <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?>
+          </p>
         </div>
       </div>
 
