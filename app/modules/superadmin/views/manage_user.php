@@ -18,17 +18,17 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
   <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <?php include COMPONENTS_PATH . '/admin_header.php'; ?>
 
-  <main class="ml-64 flex flex-col p-4 min-h-screen">
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold">Users</h1>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+  <main class="ml-64 flex flex-col min-h-screen">
+    <div class="p-6">
+      <h1 class="text-2xl font-bold">Manage Users</h1>
+      <!-- <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         onclick="document.getElementById('addUserModal').classList.remove('hidden')">
         Add User
-      </button>
+      </button> -->
     </div>
 
-    <div class="mb-4">
-      <input type="text" id="searchUser" placeholder="Search by name or email" class="border rounded px-2 py-1 w-full">
+    <div class="mb-4 px">
+      <input type="text" id="searchUser" placeholder="Search by name or email" class="w-full input-field">
     </div>
 
     <div class="bg-white shadow rounded-lg overflow-x-auto">
