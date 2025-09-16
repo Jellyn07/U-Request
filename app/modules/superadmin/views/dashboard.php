@@ -18,15 +18,15 @@ $data = $controller->getDashboardData($year);
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="bg-gray-100">
-  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
-  <?php include COMPONENTS_PATH . '/admin_header.php'; ?>
+  <?php include COMPONENTS_PATH . '/superadmin_menu.php';?>
+        <!-- include COMPONENTS_PATH . '/admin_header.php'; -->
 
-  <main class="ml-64 flex flex-col min-h-screen">
-    <p class="flex text-sm text-gray-600 p-4">
+<main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
+    <!-- <p class="flex text-sm text-gray-600 p-4">
       <img src="/public/assets/img/upper_logo.png" class="size-5 m-0.5">
        > Dashboard
-    </p>
-    <div class="p-6 pt-0">
+    </p> -->
+    <div class="p-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
       <!-- Year Selector -->
@@ -55,10 +55,15 @@ $data = $controller->getDashboardData($year);
           </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
+<<<<<<< Updated upstream
           <h2 class="text-gray-600 text-xs">Total GSU Personnels</h2>
           <p class="text-xl font-bold text-green-500" id="totalgPersonnel">
           <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
         </p>
+=======
+          <h2 class="text-gray-600 text-xs">Approved / Finished</h2>
+          <p class="text-xl font-bold text-green-500" id="approvedRequests">890</p>
+>>>>>>> Stashed changes
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
           <h2 class="text-gray-600 text-xs">Total Drivers</h2>
@@ -73,7 +78,7 @@ $data = $controller->getDashboardData($year);
       </div>
 
       <!-- Line Graph with Title -->
-      <div class="bg-white shadow rounded-lg p-10 flex flex-col justify-center items-center" style="height: 470px;">
+      <div class="bg-white shadow rounded-lg p-10 flex flex-col justify-center items-center" style="height: 490px;">
         <h2 class="text-sm font-semibold mb-2">Monthly Requests Overview</h2>
         <canvas id="requestsChart" class="w-full h-full"></canvas>
       </div>      
