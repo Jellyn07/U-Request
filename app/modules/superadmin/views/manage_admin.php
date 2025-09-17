@@ -167,7 +167,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
-          <h2 class="text-lg font-bold mb-2">User Information</h2>
+          <h2 class="text-lg font-bold mb-2">Admin Information</h2>
           <img id="profile-preview"  
                   src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
                   alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
@@ -186,7 +186,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
 
             <div>
               <label class="text-sm text-text mb-1">
-                Student/Staff ID No.
+                Staff ID No.
               </label>
               <input type="text" value="<?php echo htmlspecialchars($profile['requester_id'] ?? ''); ?>" class="w-full input-field"/>
             </div>
@@ -207,30 +207,13 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
             </div>
 
             <div>
-              <label for="program" class="text-sm text-text mb-1">Program/Office</label>
+              <label for="program" class="text-sm text-text mb-1">Role</label>
               <select id="dept" name="officeOrDept" class="w-full input-field" >
-              <option disabled <?php echo empty($profile['officeOrDept']) ? 'selected' : ''; ?>>Select Department/Office</option>
-                <optgroup label="Department">
-                    <option value="BEED">BEED</option>
-                    <option value="BSNED">BSNED</option>
-                    <option value="BECED">BECED</option>
-                    <option value="BSED">BSED</option>
-                    <option value="BSIT">BSIT</option>
-                    <option value="BTVTED">BTVTED</option>
-                    <option value="BSABE">BSABE</option>
-                </optgroup>
-                <optgroup label="OFFICES">
-                    <option value="OSAS">OSAS</option>
-                    <option value="CTET">CTET</option>
-                    <option value="SDMD">SDMD</option>
-                    <option value="CPU">CPU</option>
-                    <option value="Chancellor Office">Chancellor Office</option>
-                    <option value="Campus Library">Campus Library</option>
-                    <option value="Campus Clinic">Campus Clinic</option>
-                    <option value="Campus Register">Campus Register</option>
-                    <option value="Admin Office">Admin Office</option>
-                </optgroup>
-                <option value="Others">Others</option>
+              <option disabled <?php echo empty($profile['officeOrDept']) ? 'selected' : ''; ?>>Select Role</option>
+              <option value="GSU">GSU Administrator</option>
+              <option value="Motorpool">Motorpool Administrator</option>
+              <option value="Motorpool">Superadmin</option>
+          
               </select>
             </div>
             <div class="flex justify-center">

@@ -28,8 +28,8 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
             <select class="input-field">
               <option value="all">All</option>
-              <option value="have_pending">Have Pending</option>
-              <option value="no_pending">No Pending</option>
+              <option value="have_pending">Active</option>
+              <option value="no_pending">Inactive</option>
             </select>
             <select class="input-field">
               <option value="az">Sort A-Z</option>
@@ -59,7 +59,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
                 <td class="pl-4 py-2">
                   <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
                 </td>
-                <td class="px-4 py-2">John Doe</td>
+                <td class="px-4 py-2">Jellyn Omo</td>
                 <td class="px-4 py-2 text-green-800">Active</td>
                 <td class="px-4 py-2">john@example.com</td>
               </tr>
@@ -158,8 +158,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
         </div>
 
         <!-- Right Section (Details) -->
-        <div x-show="showDetails" x-cloak
-            class="bg-white shadow rounded-lg p-4">
+        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
