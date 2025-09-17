@@ -18,17 +18,17 @@
     <nav class="flex-1 overflow-y-auto text-sm text-white mt-2">
       <ul class="space-y-2 p-2">
         <!-- Dashboard -->
-        <li class="flex p-2 rounded-lg hover:bg-accent transition gap-2">
-          <img src="/public/assets/img/dashboard.png" alt="Dashboard" class="size-8 p-1.5 md:p-0 md:size-6 self-center" />
-          <a href="dashboard.php" class="hidden md:flex items-center sidebar-text">Dashboard</a>
-        </li>
+         <a href="dashboard.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+            <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+            <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
+          </a>
 
         <!-- Account Management -->
         <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/accout-management.png" alt="Account Management" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Account Management</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex arrows size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
@@ -51,7 +51,7 @@
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/repair-admin.png" alt="GSU Oversight" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">GSU Oversight</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Personnels</a></li>
@@ -68,7 +68,7 @@
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/car-admin.png" alt="Motorpool Oversight" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6 self-center" />
             <span class="hidden md:flex items-center sidebar-text">Motorpool Oversight</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Drivers</a></li>
@@ -85,27 +85,26 @@
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/reports.png" alt="Reports & Analytics" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6 self-center" />
             <span class="hidden md:flex items-center sidebar-text">Reports & Analytics</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
-            <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Requests Summary</a></li>
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Activity Logs</a></li>
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Export Data</a></li>
           </ul>
         </li>
 
         <!-- Settings -->
-        <li>
+        <!-- <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/settings.png" alt="System Settings" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6 self-center" />
             <span class="hidden md:flex items-center sidebar-text">System Settings</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Logs & Audit Trail</a></li>
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">User Permissions</a></li>
           </ul>
-        </li>
+        </li> -->
       </ul>
     </nav>
 
@@ -139,13 +138,25 @@
     button.addEventListener("click", () => {
       const submenu = button.nextElementSibling;
       const arrow = button.querySelector("img.arrows");
+
+      // Close all other submenus and reset their arrows
       document.querySelectorAll(".submenu").forEach(menu => {
-        if (menu !== submenu) menu.classList.add("hidden");
+        if (menu !== submenu) {
+          menu.classList.add("hidden");
+        }
       });
+      document.querySelectorAll(".accordion img.arrows").forEach(img => {
+        if (img !== arrow) {
+          img.classList.remove("rotate-180");
+        }
+      });
+
+      // Toggle the clicked one
       submenu.classList.toggle("hidden");
       arrow.classList.toggle("rotate-180");
     });
   });
+
 
   // Sidebar collapse
   // const sidebar = document.getElementById("sidebar");

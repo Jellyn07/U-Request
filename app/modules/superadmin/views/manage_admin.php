@@ -19,7 +19,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-4">Manage User</h1>
+      <h1 class="text-2xl font-bold mb-4">Manage Admin</h1>
       <div x-data="{ showDetails: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
@@ -40,6 +40,10 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
             </button>
             <button class="input-field">
               <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+            </button>
+            <button class="btn btn-primary">
+              <!-- <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5"> -->
+              Add
             </button>
           </div>
 

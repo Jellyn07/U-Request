@@ -40,39 +40,40 @@ $data = $controller->getDashboardData($year);
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Total Repair Requests</h2>
+          <h2 class="text-gray-600 text-xs">Repair Requests</h2>
           <p class="text-xl font-bold text-primary" id="totalrRequests">
               <?= isset($data['summary']['total_rrequests']) ? $data['summary']['total_rrequests'] : 0 ?>
           </p>
 
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Total Vehicle Request</h2>
+          <h2 class="text-gray-600 text-xs">Vehicle Request</h2>
           <p class="text-xl font-bold text-yellow-500" id="totalrvRequests">
-          <?= isset($data['summary']['total_vrequests']) ? $data['summary']['total_vrequests'] : 0 ?>
+            <?= isset($data['summary']['total_vrequests']) ? $data['summary']['total_vrequests'] : 0 ?>
           </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
-<<<<<<< Updated upstream
-          <h2 class="text-gray-600 text-xs">Total GSU Personnels</h2>
+          <h2 class="text-gray-600 text-xs">GSU Personnels</h2>
           <p class="text-xl font-bold text-green-500" id="totalgPersonnel">
-          <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
-        </p>
-=======
-          <h2 class="text-gray-600 text-xs">Approved / Finished</h2>
-          <p class="text-xl font-bold text-green-500" id="approvedRequests">890</p>
->>>>>>> Stashed changes
+            <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
+          </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Total Drivers</h2>
+          <h2 class="text-gray-600 text-xs">Drivers</h2>
           <p class="text-xl font-bold text-secondary">3</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
           <h2 class="text-gray-600 text-xs">Users</h2>
           <p class="text-xl font-bold text-secondary">
-          <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?>
+            <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?>
+          </p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 text-center">
+          <h2 class="text-gray-600 text-xs">Admins</h2>
+          <p class="text-xl font-bold text-secondary">
+            <!-- <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?> --> 1
           </p>
         </div>
       </div>
