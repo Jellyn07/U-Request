@@ -45,6 +45,13 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                   alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
                   class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
               />
+
+              <?php
+              $defaultPic = '/public/assets/img/user-default.png';
+              $profilePic = (!empty($profile['profile_pic']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $profile['profile_pic']))
+              ? $profile['profile_pic']
+              : $defaultPic;
+              ?>
               <!-- Edit button -->
               <label for="profile_picture" title="Change Profile Picture" 
                 class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition">
