@@ -229,6 +229,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
       </div>
     </div>
   </div>
+  </main>
 
   <script>
     document.getElementById('searchUser').addEventListener('input', function() {

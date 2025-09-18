@@ -37,12 +37,35 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
         </p>
       </div>
 
+      <!-- ================= Filter & Sort Controls ================= -->
+      <div class="flex justify-center gap-4 mb-6">
+        <!-- Filter by Status -->
+        <form method="GET" class="flex gap-2">
+          <select name="status" class="input-field">
+            <option value="Pending" <?php if($_GET['status']??''=='Pending') echo 'selected'; ?>>Pending</option>
+            <option value="Approved" <?php if($_GET['status']??''=='Approved') echo 'selected'; ?>>Approved</option>
+            <option value="Fixed" <?php if($_GET['status']??''=='Fixed') echo 'selected'; ?>>Fixed</option>
+            <option value="Disapproved" <?php if($_GET['status']??''=='Disapproved') echo 'selected'; ?>>Disapproved</option>
+            <option value="" selected >All Status</option>
+          </select>
+
+          <!-- Sort by -->
+          <select name="sort" class="input-field">
+            <option value="oldest" <?php if($_GET['sort']??''=='oldest') echo 'selected'; ?>>Oldest</option>
+            <option value="newest" <?php if($_GET['sort']??''=='newest') echo 'selected'; ?>>Newest</option>
+          </select>
+
+          <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+      </div>
+
+
       <!-- ================= Repair Requests ================= -->
       <div class="mt-10">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Repair Requests</h2>
+        <!-- <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Repair Requests</h2> -->
         <?php if (!empty($repairList)) { ?>
           <?php foreach ($repairList as $track): ?>
-            <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
+            <article class="w-3/4 md:w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
               <div class="flex justify-start mb-3">
                 <img src="<?php echo PUBLIC_URL; ?>/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
               </div>
@@ -84,10 +107,10 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
 
       <!-- ================= Vehicle Requests ================= -->
       <div class="mt-10">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Vehicle Requests</h2>
+        <!-- <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Vehicle Requests</h2> -->
         <?php if (!empty($vehicleList)) { ?>
           <?php foreach ($vehicleList as $track): ?>
-            <article class="w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
+            <article class="w-3/4 md:w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
               <div class="flex justify-start mb-3">
                 <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
               </div>
@@ -97,7 +120,9 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
               <p class="mt-2 text-xs text-gray-700">
                 <span class="font-medium">Trip Purpose:</span>
                 <?php echo htmlspecialchars($track['trip_purpose']); ?> 
-                (Destination: <?php echo htmlspecialchars($track['travel_destination']); ?>)
+                <br>
+                <span class="font-medium">Destination:</span>
+                <?php echo htmlspecialchars($track['travel_destination']); ?>
               </p>
               <p class="mt-2 text-sm">
                 <span class="font-medium">Status:</span>
