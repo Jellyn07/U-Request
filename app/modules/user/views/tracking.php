@@ -55,7 +55,7 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
             <option value="newest" <?php if($_GET['sort']??''=='newest') echo 'selected'; ?>>Newest</option>
           </select>
 
-          <button type="submit" class="btn btn-primary">Apply</button>
+          <!-- <button type="submit" class="btn btn-primary">Apply</button> -->
         </form>
       </div>
 

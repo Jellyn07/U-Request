@@ -230,7 +230,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
             </div>
             <div class="flex justify-center">
               <button type="submit" class="btn btn-secondary mr-2">
-                User Requests
+                <img src="/public/assets/img/request-icon.png" alt="User" class="size-4 my-0.5">
               </button>
               <button type="submit" class="btn btn-primary">
                 Save Changes

@@ -41,9 +41,8 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
             <button class="input-field">
               <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
-            <button class="btn btn-primary">
-              <!-- <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5"> -->
-              Add
+            <button class="btn btn-secondary">
+              <img src="/public/assets/img/add-admin.png" alt="User" class="size-4 my-0.5">
             </button>
           </div>
 
@@ -171,7 +170,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
           <img id="profile-preview"  
                   src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
                   alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
-                  class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4"
+                  class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto"
               />
           <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
             <!-- <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>"> -->
@@ -217,9 +216,9 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
               </select>
             </div>
             <div class="flex justify-center">
-              <button type="submit" class="btn btn-secondary mr-2">
+              <!-- <button type="submit" class="btn btn-secondary mr-2">
                 User Requests
-              </button>
+              </button> -->
               <button type="submit" class="btn btn-primary">
                 Save Changes
               </button>
