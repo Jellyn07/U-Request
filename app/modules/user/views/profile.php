@@ -103,31 +103,34 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
             </div>
 
             <div>
-              <label for="program" class="text-sm text-text mb-1">Program/Office</label>
-              <select id="dept" name="officeOrDept" class="w-full input-field" >
-              <option disabled <?php echo empty($profile['officeOrDept']) ? 'selected' : ''; ?>>Select Department/Office</option>
-                <optgroup label="Department">
-                    <option value="BEED">BEED</option>
-                    <option value="BSNED">BSNED</option>
-                    <option value="BECED">BECED</option>
-                    <option value="BSED">BSED</option>
-                    <option value="BSIT">BSIT</option>
-                    <option value="BTVTED">BTVTED</option>
-                    <option value="BSABE">BSABE</option>
-                </optgroup>
-                <optgroup label="OFFICES">
-                    <option value="OSAS">OSAS</option>
-                    <option value="CTET">CTET</option>
-                    <option value="SDMD">SDMD</option>
-                    <option value="CPU">CPU</option>
-                    <option value="Chancellor Office">Chancellor Office</option>
-                    <option value="Campus Library">Campus Library</option>
-                    <option value="Campus Clinic">Campus Clinic</option>
-                    <option value="Campus Register">Campus Register</option>
-                    <option value="Admin Office">Admin Office</option>
-                </optgroup>
-                <option value="Others">Others</option>
-              </select>
+              <label for="dept" class="text-sm text-text mb-1">Program/Office</label>
+                <select id="dept" name="officeOrDept" class="w-full input-field">
+                  <option disabled <?= empty($profile['officeOrDept']) ? 'selected' : ''; ?>>Select Department/Office</option>
+
+                  <optgroup label="Department">
+                    <option value="BEED" <?= ($profile['officeOrDept'] ?? '') === 'BEED' ? 'selected' : '' ?>>BEED</option>
+                    <option value="BSNED" <?= ($profile['officeOrDept'] ?? '') === 'BSNED' ? 'selected' : '' ?>>BSNED</option>
+                    <option value="BECED" <?= ($profile['officeOrDept'] ?? '') === 'BECED' ? 'selected' : '' ?>>BECED</option>
+                    <option value="BSED" <?= ($profile['officeOrDept'] ?? '') === 'BSED' ? 'selected' : '' ?>>BSED</option>
+                    <option value="BSIT" <?= ($profile['officeOrDept'] ?? '') === 'BSIT' ? 'selected' : '' ?>>BSIT</option>
+                    <option value="BTVTED" <?= ($profile['officeOrDept'] ?? '') === 'BTVTED' ? 'selected' : '' ?>>BTVTED</option>
+                    <option value="BSABE" <?= ($profile['officeOrDept'] ?? '') === 'BSABE' ? 'selected' : '' ?>>BSABE</option>
+                  </optgroup>
+
+                  <optgroup label="OFFICES">
+                    <option value="OSAS" <?= ($profile['officeOrDept'] ?? '') === 'OSAS' ? 'selected' : '' ?>>OSAS</option>
+                    <option value="CTET" <?= ($profile['officeOrDept'] ?? '') === 'CTET' ? 'selected' : '' ?>>CTET</option>
+                    <option value="SDMD" <?= ($profile['officeOrDept'] ?? '') === 'SDMD' ? 'selected' : '' ?>>SDMD</option>
+                    <option value="CPU" <?= ($profile['officeOrDept'] ?? '') === 'CPU' ? 'selected' : '' ?>>CPU</option>
+                    <option value="Chancellor Office" <?= ($profile['officeOrDept'] ?? '') === 'Chancellor Office' ? 'selected' : '' ?>>Chancellor Office</option>
+                    <option value="Campus Library" <?= ($profile['officeOrDept'] ?? '') === 'Campus Library' ? 'selected' : '' ?>>Campus Library</option>
+                    <option value="Campus Clinic" <?= ($profile['officeOrDept'] ?? '') === 'Campus Clinic' ? 'selected' : '' ?>>Campus Clinic</option>
+                    <option value="Campus Register" <?= ($profile['officeOrDept'] ?? '') === 'Campus Register' ? 'selected' : '' ?>>Campus Register</option>
+                    <option value="Admin Office" <?= ($profile['officeOrDept'] ?? '') === 'Admin Office' ? 'selected' : '' ?>>Admin Office</option>
+                  </optgroup>
+
+                  <option value="Others" <?= ($profile['officeOrDept'] ?? '') === 'Others' ? 'selected' : '' ?>>Others</option>
+                </select>
             </div>
             <div class="flex justify-end">
               <button type="submit" class="btn btn-primary">

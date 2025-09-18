@@ -24,8 +24,8 @@ class ProfileController {
     }
 
     // Save new profile picture
-    public function saveProfilePicture($requester_email, $filePath) {
-        return $this->model->updateProfilePicture($requester_email, $filePath);
+    public function saveProfilePicture($filePath, $originalFileName) {
+        return $this->model->updateProfilePicture( $filePath, $originalFileName);
     }
 
     // Save password update
@@ -46,7 +46,6 @@ class ProfileController {
     }
 }
 
-//Update Password
 // Update Password
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_password') {
 
@@ -88,7 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
         if (in_array($fileExtension, $allowedExts)) {
 
-            $newFileName = $code . '_' . time() . '.' . $fileExtension;
+            $baseFileName = pathinfo($fileName, PATHINFO_FILENAME); // original filename without extension
+            $newFileName = $baseFileName . '_' . time() . '.' . $fileExtension;
             $uploadFileDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/profile_pics/';
             if (!is_dir($uploadFileDir)) {
                 mkdir($uploadFileDir, 0755, true);
@@ -100,7 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                 // ✅ Use controller method instead of $model
                 $profileController = new ProfileController();
-                if ($profileController->saveProfilePicture($code, $relativePath)) {
+                $originalFileName = $fileName;
+                if ($profileController->saveProfilePicture($code, $relativePath, $originalFileName)) {
                     $_SESSION['success'] = "Profile picture updated successfully.";
                 } else {
                     $_SESSION['error'] = "Failed to update profile picture in database.";
@@ -128,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['officeOrDept'], $_POS
     $officeOrDept = $_POST['officeOrDept'];
 
     if ($controller->saveOfficeOrDept($email, $officeOrDept)) {
-        $_SESSION['success'] = "Department/Office updated successfully.";
+    $_SESSION['success'] = "Department/Office updated successfully.";
     } else {
         $_SESSION['error'] = "Failed to update Department/Office.";
     }
