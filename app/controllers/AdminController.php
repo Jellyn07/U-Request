@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../models/AdminModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
 
 $login_error = "";
@@ -65,6 +66,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
         $_SESSION['old_email'] = $email;
         header("Location: ../modules/shared/views/admin_login.php");
+        exit;
+    }
+}
+
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
+    $adminModel = new AdministratorModel(); // ✅ This must be inside the condition
+
+    $staff_id       = $_POST['staff_id'] ?? '';
+    $email          = $_POST['email'] ?? '';
+    $first_name     = $_POST['first_name'] ?? '';
+    $last_name      = $_POST['last_name'] ?? '';
+    $access_level   = $_POST['access_level'] ?? '';
+    $password_raw   = $_POST['password'] ?? '';
+    $confirm_pass   = $_POST['confirm_password'] ?? '';
+
+    if ($password_raw !== $confirm_pass) {
+        $_SESSION['admin_error'] = "Passwords do not match.";
+        header("Location: ../modules/superadmin/views/manage_admin.php");
+        exit;
+    }
+
+    $encrypted_pass = encrypt($password_raw);
+
+    // Upload profile picture
+    $profile_picture_path = null;
+
+    if (!empty($_FILES['profile_picture']['name']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = __DIR__ . "/../../public/uploads/profile_pics";
+
+        // Create directory if not exists
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        $filename = basename($_FILES["profile_picture"]["name"]);
+        $target_file = $upload_dir . '/' . $filename;
+
+        if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+            $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
+        } else {
+            $_SESSION['admin_error'] = "Failed to upload profile picture.";
+            header("Location: ../modules/superadmin/views/manage_admin.php");
+            exit;
+        }
+    }
+
+
+    // ✅ Now use the model
+    $result = $adminModel->addAdministrator(
+        $staff_id,
+        $email,
+        $first_name,
+        $last_name,
+        $access_level,
+        $encrypted_pass,
+        $filename
+    );
+
+    if ($result) {
+        $_SESSION['admin_success'] = "Administrator successfully added.";
+        header("Location: ../modules/superadmin/views/manage_admin.php");
+        exit;
+    } else {
+        $_SESSION['admin_error'] = $_SESSION['db_error'] ?? "Unknown error occurred.";
+        header("Location: ../modules/superadmin/views/manage_admin.php");
         exit;
     }
 }

@@ -84,3 +84,28 @@ function showRequestError(message, redirect = null) {
         }
     });
 }
+
+// alert.js
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.adminSuccess) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: window.adminSuccess,
+      timer: 1000,
+      timerProgressBar: true,
+      showConfirmButton: false
+    });
+  }
+
+  if (window.adminError) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: window.adminError,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: true
+    });
+  }
+});
