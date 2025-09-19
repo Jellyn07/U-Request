@@ -2,6 +2,10 @@
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/UserController.php';
+require_once __DIR__ . '/../../../controllers/AdminController.php';
+
+$controller = new AdminController();
+$admins = $controller->getAllAdmins();
 
 ?>
 <!DOCTYPE html>
@@ -25,7 +29,7 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
     <div class="p-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Manage Admin</h1>
-      <div x-data="{ showDetails: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
@@ -110,6 +114,16 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
                             <label class="text-sm text-text mb-1">Last Name</label>
                             <input type="text" name="last_name" class="w-full input-field" required />
                           </div>
+                          <div>
+                            <label class="text-sm text-text mb-1">Contact No.</label>
+                            <input type="text" name="contact_no" 
+                                  class="w-full input-field" 
+                                  required 
+                                  minlength="11" 
+                                  maxlength="11" 
+                                  pattern="[0-9]{11}" 
+                                  title="Please enter a valid 11-digit contact number" />
+                          </div>
                         </div>
 
                         <div>
@@ -166,103 +180,46 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
               </tr>
             </thead>
             <tbody id="usersTable">
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <tr @click="showDetails = true" class="cursor-pointer hover:bg-gray-100">
-                <td class="pl-4 py-2">
-                  <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                </td>
-                <td class="px-4 py-2">John Doe</td>
-                <td class="px-4 py-2 text-green-800">Active</td>
-                <td class="px-4 py-2">john@example.com</td>
-              </tr>
-              <!-- more rows -->
+              <?php if (!empty($admins)): ?>
+                <?php foreach ($admins as $admin): ?>
+                  <tr 
+                      @click="showDetails = true; selected = {
+                        staff_id: '<?php echo $admin['staff_id']; ?>',
+                        email: '<?php echo $admin['email']; ?>',
+                        first_name: '<?php echo $admin['first_name']; ?>',
+                        last_name: '<?php echo $admin['last_name']; ?>',
+                        full_name: '<?php echo $admin['full_name']; ?>',
+                        contact_no: '<?php echo $admin['contact_no']; ?>',
+                        profile_picture: '<?php echo $admin['profile_picture']; ?>',
+                        accessLevel_id: '<?php echo $admin['accessLevel_id']; ?>',
+                        accessLevel_desc: '<?php echo $admin['accessLevel_desc']; ?>',
+                        status: '<?php echo $admin['status']; ?>'
+                      }"
+                      class="cursor-pointer hover:bg-gray-100"
+                    >
+                    <td class="pl-4 py-2">
+                    <img src="<?php echo !empty($admin['profile_picture']) 
+                                ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) 
+                                : '/public/assets/img/user-default.png'; ?>" 
+                                  alt="User" 
+                                  class="size-8 rounded-full object-cover">
+                    </td>
+                    <td class="px-4 py-2">
+                      <?php echo htmlspecialchars($admin['full_name']); ?>
+                    </td>
+                    <td class="px-4 py-2 <?php echo strtolower($admin['status']) === 'active' ? 'text-green-800' : 'text-red-800'; ?>">
+                      <?php echo htmlspecialchars($admin['status']); ?>
+                    </td>
+                    <td class="px-4 py-2">
+                      <?php echo htmlspecialchars($admin['email']); ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-gray-500">No administrators found.</td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
           </div>
@@ -274,65 +231,86 @@ require_once __DIR__ . '/../../../controllers/UserController.php';
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
+
           <h2 class="text-lg font-bold mb-2">Admin Information</h2>
+
+          <!-- Profile Picture -->
           <img id="profile-preview"  
-                  src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
-                  alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
-                  class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto"
-              />
-          <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
-            <!-- <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>"> -->
+            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
+            alt=""
+            class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto"
+          />
+
+          <!-- Form -->
+          <form class="space-y-5" method="post" action="../../../controllers/AdminController.php">
+            <input type="hidden" name="requester_email" :value="selected.email || ''">
 
             <div>
-              <label class="text-sm text-text mb-1">
-                USeP Email
-              </label>
-              <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" disabled class="w-full view-field cursor-not-allowed"/>
-              <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
+              <label class="text-sm text-text mb-1">USeP Email</label>
+              <input type="email" id="email" :value="selected.email || ''" disabled class="w-full view-field cursor-not-allowed"/>
             </div>
 
             <div>
-              <label class="text-sm text-text mb-1">
-                Staff ID No.
-              </label>
-              <input type="text" value="<?php echo htmlspecialchars($profile['requester_id'] ?? ''); ?>" class="w-full input-field"/>
+              <label class="text-sm text-text mb-1">Staff ID No.</label>
+              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field"/>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="text-sm text-text mb-1">
-                  First Name
-                </label>
-                <input type="text" value="<?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>" class="w-full input-field"/>
+                <label class="text-sm text-text mb-1">First Name</label>
+                <input type="text" id="firstName" name="firstName" :value="selected.first_name || ''" class="w-full input-field"/>
               </div>
               <div>
-                <label class="text-sm text-text mb-1">
-                  Last Name
-                </label>
-                <input type="text" value="<?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>" class="w-full input-field"/>
+                <label class="text-sm text-text mb-1">Last Name</label>
+                <input type="text" id="lastName" name="lastName" :value="selected.last_name || ''" class="w-full input-field"/>
+              </div>
+              <div>
+                <label class="text-sm text-text mb-1">Contact No.</label>
+                <input type="text" id="contact_no" name="contact_no" :value="selected.contact_no || ''" class="w-full input-field"/>
               </div>
             </div>
 
-            <div>
-              <label for="program" class="text-sm text-text mb-1">Role</label>
-              <select id="dept" name="officeOrDept" class="w-full input-field" >
-              <option disabled <?php echo empty($profile['officeOrDept']) ? 'selected' : ''; ?>>Select Role</option>
-              <option value="GSU">GSU Administrator</option>
-              <option value="Motorpool">Motorpool Administrator</option>
-              <option value="Motorpool">Superadmin</option>
-          
-              </select>
-            </div>
+            <div x-data="{ editingRole: false }">
+          <label class="text-sm text-text mb-1">Access Level</label>
+
+          <!-- Display mode -->
+          <div x-show="!editingRole" class="flex items-center justify-between">
+          <span class="font-medium text-gray-700" x-text="selected.accessLevel_desc || 'No Role Assigned'"></span>
+
+          <!-- Edit button -->
+          <button type="button"
+            @click="editingRole = true"
+            class="text-blue-600 hover:text-blue-800 text-sm ml-2">
+            Edit
+          </button>
+        </div>
+
+
+          <!-- Edit mode -->
+          <div x-show="editingRole" class="flex items-center gap-2 mt-2">
+            <select name="accessLevel_id" x-model="selected.accessLevel_id" class="w-full input-field">
+              <option disabled value="">Select Role</option>
+              <option value="1">GSU Administrator</option>
+              <option value="2">Motorpool Administrator</option>
+              <option value="3">Superadmin</option>
+            </select>
+
+            <button type="button"
+              @click="editingRole = false"
+              class="text-gray-500 hover:text-gray-700 text-sm">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+
+
             <div class="flex justify-center">
-              <!-- <button type="submit" class="btn btn-secondary mr-2">
-                User Requests
-              </button> -->
-              <button type="submit" class="btn btn-primary">
-                Save Changes
-              </button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>
+
       </div>
     </div>
   </div>

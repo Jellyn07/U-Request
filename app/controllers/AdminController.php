@@ -1,7 +1,10 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();   // ✅ Start only if not already active
+}
 
 require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../config/encryption.php'; 
 require_once __DIR__ . '/../models/AdminModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
 
@@ -26,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
     $userModel = new UserModel();
     $admin = $userModel->getAdminUserByEmail($email);
-
-    if ($admin && ($input_pass == $admin['password'])) {
+    // if ($admin && $userModel->verifyPassword($input_pass, $admin['password']))
+    if ($admin &&($input_pass== $admin['password'])) {
         // ✅ SUCCESS: reset attempts
         $_SESSION['login_attempts'] = 0;
         $_SESSION['lock_time'] = null;
@@ -78,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     $email          = $_POST['email'] ?? '';
     $first_name     = $_POST['first_name'] ?? '';
     $last_name      = $_POST['last_name'] ?? '';
+    $contact_no     = $_POST['contact_no'] ?? '';
     $access_level   = $_POST['access_level'] ?? '';
     $password_raw   = $_POST['password'] ?? '';
     $confirm_pass   = $_POST['confirm_password'] ?? '';
@@ -120,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         $email,
         $first_name,
         $last_name,
+        $contact_no,
         $access_level,
         $encrypted_pass,
         $filename
@@ -133,5 +138,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         $_SESSION['admin_error'] = $_SESSION['db_error'] ?? "Unknown error occurred.";
         header("Location: ../modules/superadmin/views/manage_admin.php");
         exit;
+    }
+}
+
+class AdminController {
+    private $model;
+
+    public function __construct() {
+        $this->model = new AdministratorModel();
+    }
+
+    public function getAllAdmins() {
+        return $this->model->getAdministrators();
     }
 }

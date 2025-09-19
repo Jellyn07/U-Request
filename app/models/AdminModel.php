@@ -6,16 +6,16 @@ require_once __DIR__ . '/../config/encryption.php';
 class AdministratorModel extends BaseModel {
 
     // ADD ADMINISTRATOR
-    public function addAdministrator($staff_id, $email, $first_name, $last_name, $access_level, $password, $profile_picture) {
+    public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
         $encrypted_pass = encrypt($password);
 
-        $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
             return false;
         }
 
-        $stmt->bind_param("ssssiss", $staff_id, $email, $first_name, $last_name, $access_level, $encrypted_pass, $profile_picture);
+        $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
         $result = $stmt->execute();
 
         if (!$result) {
@@ -67,6 +67,23 @@ class AdministratorModel extends BaseModel {
     public function verifyPassword($input_pass, $stored_encrypted_pass) {
         return $input_pass === decrypt($stored_encrypted_pass);
     }
+
+    public function getAdministrators() {
+        $stmt = $this->db->prepare("SELECT * FROM vw_administrator");
+        
+        if (!$stmt) {
+            $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
+            return [];
+        }
+    
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $admins = $result->fetch_all(MYSQLI_ASSOC);
+    
+        $stmt->close();
+        return $admins;
+    }
+    
 
     // Destructor
     public function __destruct() {

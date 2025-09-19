@@ -147,3 +147,46 @@ BEGIN
 END //
 
 DELIMITER ;
+
+ALTER TABLE administrator ADD COLUMN status ENUM('Active','Inactive') DEFAULT 'Active';
+ALTER TABLE administrator
+ADD COLUMN contact_no VARCHAR(11) NOT NULL
+AFTER last_name;
+
+DELIMITER $$
+CREATE PROCEDURE spAddAdministrator (
+    IN p_staff_id VARCHAR(100),
+    IN p_email VARCHAR(150),
+    IN p_first_name VARCHAR(50),
+    IN p_last_name VARCHAR(50),
+    IN p_contact_no VARCHAR(11),
+    IN p_accessLevel_id INT,
+    IN p_password VARCHAR(255),
+    IN p_profile_picture VARCHAR(255)
+)
+BEGIN
+    INSERT INTO administrator (
+        staff_id, email, first_name, last_name, contact_no,
+        accessLevel_id, password, profile_picture
+    ) VALUES (
+        p_staff_id, p_email, p_first_name, p_last_name, p_contact_no,
+        p_accessLevel_id, p_password, p_profile_picture
+    );
+END$$
+DELIMITER ;
+
+CREATE OR REPLACE VIEW vw_administrator AS
+SELECT 
+    a.staff_id,
+    a.email,
+    CONCAT(a.first_name, ' ', a.last_name) AS full_name,
+    a.first_name,
+    a.last_name,
+    a.contact_no,
+    a.profile_picture,
+    acl.accessLevel_desc,
+    a.accessLevel_id,
+    a.status
+FROM administrator a
+INNER JOIN admin_access_level acl 
+    ON acl.accessLevel_id = a.accessLevel_id;
