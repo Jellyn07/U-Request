@@ -83,6 +83,15 @@ class UserModel extends BaseModel  {
         return $result['cnt'] > 0;
     }
 
+    // GET ADMIN User
+    public function getAdminUserByEmail($email) {
+        $stmt = $this->db->prepare("CALL spGetAdminByEmail(?)");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $result;
+    }
 
     // Destructor
     public function __destruct() {

@@ -1,4 +1,17 @@
 <?php
+session_start();
+
+$login_error = '';
+if (isset($_SESSION['login_error'])) {
+    $login_error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
+
+$signup_success = $_SESSION['signup_success'] ?? '';
+unset($_SESSION['signup_success']);
+
+$old_email = $_SESSION['old_email'] ?? '';
+unset($_SESSION['old_email']);
 require_once __DIR__ . '/../../../config/constants.php';
 ?>
 <!DOCTYPE html>
@@ -40,7 +53,7 @@ require_once __DIR__ . '/../../../config/constants.php';
       </div>
 
       <!-- Form -->
-      <form method="post" action="../../../controllers/LoginController.php">
+      <form method="post" action="../../../controllers/AdminController.php">
         <!-- Email -->
         <div>
           <label for="email" class="text-sm text-text mb-1">
@@ -82,4 +95,12 @@ require_once __DIR__ . '/../../../config/constants.php';
 </script>
 <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
 </html>
+
+<script>
+  // Pass PHP variable to JS
+  let loginError = <?= json_encode($login_error) ?>;
+  if (loginError) {
+      showErrorAlert(loginError);
+  }
+</script>
 

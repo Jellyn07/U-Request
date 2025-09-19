@@ -89,3 +89,61 @@ END$$
 
 DELIMITER ;
 
+start drig run / insert to the db sa inyong bet na superadmin acc
+
+CREATE TABLE admin_access_level (
+    accessLevel_id INT NOT NULL PRIMARY KEY,
+    accessLevel_desc VARCHAR(150) NOT NULL
+);
+
+CREATE TABLE administrator (
+    staff_id VARCHAR(100) NOT NULL PRIMARY KEY,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    accessLevel_id INT NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    profile_picture VARCHAR(255),
+    FOREIGN KEY (accessLevel_id) REFERENCES admin_access_level(accessLevel_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+INSERT INTO admin_access_level (accessLevel_id, accessLevel_desc)
+VALUES 
+    (1, 'Super Admin'),
+    (2, 'GSU Admin'),
+    (3, 'Motorpool Admin');
+
+INSERT INTO administrator (
+    staff_id, email, first_name, last_name, accessLevel_id, password, profile_picture
+)
+VALUES (
+    '2023-00061',                          
+    'jsgujol00061@usep.edu.ph',             
+    'Jona',                             
+    'Gujol',                          
+    1,                               
+    'password',                 
+    '' 
+);
+
+DELIMITER //
+
+CREATE PROCEDURE spGetAdminByEmail (
+    IN input_email VARCHAR(150)
+)
+BEGIN
+    SELECT 
+        staff_id,
+        email,
+        password,
+        first_name,
+        last_name,
+        accessLevel_id,
+        profile_picture
+    FROM administrator
+    WHERE email = input_email;
+END //
+
+DELIMITER ;
