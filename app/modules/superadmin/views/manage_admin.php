@@ -242,8 +242,8 @@ $admins = $controller->getAllAdmins();
           />
 
           <!-- Form -->
-          <form class="space-y-5" method="post" action="../../../controllers/AdminController.php">
-            <input type="hidden" name="requester_email" :value="selected.email || ''">
+          <form id="adminForm" class="space-y-5" method="post" action="../../../controllers/AdminController.php">
+            <input type="hidden" name="admin_email" :value="selected.email || ''">
 
             <div>
               <label class="text-sm text-text mb-1">USeP Email</label>
@@ -276,6 +276,8 @@ $admins = $controller->getAllAdmins();
           <!-- Display mode -->
           <div x-show="!editingRole" class="flex items-center justify-between">
           <span class="font-medium text-gray-700" x-text="selected.accessLevel_desc || 'No Role Assigned'"></span>
+          <!-- Keep current access level in sync for form submission -->
+          <input type="hidden" name="accessLevel_id" x-model="selected.accessLevel_id" />
 
           <!-- Edit button -->
           <button type="button"

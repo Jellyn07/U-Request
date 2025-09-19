@@ -83,7 +83,63 @@ class AdministratorModel extends BaseModel {
         $stmt->close();
         return $admins;
     }
-    
+
+     // Update admin details
+     public function updateAdminDetails($data) {
+        // Map incoming keys to DB columns and types
+        $allowedFields = [
+            'staff_id' => ['col' => 'staff_id', 'type' => 's'],
+            'firstName' => ['col' => 'first_name', 'type' => 's'],
+            'lastName' => ['col' => 'last_name', 'type' => 's'],
+            'contact_no' => ['col' => 'contact_no', 'type' => 's'],
+            'accessLevel_id' => ['col' => 'accessLevel_id', 'type' => 'i'],
+        ];
+
+        $setParts = [];
+        $types = '';
+        $values = [];
+
+        foreach ($allowedFields as $key => $meta) {
+            if (isset($data[$key]) && $data[$key] !== '' && $data[$key] !== null) {
+                $setParts[] = $meta['col'] . ' = ?';
+                $types .= $meta['type'];
+                $values[] = $data[$key];
+            }
+        }
+
+        if (empty($setParts) || empty($data['admin_email'])) {
+            $_SESSION['db_error'] = 'No fields to update or missing admin_email.';
+            return false;
+        }
+
+        $sql = 'UPDATE administrator SET ' . implode(', ', $setParts) . ' WHERE email = ?';
+
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            $_SESSION['db_error'] = 'Prepare failed: ' . $this->db->error;
+            return false;
+        }
+
+        // Append WHERE parameter
+        $types .= 's';
+        $values[] = $data['admin_email'];
+
+        // bind_param requires references
+        $bindParams = [];
+        $bindParams[] = & $types;
+        foreach ($values as $idx => $val) {
+            $bindParams[] = & $values[$idx];
+        }
+
+        call_user_func_array([$stmt, 'bind_param'], $bindParams);
+
+        $result = $stmt->execute();
+        if (!$result) {
+            $_SESSION['db_error'] = 'Execute failed: ' . $stmt->error;
+        }
+        $stmt->close();
+        return $result;
+    }
 
     // Destructor
     public function __destruct() {

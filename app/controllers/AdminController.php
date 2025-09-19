@@ -141,6 +141,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     }
 }
 
+// --- HANDLE POST REQUEST ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $controller = new AdminController();
+
+    $data = [
+        'staff_id'       => $_POST['staff_id'] ?? null,
+        'firstName'      => $_POST['firstName'] ?? null,
+        'lastName'       => $_POST['lastName'] ?? null,
+        'contact_no'     => $_POST['contact_no'] ?? null,
+        'accessLevel_id' => $_POST['accessLevel_id'] ?? null,
+        'admin_email'=> $_POST['admin_email'] ?? null,
+    ];
+
+    $updated = $controller->updateAdmin($data);
+
+    if ($updated) {
+        $_SESSION['admin_success'] = ['type' => 'success', 'message' => 'Administrator details updated successfully.'];
+    } else {
+        $_SESSION['admin_error'] = ['type' => 'error', 'message' => 'Failed to update administrator details.'];
+    }
+
+    header("Location: ../modules/superadmin/views/manage_admin.php");
+    exit;
+}
+
 class AdminController {
     private $model;
 
@@ -151,4 +176,18 @@ class AdminController {
     public function getAllAdmins() {
         return $this->model->getAdministrators();
     }
+
+     // --- UPDATE ADMIN DETAILS ---
+     public function updateAdmin($data) {
+        // Filter out null/empty fields so we only update changed ones
+        $updates = array_filter($data, function($value) {
+            return $value !== null && $value !== '';
+        });
+    
+        if (!empty($updates['admin_email'])) {
+            return $this->model->updateAdminDetails($updates);
+        }
+        return false;
+    }
+    
 }
