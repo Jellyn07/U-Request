@@ -173,3 +173,7 @@ SELECT
 FROM administrator a
 INNER JOIN admin_access_level acl 
     ON acl.accessLevel_id = a.accessLevel_id;
+
+start again here 
+
+ALTER TABLE gsu_personnel MODIFY contact VARCHAR(11);

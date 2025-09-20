@@ -4,8 +4,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/UserController.php';
 require_once __DIR__ . '/../../../controllers/AdminController.php';
 
-$controller = new AdminController();
-$admins = $controller->getAllAdmins();
+
 
 ?>
 <!DOCTYPE html>
@@ -63,7 +62,7 @@ $admins = $controller->getAllAdmins();
                 <!-- Modal Content -->
                 <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
                   <!-- Profile Picture -->
-                  <form method="post" action="../../../controllers/AdminController.php" enctype="multipart/form-data">
+                  <form method="post" action="../../../controllers/PersonnelController.php" enctype="multipart/form-data">
                     <div class="rounded-xl flex flex-col items-center">
                       <div class="relative">
                         <img id="profile-preview"  
@@ -149,7 +148,7 @@ $admins = $controller->getAllAdmins();
                   <!-- Action Buttons -->
                   <div class="flex justify-center gap-2 pt-4">
                     <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" name="add_admin" class="btn btn-primary px-7">Save</button>
+                    <button type="submit" name="add_personnel" class="btn btn-primary px-7">Save</button>
                   </div>
                   </form>
                 </main>
@@ -162,26 +161,43 @@ $admins = $controller->getAllAdmins();
           <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow">
           <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg p-2">
             <thead class="bg-gray-50">
-              <tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
+              <tr>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Department</th>
               </tr>
             </thead>
             <tbody id="personnelTable" class="text-sm">
-                <?php for($i=0; $i<12; $i++){
-                    echo'
-                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left">
-                            <td class="pl-8 py-2">
-                                <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                            </th>
-                            <td class="px-4 py-2">Jellyn Omo</th>
-                            <td class="px-4 py-2">Available</th>
-                            <td class="px-4 py-2">Utility</th>
-                        </tr>                    
+              <?php 
+                require_once __DIR__ . '/../../../controllers/PersonnelController.php';
+                $controller = new PersonnelController();
+                $personnels = $controller->getAllPersonnel();
+
+                if (!empty($personnels)) {
+                  foreach ($personnels as $person) {
+                    echo '
+                      <tr @click="showDetails = true; selected = ' . htmlspecialchars(json_encode($person)) . '" 
+                          class="hover:bg-gray-100 cursor-pointer text-left">
+                        <td class="pl-8 py-2">
+                          <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
+                        </td>
+                        <td class="px-4 py-2">' . htmlspecialchars($person['staff_id']) . '</td>
+                        <td class="px-4 py-2">' . htmlspecialchars($person['full_name']) . '</td>
+                        <td class="px-4 py-2">' . (!empty($person['status']) ? htmlspecialchars($person['status']) : 'Available') . '</td>
+                        <td class="px-4 py-2">' . htmlspecialchars($person['department']) . '</td>
+                      </tr>
                     ';
-                } 
-                ?>
+                  }
+                } else {
+                  echo '
+                    <tr>
+                      <td colspan="5" class="text-center py-4 text-gray-500">No personnel records found.</td>
+                    </tr>
+                  ';
+                }
+              ?>
             </tbody>
           </table>
           </div>
@@ -204,7 +220,7 @@ $admins = $controller->getAllAdmins();
           />
 
           <!-- Form -->
-          <form id="adminForm" class="space-y-2" method="post">
+          <form id="adminForm" class="space-y-2" method="post" action="../../../controllers/PersonnelController.php" >
             <div>
               <label class="text-xs text-text mb-1">Staff ID No.</label>
               <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field"/>
@@ -213,39 +229,39 @@ $admins = $controller->getAllAdmins();
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="text-xs text-text mb-1">First Name</label>
-                <input type="text" id="firstName" name="firstName" :value="selected.first_name || ''" class="w-full input-field"/>
+                <input type="text" id="firstName" name="firstName" :value="selected.firstName || ''" class="w-full input-field"/>
               </div>
               <div>
                 <label class="text-xs text-text mb-1">Last Name</label>
-                <input type="text" id="lastName" name="lastName" :value="selected.last_name || ''" class="w-full input-field"/>
+                <input type="text" id="lastName" name="lastName" :value="selected.lastName || ''" class="w-full input-field"/>
               </div>
             </div>
 
             <div>
                 <label class="text-xs text-text mb-1">Contact No.</label>
-                <input type="text" id="contact_no" name="contact_no" class="w-full input-field"/>
+                <input type="text" id="contact_no" name="contact_no" :value="selected.contact || ''" class="w-full input-field"/>
             </div>
 
             <div>
                 <label class="text-xs text-text mb-1">Unit</label>
-                <input type="text" class="w-full input-field"/>
+                <input type="text" :value="selected.unit || ''" class="w-full input-field"/>
             </div>
 
             <div>
                 <label class="text-xs text-text mb-1">Departemt</label>
-                <input type="text" class="w-full input-field"/>
+                <input type="text" :value="selected.department || ''" class="w-full input-field"/>
             </div>
 
             <div>
                 <label class="text-xs text-text mb-1">Hire Date</label>
-                <input type="text" disabled class="w-full cursor-not-allowed view-field"/>
+                <input type="text" disabled :value="selected.hire_date || ''" class="w-full cursor-not-allowed view-field"/>
             </div>
 
             <div class="flex justify-center gap-2 pt-2">
               <button type="button" title="Work History" class="btn btn-secondary">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="work history">
               </button>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="submit" name="update_personnel"  class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>
@@ -270,8 +286,8 @@ $admins = $controller->getAllAdmins();
         const output = document.getElementById('profile-preview');
         output.src = URL.createObjectURL(event.target.files[0]);
       }
-      window.adminSuccess = <?= isset($_SESSION['admin_success']) ? json_encode($_SESSION['admin_success']) : 'null' ?>;
-      window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
+      window.personnelSuccess = <?= isset($_SESSION['personnel_success']) ? json_encode($_SESSION['personnel_success']) : 'null' ?>;
+      window.personnelError = <?= isset($_SESSION['personnel_error']) ? json_encode($_SESSION['personnel_error']) : 'null' ?>;
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
@@ -279,6 +295,6 @@ $admins = $controller->getAllAdmins();
 
 <?php
 // Clear session variables after outputting
-unset($_SESSION['admin_success']);
-unset($_SESSION['admin_error']);
+unset($_SESSION['personnel_success']);
+unset($_SESSION['personnel_error']);
 ?>

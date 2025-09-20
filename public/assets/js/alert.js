@@ -192,3 +192,33 @@ document.getElementById('updateBtn').addEventListener('click', function(e) {
       }
   })
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.personnelSuccess) {
+    const successMsg = typeof window.personnelSuccess === 'string'
+      ? window.personnelSuccess
+      : (window.personnelSuccess.message || 'Operation successful.');
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: successMsg,
+      timer: 1000,
+      timerProgressBar: true,
+      showConfirmButton: false
+    });
+  }
+
+  if (window.personnelError) {
+    const errorMsg = typeof window.personnelError === 'string'
+      ? window.personnelError
+      : (window.personnelError.message || 'Something went wrong.');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: errorMsg,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: true
+    });
+  }
+});
