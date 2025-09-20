@@ -73,7 +73,7 @@ $data = $controller->getDashboardData($year);
         <div class="bg-white shadow rounded-lg p-4 text-center">
           <h2 class="text-gray-600 text-xs">Admins</h2>
           <p class="text-xl font-bold text-secondary">
-            <!-- <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?> --> 1
+            <?= isset($data['summary']['total_admin']) ? $data['summary']['total_admin'] : 0 ?> 
           </p>
         </div>
       </div>

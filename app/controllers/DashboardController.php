@@ -19,6 +19,7 @@ class DashboardController {
             'totalgPersonnel' => $summary['totalgPersonnel'] ?? 0,
             'totalDrivers'    => $summary['totalDrivers'] ?? 0,
             'total_user'      => $summary['total_user'] ?? 0,
+            'total_admin'      => $summary['total_admin'] ?? 0
         ];
     
         $data['monthly'] = $monthly;

@@ -23,7 +23,11 @@ class DashboardModel extends BaseModel  {
 
                 (
                     (SELECT COUNT(*) FROM requester)
-                ) AS total_user
+                ) AS total_user,
+
+                (
+                    (SELECT COUNT(*) FROM administrator)
+                ) AS total_admin
         ";
     
         $stmt = $this->db->prepare($sql);
