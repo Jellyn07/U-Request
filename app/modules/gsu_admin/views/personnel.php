@@ -1,11 +1,9 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../controllers/UserController.php';
-require_once __DIR__ . '/../../../controllers/AdminController.php';
+require_once __DIR__ . '/../../../controllers/PersonnelController.php';
 
-
-
+$controller = new PersonnelController(); $personnels = $controller->getAllPersonnel();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,8 +16,21 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   
+  <?php
+  // ✅ Pass PHP session values into JavaScript after scripts are loaded
+  if (isset($_SESSION['personnel_success'])) {
+      echo "<script>window.personnelSuccess = " . json_encode($_SESSION['personnel_success']) . "; console.log('Personnel Success:', window.personnelSuccess);</script>";
+      unset($_SESSION['personnel_success']);
+  }
+
+  if (isset($_SESSION['personnel_error'])) {
+      echo "<script>window.personnelError = " . json_encode($_SESSION['personnel_error']) . "; console.log('Personnel Error:', window.personnelError);</script>";
+      unset($_SESSION['personnel_error']);
+  }
+  ?>
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
@@ -39,7 +50,7 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
                 <option value="available">Available</option>
                 <option value="fixing">Fixing</option>
             </select>
-            <select class="input-field">
+            <select class="input-field" id="sortUsers">
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
             </select>
@@ -169,36 +180,54 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Department</th>
               </tr>
             </thead>
-            <tbody id="personnelTable" class="text-sm">
-              <?php 
-                require_once __DIR__ . '/../../../controllers/PersonnelController.php';
-                $controller = new PersonnelController();
-                $personnels = $controller->getAllPersonnel();
+            <tbody id="usersTable" class="text-sm">
+              
+            <?php if (!empty($personnels)): ?>
+              <?php foreach ($personnels as $person): ?>
 
-                if (!empty($personnels)) {
-                  foreach ($personnels as $person) {
-                    echo '
-                      <tr @click="showDetails = true; selected = ' . htmlspecialchars(json_encode($person)) . '" 
-                          class="hover:bg-gray-100 cursor-pointer text-left">
-                        <td class="pl-8 py-2">
-                          <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
-                        </td>
-                        <td class="px-4 py-2">' . htmlspecialchars($person['staff_id']) . '</td>
-                        <td class="px-4 py-2">' . htmlspecialchars($person['full_name']) . '</td>
-                        <td class="px-4 py-2">' . (!empty($person['status']) ? htmlspecialchars($person['status']) : 'Available') . '</td>
-                        <td class="px-4 py-2">' . htmlspecialchars($person['department']) . '</td>
-                      </tr>
-                    ';
-                  }
-                } else {
-                  echo '
-                    <tr>
-                      <td colspan="5" class="text-center py-4 text-gray-500">No personnel records found.</td>
-                    </tr>
-                  ';
-                }
-              ?>
-            </tbody>
+                <tr 
+                  data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
+                  data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
+                  data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
+                  @click="selected = {
+                      staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
+                      firstName: '<?= htmlspecialchars($person['firstName']) ?>',
+                      lastName: '<?= htmlspecialchars($person['lastName']) ?>',
+                      department: '<?= htmlspecialchars($person['department']) ?>',
+                      contact: '<?= htmlspecialchars($person['contact']) ?>',
+                      hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
+                      unit: '<?= htmlspecialchars($person['unit']) ?>',
+                      status: '<?= !empty($person['status']) ? htmlspecialchars($person['status']) : "Available" ?>',
+                      profile_pic: '/public/assets/img/user-default.png'
+                  }; showDetails = true"
+                  class="cursor-pointer hover:bg-gray-100"
+                >
+                  <td class="pl-4 py-2">
+                    <img src="/public/assets/img/user-default.png" 
+                        alt="User" 
+                        class="size-8 rounded-full object-cover">
+                  </td>
+                  <td class="px-4 py-2">
+                    <?= htmlspecialchars($person['staff_id']) ?>
+                  </td>
+                  <td class="px-4 py-2">
+                    <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
+                  </td>
+                  <td class="px-4 py-2 text-green-800">
+                    <?= !empty($person['status']) ? htmlspecialchars($person['status']) : 'Available' ?>
+                  </td>
+                  <td class="px-4 py-2">
+                    <?= htmlspecialchars($person['department']) ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="5" class="text-center py-4 text-gray-500">No personnel records found.</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+
           </table>
           </div>
         </div>
@@ -220,20 +249,20 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
           />
 
           <!-- Form -->
-          <form id="adminForm" class="space-y-2" method="post" action="../../../controllers/PersonnelController.php" >
+          <form id="personnelForm" class="space-y-2" method="post" action="../../../controllers/PersonnelController.php" >
             <div>
               <label class="text-xs text-text mb-1">Staff ID No.</label>
-              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field"/>
+              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field" readonly/>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="text-xs text-text mb-1">First Name</label>
-                <input type="text" id="firstName" name="firstName" :value="selected.firstName || ''" class="w-full input-field"/>
+                <input type="text" id="first_name" name="first_name" :value="selected.firstName || ''" class="w-full input-field"/>
               </div>
               <div>
                 <label class="text-xs text-text mb-1">Last Name</label>
-                <input type="text" id="lastName" name="lastName" :value="selected.lastName || ''" class="w-full input-field"/>
+                <input type="text" id="last_name" name="last_name" :value="selected.lastName || ''" class="w-full input-field"/>
               </div>
             </div>
 
@@ -244,17 +273,26 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
 
             <div>
                 <label class="text-xs text-text mb-1">Unit</label>
-                <input type="text" :value="selected.unit || ''" class="w-full input-field"/>
+                <select name="unit" class="w-full input-field">
+                  <option value="Tagum Unit" :selected="selected.unit === 'Tagum Unit'">Tagum Unit</option>
+                  <option value="Mabini Unit" :selected="selected.unit === 'Mabini Unit'">Mabini Unit</option>
+                </select>
             </div>
 
             <div>
-                <label class="text-xs text-text mb-1">Departemt</label>
-                <input type="text" :value="selected.department || ''" class="w-full input-field"/>
+                <label class="text-xs text-text mb-1">Department</label>
+                <select name="department" class="w-full input-field">
+                  <option value="Janitorial" :selected="selected.department === 'Janitorial'">Janitorial</option>
+                  <option value="Utility" :selected="selected.department === 'Utility'">Utility</option>
+                  <option value="Landscaping" :selected="selected.department === 'Landscaping'">Landscaping</option>
+                  <option value="Ground Maintenance" :selected="selected.department === 'Ground Maintenance'">Ground Maintenance</option>
+                  <option value="Building Repair And Maintenance" :selected="selected.department === 'Building Repair And Maintenance'">Building Repair And Maintenance</option>
+                </select>
             </div>
 
             <div>
                 <label class="text-xs text-text mb-1">Hire Date</label>
-                <input type="text" disabled :value="selected.hire_date || ''" class="w-full cursor-not-allowed view-field"/>
+                <input type="date" name="hire_date" :value="selected.hire_date || ''" class="w-full input-field"/>
             </div>
 
             <div class="flex justify-center gap-2 pt-2">
@@ -286,15 +324,7 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
         const output = document.getElementById('profile-preview');
         output.src = URL.createObjectURL(event.target.files[0]);
       }
-      window.personnelSuccess = <?= isset($_SESSION['personnel_success']) ? json_encode($_SESSION['personnel_success']) : 'null' ?>;
-      window.personnelError = <?= isset($_SESSION['personnel_error']) ? json_encode($_SESSION['personnel_error']) : 'null' ?>;
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 </html>
-
-<?php
-// Clear session variables after outputting
-unset($_SESSION['personnel_success']);
-unset($_SESSION['personnel_error']);
-?>

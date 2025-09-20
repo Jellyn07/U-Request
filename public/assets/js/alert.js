@@ -117,15 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("adminForm");
+  const adminForm = document.getElementById("adminForm");
+  const personnelForm = document.getElementById("personnelForm");
 
-  if (form) {
-    form.addEventListener("submit", function (e) {
+  if (adminForm) {
+    adminForm.addEventListener("submit", function (e) {
       e.preventDefault(); 
 
       Swal.fire({
         title: "Are you sure?",
-        text: "Do you want to update this administrator’s details?",
+        text: "Do you want to update this administrator's details?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -134,7 +135,28 @@ document.addEventListener("DOMContentLoaded", function () {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          form.submit();
+          adminForm.submit();
+        }
+      });
+    });
+  }
+
+  if (personnelForm) {
+    personnelForm.addEventListener("submit", function (e) {
+      e.preventDefault(); 
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to update this personnel's details?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update it",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          personnelForm.submit();
         }
       });
     });
@@ -193,32 +215,39 @@ document.getElementById('updateBtn').addEventListener('click', function(e) {
   })
 });
 
+// Personnel alerts handler
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Alert.js loaded, checking for personnel messages...');
+  console.log('window.personnelSuccess:', window.personnelSuccess);
+  console.log('window.personnelError:', window.personnelError);
+  
+  // Check for personnel success message
   if (window.personnelSuccess) {
-    const successMsg = typeof window.personnelSuccess === 'string'
-      ? window.personnelSuccess
-      : (window.personnelSuccess.message || 'Operation successful.');
+    console.log('Showing personnel success alert:', window.personnelSuccess);
     Swal.fire({
       icon: 'success',
       title: 'Success',
-      text: successMsg,
-      timer: 1000,
+      text: window.personnelSuccess,
+      timer: 2000,
       timerProgressBar: true,
       showConfirmButton: false
     });
+    // Clear the variable after showing
+    window.personnelSuccess = null;
   }
 
+  // Check for personnel error message
   if (window.personnelError) {
-    const errorMsg = typeof window.personnelError === 'string'
-      ? window.personnelError
-      : (window.personnelError.message || 'Something went wrong.');
+    console.log('Showing personnel error alert:', window.personnelError);
     Swal.fire({
       icon: 'error',
       title: 'Error',
-      text: errorMsg,
-      timer: 3000,
+      text: window.personnelError,
+      timer: 4000,
       timerProgressBar: true,
       showConfirmButton: true
     });
+    // Clear the variable after showing
+    window.personnelError = null;
   }
 });

@@ -23,6 +23,31 @@ class PersonnelModel extends BaseModel {
 
     // Add new personnel
     public function addPersonnel($data) {
+        // Check duplicate staff_id
+        $checkStaff = $this->db->prepare("SELECT COUNT(*) as cnt FROM gsu_personnel WHERE staff_id = ?");
+        $checkStaff->bind_param("i", $data['staff_id']);
+        $checkStaff->execute();
+        $staffResult = $checkStaff->get_result()->fetch_assoc();
+        $checkStaff->close();
+    
+        if ($staffResult['cnt'] > 0) {
+            $_SESSION['personnel_error'] = "Staff ID already exists!";
+            return false;
+        }
+    
+        // Check duplicate contact number
+        $checkContact = $this->db->prepare("SELECT COUNT(*) as cnt FROM gsu_personnel WHERE contact = ?");
+        $checkContact->bind_param("s", $data['contact']);
+        $checkContact->execute();
+        $contactResult = $checkContact->get_result()->fetch_assoc();
+        $checkContact->close();
+    
+        if ($contactResult['cnt'] > 0) {
+            $_SESSION['personnel_error'] = "Contact number already exists!";
+            return false;
+        }
+    
+        // ✅ If no duplicates, proceed with insert
         $stmt = $this->db->prepare("CALL spAddGsuPersonnel (?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("issssss", 
             $data['staff_id'],
@@ -37,6 +62,7 @@ class PersonnelModel extends BaseModel {
         $stmt->close();
         return $result;
     }
+    
 
     // Update personnel
     public function updatePersonnel($data) {
