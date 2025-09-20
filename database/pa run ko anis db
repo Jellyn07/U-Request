@@ -1,22 +1,5 @@
 
 
-CREATE TABLE vehicle_request (
-    control_no INT AUTO_INCREMENT PRIMARY KEY,
-    req_id INT UNSIGNED NOT NULL,
-    date_request DATETIME DEFAULT CURRENT_TIMESTAMP,
-    tracking_id VARCHAR(50) NOT NULL UNIQUE,
-    trip_purpose VARCHAR(100) NOT NULL,
-    travel_destination VARCHAR(255) NOT NULL,
-    travel_date DATE NOT NULL,
-    return_date DATE NOT NULL,
-    departure_time TIME NOT NULL,
-    return_time TIME NOT NULL,
-    CONSTRAINT fk_vehicle_request_requester
-        FOREIGN KEY (req_id) REFERENCES requester(req_id)
-        ON DELETE CASCADE
-);
-
-
 CREATE TABLE passengers (
 	passenger_id INT auto_increment PRIMARY KEY,
     firstName VARCHAR(50) NOT NULL,

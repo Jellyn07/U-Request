@@ -20,8 +20,7 @@ $data = $controller->getDashboardData($year);
 <body class="bg-gray-100">
   <?php include COMPONENTS_PATH . '/superadmin_menu.php';?>
         <!-- include COMPONENTS_PATH . '/admin_header.php'; -->
-
-<main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
+  <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <!-- <p class="flex text-sm text-gray-600 p-4">
       <img src="/public/assets/img/upper_logo.png" class="size-5 m-0.5">
        > Dashboard
@@ -163,4 +162,5 @@ $data = $controller->getDashboardData($year);
     });
   </script>
 </body>
+<script src="/public/assets/js/shared/menus.js"></script>
 </html>
