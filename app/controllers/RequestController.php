@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../models/RequestModel.php';
 require_once __DIR__ . '/../config/constants.php';
 
@@ -114,6 +116,14 @@ class RequestController {
 
 
     }
+    public function getAllRequesters() {
+        return $this->model->getAllRequesters();
+    }
+    
+    public function getRequesterById($id) {
+        return $this->model->getRequesterById($id);
+    }
+    
 }
 
 // Run controller on form submission
@@ -121,3 +131,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $controller = new RequestController();
     $controller->submitRequest();
 }
+
+

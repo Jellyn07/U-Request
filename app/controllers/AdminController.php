@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 }
 
 // --- HANDLE POST REQUEST ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_admin']) ) {
     $controller = new AdminController();
 
     $data = [
@@ -179,15 +179,63 @@ class AdminController {
 
      // --- UPDATE ADMIN DETAILS ---
      public function updateAdmin($data) {
-        // Filter out null/empty fields so we only update changed ones
-        $updates = array_filter($data, function($value) {
-            return $value !== null && $value !== '';
-        });
-    
-        if (!empty($updates['admin_email'])) {
-            return $this->model->updateAdminDetails($updates);
+        // Check if staff_id already exists (exclude current admin)
+        if (!empty($data['staff_id']) && $this->model->isAdminIdExists($data['staff_id'], $data['admin_email'])) {
+            $_SESSION['update_status'] = 'duplicate';
+            return false;
         }
+    
+        // Proceed with update if email exists
+        if (!empty($data['admin_email'])) {
+            $success = $this->model->updateAdminDetails($data);
+            $_SESSION['update_status'] = $success ? 'success' : 'error';
+            return $success;
+        }
+    
+        $_SESSION['update_status'] = 'error';
         return false;
     }
     
+    
+    public function updateUser($data) {
+        // Check if requester_id exists
+        if (!empty($data['requester_id']) && $this->model->isRequesterIdExists($data['requester_id'], $data['email'])) {
+            $_SESSION['update_status'] = 'duplicate';
+            return false;
+        }
+    
+        if (!empty($data['email'])) {
+            return $this->model->updateUserDetails($data);
+        }
+    
+        return false;
+    }
+    
+    
 }
+
+// Handle POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
+    $controller = new AdminController(); // or AdminController if using admin
+
+    $data = [
+        'email' => $_POST['requester_email'],
+        'requester_id' => $_POST['requester_id'] ?? null,
+        'firstName' => $_POST['firstName'] ?? null,
+        'lastName' => $_POST['lastName'] ?? null,
+        'officeOrDept' => $_POST['officeOrDept'] ?? null
+    ];
+
+    $success = $controller->updateUser($data);
+
+    if (isset($_SESSION['update_status']) && $_SESSION['update_status'] === 'duplicate') {
+        $_SESSION['update_status'] = 'duplicate';
+    } else {
+        $_SESSION['update_status'] = $success ? 'success' : 'error';
+    }
+
+    header("Location: ../modules/superadmin/views/manage_user.php");
+    exit;
+}
+
+

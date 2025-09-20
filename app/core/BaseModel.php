@@ -12,6 +12,8 @@ class BaseModel {
     }
 
     public function __destruct() {
-        $this->db->close();
+        if ($this->db !== null) {
+            $this->db->close();
+        }
     }
 }

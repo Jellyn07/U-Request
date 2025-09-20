@@ -141,6 +141,76 @@ class AdministratorModel extends BaseModel {
         return $result;
     }
 
+    public function updateUserDetails($data) {
+        $allowedFields = [
+            'requester_id' => ['col' => 'requester_id', 'type' => 's'],
+            'firstName' => ['col' => 'firstName', 'type' => 's'],
+            'lastName' => ['col' => 'lastName', 'type' => 's'],
+            'officeOrDept' => ['col' => 'officeOrDept', 'type' => 's'],
+        ];
+    
+        $setParts = [];
+        $types = '';
+        $values = [];
+    
+        foreach ($allowedFields as $key => $meta) {
+            if (isset($data[$key]) && $data[$key] !== '' && $data[$key] !== null) {
+                $setParts[] = $meta['col'] . ' = ?';
+                $types .= $meta['type'];
+                $values[] = $data[$key];
+            }
+        }
+    
+        if (empty($setParts) || empty($data['email'])) return false;
+    
+        $sql = 'UPDATE requester SET ' . implode(', ', $setParts) . ' WHERE email = ?';
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+    
+        $types .= 's';
+        $values[] = $data['email'];
+    
+        $bindParams = [];
+        $bindParams[] = & $types;
+        foreach ($values as $idx => $val) {
+            $bindParams[] = & $values[$idx];
+        }
+    
+        call_user_func_array([$stmt, 'bind_param'], $bindParams);
+    
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    // Check if requester_id already exists (excluding the current user)
+    public function isRequesterIdExists($requester_id, $currentEmail) {
+        $sql = "SELECT COUNT(*) as count FROM vw_requesters WHERE requester_id = ? AND email != ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('ss', $requester_id, $currentEmail);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+    public function isAdminIdExists($staff_id, $currentEmail) {
+        $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE staff_id = ? AND email != ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('ss', $staff_id, $currentEmail);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+
     // Destructor
     public function __destruct() {
         if ($this->db) {

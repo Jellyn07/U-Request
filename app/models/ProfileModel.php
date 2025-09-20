@@ -75,5 +75,5 @@ class ProfileModel extends BaseModel {
         $stmt = $this->db->prepare("DELETE FROM requester WHERE email = ?");
         $stmt->bind_param("s", $requester_email);
         return $stmt->execute();
-    }
+    }   
 }

@@ -19,6 +19,7 @@ $requesters = $controller->getAllRequesters();
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
@@ -38,7 +39,7 @@ $requesters = $controller->getAllRequesters();
               <option value="have_pending">Active</option>
               <option value="no_pending">Inactive</option>
             </select>
-            <select class="input-field">
+            <select id="sortUsers" class="input-field">
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
             </select>
@@ -65,15 +66,17 @@ $requesters = $controller->getAllRequesters();
             <tbody id="usersTable">
             <?php foreach ($requesters as $req): ?>
               <tr 
-                  @click="selected = {
-                      email: '<?= htmlspecialchars($req['email']) ?>',
-                      firstName: '<?= htmlspecialchars($req['firstName']) ?>',
-                      lastName: '<?= htmlspecialchars($req['lastName']) ?>',
-                      requester_id: '<?= htmlspecialchars($req['requester_id']) ?>',
-                      officeOrDept: '<?= htmlspecialchars($req['officeOrDept']) ?>',
-                      profile_pic: '<?= !empty($req['profile_pic']) ? $req['profile_pic'] : '/public/assets/img/user-default.png' ?>'
-                    }; showDetails = true"
-                  class="cursor-pointer hover:bg-gray-100">
+              data-firstname="<?= htmlspecialchars($req['firstName']) ?>"
+              data-lastname="<?= htmlspecialchars($req['lastName']) ?>"
+              @click="selected = {
+                  email: '<?= htmlspecialchars($req['email']) ?>',
+                  firstName: '<?= htmlspecialchars($req['firstName']) ?>',
+                  lastName: '<?= htmlspecialchars($req['lastName']) ?>',
+                  requester_id: '<?= htmlspecialchars($req['requester_id']) ?>',
+                  officeOrDept: '<?= htmlspecialchars($req['officeOrDept']) ?>',
+                  profile_pic: '<?= !empty($req['profile_pic']) ? $req['profile_pic'] : '/public/assets/img/user-default.png' ?>'
+              }; showDetails = true"
+              class="cursor-pointer hover:bg-gray-100">
                 <td class="pl-4 py-2">
                   <img src="<?= !empty($req['profile_pic']) ? $req['profile_pic'] : '/public/assets/img/user-default.png' ?>"
                       alt="User" class="size-8 rounded-full object-cover">
@@ -98,80 +101,109 @@ $requesters = $controller->getAllRequesters();
         </div>
 
         <!-- Right Section (Details) -->
-        <div x-show="showDetails" x-cloak
-            class="bg-white shadow rounded-lg p-4">
-          <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
-            <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
-          </button>
+      <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4">
+        <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
+          <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
+        </button>
 
-          <h2 class="text-lg font-bold mb-2">User Information</h2>
+        <h2 class="text-lg font-bold mb-2">User Information</h2>
 
-          <!-- Profile Picture -->
-          <img id="profile-preview"  
-            :src="selected.profile_pic ? selected.profile_pic : '/public/assets/img/user-default.png'"
-            alt=""
-            class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4"
-          />
+        <!-- Profile Picture -->
+        <img id="profile-preview"  
+          :src="selected.profile_pic ? selected.profile_pic : '/public/assets/img/user-default.png'"
+          alt=""
+          class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4"
+        />
 
-          <!-- Form -->
-          <form id="userForm" class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
-            <input type="hidden" name="requester_email" :value="selected.email || ''">
+        <!-- Form -->
+        <form id="userForm" class="space-y-5" method="post" action="../../../controllers/AdminController.php">
+          <input type="hidden" name="requester_email" :value="selected.email || ''">
+          <input type="hidden" name="update_user" value="1">
 
+          <div>
+            <label class="text-sm text-text mb-1">USeP Email</label>
+            <input type="email" :value="selected.email || ''" disabled class="w-full view-field cursor-not-allowed"/>
+          </div>
+
+          <div>
+            <label class="text-sm text-text mb-1">Student/Staff ID No.</label>
+            <input type="text" name="requester_id" :value="selected.requester_id || ''" class="w-full input-field"/>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="text-sm text-text mb-1">USeP Email</label>
-              <input type="email" id="email" :value="selected.email || ''" disabled class="w-full view-field cursor-not-allowed"/>
+              <label class="text-sm text-text mb-1">First Name</label>
+              <input type="text" name="firstName" :value="selected.firstName || ''" class="w-full input-field"/>
             </div>
-
             <div>
-              <label class="text-sm text-text mb-1">Student/Staff ID No.</label>
-              <input type="text" id="requester_id" name="requester_id" :value="selected.requester_id || ''" class="w-full input-field"/>
+              <label class="text-sm text-text mb-1">Last Name</label>
+              <input type="text" name="lastName" :value="selected.lastName || ''" class="w-full input-field"/>
             </div>
+          </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm text-text mb-1">First Name</label>
-                <input type="text" id="firstName" name="firstName" :value="selected.firstName || ''" class="w-full input-field"/>
-              </div>
-              <div>
-                <label class="text-sm text-text mb-1">Last Name</label>
-                <input type="text" id="lastName" name="lastName" :value="selected.lastName || ''" class="w-full input-field"/>
-              </div>
-            </div>
+          <div>
+            <label for="dept" class="text-sm text-text mb-1">Program/Office</label>
+            <select name="officeOrDept" x-model="selected.officeOrDept" class="w-full input-field">
+              <option disabled value="">Select Department/Office</option>
+              <optgroup label="Department">
+                <option value="BEED">BEED</option>
+                <option value="BSNED">BSNED</option>
+                <option value="BECED">BECED</option>
+                <option value="BSED">BSED</option>
+                <option value="BSIT">BSIT</option>
+                <option value="BTVTED">BTVTED</option>
+                <option value="BSABE">BSABE</option>
+              </optgroup>
+              <optgroup label="OFFICES">
+                <option value="OSAS">OSAS</option>
+                <option value="CTET">CTET</option>
+                <option value="SDMD">SDMD</option>
+                <option value="CPU">CPU</option>
+                <option value="Chancellor Office">Chancellor Office</option>
+                <option value="Campus Library">Campus Library</option>
+                <option value="Campus Clinic">Campus Clinic</option>
+                <option value="Campus Register">Campus Register</option>
+                <option value="Admin Office">Admin Office</option>
+              </optgroup>
+              <option value="Others">Others</option>
+            </select>
+          </div>
 
-            <div>
-              <label for="dept" class="text-sm text-text mb-1">Program/Office</label>
-              <select id="dept" name="officeOrDept" x-model="selected.officeOrDept" class="w-full input-field">
-                <option disabled value="">Select Department/Office</option>
-                <optgroup label="Department">
-                    <option value="BEED">BEED</option>
-                    <option value="BSNED">BSNED</option>
-                    <option value="BECED">BECED</option>
-                    <option value="BSED">BSED</option>
-                    <option value="BSIT">BSIT</option>
-                    <option value="BTVTED">BTVTED</option>
-                    <option value="BSABE">BSABE</option>
-                </optgroup>
-                <optgroup label="OFFICES">
-                    <option value="OSAS">OSAS</option>
-                    <option value="CTET">CTET</option>
-                    <option value="SDMD">SDMD</option>
-                    <option value="CPU">CPU</option>
-                    <option value="Chancellor Office">Chancellor Office</option>
-                    <option value="Campus Library">Campus Library</option>
-                    <option value="Campus Clinic">Campus Clinic</option>
-                    <option value="Campus Register">Campus Register</option>
-                    <option value="Admin Office">Admin Office</option>
-                </optgroup>
-                <option value="Others">Others</option>
-              </select>
-            </div>
+          <div class="flex justify-center">
+            <button type="button" id="updateBtn" name="update_user" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
 
-            <div class="flex justify-center">
-              <button type="submit" name="update_user" class="btn btn-primary">Save Changes</button>
-            </div>
-          </form>
-        </div>
-
+      <script>
+      document.getElementById('updateBtn').addEventListener('click', function(e) {
+          Swal.fire({
+              title: 'Update User Details?',
+              text: "Are you sure you want to save these changes?",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, update!'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  document.getElementById('userForm').submit();
+              }
+          })
+      });
+      </script> <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        <?php if(isset($_SESSION['update_status'])): ?>
+          Swal.fire({
+            icon: '<?php echo $_SESSION['update_status'] === "success" ? "success" : ($_SESSION['update_status'] === "duplicate" ? "warning" : "error"); ?>',
+            title: '<?php echo $_SESSION['update_status'] === "success" ? "Updated!" : ($_SESSION['update_status'] === "duplicate" ? "Duplicate ID!" : "Error!"); ?>',
+            text: '<?php echo $_SESSION['update_status'] === "success" ? "User updated successfully." : ($_SESSION['update_status'] === "duplicate" ? "This requester ID already exists." : "Failed to update user."); ?>'
+          });
+          <?php unset($_SESSION['update_status']); ?>
+        <?php endif; ?>
+      });
+      </script>
       </div>
     </div>
   </div>
@@ -189,13 +221,3 @@ $requesters = $controller->getAllRequesters();
   </script>
 </body>
 </html>
-<?php if (isset($_SESSION['alert'])): ?>
-<script>
-Swal.fire({
-  icon: "<?= $_SESSION['alert']['type'] ?>",
-  title: "<?= $_SESSION['alert']['message'] ?>",
-  timer: 2000,
-  showConfirmButton: false
-});
-</script>
-<?php unset($_SESSION['alert']); endif; ?>

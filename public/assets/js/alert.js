@@ -158,3 +158,37 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+document.getElementById("userForm").addEventListener("submit", function(e) {
+  e.preventDefault(); // stop default submit
+
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Do you want to save these changes?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, save it!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      e.target.submit(); // actually submit form
+    }
+  });
+});
+
+document.getElementById('updateBtn').addEventListener('click', function(e) {
+  Swal.fire({
+      title: 'Update User Details?',
+      text: "Are you sure you want to save these changes?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update!'
+  }).then((result) => {
+      if (result.isConfirmed) {
+          document.getElementById('userForm').submit();
+      }
+  })
+});

@@ -4,9 +4,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../models/ProfileModel.php';
+require_once __DIR__ . '/../core/BaseModel.php';
 require_once __DIR__ . '/../config/constants.php';
 
-class ProfileController {
+class ProfileController extends BaseModel {
     private $model;
 
     public function __construct() {
@@ -43,6 +44,33 @@ class ProfileController {
     // Delete account
     public function deleteAccount($requester_id) {
         return $this->model->deleteAccount($requester_id);
+    }
+
+    // Update full profile
+    public function updateProfile($data) {
+        $sql = "UPDATE requester SET 
+                    requester_id = ?, 
+                    firstName = ?, 
+                    lastName = ?, 
+                    officeOrDept = ?, 
+                    contact_no = ?, 
+                    accessLevel_id = ?
+                WHERE email = ?";
+        $stmt = $this->db->prepare($sql);
+
+        if (!$stmt) {
+            throw new Exception("SQL Prepare failed: " . $this->db->error);
+        }
+
+        return $stmt->execute([
+            $data['requester_id'],
+            $data['firstName'],
+            $data['lastName'],
+            $data['officeOrDept'],
+            $data['contact_no'] ?? null,
+            $data['accessLevel_id'] ?? null,
+            $data['email']
+        ]);
     }
 }
 
@@ -137,4 +165,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['officeOrDept'], $_POS
     header("Location: /app/modules/user/views/profile.php");
     exit;
 }
-

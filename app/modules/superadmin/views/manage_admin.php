@@ -20,6 +20,7 @@ $admins = $controller->getAllAdmins();
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   
 </head>
 <body class="bg-gray-100">
@@ -40,7 +41,7 @@ $admins = $controller->getAllAdmins();
               <option value="have_pending">Have Pending</option>
               <option value="no_pending">No Pending</option>
             </select>
-            <select class="input-field">
+            <select id="sortUsers" class="input-field">
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
             </select>
@@ -183,6 +184,8 @@ $admins = $controller->getAllAdmins();
               <?php if (!empty($admins)): ?>
                 <?php foreach ($admins as $admin): ?>
                   <tr 
+                      data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
+                      data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
                       @click="showDetails = true; selected = {
                         staff_id: '<?php echo $admin['staff_id']; ?>',
                         email: '<?php echo $admin['email']; ?>',
@@ -243,7 +246,9 @@ $admins = $controller->getAllAdmins();
 
           <!-- Form -->
           <form id="adminForm" class="space-y-5" method="post" action="../../../controllers/AdminController.php">
-            <input type="hidden" name="admin_email" :value="selected.email || ''">
+          <input type="hidden" name="admin_email" x-model="selected.email">
+          <input type="hidden" name="update_admin" value="1">
+
 
             <div>
               <label class="text-sm text-text mb-1">USeP Email</label>
@@ -304,11 +309,8 @@ $admins = $controller->getAllAdmins();
             </button>
           </div>
         </div>
-
-
-
             <div class="flex justify-center">
-              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <button type="submit" name="update_admin" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>
