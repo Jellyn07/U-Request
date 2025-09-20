@@ -20,43 +20,41 @@ $admins = $controller->getAllAdmins();
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
-  <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-4">Manage Admin</h1>
+      <h1 class="text-2xl font-bold mb-4">Personnels</h1>
       <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
             <!-- Search + Filters + Buttons -->
-            <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
+            <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
             <select class="input-field">
-              <option value="all">All</option>
-              <option value="1">Super Admin</option>
-              <option value="2">GSU Admin</option>
-              <option value="3">Motorpool Admin</option>
+                <option value="all">All</option>
+                <option value="available">Available</option>
+                <option value="fixing">Fixing</option>
             </select>
-            <select id="sortUsers" class="input-field">
-              <option value="az">Sort A-Z</option>
-              <option value="za">Sort Z-A</option>
+            <select class="input-field">
+                <option value="az">Sort A-Z</option>
+                <option value="za">Sort Z-A</option>
             </select>
-            <button class="input-field">
-              <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
+            <button title="Print data in the table" class="input-field">
+                <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
-            <button class="input-field">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+            <button class="input-field" title="Export to Excel">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
-          <div x-data="{ showModal: false }">
+                <div x-data="{ showModal: false }">
             <!-- Trigger Button (example only) -->
-            <button @click="showModal = true" class="btn btn-secondary">
-              <img src="/public/assets/img/add-admin.png" alt="User" class="size-4 my-0.5">
+            <button @click="showModal = true" title="Add new personnel" class="btn btn-secondary">
+                <img src="/public/assets/img/add-admin.png" alt="User" class="size-4 my-0.5">
             </button>
 
             <!-- Modal Background -->
@@ -90,17 +88,17 @@ $admins = $controller->getAllAdmins();
                   <!-- Identity Information -->
                   <div class="flex justify-center">
                     <div class="w-full">
-                      <h2 class="text-base font-semibold">Admin Credentials</h2>
+                      <h2 class="text-base font-medium">Personnel Credentials</h2>
                       <!-- <form class="space-y-4" method="post"> -->
                         <div>
                           <label class="text-xs text-text mb-1">Staff ID No.<span class="text-secondary">*</span></label>
                           <input type="text" name="staff_id" class="w-full input-field" required />
                         </div>
 
-                        <div>
-                          <label class="text-xs text-text mb-1">USeP Email<span class="text-secondary">*</span></label>
+                        <!-- <div>
+                          <label class="text-xs text-text mb-1">USeP Email</label>
                           <input type="email" name="email" class="w-full input-field" required />
-                        </div>
+                        </div> -->
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
@@ -114,45 +112,39 @@ $admins = $controller->getAllAdmins();
                         </div>
 
                         <div>
-                          <label class="text-xs text-text mb-1">Contact No.<span class="text-secondary">*</span></label>
-                          <input type="text" name="contact_no" 
-                                class="w-full input-field" 
-                                required 
-                                minlength="11" 
-                                maxlength="11" 
-                                pattern="[0-9]{11}" 
-                                title="Please enter a valid 11-digit contact number" />
+                            <label class="text-xs text-text mb-1">Contact No.<span class="text-secondary">*</span></label>
+                            <input type="text" name="contact_no" required minlength="11" maxlength="11" pattern="[0-9]{11}" title="Please enter a valid 11-digit contact number" class="w-full input-field"/>
                         </div>
 
                         <div>
-                          <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
+                          <label class="text-xs text-text mb-1">Unit<span class="text-secondary">*</span></label>
                           <select name="access_level" class="w-full input-field" required>
-                            <option value="" disabled selected>Select Access</option>
-                            <option value="1">Super Admin</option>
-                            <option value="2">GSU Admin</option>
-                            <option value="3">Motorpool Admin</option>
+                            <option value="" disabled selected>Select Unit</option>
+                            <option value="tagum">Tagum Unit</option>
+                            <option value="mabini">Mabini Unit</option>
                           </select>
                         </div>
+
+                        <div>
+                          <label class="text-xs text-text mb-1">Department<span class="text-secondary">*</span></label>
+                          <select name="department" class="w-full input-field" required>
+                            <option value="" disabled selected>Select department</option>
+                            <option value="Janitorial">Janitorial</option>
+                            <option value="Utility">Utility</option>
+                            <option value="Landscaping">Landscaping</option>
+                            <option value="Ground Maintenance">Ground Maintenance</option>
+                            <option value="Building Repair And Maintenance">Building Repair And Maintenance</option>
+                          </select>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-text mb-1">Hire Date<span class="text-secondary">*</span></label>
+                            <input type="date" name="hire_date" required class="w-full input-field"/>
+                        </div>
                       <!-- </form> -->
                     </div>
                   </div>
 
-                  <!-- Password Update -->
-                  <div class="flex justify-center">
-                    <div class="w-full">
-                      <h2 class="text-base font-semibold mt-5">Default Password</h2>
-                      <!-- <form class="space-y-4" method="post" action="../../../controllers/ProfileController.php"> -->
-                        <div>
-                          <label class="text-xs text-text mb-1">Password<span class="text-secondary">*</span></label>
-                          <input type="password" name="password" class="w-full input-field" required />
-                        </div>
-                        <div>
-                          <label class="text-xs text-text mb-1">Confirm Password<span class="text-secondary">*</span></label>
-                          <input type="password" name="confirm_password" class="w-full input-field" required />
-                        </div>
-                      <!-- </form> -->
-                    </div>
-                  </div>
 
                   <!-- Action Buttons -->
                   <div class="flex justify-center gap-2 pt-4">
@@ -170,90 +162,49 @@ $admins = $controller->getAllAdmins();
           <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow">
           <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg p-2">
             <thead class="bg-gray-50">
-              <tr>
-                <th class="px-1 py-2 rounded-tl-lg">&nbsp;</th>
+              <tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Access Level</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Department</th>
               </tr>
             </thead>
-            <tbody id="usersTable" class="text-sm">
-              <?php if (!empty($admins)): ?>
-                <?php foreach ($admins as $admin): ?>
-                  <tr 
-                      data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
-                      data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
-                      @click="showDetails = true; selected = {
-                        staff_id: '<?php echo $admin['staff_id']; ?>',
-                        email: '<?php echo $admin['email']; ?>',
-                        first_name: '<?php echo $admin['first_name']; ?>',
-                        last_name: '<?php echo $admin['last_name']; ?>',
-                        full_name: '<?php echo $admin['full_name']; ?>',
-                        contact_no: '<?php echo $admin['contact_no']; ?>',
-                        profile_picture: '<?php echo $admin['profile_picture']; ?>',
-                        accessLevel_id: '<?php echo $admin['accessLevel_id']; ?>',
-                        accessLevel_desc: '<?php echo $admin['accessLevel_desc']; ?>',
-                        status: '<?php echo $admin['status']; ?>'
-                      }"
-                      class="cursor-pointer hover:bg-gray-100"
-                    >
-                    <td class="pl-8 py-2">
-                    <img src="<?php echo !empty($admin['profile_picture']) 
-                                ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) 
-                                : '/public/assets/img/user-default.png'; ?>" 
-                                  alt="User" 
-                                  class="size-8 rounded-full object-cover">
-                    </td>
-                    <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['full_name']); ?>
-                    </td>
-                    <td class="px-4 py-2 <?php echo strtolower($admin['status']) === 'active' ? 'text-green-800' : 'text-red-800'; ?>">
-                      <?php echo htmlspecialchars($admin['status']); ?>
-                    </td>
-                    <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['email']); ?>
-                    </td>
-                    <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['accessLevel_desc']); ?>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr>
-                  <td colspan="4" class="text-center py-4 text-gray-500">No administrators found.</td>
-                </tr>
-              <?php endif; ?>
+            <tbody id="personnelTable" class="text-sm">
+                <?php for($i=0; $i<12; $i++){
+                    echo'
+                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left">
+                            <td class="pl-8 py-2">
+                                <img src="/public/assets/img/user-default.png" alt="User" class="size-8 rounded-full object-cover">
+                            </th>
+                            <td class="px-4 py-2">Jellyn Omo</th>
+                            <td class="px-4 py-2">Available</th>
+                            <td class="px-4 py-2">Utility</th>
+                        </tr>                    
+                    ';
+                } 
+                ?>
             </tbody>
           </table>
           </div>
         </div>
 
         <!-- Right Section (Details) -->
-        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4">
+        <div x-show="showDetails" x-cloak
+            class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
 
-          <h2 class="text-lg font-bold mb-2">Admin Information</h2>
+          <h2 class="text-lg font-bold mb-2">Personnel Information</h2>
 
           <!-- Profile Picture -->
           <img id="profile-preview"  
             :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
             alt=""
-            class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto"
+            class="w-24 h-24 rounded-full object-cover shadow-sm mx-auto"
           />
 
           <!-- Form -->
-          <form id="adminForm" class="space-y-2" method="post" action="../../../controllers/AdminController.php">
-            <input type="hidden" name="admin_email" x-model="selected.email">
-            <input type="hidden" name="update_admin" value="1">
-
-            <div>
-              <label class="text-xs text-text mb-1">USeP Email</label>
-              <input type="email" id="email" :value="selected.email || ''" disabled class="w-full view-field cursor-not-allowed"/>
-            </div>
-
+          <form id="adminForm" class="space-y-2" method="post">
             <div>
               <label class="text-xs text-text mb-1">Staff ID No.</label>
               <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field"/>
@@ -269,23 +220,32 @@ $admins = $controller->getAllAdmins();
                 <input type="text" id="lastName" name="lastName" :value="selected.last_name || ''" class="w-full input-field"/>
               </div>
             </div>
-            
+
             <div>
-              <label class="text-xs text-text mb-1">Contact No.</label>
-              <input type="text" id="contact_no" name="contact_no" :value="selected.contact_no || ''" class="w-full input-field"/>
+                <label class="text-xs text-text mb-1">Contact No.</label>
+                <input type="text" id="contact_no" name="contact_no" class="w-full input-field"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Access Level</label>
-              <select name="accessLevel_id" x-model="selected.accessLevel_id" class="w-full input-field">
-                <option value="1">GSU Administrator</option>
-                <option value="2">Motorpool Administrator</option>
-                <option value="3">Superadmin</option>
-              </select>
+                <label class="text-xs text-text mb-1">Unit</label>
+                <input type="text" class="w-full input-field"/>
             </div>
 
-            <div class="flex justify-center">
-              <button type="submit" name="update_admin" class="btn btn-primary mt-2">Save Changes</button>
+            <div>
+                <label class="text-xs text-text mb-1">Departemt</label>
+                <input type="text" class="w-full input-field"/>
+            </div>
+
+            <div>
+                <label class="text-xs text-text mb-1">Hire Date</label>
+                <input type="text" disabled class="w-full cursor-not-allowed view-field"/>
+            </div>
+
+            <div class="flex justify-center gap-2 pt-2">
+              <button type="button" title="Work History" class="btn btn-secondary">
+                <img src="/public/assets/img/work-history.png" class="size-4" alt="work history">
+              </button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>
@@ -298,7 +258,7 @@ $admins = $controller->getAllAdmins();
   <script>
     document.getElementById('searchUser').addEventListener('input', function() {
       const filter = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#usersTable tr');
+      const rows = document.querySelectorAll('#personnelTable tr');
       rows.forEach(row => {
         const name = row.children[1].textContent.toLowerCase();
         const email = row.children[2].textContent.toLowerCase();

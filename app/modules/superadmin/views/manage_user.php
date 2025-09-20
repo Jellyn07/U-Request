@@ -60,10 +60,10 @@ $requesters = $controller->getAllRequesters();
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Office or Department</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Office / Department</th>
               </tr>
             </thead>
-            <tbody id="usersTable">
+            <tbody id="usersTable" class="text-sm">
             <?php foreach ($requesters as $req): ?>
               <tr 
               data-firstname="<?= htmlspecialchars($req['firstName']) ?>"
@@ -101,7 +101,7 @@ $requesters = $controller->getAllRequesters();
         </div>
 
         <!-- Right Section (Details) -->
-      <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4">
+      <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
         <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
           <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
         </button>
@@ -169,7 +169,10 @@ $requesters = $controller->getAllRequesters();
             </select>
           </div>
 
-          <div class="flex justify-center">
+          <div class="flex justify-center gap-2">
+            <button type="button" name="update_user" title="Request History" class="btn btn-secondary">
+              <img src="/public/assets/img/work-history.png" class="size-4" alt="Request history">
+            </button>
             <button type="button" id="updateBtn" name="update_user" class="btn btn-primary">Save Changes</button>
           </div>
         </form>
@@ -220,4 +223,5 @@ $requesters = $controller->getAllRequesters();
     });
   </script>
 </body>
+<script src="/public/assets/js/shared/menus.js"></script>
 </html>
