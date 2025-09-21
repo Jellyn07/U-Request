@@ -5,6 +5,19 @@ require_once __DIR__ . '/../core/BaseModel.php';
 require_once __DIR__ . '/../models/ProfileModel.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);
+
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$controller = new ProfileController();
+
+// Get user ID from session
+$requester_email = $_SESSION['email'] ?? null;
+
+// Safely load profile; may be null if not found
+$profile = $requester_email ? $controller->getProfile($requester_email) : null;
 ?>
 <style>
   .logout-icon {
