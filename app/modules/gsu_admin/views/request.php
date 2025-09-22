@@ -29,16 +29,37 @@ $admins = $controller->getAllAdmins();
     <div class="p-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Repair Request</h1>
+
+        <div id="tabs" class="flex gap-2 mt-4 text-xs text-gray-700">
+            <button class="ml-5 btn bg-white hover:bg-red-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg">
+                <p>All</p>
+            </button>
+            <button class="btn">
+                <p>To Inspect</p>
+            </button>
+            <button class="btn">
+                <p>In Progress</p>
+            </button>
+            <button class="btn">
+                <p>Completed</p>
+            </button>
+        </div>
       <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="search" placeholder="Search by ID or Requester Name" class="flex-1 min-w-[200px] input-field">
             <select class="input-field">
                 <option value="all">All</option>
-                <option value="available">Available</option>
-                <option value="fixing">Unavailable</option>
+                <option>Carpentry/Masonry</option>
+                <option>Welding</option>
+                <option>Hauling</option>
+                <option>Plumbing</option>
+                <option>Landscaping</option>
+                <option>Electrical</option>
+                <option>Air-Condition</option>
+                <option>Others</option>
             </select>
             <select class="input-field">
                 <option value="az">Sort A-Z</option>
@@ -51,78 +72,37 @@ $admins = $controller->getAllAdmins();
                 <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
-                <div x-data="{ showModal: false }">
-            <!-- Trigger Button (example only) -->
-            <button @click="showModal = true" title="Add new material" class="btn btn-secondary">
-                <img src="/public/assets/img/add-material.png" alt="User" class="size-5 ">
-            </button>
-
-            <!-- Modal Background -->
-            <div x-show="showModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
-              <div class="bg-white rounded-xl shadow-xl w-90% md:w-1/5 mx-auto relative overflow-auto">
-                <!-- Modal Content -->
-                <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
-                  <!-- Profile Picture -->
-                  <form method="post" action="../../../controllers/AdminController.php" enctype="multipart/form-data">
-                  <!-- Identity Information -->
-                  <div class="flex justify-center">
-                    <div class="w-full">
-                      <h2 class="text-base font-medium mb-3">Add Materials</h2>
-                        <div>
-                          <label class="text-xs text-text mb-1">Material Code No.<span class="text-secondary">*</span></label>
-                          <input type="text" name="staff_id" class="w-full input-field" required />
-                        </div>
-
-                        <div>
-                          <label class="text-xs text-text mb-1">Description<span class="text-secondary">*</span></label>
-                          <input type="text" name="staff_id" class="w-full input-field" required />
-                        </div>
-
-                        <div>
-                          <label class="text-xs text-text mb-1">Quantity<span class="text-secondary">*</span></label>
-                          <input type="number" name="staff_id" class="w-full input-field" required />
-                        </div>
-
-                      </div>
-                    </div>
-                  </form>
-
-
-                  <!-- Action Buttons -->
-                  <div class="flex justify-center gap-2 pt-4">
-                    <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" name="add_admin" class="btn btn-primary px-7">Save</button>
-                  </div>
-                </main>
-              </div>
-            </div>
-
+            <div x-data="{ showModal: false }">
           </div>
-          </div>
-
-            <div class="mt-4">
-
-            </div>
+        </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto rounded-lg shadow">
-          <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg p-2">
-            <thead class="bg-gray-50">
+          <div class="overflow-x-auto max-h-[540px] overflow-y-auto rounded-b-lg shadow">
+          <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-b-lg p-2">
+            <thead class="bg-white sticky top-0">
               <tr>
-                <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Status</th>
               </tr>
             </thead>
             <tbody id="table" class="text-sm">
-                <?php for($i=0; $i<12; $i++){
+                <?php for($i=0; $i<20; $i++){
                     echo'
                         <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left">
                             <td class="pl-8 py-3">0001</th>
-                            <td class="px-4 py-3">Nails</th>
-                            <td class="px-4 py-3">15</th>
-                            <td class="px-4 py-3">Available</th>
+                            <td class="px-4 py-3">Juan Cruz</th>
+                            <td class="px-4 py-3">Electrical</th>
+                            <td class="px-4 py-3">Admin Building</th>
+                            <td class="px-4 py-3">
+                            <select class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                                <option value="to inspect" selected>To Inspect</option>
+                                <option value="to inspect">In Progress</option> /*This is blue*/
+                                <option value="to inspect">Completed</option> /*This is green*/
+                            </select>
+                            </th>
                         </tr>                    
                     ';
                 } 
@@ -134,81 +114,68 @@ $admins = $controller->getAllAdmins();
 
         <!-- Right Section (Details) -->
         <div x-show="showDetails" x-cloak
-            class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
+            class="bg-white shadow rounded-lg p-4 max-h-[602px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
           
           <!-- Form -->
-          <form id="adminForm" class="space-y-5" method="post">
-            <h2 class="text-lg font-bold">Material Information</h2>
+          <form id="adminForm" class="space-y-1" method="post">
+            <h2 class="text-lg font-bold mb-2">Repair Information</h2>
+
+            <img id="profile-preview"  
+            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/default-img.png'"
+            alt=""
+            class="w-10/12 shadow-lg mx-auto rounded-lg"
+            />
+
             <div>
-              <label class="text-xs text-text mb-1">Material Code No.</label>
-              <input type="text" :value="selected.staff_id || ''" class="w-full input-field"/>
+              <label class="text-xs text-text mb-1">Tracking No.</label>
+              <input type="text" class="w-full view-field"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Description</label>
-              <input type="text" :value="selected.staff_id || ''" class="w-full input-field"/>
+              <label class="text-xs text-text mb-1">Requester</label>
+              <input type="text" class="w-full view-field"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Current Quantity</label>
-              <div class="w-full flex gap-2">
-                <input type="text" class="w-full view-field mt-0" disabled/>
-                <button type="button" @click="addmaterial = true" title="Add Stock" class="btn btn-secondary py-0.5 px-4">
-                  <img src="/public/assets/img/add.png" class="size-3" alt="Add Stock">
-                </button>
-              </div>
-              
-              
+              <label class="text-xs text-text mb-1">Category</label>
+              <input type="text" class="w-full view-field"/>
             </div>
 
-            <div class="flex justify-center gap-2 pt-2">
-              <button type="button" title="Material Used History" class="btn btn-secondary">
-                <img src="/public/assets/img/work-history.png" class="size-4" alt="Material Used History">
-              </button>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+            <div>
+              <label class="text-xs text-text mb-1">Location</label>
+              <input type="text" class="w-full view-field"/>
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">Assign Personnel</label>
+              <select type="text" :value="selected.staff_id || ''" class="w-full input-field">
+                <option value="" disabled selected>Select Personnel</option>
+                <option>John Doe</option>
+                <option>Jane Smith</option>
+                <option>Mike Johnson</option>
+                <option>John Doe</option>
+                <option>Jane Smith</option>
+                <option>Mike Johnson</option>
+                <option>John Doe</option>
+                <option>Jane Smith</option>
+                <option>Mike Johnson</option>
+              </select>
+            </div>
+
+            <div class="flex justify-center pt-2">
+                <!-- Use the request layout in user just add the completion date -->
+                <button type="button" title="View all request information" class="btn btn-primary">Full Details</button>
             </div>
           </form>
-
         </div>
-
-
-        <!-- Stock Management Modal -->
-        <div x-show="addmaterial" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center  z-50 overflow-auto">
-          <div class="bg-white rounded-lg shadow-lg w-1/5 p-6">
-            <!-- <h2 class="text-lg font-semibold mb-4">Stock Management</h2> -->
-            <form method="post" action="add_stock.php">
-              <div class="mb-4">
-                <label class="block text-xs mb-1">Quantity to Add<span class="text-secondary">*</span></label>
-                <input type="number" name="quantity" class="w-full input-field" required>
-              </div>
-              <div class="flex justify-center gap-2">
-                <button type="button" @click="addmaterial = false" class="btn btn-secondary">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add</button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-
       </div>
     </div>
   </div>
   </main>
-
-  <script>
-      window.adminSuccess = <?= isset($_SESSION['admin_success']) ? json_encode($_SESSION['admin_success']) : 'null' ?>;
-      window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
-  </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
 </html>
-
-<?php
-// Clear session variables after outputting
-unset($_SESSION['admin_success']);
-unset($_SESSION['admin_error']);
-?>
