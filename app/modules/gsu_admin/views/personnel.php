@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/PersonnelController.php';
 
 $controller = new PersonnelController(); $personnels = $controller->getAllPersonnel();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,10 +129,10 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
 
                         <div>
                           <label class="text-xs text-text mb-1">Unit<span class="text-secondary">*</span></label>
-                          <select name="access_level" class="w-full input-field" required>
+                          <select name="unit" class="w-full input-field" required>
                             <option value="" disabled selected>Select Unit</option>
-                            <option value="tagum">Tagum Unit</option>
-                            <option value="mabini">Mabini Unit</option>
+                            <option value="Tagum Unit">Tagum Unit</option>
+                            <option value="Mabini Unit">Mabini Unit</option>
                           </select>
                         </div>
 
@@ -149,7 +150,7 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
 
                         <div>
                             <label class="text-xs text-text mb-1">Hire Date<span class="text-secondary">*</span></label>
-                            <input type="date" name="hire_date" required class="w-full input-field"/>
+                            <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
                         </div>
                       <!-- </form> -->
                     </div>
@@ -291,9 +292,10 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
             </div>
 
             <div>
-                <label class="text-xs text-text mb-1">Hire Date</label>
-                <input type="date" name="hire_date" :value="selected.hire_date || ''" class="w-full input-field"/>
+              <label class="text-xs text-text mb-1">Hire Date</label>
+              <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
             </div>
+
 
             <div class="flex justify-center gap-2 pt-2">
               <button type="button" title="Work History" class="btn btn-secondary">
@@ -312,7 +314,7 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
   <script>
     document.getElementById('searchUser').addEventListener('input', function() {
       const filter = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#personnelTable tr');
+      const rows = document.querySelectorAll('#usersTable tr');
       rows.forEach(row => {
         const name = row.children[1].textContent.toLowerCase();
         const email = row.children[2].textContent.toLowerCase();

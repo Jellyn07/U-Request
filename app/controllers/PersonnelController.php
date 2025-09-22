@@ -27,42 +27,50 @@ class PersonnelController {
             'hire_date'  => $postData['hire_date'] ?? '',
             'unit'       => $postData['unit'] ?? ''
         ];
-
+    
         $result = $this->model->addPersonnel($data);
-
+    
         if ($result) {
             $_SESSION['personnel_success'] = "Personnel added successfully!";
         } else {
-            $_SESSION['personnel_error'] = $_SESSION['db_error'] ?? "Failed to add personnel.";
+            // ✅ Keep specific model error if it exists
+            if (!isset($_SESSION['personnel_error'])) {
+                $_SESSION['personnel_error'] = $_SESSION['db_error'] ?? "Failed to add personnel.";
+            }
         }
-
+    
         header("Location: ../modules/gsu_admin/views/personnel.php");
         exit;
     }
+    
 
     // --- UPDATE PERSONNEL ---
     public function updatePersonnel($postData) {
         $data = [
-            'staff_id'   => $postData['staff_id'] ?? null,
-            'firstName'  => $postData['first_name'] ?? null,
-            'lastName'   => $postData['last_name'] ?? null,
-            'department' => $postData['department'] ?? null,
-            'contact'    => $postData['contact_no'] ?? null,
-            'hire_date'  => $postData['hire_date'] ?? null,
-            'unit'       => $postData['unit'] ?? null
+            'staff_id'  => $postData['staff_id'] ?? null,
+            'firstName' => $postData['first_name'] ?? '',
+            'lastName'  => $postData['last_name'] ?? '',
+            'department'=> $postData['department'] ?? '',
+            'contact'   => $postData['contact_no'] ?? '',
+            'hire_date' => $postData['hire_date'] ?? '',
+            'unit'      => $postData['unit'] ?? ''
+            
         ];
 
-        $updated = $this->model->updatePersonnel($data);
+        $ok = $this->model->updatePersonnel($data);
 
-        if ($updated) {
+        if ($ok) {
             $_SESSION['personnel_success'] = "Personnel updated successfully!";
         } else {
-            $_SESSION['personnel_error'] = "Failed to update personnel.";
+            if (!isset($_SESSION['personnel_error'])) {
+                $_SESSION['personnel_error'] = "Failed to update personnel.";
+            }
         }
 
         header("Location: ../modules/gsu_admin/views/personnel.php");
         exit;
     }
+
 
     // --- DELETE PERSONNEL ---
     public function deletePersonnel($staff_id) {
@@ -92,8 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_personnel'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_personnel'])) {
+    $controller = new PersonnelController();
     $controller->updatePersonnel($_POST);
 }
+
 
 // --- HANDLE GET REQUEST (DELETE) ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['delete'])) {

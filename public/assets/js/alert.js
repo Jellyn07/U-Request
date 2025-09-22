@@ -156,6 +156,14 @@ document.addEventListener("DOMContentLoaded", function () {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
+          // Ensure routing flag is present because programmatic submit omits the clicked button name
+          if (!personnelForm.querySelector('input[name="update_personnel"]')) {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'update_personnel';
+            hidden.value = '1';
+            personnelForm.appendChild(hidden);
+          }
           personnelForm.submit();
         }
       });
@@ -181,73 +189,75 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-document.getElementById("userForm").addEventListener("submit", function(e) {
-  e.preventDefault(); // stop default submit
+const userForm = document.getElementById("userForm");
+if (userForm) {
+  userForm.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-  Swal.fire({
-    title: "Are you sure?",
-    text: "Do you want to save these changes?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, save it!"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      e.target.submit(); // actually submit form
-    }
-  });
-});
-
-document.getElementById('updateBtn').addEventListener('click', function(e) {
-  Swal.fire({
-      title: 'Update User Details?',
-      text: "Are you sure you want to save these changes?",
-      icon: 'warning',
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to save these changes?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, update!'
-  }).then((result) => {
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, save it!"
+    }).then((result) => {
       if (result.isConfirmed) {
-          document.getElementById('userForm').submit();
+        e.target.submit();
       }
-  })
-});
+    });
+  });
+}
 
-// Personnel alerts handler
+const updateBtn = document.getElementById('updateBtn');
+if (updateBtn) {
+  updateBtn.addEventListener('click', function(e) {
+    Swal.fire({
+        title: 'Update User Details?',
+        text: "Are you sure you want to save these changes?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, update!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('userForm').submit();
+        }
+    })
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Alert.js loaded, checking for personnel messages...');
-  console.log('window.personnelSuccess:', window.personnelSuccess);
-  console.log('window.personnelError:', window.personnelError);
-  
-  // Check for personnel success message
+  // debug lines — remove when stable
+  // console.log('alert.js loaded, personnelSuccess:', window.personnelSuccess, 'personnelError:', window.personnelError);
+
   if (window.personnelSuccess) {
-    console.log('Showing personnel success alert:', window.personnelSuccess);
+    const msg = (typeof window.personnelSuccess === 'string') ? window.personnelSuccess
+               : (window.personnelSuccess.message || JSON.stringify(window.personnelSuccess));
     Swal.fire({
       icon: 'success',
       title: 'Success',
-      text: window.personnelSuccess,
+      text: msg,
       timer: 2000,
       timerProgressBar: true,
       showConfirmButton: false
     });
-    // Clear the variable after showing
     window.personnelSuccess = null;
   }
 
-  // Check for personnel error message
   if (window.personnelError) {
-    console.log('Showing personnel error alert:', window.personnelError);
+    const msg = (typeof window.personnelError === 'string') ? window.personnelError
+              : (window.personnelError.message || JSON.stringify(window.personnelError));
     Swal.fire({
       icon: 'error',
       title: 'Error',
-      text: window.personnelError,
+      text: msg,
       timer: 4000,
       timerProgressBar: true,
       showConfirmButton: true
     });
-    // Clear the variable after showing
     window.personnelError = null;
   }
 });

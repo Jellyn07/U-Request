@@ -177,3 +177,48 @@ INNER JOIN admin_access_level acl
 start again here 
 
 ALTER TABLE gsu_personnel MODIFY contact VARCHAR(11);
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS spAddGsuPersonnel $$
+CREATE PROCEDURE spAddGsuPersonnel(
+  IN p_staff_id INT,
+  IN p_first_name VARCHAR(50),
+  IN p_last_name VARCHAR(50),
+  IN p_department VARCHAR(50),
+  IN p_contact VARCHAR(11),
+  IN p_hire_date DATE,
+  IN p_unit VARCHAR(100)
+)
+BEGIN
+  INSERT INTO gsu_personnel (staff_id, firstName, lastName, department, contact, hire_date, unit)
+  VALUES (p_staff_id, p_first_name, p_last_name, p_department, p_contact, p_hire_date, p_unit);
+END $$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS spUpdateGsuPersonnel $$
+CREATE PROCEDURE spUpdateGsuPersonnel(
+  IN p_staff_id INT,
+  IN p_first_name VARCHAR(50),
+  IN p_last_name VARCHAR(50),
+  IN p_department VARCHAR(50),
+  IN p_contact VARCHAR(11),
+  IN p_hire_date DATE,
+  IN p_unit VARCHAR(100)
+)
+BEGIN
+  UPDATE gsu_personnel
+  SET 
+    firstName = p_first_name,
+    lastName = p_last_name,
+    department = p_department,
+    contact = p_contact,
+    hire_date = p_hire_date,
+    unit = p_unit
+  WHERE staff_id = p_staff_id;
+END $$
+DELIMITER ;
+
+
+
+

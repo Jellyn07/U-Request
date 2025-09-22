@@ -49,6 +49,10 @@ class PersonnelModel extends BaseModel {
     
         // ✅ If no duplicates, proceed with insert
         $stmt = $this->db->prepare("CALL spAddGsuPersonnel (?, ?, ?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            $_SESSION['db_error'] = "Prepare failed (AddPersonnel): " . $this->db->error;
+            return false;
+        }
         $stmt->bind_param("issssss", 
             $data['staff_id'],
             $data['firstName'],
@@ -58,27 +62,84 @@ class PersonnelModel extends BaseModel {
             $data['hire_date'],
             $data['unit']
         );
-        $result = $stmt->execute();
+        $ok = $stmt->execute();
+        if (!$ok) {
+            $_SESSION['db_error'] = "Execute failed (AddPersonnel): " . ($stmt->error ?: $this->db->error);
+        }
         $stmt->close();
-        return $result;
+        return $ok;
     }
     
 
     // Update personnel
     public function updatePersonnel($data) {
-        $stmt = $this->db->prepare("CALL spUpdateGsuPersonnel (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("issssss",
-            $data['staff_id'],
+        // require staff_id (the record to update)
+        if (empty($data['staff_id'])) {
+            $_SESSION['personnel_error'] = "Missing staff identifier.";
+            return false;
+        }
+
+        // Normalize values
+        $staffId = (int)$data['staff_id'];
+        $contact = isset($data['contact']) ? trim($data['contact']) : '';
+
+        
+        if ($contact !== '') {
+            $checkContact = $this->db->prepare(
+                "SELECT COUNT(*) AS cnt FROM gsu_personnel WHERE contact = ? AND staff_id != ?"
+            );
+            if ($checkContact) {
+                $checkContact->bind_param("si", $contact, $staffId);
+                $checkContact->execute();
+                $contactRes = $checkContact->get_result()->fetch_assoc();
+                $checkContact->close();
+                if (!empty($contactRes['cnt']) && $contactRes['cnt'] > 0) {
+                    $_SESSION['personnel_error'] = "Contact number already exists!";
+                    return false;
+                }
+            } else {
+                $_SESSION['personnel_error'] = "DB error (contact check): " . $this->db->error;
+                return false;
+            }
+        }
+        if (isset($data['new_staff_id']) && $data['new_staff_id'] !== '' && (int)$data['new_staff_id'] !== $staffId) {
+            $newId = (int)$data['new_staff_id'];
+            $checkStaff = $this->db->prepare("SELECT COUNT(*) AS cnt FROM gsu_personnel WHERE staff_id = ?");
+            if ($checkStaff) {
+                $checkStaff->bind_param("i", $newId);
+                $checkStaff->execute();
+                $staffRes = $checkStaff->get_result()->fetch_assoc();
+                $checkStaff->close();
+                if (!empty($staffRes['cnt']) && $staffRes['cnt'] > 0) {
+                    $_SESSION['personnel_error'] = "Staff ID already exists!";
+                    return false;
+                }
+            } else {
+                $_SESSION['personnel_error'] = "DB error (staff_id check): " . $this->db->error;
+                return false;
+            }
+        }     
+        $stmt = $this->db->prepare("CALL spUpdateGsuPersonnel (?, ?, ?, ?, ?, ?, ?)"); 
+        if (!$stmt) {
+            $_SESSION['personnel_error'] = "Prepare failed (Update): " . $this->db->error;
+            return false;
+        }
+        $stmt->bind_param(
+            "issssss",
+            $staffId,
             $data['firstName'],
             $data['lastName'],
             $data['department'],
-            $data['contact'],
+            $contact,
             $data['hire_date'],
             $data['unit']
         );
-        $result = $stmt->execute();
+        $ok = $stmt->execute();
+        if (!$ok) {
+            $_SESSION['personnel_error'] = "Failed to update personnel. " . ($stmt->error ?: $this->db->error);
+        }
         $stmt->close();
-        return $result;
+        return $ok;
     }
 
     // Delete personnel

@@ -69,7 +69,7 @@ class DashboardModel extends BaseModel  {
         // Vehicle requests
         $sqlVehicle = "
             SELECT MONTH(date_request) AS month, COUNT(*) AS total
-            FROM vehicle
+            FROM vehicle_request
             WHERE YEAR(date_request) = ?
             GROUP BY MONTH(date_request)
         ";
