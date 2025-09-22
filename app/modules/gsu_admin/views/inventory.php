@@ -151,7 +151,7 @@ $admins = $controller->getAllAdmins();
             <div>
               <label class="text-xs text-text mb-1">Current Quantity</label>
               <div class="w-full flex gap-2">
-                <input type="text" class="w-full view-field mt-0" disabled/>
+                <input type="text" class="w-full view-field mt-0 cursor-not-allowed" disabled/>
                 <button type="button" @click="addmaterial = true" title="Add Stock" class="btn btn-secondary py-0.5 px-4">
                   <img src="/public/assets/img/add.png" class="size-3" alt="Add Stock">
                 </button>
