@@ -22,7 +22,7 @@
             <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
           </a>
-          <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/repair-request.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Repair Request</span>
           </a>
@@ -34,19 +34,19 @@
             <img src="/public/assets/img/personnel.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Personnels</span>
           </a>
-          <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="documents.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/documents.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Documents</span>
           </a>
-          <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="users.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Users</span>
           </a>
-          <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/campus-locations.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Campus Locations</span>
           </a>
-          <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
             <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
           </a>

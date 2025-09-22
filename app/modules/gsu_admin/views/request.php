@@ -28,13 +28,13 @@ $admins = $controller->getAllAdmins();
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-4">Inventory</h1>
+      <h1 class="text-2xl font-bold mb-4">Repair Request</h1>
       <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
             <!-- Search + Filters + Buttons -->
-            <input type="text" id="search" placeholder="Search by material name" class="flex-1 min-w-[200px] input-field">
+            <input type="text" id="search" placeholder="Search by ID or Requester Name" class="flex-1 min-w-[200px] input-field">
             <select class="input-field">
                 <option value="all">All</option>
                 <option value="available">Available</option>
@@ -100,8 +100,12 @@ $admins = $controller->getAllAdmins();
           </div>
           </div>
 
+            <div class="mt-4">
+
+            </div>
+
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow">
+          <div class="overflow-x-auto max-h-[550px] overflow-y-auto rounded-lg shadow">
           <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg p-2">
             <thead class="bg-gray-50">
               <tr>
@@ -195,10 +199,6 @@ $admins = $controller->getAllAdmins();
   </main>
 
   <script>
-      function previewProfile(event) {
-        const output = document.getElementById('profile-preview');
-        output.src = URL.createObjectURL(event.target.files[0]);
-      }
       window.adminSuccess = <?= isset($_SESSION['admin_success']) ? json_encode($_SESSION['admin_success']) : 'null' ?>;
       window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
   </script>
