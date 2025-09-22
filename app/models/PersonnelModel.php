@@ -6,7 +6,7 @@ class PersonnelModel extends BaseModel {
 
     // Get all personnel
     public function getAllPersonnel() {
-        $sql = "SELECT staff_id, firstName, lastName, CONCAT (firstName, ' ' ,lastName) as full_name, department, contact,hire_date, unit FROM gsu_personnel ORDER BY full_name ASC";
+        $sql = "SELECT staff_id, firstName, lastName, CONCAT (firstName, ' ' ,lastName) as full_name, department, contact,hire_date, unit, profile_picture FROM gsu_personnel ORDER BY full_name ASC";
         $result = $this->db->query($sql);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
@@ -48,20 +48,22 @@ class PersonnelModel extends BaseModel {
         }
     
         // ✅ If no duplicates, proceed with insert
-        $stmt = $this->db->prepare("CALL spAddGsuPersonnel (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->db->prepare("CALL spAddGsuPersonnel (?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed (AddPersonnel): " . $this->db->error;
             return false;
         }
-        $stmt->bind_param("issssss", 
+        $stmt->bind_param("isssssss", 
             $data['staff_id'],
             $data['firstName'],
             $data['lastName'],
             $data['department'],
             $data['contact'],
             $data['hire_date'],
-            $data['unit']
+            $data['unit'],
+            $data['profile_picture']  // must match
         );
+
         $ok = $stmt->execute();
         if (!$ok) {
             $_SESSION['db_error'] = "Execute failed (AddPersonnel): " . ($stmt->error ?: $this->db->error);
@@ -119,20 +121,21 @@ class PersonnelModel extends BaseModel {
                 return false;
             }
         }     
-        $stmt = $this->db->prepare("CALL spUpdateGsuPersonnel (?, ?, ?, ?, ?, ?, ?)"); 
+        $stmt = $this->db->prepare("CALL spUpdateGsuPersonnel (?, ?, ?, ?, ?, ?, ?, ?)"); 
         if (!$stmt) {
             $_SESSION['personnel_error'] = "Prepare failed (Update): " . $this->db->error;
             return false;
         }
         $stmt->bind_param(
-            "issssss",
+            "isssssss",
             $staffId,
             $data['firstName'],
             $data['lastName'],
             $data['department'],
             $contact,
             $data['hire_date'],
-            $data['unit']
+            $data['unit'],
+            $data['profile_picture']
         );
         $ok = $stmt->execute();
         if (!$ok) {

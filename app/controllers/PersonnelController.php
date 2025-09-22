@@ -18,14 +18,39 @@ class PersonnelController {
 
     // --- ADD PERSONNEL ---
     public function addPersonnel($postData) {
+        // ✅ Handle file upload
+        $profile_picture_path = null;
+    
+        if (!empty($_FILES['profile_picture']['name']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = __DIR__ . "/../../public/uploads/profile_pics";
+    
+            // Create directory if not exists
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
+            }
+    
+            $filename = basename($_FILES["profile_picture"]["name"]);
+            $target_file = $upload_dir . '/' . $filename;
+    
+            if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+                $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
+            } else {
+                $_SESSION['personnel_error'] = "Failed to upload profile picture.";
+                header("Location: ../modules/gsu_admin/views/personnel.php");
+                exit;
+            }
+        }
+    
+        // ✅ Collect input data + profile picture
         $data = [
-            'staff_id'   => $postData['staff_id'] ?? '',
-            'firstName'  => $postData['first_name'] ?? '',
-            'lastName'   => $postData['last_name'] ?? '',
-            'department' => $postData['department'] ?? '',
-            'contact'    => $postData['contact_no'] ?? '',
-            'hire_date'  => $postData['hire_date'] ?? '',
-            'unit'       => $postData['unit'] ?? ''
+            'staff_id'       => $postData['staff_id'] ?? '',
+            'firstName'      => $postData['first_name'] ?? '',
+            'lastName'       => $postData['last_name'] ?? '',
+            'department'     => $postData['department'] ?? '',
+            'contact'        => $postData['contact_no'] ?? '',
+            'hire_date'      => $postData['hire_date'] ?? '',
+            'unit'           => $postData['unit'] ?? '',
+            'profile_picture'=> $filename 
         ];
     
         $result = $this->model->addPersonnel($data);
@@ -33,7 +58,6 @@ class PersonnelController {
         if ($result) {
             $_SESSION['personnel_success'] = "Personnel added successfully!";
         } else {
-            // ✅ Keep specific model error if it exists
             if (!isset($_SESSION['personnel_error'])) {
                 $_SESSION['personnel_error'] = $_SESSION['db_error'] ?? "Failed to add personnel.";
             }
@@ -46,6 +70,29 @@ class PersonnelController {
 
     // --- UPDATE PERSONNEL ---
     public function updatePersonnel($postData) {
+         // ✅ Handle file upload
+         $profile_picture_path = null;
+    
+         if (!empty($_FILES['profile_picture']['name']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+             $upload_dir = __DIR__ . "/../../public/uploads/profile_pics";
+     
+             // Create directory if not exists
+             if (!is_dir($upload_dir)) {
+                 mkdir($upload_dir, 0755, true);
+             }
+     
+             $filename = basename($_FILES["profile_picture"]["name"]);
+             $target_file = $upload_dir . '/' . $filename;
+     
+             if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+                 $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
+             } else {
+                 $_SESSION['personnel_error'] = "Failed to upload profile picture.";
+                 header("Location: ../modules/gsu_admin/views/personnel.php");
+                 exit;
+             }
+         }
+
         $data = [
             'staff_id'  => $postData['staff_id'] ?? null,
             'firstName' => $postData['first_name'] ?? '',
@@ -53,8 +100,8 @@ class PersonnelController {
             'department'=> $postData['department'] ?? '',
             'contact'   => $postData['contact_no'] ?? '',
             'hire_date' => $postData['hire_date'] ?? '',
-            'unit'      => $postData['unit'] ?? ''
-            
+            'unit'      => $postData['unit'] ?? '',
+            'profile_picture'=> $filename 
         ];
 
         $ok = $this->model->updatePersonnel($data);
@@ -96,6 +143,7 @@ $controller = new PersonnelController();
 
 // --- HANDLE POST REQUESTS ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_personnel'])) {
+    $controller = new PersonnelController();
     $controller->addPersonnel($_POST);
 }
 

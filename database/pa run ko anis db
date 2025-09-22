@@ -178,6 +178,9 @@ start again here
 
 ALTER TABLE gsu_personnel MODIFY contact VARCHAR(11);
 
+ALTER TABLE gsu_personnel 
+ADD COLUMN profile_picture VARCHAR(255) AFTER unit;
+
 DELIMITER $$
 DROP PROCEDURE IF EXISTS spAddGsuPersonnel $$
 CREATE PROCEDURE spAddGsuPersonnel(
@@ -187,11 +190,12 @@ CREATE PROCEDURE spAddGsuPersonnel(
   IN p_department VARCHAR(50),
   IN p_contact VARCHAR(11),
   IN p_hire_date DATE,
-  IN p_unit VARCHAR(100)
+  IN p_unit VARCHAR(100),
+  IN p_profile_picture VARCHAR(255)
 )
 BEGIN
-  INSERT INTO gsu_personnel (staff_id, firstName, lastName, department, contact, hire_date, unit)
-  VALUES (p_staff_id, p_first_name, p_last_name, p_department, p_contact, p_hire_date, p_unit);
+  INSERT INTO gsu_personnel (staff_id, firstName, lastName, department, contact, hire_date, unit, profile_picture)
+  VALUES (p_staff_id, p_first_name, p_last_name, p_department, p_contact, p_hire_date, p_unit, p_profile_picture);
 END $$
 DELIMITER ;
 
@@ -204,18 +208,23 @@ CREATE PROCEDURE spUpdateGsuPersonnel(
   IN p_department VARCHAR(50),
   IN p_contact VARCHAR(11),
   IN p_hire_date DATE,
-  IN p_unit VARCHAR(100)
+  IN p_unit VARCHAR(100),
+  IN p_profile_picture VARCHAR(255)
 )
 BEGIN
-  UPDATE gsu_personnel
-  SET 
-    firstName = p_first_name,
-    lastName = p_last_name,
-    department = p_department,
-    contact = p_contact,
-    hire_date = p_hire_date,
-    unit = p_unit
-  WHERE staff_id = p_staff_id;
+  IF EXISTS (SELECT 1 FROM gsu_personnel WHERE contact = p_contact AND staff_id <> p_staff_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Contact number already exists!';
+  ELSE
+    UPDATE gsu_personnel
+    SET firstName       = p_first_name,
+        lastName        = p_last_name,
+        department      = p_department,
+        contact         = p_contact,
+        hire_date       = p_hire_date,
+        unit            = p_unit,
+        profile_picture = p_profile_picture
+    WHERE staff_id = p_staff_id;
+  END IF;
 END $$
 DELIMITER ;
 

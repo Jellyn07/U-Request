@@ -199,14 +199,15 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
                       hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
                       unit: '<?= htmlspecialchars($person['unit']) ?>',
                       status: '<?= !empty($person['status']) ? htmlspecialchars($person['status']) : "Available" ?>',
-                      profile_pic: '/public/assets/img/user-default.png'
+                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
                   }; showDetails = true"
                   class="cursor-pointer hover:bg-gray-100"
                 >
                   <td class="pl-4 py-2">
-                    <img src="/public/assets/img/user-default.png" 
-                        alt="User" 
-                        class="size-8 rounded-full object-cover">
+                    <img src="<?= !empty($person['profile_picture']) 
+                                  ? '/public/uploads/profile_pics/' . $person['profile_picture'] 
+                                  : '/public/assets/img/user-default.png' ?>"
+                        alt="User" class="size-8 rounded-full object-cover">
                   </td>
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['staff_id']) ?>
