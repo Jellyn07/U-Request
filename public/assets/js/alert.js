@@ -261,3 +261,64 @@ document.addEventListener('DOMContentLoaded', () => {
     window.personnelError = null;
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".historyBtn").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const requesterId = this.dataset.requesterId;
+
+      fetch(`app/modules/superadmin/views/manage_user.php?requester_id=${requesterId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) {
+            Swal.fire({
+              icon: "info",
+              title: "No Request History",
+              text: "This user has no request history."
+            });
+            return;
+          }
+
+          let tableHtml = `
+            <table class="w-full border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th class="border px-2 py-1">Type</th>
+                  <th class="border px-2 py-1">Request ID</th>
+                  <th class="border px-2 py-1">Status</th>
+                  <th class="border px-2 py-1">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          data.forEach(row => {
+            tableHtml += `
+              <tr>
+                <td class="border px-2 py-1">${row.type}</td>
+                <td class="border px-2 py-1">${row.id}</td>
+                <td class="border px-2 py-1">${row.status}</td>
+                <td class="border px-2 py-1">${row.date_requested}</td>
+              </tr>
+            `;
+          });
+
+          tableHtml += `</tbody></table>`;
+
+          Swal.fire({
+            title: "Request History",
+            html: tableHtml,
+            width: "800px",
+            confirmButtonText: "Close"
+          });
+        })
+        .catch(err => {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Could not load request history."
+          });
+        });
+    });
+  });
+});
