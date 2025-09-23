@@ -1,0 +1,93 @@
+<?php
+require_once __DIR__ . '/../core/BaseModel.php';
+
+class MaterialModel extends BaseModel {
+    private $table = "materials";
+
+    //mother division
+    public function getFilteredMaterials($search = '', $status = 'all', $order = 'az') {
+        $sql = "SELECT * FROM " . $this->table . " WHERE 1=1";
+        $params = [];
+        $types = "";
+
+        // Search
+        if (!empty($search)) {
+            $sql .= " AND material_desc LIKE ?";
+            $params[] = "%$search%";
+            $types .= "s";
+        }
+
+        // Status
+        if ($status !== 'all') {
+            $sql .= " AND material_status = ?";
+            $params[] = $status;
+            $types .= "s";
+        }
+
+        // Sorting
+        $direction = ($order === 'za') ? "DESC" : "ASC";
+        $sql .= " ORDER BY material_desc $direction";
+
+        $stmt = $this->db->prepare($sql);
+
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+
+    // Fetch all materials
+    public function getAll() {
+        $sql = "SELECT * FROM " . $this->table;
+        $result = $this->db->query($sql);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    // Fetch one material
+    public function search($keyword) {
+    $stmt = $this->db->prepare("SELECT * FROM " . $this->table . " 
+                                WHERE material_desc LIKE CONCAT('%', ?, '%')");
+    $stmt->bind_param("s", $keyword);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // Insert material
+    public function create($code, $description, $quantity, $status) {
+        $stmt = $this->db->prepare("
+            INSERT INTO " . $this->table . " (material_code, material_desc, qty, material_status) 
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->bind_param("ssis", $code, $description, $quantity, $status);
+        return $stmt->execute();
+    }
+
+    //filter status
+    public function filterByStatus($status) {
+        if ($status === "all") {
+            $sql = "SELECT * FROM " . $this->table;
+            $result = $this->db->query($sql);
+            return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        } else {
+            $stmt = $this->db->prepare("SELECT * FROM " . $this->table . " WHERE material_status = ?");
+            $stmt->bind_param("s", $status);
+            $stmt->execute();
+            return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        }
+    }
+
+    //sort a-z vice versa
+    public function sortByName($order = "az") {
+    $direction = ($order === "za") ? "DESC" : "ASC";
+
+    $sql = "SELECT * FROM " . $this->table . " ORDER BY material_desc $direction";
+    $result = $this->db->query($sql);
+
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+}
