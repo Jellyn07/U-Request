@@ -6,11 +6,41 @@ class PersonnelModel extends BaseModel {
 
     // Get all personnel
     public function getAllPersonnel() {
-        $sql = "SELECT staff_id, firstName, lastName, CONCAT (firstName, ' ' ,lastName) as full_name, department, contact,hire_date, unit, profile_picture FROM gsu_personnel ORDER BY full_name ASC";
+        $sql = "
+            WITH personnel_status AS (
+                SELECT p.*, 
+                    CASE 
+                        WHEN EXISTS (
+                            SELECT 1 
+                            FROM request_assigned_personnel rap 
+                            INNER JOIN request_assignment ra 
+                                ON rap.request_id = ra.request_id 
+                            WHERE rap.staff_id = p.staff_id 
+                            AND ra.req_status = 'In Progress'
+                        ) THEN 'Fixing'
+                        ELSE 'Available'
+                    END AS status
+                FROM gsu_personnel p
+            )
+            SELECT 
+                staff_id, 
+                firstName, 
+                lastName, 
+                CONCAT(firstName, ' ', lastName) AS full_name, 
+                department, 
+                contact, 
+                hire_date, 
+                unit, 
+                profile_picture,
+                status
+            FROM personnel_status
+            ORDER BY full_name ASC
+        ";
+    
         $result = $this->db->query($sql);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
-
+    
     // Get personnel by ID
     public function getPersonnelById($staff_id) {
         $stmt = $this->db->prepare("SELECT * FROM gsu_personnel WHERE staff_id = ?");

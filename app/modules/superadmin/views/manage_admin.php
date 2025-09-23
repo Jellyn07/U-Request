@@ -296,51 +296,17 @@ $admins = $controller->getAllAdmins();
   </div>
   </main>
 
-  <script>
-    const searchInput = document.getElementById('searchUser');
-    const roleFilter = document.getElementById('roleFilter');
-    const sortSelect = document.getElementById('sortUsers');
-    const tableBody = document.getElementById('usersTable');
+  <script type="module">
+    import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
 
-    function applyFilters() {
-      const searchValue = searchInput.value.toLowerCase();
-      const roleValue = roleFilter.value;
-      const sortValue = sortSelect.value;
-
-      // Convert NodeList to array for sorting
-      const rows = Array.from(tableBody.querySelectorAll('tr'));
-
-      rows.forEach(row => {
-        const name = row.children[1].textContent.toLowerCase();   // Full Name
-        const email = row.children[3].textContent.toLowerCase();  // Email
-        const role = row.getAttribute('data-role');               // Role ID from <tr>
-
-        const matchesSearch = name.includes(searchValue) || email.includes(searchValue);
-        const matchesRole = (roleValue === "all" || role === roleValue);
-
-        row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
-      });
-
-      // Now sort only the visible rows
-      const visibleRows = rows.filter(row => row.style.display !== 'none');
-
-      visibleRows.sort((a, b) => {
-        const nameA = a.children[1].textContent.toLowerCase();
-        const nameB = b.children[1].textContent.toLowerCase();
-        return sortValue === "az" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-      });
-
-      // Re-append in new order
-      visibleRows.forEach(row => tableBody.appendChild(row));
-    }
-
-    searchInput.addEventListener('input', applyFilters);
-    roleFilter.addEventListener('change', applyFilters);
-    sortSelect.addEventListener('change', applyFilters);
-
-    // Run once on page load
-    applyFilters();
-
+    initTableFilters({
+    tableId: "usersTable",
+    searchId: "searchUser",
+    filterId: "roleFilter",    
+    sortId: "sortUsers",     
+    searchColumns: [1, 3],     
+    filterAttr: "data-role"    
+  });
       function previewProfile(event) {
         const output = document.getElementById('profile-preview');
         output.src = URL.createObjectURL(event.target.files[0]);

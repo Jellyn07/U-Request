@@ -46,11 +46,12 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
-                <option value="all">All</option>
-                <option value="available">Available</option>
-                <option value="fixing">Fixing</option>
+            <select class="input-field" id="statusFilter">
+              <option value="all">All</option>
+              <option value="Available">Available</option>
+              <option value="Fixing">Fixing</option>
             </select>
+
             <select class="input-field" id="sortUsers">
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
@@ -198,7 +199,7 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
                       contact: '<?= htmlspecialchars($person['contact']) ?>',
                       hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
                       unit: '<?= htmlspecialchars($person['unit']) ?>',
-                      status: '<?= !empty($person['status']) ? htmlspecialchars($person['status']) : "Available" ?>',
+                      status: '<?= htmlspecialchars($person['status']) ?>',
                       profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
                   }; showDetails = true"
                   class="cursor-pointer hover:bg-gray-100"
@@ -215,8 +216,8 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
                   </td>
-                  <td class="px-4 py-2 text-green-800">
-                    <?= !empty($person['status']) ? htmlspecialchars($person['status']) : 'Available' ?>
+                  <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
+                      <?= htmlspecialchars($person['status']) ?>
                   </td>
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['department']) ?>
@@ -312,15 +313,16 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
   </div>
   </main>
 
-  <script>
-    document.getElementById('searchUser').addEventListener('input', function() {
-      const filter = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#usersTable tr');
-      rows.forEach(row => {
-        const name = row.children[1].textContent.toLowerCase();
-        const email = row.children[2].textContent.toLowerCase();
-        row.style.display = (name.includes(filter) || email.includes(filter)) ? '' : 'none';
-      });
+  <script type="module">
+    import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+
+    initTableFilters({
+      tableId: "usersTable",
+      searchId: "searchUser",
+      filterId: "statusFilter",  
+      sortId: "sortUsers",          
+      searchColumns: [2, 4],         
+      filterColumn: 3             
     });
 
       function previewProfile(event) {
