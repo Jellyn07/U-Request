@@ -43,8 +43,8 @@ $data = $controller->getDashboardData($year);
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         <div class="bg-white shadow rounded-lg p-4 text-center">
           <h2 class="text-gray-600 text-xs">Pending Requests</h2>
-          <p class="text-xl font-bold text-primary" id="totalrRequests">
-              100
+          <p class="text-xl font-bold text-primary" id="total_pending">
+            <?= isset($data['summary']['total_pending']) ? $data['summary']['total_pending'] : 0 ?>
           </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">

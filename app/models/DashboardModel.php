@@ -27,7 +27,11 @@ class DashboardModel extends BaseModel  {
 
                 (
                     (SELECT COUNT(*) FROM administrator)
-                ) AS total_admin
+                ) AS total_admin,
+
+                (
+                   SELECT COUNT(*) FROM vw_requests WHERE req_status IN ('To Inspect', 'In Progress')
+                ) AS total_pending
         ";
     
         $stmt = $this->db->prepare($sql);

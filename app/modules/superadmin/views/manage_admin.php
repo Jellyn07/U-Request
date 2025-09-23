@@ -36,7 +36,7 @@ $admins = $controller->getAllAdmins();
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
+            <select id="roleFilter" class="input-field">
               <option value="all">All</option>
               <option value="1">Super Admin</option>
               <option value="2">GSU Admin</option>
@@ -184,6 +184,7 @@ $admins = $controller->getAllAdmins();
                   <tr 
                       data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
                       data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
+                      data-role="<?= htmlspecialchars($admin['accessLevel_id']) ?>"
                       @click="showDetails = true; selected = {
                         staff_id: '<?php echo $admin['staff_id']; ?>',
                         email: '<?php echo $admin['email']; ?>',
@@ -296,15 +297,49 @@ $admins = $controller->getAllAdmins();
   </main>
 
   <script>
-    document.getElementById('searchUser').addEventListener('input', function() {
-      const filter = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#usersTable tr');
+    const searchInput = document.getElementById('searchUser');
+    const roleFilter = document.getElementById('roleFilter');
+    const sortSelect = document.getElementById('sortUsers');
+    const tableBody = document.getElementById('usersTable');
+
+    function applyFilters() {
+      const searchValue = searchInput.value.toLowerCase();
+      const roleValue = roleFilter.value;
+      const sortValue = sortSelect.value;
+
+      // Convert NodeList to array for sorting
+      const rows = Array.from(tableBody.querySelectorAll('tr'));
+
       rows.forEach(row => {
-        const name = row.children[1].textContent.toLowerCase();
-        const email = row.children[2].textContent.toLowerCase();
-        row.style.display = (name.includes(filter) || email.includes(filter)) ? '' : 'none';
+        const name = row.children[1].textContent.toLowerCase();   // Full Name
+        const email = row.children[3].textContent.toLowerCase();  // Email
+        const role = row.getAttribute('data-role');               // Role ID from <tr>
+
+        const matchesSearch = name.includes(searchValue) || email.includes(searchValue);
+        const matchesRole = (roleValue === "all" || role === roleValue);
+
+        row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
       });
-    });
+
+      // Now sort only the visible rows
+      const visibleRows = rows.filter(row => row.style.display !== 'none');
+
+      visibleRows.sort((a, b) => {
+        const nameA = a.children[1].textContent.toLowerCase();
+        const nameB = b.children[1].textContent.toLowerCase();
+        return sortValue === "az" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      });
+
+      // Re-append in new order
+      visibleRows.forEach(row => tableBody.appendChild(row));
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    roleFilter.addEventListener('change', applyFilters);
+    sortSelect.addEventListener('change', applyFilters);
+
+    // Run once on page load
+    applyFilters();
 
       function previewProfile(event) {
         const output = document.getElementById('profile-preview');
