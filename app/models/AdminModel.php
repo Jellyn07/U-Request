@@ -7,7 +7,7 @@ class AdministratorModel extends BaseModel {
 
     // ADD ADMINISTRATOR
     public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
-        $encrypted_pass = encrypt($password);
+        // $encrypted_pass = encrypt($password);
 
         $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
@@ -15,7 +15,7 @@ class AdministratorModel extends BaseModel {
             return false;
         }
 
-        $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
+        $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture);
         $result = $stmt->execute();
 
         if (!$result) {
@@ -197,6 +197,50 @@ class AdministratorModel extends BaseModel {
         return $result['count'] > 0;
     }
 
+    // For Add: Staff ID
+    public function isAdminIdExistsOnAdd($staff_id) {
+        $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE staff_id = ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('s', $staff_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+    // For Add: Email
+    public function isAdminEmailExistsOnAdd($email) {
+        $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE email = ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+    // For Add: Contact
+    public function isAdminContactExistsOnAdd($contact) {
+        $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE contact_no = ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('s', $contact);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+
+    // Check staff_id (exclude current admin by email)
     public function isAdminIdExists($staff_id, $currentEmail) {
         $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE staff_id = ? AND email != ?";
         $stmt = $this->db->prepare($sql);
@@ -210,7 +254,61 @@ class AdministratorModel extends BaseModel {
         return $result['count'] > 0;
     }
 
+    // Check email (exclude current admin by staff_id)
+    public function isAdminEmailExists($email, $currentStaffId) {
+        $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE email = ? AND staff_id != ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
 
+        $stmt->bind_param('ss', $email, $currentStaffId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+    // Check contact (exclude current admin by staff_id)
+    public function isAdminContactExists($contact, $currentStaffId) {
+        $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE contact_no = ? AND staff_id != ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return false;
+
+        $stmt->bind_param('ss', $contact, $currentStaffId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $result['count'] > 0;
+    }
+
+    public function getRequestHistory($requester_id) {
+        $sql = "
+            SELECT 'Facility' AS type, request_id AS id, req_status AS status, date_requested
+            FROM request
+            WHERE requester_id = ?
+            UNION ALL
+            SELECT 'Vehicle' AS type, vehicle_request_id AS id, status, date_requested
+            FROM vehicle_request
+            WHERE requester_id = ?
+            ORDER BY date_requested DESC
+        ";
+    
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) return [];
+    
+        $stmt->bind_param("ss", $requester_id, $requester_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $rows = [];
+        while ($row = $result->fetch_assoc()) {
+            $rows[] = $row;
+        }
+    
+        $stmt->close();
+        return $rows;
+    }
     // Destructor
     public function __destruct() {
         if ($this->db) {

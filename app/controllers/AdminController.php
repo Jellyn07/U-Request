@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         exit;
     }
 
-    $encrypted_pass = encrypt($password_raw);
+    // $encrypted_pass = encrypt($password_raw);
 
     // Upload profile picture
     $profile_picture_path = null;
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         $last_name,
         $contact_no,
         $access_level,
-        $encrypted_pass,
+        $password_raw,
         $filename
     );
 
@@ -179,23 +179,64 @@ class AdminController {
 
      // --- UPDATE ADMIN DETAILS ---
      public function updateAdmin($data) {
-        // Check if staff_id already exists (exclude current admin)
+        // Check if staff_id already exists (exclude current admin by email)
         if (!empty($data['staff_id']) && $this->model->isAdminIdExists($data['staff_id'], $data['admin_email'])) {
-            $_SESSION['update_status'] = 'duplicate';
+            $_SESSION['update_status'] = 'duplicate_staff';
             return false;
         }
     
-        // Proceed with update if email exists
-        if (!empty($data['admin_email'])) {
-            $success = $this->model->updateAdminDetails($data);
-            $_SESSION['update_status'] = $success ? 'success' : 'error';
-            return $success;
+        // Check if email already exists (exclude current admin by staff_id)
+        if (!empty($data['admin_email']) && $this->model->isAdminEmailExists($data['admin_email'], $data['staff_id'])) {
+            $_SESSION['update_status'] = 'duplicate_email';
+            return false;
         }
     
-        $_SESSION['update_status'] = 'error';
-        return false;
+        // Check if contact number already exists (exclude current admin by staff_id)
+        if (!empty($data['contact_no']) && $this->model->isAdminContactExists($data['contact_no'], $data['staff_id'])) {
+            $_SESSION['update_status'] = 'duplicate_contact';
+            return false;
+        }
+    
+        // ✅ Proceed with update if no duplicates
+        $success = $this->model->updateAdminDetails($data);
+        $_SESSION['update_status'] = $success ? 'success' : 'error';
+        return $success;
     }
     
+    public function addAdmin($data) {
+        // Check if staff_id already exists
+        if (!empty($data['staff_id']) && $this->model->isAdminIdExistsOnAdd($data['staff_id'])) {
+            $_SESSION['add_status'] = 'duplicate_staff';
+            return false;
+        }
+
+        // Check if email already exists
+        if (!empty($data['admin_email']) && $this->model->isAdminEmailExistsOnAdd($data['admin_email'])) {
+            $_SESSION['add_status'] = 'duplicate_email';
+            return false;
+        }
+
+        // Check if contact number already exists
+        if (!empty($data['contact_no']) && $this->model->isAdminContactExistsOnAdd($data['contact_no'])) {
+            $_SESSION['add_status'] = 'duplicate_contact';
+            return false;
+        }
+
+        // Insert admin
+        $success = $this->model->addAdministrator(
+            $data['staff_id'],
+            $data['admin_email'],
+            $data['first_name'],
+            $data['last_name'],
+            $data['contact_no'],
+            $data['access_level'],
+            $data['password'],
+            $data['profile_picture']
+        );
+
+        $_SESSION['add_status'] = $success ? 'success' : 'error';
+        return $success;
+    }
     
     public function updateUser($data) {
         // Check if requester_id exists
@@ -209,6 +250,23 @@ class AdminController {
         }
     
         return false;
+    }
+
+    public function getRequestHistory() {
+        header('Content-Type: application/json');
+
+        $requester_id = $_GET['requester_id'] ?? null;
+        if (!$requester_id) {
+            echo json_encode([]);
+            return;
+        }
+
+        try {
+            $history = $this->model->getRequestHistory($requester_id);
+            echo json_encode($history);
+        } catch (Exception $e) {
+            echo json_encode([]);
+        }
     }
     
     

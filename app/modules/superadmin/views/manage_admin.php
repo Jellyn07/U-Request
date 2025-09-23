@@ -323,3 +323,24 @@ $admins = $controller->getAllAdmins();
 unset($_SESSION['admin_success']);
 unset($_SESSION['admin_error']);
 ?>
+<?php if (isset($_SESSION['update_status'])): ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const status = "<?php echo $_SESSION['update_status']; ?>";
+
+    if (status === "duplicate_staff") {
+      Swal.fire("Duplicate Found", "This Staff ID is already in use.", "warning");
+    } else if (status === "duplicate_email") {
+      Swal.fire("Duplicate Found", "This Email is already registered.", "warning");
+    } else if (status === "duplicate_contact") {
+      Swal.fire("Duplicate Found", "This Contact Number is already registered.", "warning");
+    } else if (status === "success") {
+      Swal.fire("Updated!", "Administrator details updated successfully.", "success");
+    } else if (status === "error") {
+      Swal.fire("Error!", "Failed to update administrator details.", "error");
+    }
+  });
+  
+</script>
+<?php unset($_SESSION['update_status']); endif; ?>
+
