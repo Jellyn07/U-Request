@@ -31,11 +31,9 @@ $materials = $materialController->getFiltered($search, $status, $order);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
-
 </head>
-
 <body class="bg-gray-100">
-  <!-- Superadmin Menu & Header -->s
+  <!-- Superadmin Menu & Header -->
   <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
@@ -79,36 +77,44 @@ $materials = $materialController->getFiltered($search, $status, $order);
                   <!-- Modal Content -->
                   <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
                     <!-- Profile Picture -->
-                    <form method="post" action="../../../controllers/AdminController.php" enctype="multipart/form-data">
+                    <form id="addMaterialForm" method="post" action="../../../controllers/MaterialController.php" enctype="multipart/form-data" required>
                       <!-- Identity Information -->
                       <div class="flex justify-center">
                         <div class="w-full">
                           <h2 class="text-base font-medium mb-3">Add Materials</h2>
                           <div>
-                            <label class="text-xs text-text mb-1">Material Code No.<span class="text-secondary">*</span></label>
-                            <input type="text" name="staff_id" class="w-full input-field" required />
+                            <label class="text-xs text-text mb-1">Material Code No.<span class="text-secondary"></span></label>
+                            <input type="text" name="material_code" class="w-full input-field" required />
                           </div>
 
                           <div>
-                            <label class="text-xs text-text mb-1">Description<span class="text-secondary">*</span></label>
-                            <input type="text" name="staff_id" class="w-full input-field" required />
+                            <label class="text-xs text-text mb-1">Description<span class="text-secondary"></span></label>
+                            <input type="text" name="material_desc" class="w-full input-field" required />
                           </div>
 
                           <div>
-                            <label class="text-xs text-text mb-1">Quantity<span class="text-secondary">*</span></label>
-                            <input type="number" name="staff_id" class="w-full input-field" required />
+                            <label class="text-xs text-text mb-1">Quantity<span class="text-secondary"></span></label>
+                            <input type="number" name="qty" class="w-full input-field" required />
                           </div>
 
+                          <div>
+                            <label class="text-xs text-text mb-1">Status<span class="text-secondary"></span></label>
+                            <select name="material_status" class="w-full input-field">
+                              <option value="Available">Available</option>
+                              <option value="Unavailable">Unavailable</option>
+                            </select>
+
+                          </div>
+                          <div class="flex justify-center gap-2 pt-4">
+                              <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
+                              <button type="submit" name="add_material" class="btn btn-primary px-7">Save</button>
+                          </div>
                         </div>
                       </div>
                     </form>
 
 
                     <!-- Action Buttons -->
-                    <div class="flex justify-center gap-2 pt-4">
-                      <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                      <button type="submit" name="add_admin" class="btn btn-primary px-7">Save</button>
-                    </div>
                   </main>
                 </div>
               </div>
@@ -129,8 +135,17 @@ $materials = $materialController->getFiltered($search, $status, $order);
               </thead>
               <tbody id="table" class="text-sm">
                 <?php if (!empty($materials)) { ?>
-                  <?php foreach ($materials as $row) { ?>
-                    <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left">
+                  <?php foreach ($materials as $row) {
+                    $rowJson = htmlspecialchars(json_encode([
+                      'material_code'   => $row['material_code'],
+                      'material_desc'   => $row['material_desc'],
+                      'qty'             => $row['qty'],
+                      'material_status' => $row['material_status'],
+                    ]), ENT_QUOTES, 'UTF-8');
+                  ?>
+                    <tr
+                      @click="selected = <?= $rowJson ?>; showDetails = true"
+                      class="hover:bg-gray-100 cursor-pointer text-left">
                       <td class="pl-8 py-3"><?= htmlspecialchars($row['material_code']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['material_desc']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['qty']) ?></td>
@@ -143,6 +158,8 @@ $materials = $materialController->getFiltered($search, $status, $order);
                   </tr>
                 <?php } ?>
               </tbody>
+
+
             </table>
           </div>
         </div>
@@ -155,35 +172,47 @@ $materials = $materialController->getFiltered($search, $status, $order);
           </button>
 
           <!-- Form -->
-          <form id="adminForm" class="space-y-5" method="post">
+          <form id="materialForm" method="post" action="../../../controllers/MaterialController.php" class="space-y-5">
             <h2 class="text-lg font-bold">Material Information</h2>
+
+            <!-- Hidden field for ID -->
+            <input type="hidden" name="id" :value="selected.id || ''">
+
             <div>
               <label class="text-xs text-text mb-1">Material Code No.</label>
-              <input type="text" :value="selected.staff_id || ''" class="w-full input-field" />
+              <input type="text" name="material_code" :value="selected.material_code || ''" class="w-full input-field" required readonly/>
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Description</label>
-              <input type="text" :value="selected.staff_id || ''" class="w-full input-field" />
+              <input type="text" name="material_desc" :value="selected.material_desc || ''" class="w-full input-field" required />
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Current Quantity</label>
               <div class="w-full flex gap-2">
-                <input type="text" class="w-full view-field mt-0 cursor-not-allowed" disabled />
+                <input type="number" name="qty" :value="selected.qty || ''" class="w-full input-field" required />
                 <button type="button" @click="addmaterial = true" title="Add Stock" class="btn btn-secondary py-0.5 px-4">
                   <img src="/public/assets/img/add.png" class="size-3" alt="Add Stock">
                 </button>
               </div>
+            </div>
 
-
+            <div>
+              <label class="text-xs text-text mb-1">Status</label>
+                  <div>
+                    <select name="material_status" class="input-field">
+                      <option value="Available" :selected="selected.material_status === 'available'">Available</option>
+                      <option value="Unavailable" :selected="selected.material_status === 'unavailable'">Unavailable</option>
+                    </select>
+                  </div>
             </div>
 
             <div class="flex justify-center gap-2 pt-2">
               <button type="button" title="Material Used History" class="btn btn-secondary">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="Material Used History">
               </button>
-              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <button type="submit" name="update_material" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
 
@@ -232,3 +261,14 @@ $materials = $materialController->getFiltered($search, $status, $order);
 unset($_SESSION['admin_success']);
 unset($_SESSION['admin_error']);
 ?>
+
+
+
+
+<!-- 
+NOTE:
+1. dapat ang availability kay naka depend sa quantity
+2. script for add and update materials
+3. sort by what is shown
+4. add by name or id no duplicate
+-->

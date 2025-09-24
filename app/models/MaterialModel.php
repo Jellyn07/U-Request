@@ -58,7 +58,7 @@ class MaterialModel extends BaseModel {
     }
 
     // Insert material
-    public function create($code, $description, $quantity, $status) {
+    public function addmaterial($code, $description, $quantity, $status) {
         $stmt = $this->db->prepare("
             INSERT INTO " . $this->table . " (material_code, material_desc, qty, material_status) 
             VALUES (?, ?, ?, ?)
@@ -89,5 +89,24 @@ class MaterialModel extends BaseModel {
     $result = $this->db->query($sql);
 
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    // Update material
+    public function update($code, $desc, $qty, $status) {
+        $sql = "UPDATE materials 
+                SET material_desc = ?, qty = ?, material_status = ? 
+                WHERE material_code = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("siss", $desc, $qty, $status, $code);
+        return $stmt->execute();
+    }
+
+
+    // Fetch single material (for details panel if needed)
+    public function find($id) {
+        $stmt = $this->db->prepare("SELECT * FROM " . $this->table . " WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
     }
 }

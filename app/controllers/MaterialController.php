@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/../models/MaterialModel.php';
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 class MaterialController {
     private $model;
 
@@ -8,50 +13,92 @@ class MaterialController {
         $this->model = new MaterialModel();
     }
 
-    //mother division
-    public function getFiltered($search, $status, $order) {
+    // Mother division filter
+    public function getFiltered($search = '', $status = 'all', $order = 'az') {
         return $this->model->getFilteredMaterials($search, $status, $order);
     }
 
-
-    //display all
+    // Display all materials
     public function index() {
         return $this->model->getAll();
     }
 
-    //search material
+    // Search materials
     public function search($keyword) {
-    return $this->model->search($keyword);
+        return $this->model->search($keyword);
     }
 
-    //add material
+    // Add material
     public function store($data) {
-        return $this->model->create(
+        return $this->model->addmaterial(
             $data['material_code'],
             $data['material_desc'],
             $data['qty'],
             $data['material_status']
         );
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_material'])) {
-        $controller = new MaterialController();
-        $success = $controller->store($_POST);
-
-        if ($success) {
-            header("Location: ../app/modules/gsu_admin/views/inventory.php?success=1");
-        } else {
-            header("Location: ../app/modules/gsu_admin/views/inventory.php?error=1");
-        }
-        exit;
-    }
     }
 
-    //filter status
+    // Filter by status
     public function filter($status) {
         return $this->model->filterByStatus($status);
     }
 
-    //sort a-z vice versa
-    public function sort($order) {
-    return $this->model->sortByName($order);
+    // Sort by name
+    public function sort($order = 'az') {
+        return $this->model->sortByName($order);
+    }
+
+    // Update existing material
+    public function update($data) {
+        return $this->model->update(
+            $data['material_code'],
+            $data['material_desc'],
+            $data['qty'],
+            $data['material_status']
+        );
+    }
+
+    // Get one material by id
+    public function show($id) {
+        return $this->model->find($id);
+    }
+}
+
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    session_start();
+    $controller = new MaterialController();
+
+    // Handle add
+    if (isset($_POST['add_material'])) {
+        $success = $controller->store($_POST);
+
+        if ($success) {
+            $_SESSION['material_success'] = "Material added successfully!";
+        } else {
+            $_SESSION['material_error'] = "Failed to add material.";
+        }
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
+    // Handle update
+    if (isset($_POST['update_material'])) {
+        $success = $controller->update($_POST);
+
+        if ($success) {
+            $_SESSION['material_success'] = "Material updated successfully!";
+        } else {
+            $_SESSION['material_error'] = "Failed to update material.";
+        }
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
+    //Handle Add
+    if (isset($_POST['add_material'])) {
+        $success = $controller->store($_POST);
     }
 }
