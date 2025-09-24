@@ -45,19 +45,18 @@ $materials = $materialController->getFiltered($search, $status, $order);
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="search" placeholder="Search by material name" class="flex-1 min-w-[200px] input-field">
-            <form method="get" id="statusForm">
-              <select name="status" class="input-field" onchange="document.getElementById('statusForm').submit()">
-                <option value="all" <?= ($status === 'All') ? 'selected' : '' ?>>All</option>
-                <option value="available" <?= ($status === 'Available') ? 'selected' : '' ?>>Available</option>
-                <option value="unavailable" <?= ($status === 'unavailable') ? 'selected' : '' ?>>Unavailable</option>
-              </select>
-            </form>
-            <form method="get" id="sortForm">
-              <select name="order" class="input-field" onchange="document.getElementById('sortForm').submit()">
-                <option value="az" <?= ($order === 'az') ? 'selected' : '' ?>>Sort A-Z</option>
-                <option value="za" <?= ($order === 'za') ? 'selected' : '' ?>>Sort Z-A</option>
-              </select>
-            </form>
+            <!-- Filter -->
+            <select id="statusFilter" class="input-field">
+              <option value="all">All</option>
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
+            </select>
+
+            <!-- Sort -->
+            <select id="sortMaterials" class="input-field">
+              <option value="az">Sort A-Z</option>
+              <option value="za">Sort Z-A</option>
+            </select>
             <button title="Print data in the table" class="input-field">
               <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
@@ -97,14 +96,14 @@ $materials = $materialController->getFiltered($search, $status, $order);
                             <input type="number" name="qty" class="w-full input-field" required />
                           </div>
 
-                          <div>
+                          <!-- <div>
                             <label class="text-xs text-text mb-1">Status<span class="text-secondary"></span></label>
                             <select name="material_status" class="w-full input-field">
                               <option value="Available">Available</option>
                               <option value="Unavailable">Unavailable</option>
                             </select>
 
-                          </div>
+                          </div> -->
                           <div class="flex justify-center gap-2 pt-4">
                               <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
                               <button type="submit" name="add_material" class="btn btn-primary px-7">Save</button>
@@ -136,11 +135,12 @@ $materials = $materialController->getFiltered($search, $status, $order);
               <tbody id="table" class="text-sm">
                 <?php if (!empty($materials)) { ?>
                   <?php foreach ($materials as $row) {
+                    $status = ($row['qty'] == 0) ? 'Unavailable' : 'Available';
                     $rowJson = htmlspecialchars(json_encode([
                       'material_code'   => $row['material_code'],
                       'material_desc'   => $row['material_desc'],
                       'qty'             => $row['qty'],
-                      'material_status' => $row['material_status'],
+                      'material_status' => $status,
                     ]), ENT_QUOTES, 'UTF-8');
                   ?>
                     <tr
@@ -149,7 +149,7 @@ $materials = $materialController->getFiltered($search, $status, $order);
                       <td class="pl-8 py-3"><?= htmlspecialchars($row['material_code']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['material_desc']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['qty']) ?></td>
-                      <td class="px-4 py-3"><?= htmlspecialchars($row['material_status']) ?></td>
+                      <td><?php echo $status; ?></td>
                     </tr>
                   <?php } ?>
                 <?php } else { ?>
@@ -198,7 +198,7 @@ $materials = $materialController->getFiltered($search, $status, $order);
               </div>
             </div>
 
-            <div>
+            <!-- <div>
               <label class="text-xs text-text mb-1">Status</label>
                   <div>
                     <select name="material_status" class="input-field">
@@ -206,7 +206,7 @@ $materials = $materialController->getFiltered($search, $status, $order);
                       <option value="Unavailable" :selected="selected.material_status === 'unavailable'">Unavailable</option>
                     </select>
                   </div>
-            </div>
+            </div> -->
 
             <div class="flex justify-center gap-2 pt-2">
               <button type="button" title="Material Used History" class="btn btn-secondary">
@@ -242,7 +242,18 @@ $materials = $materialController->getFiltered($search, $status, $order);
     </div>
   </main>
 
-  <script>
+  <script type="module">
+  import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+
+  initTableFilters({
+    tableId: "table",         // tbody id
+    searchId: "search",       // search box id
+    filterId: "statusFilter", // dropdown id for status
+    sortId: "sortMaterials",  // dropdown id for sorting
+    searchColumns: [1],       // search in Description column (index starts at 0)
+    filterColumn: 3           // Status column index (Code=0, Desc=1, Qty=2, Status=3)
+  });
+
     function previewProfile(event) {
       const output = document.getElementById('profile-preview');
       output.src = URL.createObjectURL(event.target.files[0]);
