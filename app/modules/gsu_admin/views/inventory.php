@@ -260,6 +260,25 @@ $materials = $materialController->getFiltered($search, $status, $order);
     }
     window.adminSuccess = <?= isset($_SESSION['admin_success']) ? json_encode($_SESSION['admin_success']) : 'null' ?>;
     window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
+
+    document.addEventListener("DOMContentLoaded", () => {
+    <?php if (isset($_SESSION['material_success'])): ?>
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: <?= json_encode($_SESSION['material_success']) ?>
+      });
+    <?php unset($_SESSION['material_success']); endif; ?>
+
+    <?php if (isset($_SESSION['material_error'])): ?>
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: <?= json_encode($_SESSION['material_error']) ?>
+      });
+    <?php unset($_SESSION['material_error']); endif; ?>
+  });
+
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>

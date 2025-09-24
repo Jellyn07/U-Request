@@ -109,4 +109,57 @@ class MaterialModel extends BaseModel {
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
+
+    // Check if material_code or material_desc already exists
+    public function exists($code, $description) {
+        // Check duplicate material_code
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM " . $this->table . " WHERE material_code = ?");
+        $stmt->bind_param("s", $code);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        if ($result['count'] > 0) {
+            return "code"; // duplicate code
+        }
+    
+        // Check duplicate material_desc
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM " . $this->table . " WHERE material_desc = ?");
+        $stmt->bind_param("s", $description);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        if ($result['count'] > 0) {
+            return "description"; // duplicate description
+        }
+    
+        return false; // no duplicate
+    }
+
+    public function existsForUpdate($code, $description, $currentId) {
+        // Check duplicate code excluding current record
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count 
+                                    FROM " . $this->table . " 
+                                    WHERE material_code = ? AND material_code != ?");
+        $stmt->bind_param("ss", $code, $currentId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        if ($result['count'] > 0) {
+            return "code";
+        }
+    
+        // Check duplicate description excluding current record
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count 
+                                    FROM " . $this->table . " 
+                                    WHERE material_desc = ? AND material_code != ?");
+        $stmt->bind_param("ss", $description, $currentId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        if ($result['count'] > 0) {
+            return "description";
+        }
+    
+        return false;
+    }
+    
+    
+
+
 }

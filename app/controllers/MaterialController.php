@@ -1,12 +1,12 @@
 <?php
 require_once __DIR__ . '/../models/MaterialModel.php';
+require_once __DIR__ . '/../core/BaseModel.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
-class MaterialController {
+class MaterialController extends BaseModel {
     private $model;
 
     public function __construct() {
@@ -28,16 +28,6 @@ class MaterialController {
         return $this->model->search($keyword);
     }
 
-    // Add material
-    public function store($data) {
-        return $this->model->addmaterial(
-            $data['material_code'],
-            $data['material_desc'],
-            $data['qty'],
-            $data['material_status']
-        );
-    }
-
     // Filter by status
     public function filter($status) {
         return $this->model->filterByStatus($status);
@@ -50,6 +40,12 @@ class MaterialController {
 
     // Update existing material
     public function update($data) {
+        // check duplicates first
+        $duplicate = $this->model->existsForUpdate($data['material_code'], $data['material_desc'], $data['material_code']);
+        if ($duplicate) {
+            return $duplicate; // "code" or "description"
+        }
+    
         return $this->model->update(
             $data['material_code'],
             $data['material_desc'],
@@ -57,6 +53,25 @@ class MaterialController {
             $data['material_status']
         );
     }
+    
+
+    // Add new material
+    public function store($data) {
+        $duplicate = $this->model->exists($data['material_code'], $data['material_desc']);
+        if ($duplicate) {
+            return $duplicate; // "code" or "description"
+        }
+    
+        $status = ($data['qty'] == 0) ? 'Unavailable' : 'Available';
+    
+        return $this->model->addmaterial(
+            $data['material_code'],
+            $data['material_desc'],
+            $data['qty'],
+            $status
+        );
+    }
+    
 
     // Get one material by id
     public function show($id) {
@@ -71,34 +86,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle add
     if (isset($_POST['add_material'])) {
-        $success = $controller->store($_POST);
-
-        if ($success) {
+        $result = $controller->store($_POST);
+    
+        if ($result === "code") {
+            $_SESSION['material_error'] = "Material Code already exists!";
+        } elseif ($result === "description") {
+            $_SESSION['material_error'] = "Material Description already exists!";
+        } elseif ($result) {
             $_SESSION['material_success'] = "Material added successfully!";
         } else {
             $_SESSION['material_error'] = "Failed to add material.";
         }
-
+    
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
     }
+    
 
     // Handle update
     if (isset($_POST['update_material'])) {
-        $success = $controller->update($_POST);
-
-        if ($success) {
+        $result = $controller->update($_POST);
+    
+        if ($result === "code") {
+            $_SESSION['material_error'] = "Material Code already exists!";
+        } elseif ($result === "description") {
+            $_SESSION['material_error'] = "Material Description already exists!";
+        } elseif ($result) {
             $_SESSION['material_success'] = "Material updated successfully!";
         } else {
             $_SESSION['material_error'] = "Failed to update material.";
         }
-
+    
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
     }
-
-    //Handle Add
-    if (isset($_POST['add_material'])) {
-        $success = $controller->store($_POST);
-    }
+    
 }
