@@ -1,3 +1,10 @@
+
+<?php
+// always start the session at the very top
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <aside id="sidebar" class="bg-primary w-16 md:w-64 h-screen rounded-r-2xl text-text flex flex-col fixed z-50 transition-all duration-300">
   <!-- Logo / Title -->
   <div class="flex items-center flex-shrink-0 px-4 pt-5 gap-1">
@@ -145,14 +152,32 @@
     </nav>
 
     <!-- Profile dropdown at bottom -->
-    <div class="p-2 md:p-3 mt-auto text-sm relative">
-      <button id="profileButton" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition">
-        <img src="/public/assets/img/user-default.png" alt="Profile" class="w-8 h-8 md:h-10 md:w-10 border border-white rounded-full object-cover">
-        <div class="hidden md:block pl-2 text-left">
-          <p class="text-white text-sm font-medium">Admin Name</p>
-          <p class="text-xs text-gray-300">Super Admin</p>
-        </div>
-      </button>
+<div class="p-2 md:p-3 mt-auto text-sm relative">
+  <button id="profileButton" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition">
+    <img src="/public/assets/img/user-default.png" alt="Profile" class="w-8 h-8 md:h-10 md:w-10 border border-white rounded-full object-cover">
+
+    <div class="hidden md:block pl-2 text-left">
+      <p class="text-white text-sm font-medium">
+        <?php echo htmlspecialchars($_SESSION['full_name'] ?? 'Guest'); ?>
+      </p>
+      <p class="text-xs text-gray-300">
+        <?php
+          if (isset($_SESSION['access_level'])) {
+              switch ($_SESSION['access_level']) {
+                  case 1: echo "Super Admin"; break;
+                  case 2: echo "GSU Admin"; break;
+                  case 3: echo "Motorpool Admin"; break;
+                  default: echo "Administrator"; break;
+              }
+          } else {
+              echo "Not Logged In";
+          }
+        ?>
+      </p>
+    </div>
+  </button>
+</div>
+
       <!-- Dropdown -->
       <div id="profileMenu" class="hidden absolute bottom-4 left-20 md:bottom-20 md:left-4 w-48 bg-white text-black rounded-lg border-gray-400 shadow-lg">
         <a href="#" class="block rounded-lg px-4 py-2 hover:bg-gray-100">

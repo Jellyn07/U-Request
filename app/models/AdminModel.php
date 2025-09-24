@@ -41,8 +41,7 @@ class AdministratorModel extends BaseModel {
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         return $result;
-    }
-
+    }  
     // CHECK IF EMAIL EXISTS
     public function emailExists($email) {
         $stmt = $this->db->prepare("SELECT COUNT(*) AS cnt FROM vw_administrator WHERE email = ?");

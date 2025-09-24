@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         $_SESSION['staff_id'] = $admin['staff_id'];
         $_SESSION['email'] = $admin['email'];
         $_SESSION['access_level'] = $admin['accessLevel_id'];
+        $_SESSION['full_name'] = $admin['first_name'] . ' ' . $admin['last_name'];
 
         // 🔀 Redirect based on access level
         switch ($admin['accessLevel_id']) {
