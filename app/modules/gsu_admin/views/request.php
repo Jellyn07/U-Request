@@ -91,7 +91,7 @@ $admins = $controller->getAllAdmins();
             <tbody id="table" class="text-sm">
                 <?php for($i=0; $i<20; $i++){
                     echo'
-                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left">
+                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
                             <td class="pl-8 py-3">0001</th>
                             <td class="px-4 py-3">Juan Cruz</th>
                             <td class="px-4 py-3">Electrical</th>
@@ -147,6 +147,15 @@ $admins = $controller->getAllAdmins();
             <div>
               <label class="text-xs text-text mb-1">Location</label>
               <input type="text" class="w-full view-field"/>
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">Priority Level</label>
+              <select type="text" class="w-full input-field">
+                <option value="" disabled selected>Select Priority Level</option>
+                <option>Low</option>
+                <option>High</option>
+              </select>
             </div>
 
             <div>
