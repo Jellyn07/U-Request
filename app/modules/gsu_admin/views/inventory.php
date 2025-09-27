@@ -96,14 +96,15 @@ $materials = $materialController->getFiltered($search, $status, $order);
                             <input type="number" name="qty" class="w-full input-field" required />
                           </div>
 
-                          <!-- <div>
+                          <div>
                             <label class="text-xs text-text mb-1">Status<span class="text-secondary"></span></label>
                             <select name="material_status" class="w-full input-field">
                               <option value="Available">Available</option>
-                              <option value="Unavailable">Unavailable</option>
+                              <option value="Low Stock">Low Stock</option>
+                              <option value="Out of Stock">Out of Stock</option>
                             </select>
 
-                          </div> -->
+                          </div>
                           <div class="flex justify-center gap-2 pt-4">
                               <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
                               <button type="submit" name="add_material" class="btn btn-primary px-7">Save</button>

@@ -26,16 +26,16 @@ if (session_status() === PHP_SESSION_NONE) {
       <ul class="space-y-2 p-2">
         <!-- Dashboard -->
          <a href="dashboard.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+            <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
           </a>
 
         <!-- Account Management -->
         <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/personnel.png" alt="Account Management" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+            <img src="/public/assets/img/personnel.png" alt="Account Management" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Account Management</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-4 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transform transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
@@ -56,50 +56,50 @@ if (session_status() === PHP_SESSION_NONE) {
         <!-- GSU Oversight -->
         <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/repair-admin.png" alt="GSU Oversight" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+            <img src="/public/assets/img/repair-admin.png" alt="GSU Oversight" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">GSU Oversight</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-4 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transform transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
               <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/repair-request.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/repair-request.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Repair Request</span>
               </a>
             </li>
             <li>
               <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/inventory.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/inventory.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Inventory</span>
               </a>  
             </li>
             <li>
               <a href="personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/personnel.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/personnel.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Personnels</span>
               </a>
             </li>
-            <li>
+            <!-- <li>
               <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/documents.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/documents.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Documents</span>
               </a>
-            </li>
+            </li> -->
             <li>
               <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Users</span>
               </a>
             </li>
             <li>
               <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/campus-locations.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/campus-locations.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Campus Locations</span>
               </a>
             </li>
             <li>
               <a href="#" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-                <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6" />
+                <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
               </a>
             </li>
@@ -109,9 +109,9 @@ if (session_status() === PHP_SESSION_NONE) {
         <!-- Motorpool Oversight -->
         <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/car-admin.png" alt="Motorpool Oversight" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6 self-center" />
+            <img src="/public/assets/img/car-admin.png" alt="Motorpool Oversight" class="size-8 p-1.5 md:p-0 md:size-4 self-center" />
             <span class="hidden md:flex items-center sidebar-text">Motorpool Oversight</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-4 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transform transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Drivers</a></li>
@@ -126,9 +126,9 @@ if (session_status() === PHP_SESSION_NONE) {
         <!-- Reports -->
         <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/reports.png" alt="Reports & Analytics" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6 self-center" />
+            <img src="/public/assets/img/reports.png" alt="Reports & Analytics" class="size-8 p-1.5 md:p-0 md:size-4 self-center" />
             <span class="hidden md:flex items-center sidebar-text">Reports & Analytics</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
+            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-4 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transform transition-transform duration-300" />
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Activity Logs</a></li>
@@ -139,7 +139,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <!-- Settings -->
         <!-- <li>
           <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/settings.png" alt="System Settings" class="size-8 p-1.5 md:p-0 md:h-6 md:w-6 self-center" />
+            <img src="/public/assets/img/settings.png" alt="System Settings" class="size-8 p-1.5 md:p-0 md:size-4 self-center" />
             <span class="hidden md:flex items-center sidebar-text">System Settings</span>
             <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-5 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transition-transform duration-300" />
           </button>
