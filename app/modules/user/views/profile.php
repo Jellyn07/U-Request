@@ -43,7 +43,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
               <img id="profile-preview"  
                   src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
                   alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
-                  class="w-36 h-36 rounded-full object-cover border-2 border-secondary shadow-sm"
+                  class="w-36 h-36 rounded-full object-cover border border-secondary shadow-sm"
               />
 
               <?php
