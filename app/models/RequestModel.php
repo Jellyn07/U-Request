@@ -64,19 +64,66 @@ class RequestModel extends BaseModel {
     }
 
     // In RequestModel.php
-public function getAllRequesters() {
-    $sql = "SELECT * FROM vw_requesters"; 
-    $result = $this->db->query($sql);
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
+    public function getAllRequesters() {
+        $sql = "SELECT * FROM vw_requesters"; 
+        $result = $this->db->query($sql);
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 
-public function getRequesterById($id) {
-    $stmt = $this->db->prepare("SELECT * FROM vw_requesters WHERE requester_id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_assoc();
-}
+    public function getRequesterById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM vw_requesters WHERE requester_id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
+
+      // Get all requests from vw_requests
+      public function getAllRequests() {
+        $sql = "SELECT request_id, Name, request_Type, location, request_date, req_status 
+                FROM vw_requests
+                ORDER BY request_date DESC";
+
+        $result = $this->db->query($sql);
+
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
+    }
+
+    // Get single request by ID
+    public function getRequestById($id) {
+        $id = (int) $id; // prevent SQL injection
+        $sql = "SELECT request_id, Name, request_Type, location, request_date, req_status 
+                FROM vw_requests
+                WHERE request_id = $id
+                LIMIT 1";
+
+        $result = $this->db->query($sql);
+
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc();
+        }
+        return null;
+    }
+
+    // Get personnels
+    public function getPersonnels() {
+        $sql = "SELECT staff_id, full_name FROM vw_gsu_personnels ORDER BY full_name ASC";
+        $result = $this->db->query($sql);
+
+        $personnels = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $personnels[] = $row;
+            }
+        }
+        return $personnels;
+    }
 
     
 }

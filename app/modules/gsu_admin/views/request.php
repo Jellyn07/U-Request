@@ -1,12 +1,12 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../controllers/UserController.php';
-require_once __DIR__ . '/../../../controllers/AdminController.php';
+require_once __DIR__ . '/../../../controllers/RequestController.php';
 
-$controller = new AdminController();
-$admins = $controller->getAllAdmins();
-
+$controller = new RequestController();
+$data = $controller->index();
+$requests = $data['requests'];
+$personnels = $data['personnels'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,8 +49,8 @@ $admins = $controller->getAllAdmins();
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
-            <input type="text" id="search" placeholder="Search by ID or Requester Name" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
+            <input type="text" id="searchRequests" placeholder="Search by ID or Requester Name" class="flex-1 min-w-[200px] input-field">
+            <select class="input-field" id="filterCategory">
                 <option value="all">All</option>
                 <option>Carpentry/Masonry</option>
                 <option>Welding</option>
@@ -61,7 +61,7 @@ $admins = $controller->getAllAdmins();
                 <option>Air-Condition</option>
                 <option>Others</option>
             </select>
-            <select class="input-field">
+            <select id="sortCategory" class="input-field">
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
             </select>
@@ -81,33 +81,37 @@ $admins = $controller->getAllAdmins();
           <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-b-lg p-2">
             <thead class="bg-white sticky top-0">
               <tr>
-                <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Request ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Status</th>
               </tr>
             </thead>
-            <tbody id="table" class="text-sm">
-                <?php for($i=0; $i<20; $i++){
-                    echo'
-                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
-                            <td class="pl-8 py-3">0001</th>
-                            <td class="px-4 py-3">Juan Cruz</th>
-                            <td class="px-4 py-3">Electrical</th>
-                            <td class="px-4 py-3">Admin Building</th>
-                            <td class="px-4 py-3">
-                            <select class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                                <option value="to inspect" selected>To Inspect</option>
-                                <option value="to inspect">In Progress</option> /*This is blue*/
-                                <option value="to inspect">Completed</option> /*This is green*/
-                            </select>
-                            </th>
-                        </tr>                    
-                    ';
-                } 
-                ?>
-            </tbody>
+            <tbody id="requestsTable" class="text-sm">
+            <?php foreach ($requests as $row): ?>
+                <tr 
+                    data-category="<?= htmlspecialchars($row['request_Type']) ?>" 
+                    @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; showDetails = true"
+                    class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
+                >
+                    <td class="pl-8 py-3"><?= htmlspecialchars($row['request_id']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
+                    <td class="px-4 py-3">
+                        <select class="px-2 py-1 rounded-full text-xs 
+                            <?= $row['req_status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' : 
+                              ($row['req_status'] === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') ?>">
+                            <option <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
+                            <option <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                            <option <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
+                        </select>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+          </tbody>
+
           </table>
           </div>
         </div>
@@ -128,49 +132,45 @@ $admins = $controller->getAllAdmins();
             alt=""
             class="w-10/12 shadow-lg mx-auto rounded-lg"
             />
-
+            <input type="hidden" name="request_id" x-model="selected.request_id">
             <div>
               <label class="text-xs text-text mb-1">Tracking No.</label>
-              <input type="text" class="w-full view-field"/>
+              <input type="text" class="w-full view-field"  x-model="selected.request_id" readonly />
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Requester</label>
-              <input type="text" class="w-full view-field"/>
+              <input type="text" class="w-full view-field" x-model="selected.Name" readonly />
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Category</label>
-              <input type="text" class="w-full view-field"/>
+              <input type="text" class="w-full view-field" x-model="selected.request_Type" readonly />
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Location</label>
-              <input type="text" class="w-full view-field"/>
+              <input type="text" class="w-full view-field" x-model="selected.location" readonly />
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Priority Level</label>
-              <select type="text" class="w-full input-field">
-                <option value="" disabled selected>Select Priority Level</option>
-                <option>Low</option>
-                <option>High</option>
+              <select type="text" name="priority" class="w-full input-field">
+                <option value="" selected>Select Priority Level</option>
+                <option value="Low">Low</option>
+                <option value="High">High</option>
               </select>
             </div>
 
             <div>
               <label class="text-xs text-text mb-1">Assign Personnel</label>
-              <select type="text" :value="selected.staff_id || ''" class="w-full input-field">
-                <option value="" disabled selected>Select Personnel</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-                <option>Mike Johnson</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-                <option>Mike Johnson</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-                <option>Mike Johnson</option>
+              <select name="staff_id" x-model="selected.staff_id" class="w-full input-field">
+                  <option value="" disabled>Select Personnel</option>
+                  <?php foreach ($personnels as $person): ?>
+                      <option value="<?= $person['staff_id'] ?>">
+                          <?= htmlspecialchars($person['full_name']) ?>
+                      </option>
+                  <?php endforeach; ?>
               </select>
             </div>
 
@@ -187,4 +187,21 @@ $admins = $controller->getAllAdmins();
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
+<script type="module">
+  import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initTableFilters({
+      tableId: "requestsTable",
+      searchId: "searchRequests",
+      filterId: "filterCategory",
+      sortId: "sortCategory",
+      searchColumns: [0, 1],   // search by ID + Requester
+      filterAttr: "data-category",
+      sortColumn: 1           // ✅ sort by Category column
+    });
+  });
+</script>
+
+
 </html>

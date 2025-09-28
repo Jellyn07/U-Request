@@ -123,6 +123,22 @@ class RequestController {
     public function getRequesterById($id) {
         return $this->model->getRequesterById($id);
     }
+
+    public function index() {
+        $requests = $this->model->getAllRequests();
+        $personnels = $this->model->getPersonnels();
+
+        // Pass data to view
+        return [
+            "requests"   => $requests,
+            "personnels" => $personnels
+        ];
+    }
+
+    // Show single request details
+    public function view($id) {
+        return $this->model->getRequestById($id);
+    }
     
 }
 
