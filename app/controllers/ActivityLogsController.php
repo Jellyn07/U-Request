@@ -28,7 +28,10 @@ class ActivityLogsController {
                 @click="selected = JSON.parse($el.dataset.log); showDetails = true"
                 class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100 transition-colors duration-150 ease-in-out"
             >
-                <td class="pl-8 py-3">' . date('M d, Y', strtotime($row['timestamp'])) . '</td>
+                <td class="pl-8 py-3">
+                ' . date('M d, Y', strtotime($row['timestamp'])) . ' 
+                <span class="text-xs text-gray-500">(' . date('h:i A', strtotime($row['timestamp'])) . ')</span>
+                </td>
                 <td class="px-4 py-3">' . htmlspecialchars($row['source']) . '</td>
                 <td class="px-4 py-3 ' . $actionClass . '">' . htmlspecialchars($row['action_type']) . '</td>
                 <td class="px-4 py-3">' . htmlspecialchars($row['affected_item']) . '</td>
