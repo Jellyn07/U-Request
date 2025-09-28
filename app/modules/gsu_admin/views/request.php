@@ -92,6 +92,7 @@ $personnels = $data['personnels'];
             <?php foreach ($requests as $row): ?>
                 <tr 
                     data-category="<?= htmlspecialchars($row['request_Type']) ?>" 
+                    data-status="<?= htmlspecialchars($row['req_status']) ?>" 
                     @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; showDetails = true"
                     class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
                 >
@@ -186,7 +187,6 @@ $personnels = $data['personnels'];
   </main>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
-<script src="/public/assets/js/shared/search.js"></script>
 <script type="module">
   import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
 
@@ -194,14 +194,15 @@ $personnels = $data['personnels'];
     initTableFilters({
       tableId: "requestsTable",
       searchId: "searchRequests",
-      filterId: "filterCategory",
-      sortId: "sortCategory",
-      searchColumns: [0, 1],   // search by ID + Requester
-      filterAttr: "data-category",
-      sortColumn: 1           // ✅ sort by Category column
+      filterId: "filterCategory",  
+      sortId: "sortCategory",      
+      searchColumns: [0, 1],       
+      filterAttr: "data-category", 
+      statusTabs: "#tabs button"   // ✅ NEW: listen for tab clicks
     });
   });
 </script>
+
 
 
 </html>
