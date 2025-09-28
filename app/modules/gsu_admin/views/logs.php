@@ -1,12 +1,13 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../controllers/UserController.php';
-require_once __DIR__ . '/../../../controllers/AdminController.php';
+require_once __DIR__ . '/../../../controllers/ActivityLogsController.php';
+$controller = new ActivityLogsController();
 
-$controller = new AdminController();
-$admins = $controller->getAllAdmins();
-
+// Default filters
+$tableFilter = $_GET['table'] ?? 'all';
+$actionFilter = $_GET['action'] ?? 'all';
+$dateFilter = $_GET['date'] ?? 'all';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,28 +37,30 @@ $admins = $controller->getAllAdmins();
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="search" placeholder="Search Activities" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
-                <option value="all">All Users</option>
-                <option>Admin</option>
-                <option>Student/Staff</option>
+            <form method="GET" id="filterForm">
+            <select name="table" onchange="document.getElementById('filterForm').submit()" class="input-field">
+              <option value="all" <?= $tableFilter==='all'?'selected':'' ?>>All</option>
+              <option value="gsu_personnel" <?= $tableFilter==='gsu_personnel'?'selected':'' ?>>GSU Personnel</option>
+              <option value="materials" <?= $tableFilter==='materials'?'selected':'' ?>>Materials</option>
+              <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
+              <option value="status" <?= $tableFilter==='status'?'selected':'' ?>>Status</option>
+              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
             </select>
-            <select class="input-field">
-              <option value="all">Activity Type</option>
-                <option>Added</option>
-                <option>Updated</option>
-                <option>Deleted</option>
-                <option>Approved</option>
-                <option>Rejected</option>
-                <option>Completed</option>
+            <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
+              <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>
+              <option value="INSERT" <?= $actionFilter==='INSERT'?'selected':'' ?>>Added</option>
+              <option value="UPDATE" <?= $actionFilter==='UPDATE'?'selected':'' ?>>Updated</option>
+              <option value="DELETE" <?= $actionFilter==='DELETE'?'selected':'' ?>>Deleted</option>
             </select>
-            <select class="input-field">
-                <option value="all">All Dates</option>
-                <option>Today</option>
-                <option>Yesterday</option>
-                <option>Last 7 days</option>
-                <option>Last 14 days</option>
-                <option>Last 30 days</option>
+            <select name="date" onchange="document.getElementById('filterForm').submit()" class="input-field">
+                <option value="all" <?= $dateFilter==='all'?'selected':'' ?>>All Dates</option>
+                <option value="today" <?= $dateFilter==='today'?'selected':'' ?>>Today</option>
+                <option value="yesterday" <?= $dateFilter==='yesterday'?'selected':'' ?>>Yesterday</option>
+                <option value="7" <?= $dateFilter==='7'?'selected':'' ?>>Last 7 days</option>
+                <option value="14" <?= $dateFilter==='14'?'selected':'' ?>>Last 14 days</option>
+                <option value="30" <?= $dateFilter==='30'?'selected':'' ?>>Last 30 days</option>
             </select>
+            </form>
             <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
@@ -75,23 +78,14 @@ $admins = $controller->getAllAdmins();
             <thead class="bg-white sticky top-0">
               <tr>
                 <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Description</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Affected Items</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Details</th>
               </tr>
             </thead>
             <tbody id="table" class="text-sm">
-                <?php for($i=0; $i<20; $i++){
-                    echo'
-                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
-                            <td class="pl-8 py-3">Jan 07, 2025</td>
-                            <td class="px-4 py-3">Juan Cruz</td>
-                            <td class="px-4 py-3">Added</td>
-                            <td class="px-4 py-3">Added new personnel named Tommy Lim</td>
-                        </tr>                    
-                    ';
-                } 
-                ?>
+                 <?= $controller->renderLogs($tableFilter, $actionFilter, $dateFilter) ?>
             </tbody>
           </table>
           </div>
