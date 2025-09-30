@@ -80,10 +80,29 @@ class RequestModel extends BaseModel {
 
       // Get all requests from vw_requests
       public function getAllRequests() {
-        $sql = "SELECT request_id, Name, request_Type, location, request_date, req_status 
-                FROM vw_requests
-                ORDER BY request_date DESC";
-
+        $sql = "
+          SELECT 
+                vw.*,
+                r.*,
+                ra.*,
+                rap.staff_id,
+                vwg.full_name
+            FROM vw_requests vw
+            INNER JOIN request r 
+                ON vw.request_id = r.request_id
+            LEFT JOIN request_assignment ra
+                ON r.request_id = ra.request_id
+            LEFT JOIN request_assigned_personnel rap
+                ON r.request_id = rap.request_id
+            LEFT JOIN vw_gsu_personnel vwg
+                ON rap.staff_id = vwg.staff_id
+            WHERE rap.staff_id IS NULL OR rap.staff_id = (
+                SELECT MIN(staff_id) 
+                FROM request_assigned_personnel 
+                WHERE request_id = r.request_id
+            )
+            ORDER BY vw.request_date DESC;
+            ";
         $result = $this->db->query($sql);
 
         $data = [];
@@ -111,19 +130,121 @@ class RequestModel extends BaseModel {
         return null;
     }
 
-    // Get personnels
-    public function getPersonnels() {
-        $sql = "SELECT staff_id, full_name FROM vw_gsu_personnels ORDER BY full_name ASC";
-        $result = $this->db->query($sql);
+   // In RequestModel.php
+   public function addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level, $date_finished = null) {
+    try {
+        // ✅ 0. Check if request assignment already exists
+        $checkStmt = $this->db->prepare("SELECT COUNT(*) AS count FROM REQUEST_ASSIGNMENT WHERE request_id = ?");
+        $checkStmt->bind_param("i", $request_id);
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
 
-        $personnels = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $personnels[] = $row;
-            }
+        if ($count > 0) {
+            $_SESSION['alert'] = [
+                "type" => "warning",
+                "title" => "Already Assigned",
+                "message" => "This request already has an assignment. No duplicate created."
+            ];
+            return false;
         }
-        return $personnels;
+
+        // 1️⃣ Add Request Assignment
+        $stmt = $this->db->prepare("CALL spAddRequestAssignment(?, ?, ?, ?)");
+        if (!$stmt) {
+            $_SESSION['alert'] = [
+                "type" => "error",
+                "title" => "Database Error",
+                "message" => "Add Assignment failed: " . $this->db->error
+            ];
+            return false;
+        }
+        $stmt->bind_param("iiss", $request_id, $req_id, $req_status, $date_finished);
+        $stmt->execute();
+        $stmt->close();
+
+        // 2️⃣ Update Priority Status
+        $stmt2 = $this->db->prepare("CALL spUpdateRequestPriorityStatus(?, ?)");
+        if (!$stmt2) {
+            $_SESSION['alert'] = [
+                "type" => "error",
+                "title" => "Database Error",
+                "message" => "Update Priority failed: " . $this->db->error
+            ];
+            return false;
+        }
+        $stmt2->bind_param("is", $request_id, $prio_level);
+        $stmt2->execute();
+        $stmt2->close();
+
+        // 3️⃣ Assign Personnel
+        $stmt3 = $this->db->prepare("CALL spAssignPersonnel(?, ?)");
+        if (!$stmt3) {
+            $_SESSION['alert'] = [
+                "type" => "error",
+                "title" => "Database Error",
+                "message" => "Assign Personnel failed: " . $this->db->error
+            ];
+            return false;
+        }
+        $stmt3->bind_param("ii", $request_id, $staff_id);
+        $stmt3->execute();
+        $stmt3->close();
+
+        // ✅ Success
+        $_SESSION['alert'] = [
+            "type" => "success",
+            "title" => "Success",
+            "message" => "Assignment, priority, and personnel saved successfully."
+        ];
+
+        return true;
+
+    } catch (Exception $e) {
+        $_SESSION['alert'] = [
+            "type" => "error",
+            "title" => "Error",
+            "message" => $e->getMessage()
+        ];
+        return false;
     }
+}
+
+public function updateRequestStatus($request_id, $req_status) {
+    try {
+        $stmt = $this->db->prepare("CALL spUpdateRequestStatus(?, ?)");
+        $stmt->bind_param("is", $request_id, $req_status);
+        $stmt->execute();
+        $stmt->close();
+
+        return ["success" => true, "message" => "Status updated successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+
+
+    
+    public function getAvailableStaff() {
+        $sql = "
+            SELECT gp.staff_id, gp.full_name
+            FROM vw_gsu_personnel gp
+            WHERE gp.staff_id NOT IN (
+                SELECT rap.staff_id
+                FROM request_assigned_personnel rap
+                INNER JOIN request_assignment ra 
+                    ON rap.request_id = ra.request_id
+                WHERE ra.date_finished IS NULL
+            )
+            ORDER BY gp.full_name ASC
+        ";
+    
+        $result = $this->db->query($sql);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+    
 
     
 }

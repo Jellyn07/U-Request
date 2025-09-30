@@ -13,71 +13,59 @@ class RequestController {
     }
 
     public function submitRequest() {
-        // Tracking ID
         $tracking_id = 'TRK-' . date("Ymd") . '-' . substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"), 0, 5);
 
-        // Collect inputs (matching your form names)
         $nature       = $_POST['nature-request'] ?? '';
         $req_id       = $_POST['req_id'] ?? 1; // Replace with actual logged-in requester ID
         $description  = $_POST['description'] ?? '';
         $unit         = $_POST['unit'] ?? '';
         $building     = $_POST['exLocb'] ?? '';
         $room         = $_POST['exLocr'] ?? '';
-        $location    = $building . ' - ' . $room;
+        $location     = $building . ' - ' . $room;
         $dateNoticed  = $_POST['dateNoticed'] ?? date('Y-m-d');
 
-        $fileName = $_FILES['picture']['name'];
-        $fileTmp  = $_FILES['picture']['tmp_name'];
-        $fileExt  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-        // Allowed file extensions
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-        if (!in_array($fileExt, $allowedExtensions)) {
-            echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid File Type',
-                    text: 'Only JPG, JPEG, PNG, and GIF files are allowed.'
-                });
-            </script>";
-            exit;
-        }
-
         $filePath = null;
-        if (!empty($fileName)) {
-            // Save files inside: /public/uploads/
-            $targetDir = __DIR__ . '/../../public/uploads/';
 
-            // Make sure the folder exists
-            if (!is_dir($targetDir)) {
-                mkdir($targetDir, 0777, true);
+        // Handle file if uploaded
+        if (isset($_FILES['picture']) && !empty($_FILES['picture']['name'])) {
+            $fileName = $_FILES['picture']['name'];
+            $fileTmp  = $_FILES['picture']['tmp_name'];
+            $fileExt  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            $allowedExtensions = ['jpg','jpeg','png','gif'];
+            if (!in_array($fileExt, $allowedExtensions)) {
+                $_SESSION['alert'] = [
+                    'type'=>'error',
+                    'title'=>'Invalid File Type',
+                    'message'=>'Only JPG, JPEG, PNG, and GIF files are allowed.',
+                    'redirect'=>"/app/modules/user/views/request.php"
+                ];
+                header("Location: ../modules/user/views/request.php");
+                exit;
             }
 
-            // Add unique ID before filename (avoid overwrite)
-            $newFileName = uniqid("img_", true) . "." . $fileExt;
+            $targetDir = __DIR__ . '/../../public/uploads/';
+            if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
 
-            // Full server path
+            $newFileName = uniqid("img_", true) . "." . $fileExt;
             $targetPath = $targetDir . $newFileName;
 
-            // Move file
             if (move_uploaded_file($fileTmp, $targetPath)) {
-                // Store relative path for DB
                 $filePath = '/public/uploads/' . $newFileName;
             } else {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Upload Failed',
-                        text: 'There was a problem uploading your file.'
-                    });
-                </script>";
+                $_SESSION['alert'] = [
+                    'type'=>'error',
+                    'title'=>'Upload Failed',
+                    'message'=>'There was a problem uploading your file.',
+                    'redirect'=>"/app/modules/user/views/request.php"
+                ];
+                header("Location: ../modules/user/views/request.php");
                 exit;
             }
         }
 
-        // --- ✅ Check for duplicates ---
-        $duplicate = $this->model->checkDuplicateRequest($unit, $location, $nature);
-        if ($duplicate) {
+        // Check for duplicate request
+        if ($this->model->checkDuplicateRequest($unit, $location, $nature)) {
             $_SESSION['alert'] = [
                 'type' => 'warning',
                 'title' => 'Duplicate Request',
@@ -88,8 +76,7 @@ class RequestController {
             exit;
         }
 
-
-        // Save to DB
+        // Save request to DB
         $request_id = $this->model->createRequest(
             $tracking_id, $nature, $req_id, $description,
             $unit, $location, $dateNoticed, $filePath
@@ -113,9 +100,8 @@ class RequestController {
 
         header("Location: ../modules/user/views/request.php");
         exit;
-
-
     }
+
     public function getAllRequesters() {
         return $this->model->getAllRequesters();
     }
@@ -126,12 +112,9 @@ class RequestController {
 
     public function index() {
         $requests = $this->model->getAllRequests();
-        $personnels = $this->model->getPersonnels();
-
         // Pass data to view
         return [
-            "requests"   => $requests,
-            "personnels" => $personnels
+            "requests"   => $requests
         ];
     }
 
@@ -139,13 +122,94 @@ class RequestController {
     public function view($id) {
         return $this->model->getRequestById($id);
     }
+
+    // In RequestController.php
+    public function saveAssignment() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'saveAssignment') {
+            $request_id = $_POST['request_id'] ?? null;
+            $req_id     = $_POST['req_id'] ?? null;
+            $req_status = $_POST['req_status'] ?? 'To Inspect';
+            $prio_level = $_POST['prio_level'] ?? null;
+            $staff_id   = $_POST['staff_id'] ?? null;
     
+            if (!$request_id || !$req_id || !$prio_level || !$staff_id) {
+                $_SESSION['alert'] = [
+                    "type" => "warning",
+                    "title" => "Missing Fields",
+                    "message" => "Please fill in all required fields."
+                ];
+                header("Location: ../modules/gsu_admin/views/request.php");
+                exit;
+            }
+    
+            $this->model->addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level);
+            header("Location: ../modules/gsu_admin/views/request.php");
+            exit;
+        }
+    }
+
+    public function updateStatus() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'updateStatus') {
+            $request_id = $_POST['request_id'] ?? null;
+            $req_status = $_POST['req_status'] ?? null;
+    
+            if (!$request_id || !$req_status) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Request ID or status is missing."
+                ]);
+                exit;
+            }
+    
+            $result = $this->model->updateRequestStatus($request_id, $req_status);
+            echo json_encode($result);
+            exit;
+        }
+    }
+    
+    
+    
+    
+
 }
 
 // Run controller on form submission
+$controller = new RequestController();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $controller = new RequestController();
-    $controller->submitRequest();
+    if (isset($_POST['action']) && $_POST['action'] === 'saveAssignment') {
+        $controller->saveAssignment();
+
+    }else if (isset($_POST['action']) && $_POST['action'] === 'updateStatus') {
+        $controller->updateStatus();
+
+    }else {
+        $controller->submitRequest();
+    }
 }
 
 
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === "saveAssignment") {
+    
+//     // Safely get POST values with null coalescing
+//     $request_id = $_POST['request_id'] ?? null;
+//     $req_id = $_POST['req_id'] ?? null;
+//     $req_status = $_POST['req_status'] ?? 'To Inspect';
+//     $prio_level = $_POST['prio_level'] ?? null;
+//     $staff_id = $_POST['staff_id'] ?? null; // ⚡ safely handle optional picture
+    
+//     // Validate required fields
+//     if (!$request_id || !$req_id || !$prio_level || !$staff_id) {
+//         echo json_encode([
+//             "success" => false,
+//             "message" => "Please fill in all required fields."
+//         ]);
+//         exit;
+//     }
+
+//     // Call model to save assignment
+//     $result = $model->addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level);
+
+//     echo json_encode($result);
+//     exit;
+// }

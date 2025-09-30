@@ -6,7 +6,8 @@ export function initTableFilters({
   searchColumns = [],
   filterAttr = null,
   filterColumn = null,
-  statusTabs = null   // ✅ NEW
+  statusTabs = null,   // ✅ NEW
+  dateColumnIndex = null // ✅ NEW: column index for request_date
 }) {
   const searchInput = document.getElementById(searchId);
   const filterSelect = filterId ? document.getElementById(filterId) : null;
@@ -48,11 +49,23 @@ export function initTableFilters({
 
     // ✅ Sorting visible rows
     const visibleRows = rows.filter(row => row.style.display !== "none");
-    visibleRows.sort((a, b) => {
-      const textA = a.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
-      const textB = b.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
-      return sortValue === "az" ? textA.localeCompare(textB) : textB.localeCompare(textA);
-    });
+
+    if (dateColumnIndex !== null) {
+      // Always sort by request_date newest first
+      visibleRows.sort((a, b) => {
+        const dateA = new Date(a.children[dateColumnIndex]?.textContent.trim() || 0);
+        const dateB = new Date(b.children[dateColumnIndex]?.textContent.trim() || 0);
+        return dateB - dateA; // ✅ Newest first
+      });
+    } else {
+      // fallback to alphabetical sort
+      visibleRows.sort((a, b) => {
+        const textA = a.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
+        const textB = b.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
+        return sortValue === "az" ? textA.localeCompare(textB) : textB.localeCompare(textA);
+      });
+    }
+
     visibleRows.forEach(row => tableBody.appendChild(row));
   }
 
