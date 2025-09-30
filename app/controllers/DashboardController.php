@@ -27,5 +27,10 @@ class DashboardController {
     
         return $data;  // ✅ always return the cleaned structure
     }
+
+    public function getProfile($admin_email)
+    {
+        return $this->model->getProfileByEmail($admin_email);
+    }
     
 }

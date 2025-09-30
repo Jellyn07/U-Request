@@ -6,6 +6,14 @@ require_once __DIR__ . '/../../../controllers/DashboardController.php';
 $controller = new DashboardController();
 $year = $_GET['year'] ?? date('Y');
 $data = $controller->getDashboardData($year);
+
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+
+// ✅ Fetch profile here
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">

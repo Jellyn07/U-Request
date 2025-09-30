@@ -57,7 +57,18 @@
     <!-- Profile dropdown at bottom -->
     <div class="p-2 md:p-3 mt-auto text-sm relative">
       <button id="profileButton" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition">
-        <img src="/public/assets/img/user-default.png" alt="Profile" class="w-8 h-8 md:h-10 md:w-10 border border-white rounded-full object-cover">
+        <img id="profile-preview"  
+                  src="<?php echo htmlspecialchars(!empty($profile['profile_picture']) ? $profile['profile_picture'] : '/public/assets/img/user-default.png'); ?>" 
+                  class="w-10 h-10 rounded-full object-cover border border-secondary shadow-sm"
+              />
+
+              <?php
+              $defaultPic = '/public/assets/img/user-default.png';
+$profilePic = (!empty($profile['profile_picture']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $profile['profile_picture']))
+    ? $profile['profile_picture']
+    : $defaultPic;
+
+              ?>
 
         <div class="hidden md:block pl-2 text-left">
           <p class="text-white text-sm font-medium">

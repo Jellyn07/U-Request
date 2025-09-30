@@ -1,5 +1,19 @@
 <?php
 require_once __DIR__ . '/../../../config/constants.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+
+// ✅ Load controller & fetch profile before including the view
+require_once __DIR__ . '/../../../controllers/AdminProfileController.php';
+$controller = new AdminProfileController();
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,9 +27,8 @@ require_once __DIR__ . '/../../../config/constants.php';
 </head>
 <body class="bg-gray-100">
   <?php 
-    include COMPONENTS_PATH . '/admin_profile.php';
+    include COMPONENTS_PATH . '/admin_profile.php'; 
   ?>
-
   <!-- Action Buttons -->
   <div class="flex w-1/2 mx-auto flex-col sm:flex-row gap-3 mb-10">
     <button 
@@ -25,9 +38,9 @@ require_once __DIR__ . '/../../../config/constants.php';
     <button 
       type="button"
       onclick="window.location.href='/app/controllers/LogoutController.php';"
-      class="flex-1 btn btn-primary mr-4"
-    >
+      class="flex-1 btn btn-primary mr-4">
       Logout
     </button>
   </div>
+</body>
 </html>
