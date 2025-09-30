@@ -78,32 +78,32 @@
     </div>
 
     <!-- Password Update -->
-    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200">
-        <h2 class="text-xl font-semibold">Update Password</h2>
-        <form class="space-y-5" method="post" action="../../../controllers/AdminProfileController.php">
+    <div class="bg-white shadow-md rounded-xl p-6 mb-5 border border-gray-200">
+          <h2 class="text-xl font-semibold">Update Password</h2>
+          <form class="space-y-5" method="post" action="../../../controllers/AdminProfileController.php">
             <input type="hidden" name="action" value="change_password">
 
             <div>
-                <label for="old_password" class="text-sm text-text mb-1">Old Password</label>
-                <input type="password" id="old_password" name="old_password" class="w-full input-field" placeholder="Enter old password" required />
+              <label for="old_password" class="text-sm text-text mb-1">Old Password</label>
+              <input type="password" id="old_password" name="old_password" class="w-full input-field" placeholder="Enter old password" required />
             </div>
 
             <div>
-                <label for="new_password" class="text-sm text-text mb-1">New Password</label>
-                <input type="password" id="new_password" name="new_password" class="w-full input-field" placeholder="Enter new password" required />
+              <label for="new_password" class="text-sm text-text mb-1">New Password</label>
+              <input type="password" id="new_password" name="new_password" class="w-full input-field" placeholder="Enter new password" required />
             </div>
 
             <div>
-                <label for="confirm_password" class="text-sm text-text mb-1">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" placeholder="Re-enter new password" required />
+              <label for="confirm_password" class="text-sm text-text mb-1">Confirm Password</label>
+              <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" placeholder="Re-enter new password" required />
             </div>
 
             <div class="flex justify-end">
-                <button type="submit" class="btn btn-primary">
-                    Save New Password
-                </button>
+              <button type="submit" class="btn btn-primary">
+                Save New Password
+              </button>
             </div>
-        </form>
+          </form>
     </div>
     </div>
     <script>

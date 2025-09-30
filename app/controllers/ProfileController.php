@@ -31,15 +31,15 @@ class ProfileController extends BaseModel {
 
     // Save password update
     public function savePassword($requester_email, $oldPassword, $newPassword) {
-    $profile = $this->model->getProfileByEmail($requester_email);
+        $profile = $this->model->getProfileByEmail($requester_email);
 
-    // Verify old password using encryption
-    if (!$this->model->verifyPassword($requester_email, $oldPassword)) {
-        return false; // old password incorrect
+        // Verify old password using encryption
+        if (!$this->model->verifyPassword($requester_email, $oldPassword)) {
+            return false; // old password incorrect
+        }
+
+        return $this->model->updatePassword($requester_email, $newPassword);
     }
-
-    return $this->model->updatePassword($requester_email, $newPassword);
-}
 
     // Delete account
     public function deleteAccount($requester_id) {

@@ -40,31 +40,22 @@ class AdminProfileController extends BaseModel
 
         return $this->model->updatePassword($requester_email, $newPassword);
     }
-
-    // Delete account
-    public function deleteAccount($requester_id)
-    {
-        return $this->model->deleteAccount($requester_id);
-    }
 }
 
 // Update Password
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_password') {
+
     $email = $_SESSION['email'];
     $oldPassword = $_POST['old_password'] ?? '';
     $newPassword = $_POST['new_password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    $controller = new AdminProfileController(); // ✅ fixed class name
+    $controller = new AdminProfileController();
 
-    if ($newPassword !== $confirmPassword) {
-        $_SESSION['error'] = "New passwords do not match.";
+    if ($controller->savePassword($email, $oldPassword, $newPassword)) {
+        $_SESSION['success'] = "Password updated successfully.";
     } else {
-        if ($controller->savePassword($email, $oldPassword, $newPassword)) {
-            $_SESSION['success'] = "Password updated successfully.";
-        } else {
-            $_SESSION['error'] = "Old password is incorrect or update failed.";
-        }
+        $_SESSION['error'] = "Old password is incorrect or update failed.";
     }
 
     header("Location: /app/modules/gsu_admin/views/profile.php");
