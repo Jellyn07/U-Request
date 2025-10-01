@@ -40,7 +40,31 @@ class AdminProfileController extends BaseModel
 
         return $this->model->updatePassword($requester_email, $newPassword);
     }
+
+
+    // Save new profile picture
+    public function verifyPassword($email, $filePath)
+    {
+        return $this->model->verifyPassword($email, $filePath);
+    }
+    
 }
+
+// AJAX endpoint: verify old password
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'verify_old_password') {
+    $email = $_SESSION['email'];
+    $oldPassword = $_POST['old_password'] ?? '';
+
+    $controller = new AdminProfileController();
+
+    if ($controller->verifyPassword($email, $oldPassword)) {
+        echo json_encode(["valid" => true]);
+    } else {
+        echo json_encode(["valid" => false]);
+    }
+    exit;
+}
+
 
 // Update Password
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_password') {
