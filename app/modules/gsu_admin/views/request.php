@@ -9,6 +9,13 @@ $requests = $data['requests'];
 
 $model = new RequestModel();
 $personnels = $model->getAvailableStaff();
+
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+// ✅ Fetch profile here
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -321,21 +328,21 @@ document.getElementById('saveBtn').addEventListener('click', function() {
       return;
   }
 
-  // // ✅ Confirmation
-  // Swal.fire({
-  //     title: 'Save Changes?',
-  //     text: 'Are you sure you want to update this request assignment?',
-  //     icon: 'question',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //     confirmButtonText: 'Yes, Save',
-  //     cancelButtonText: 'Cancel'
-  // }).then((result) => {
-  //     if (result.isConfirmed) {
-  //         form.submit(); // ✅ Submit the form normally
-  //     }
-  // });
+   // ✅ Confirmation
+   Swal.fire({
+       title: 'Save Changes?',
+       text: 'Are you sure you want to update this request assignment?',
+       icon: 'question',
+       showCancelButton: true,
+       confirmButtonColor: '#3085d6',
+       cancelButtonColor: '#d33',
+       confirmButtonText: 'Yes, Save',
+       cancelButtonText: 'Cancel'
+   }).then((result) => {
+       if (result.isConfirmed) {
+           form.submit(); // ✅ Submit the form normally
+        }
+   });
 });
 
 document.addEventListener("DOMContentLoaded", () => {
