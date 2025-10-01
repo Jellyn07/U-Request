@@ -40,5 +40,10 @@ class ActivityLogsController {
         }
         return $html;
     }
+
+    public function getProfile($admin_email)
+    {
+        return $this->model->getProfileByEmail($admin_email);
+    }
     
 }

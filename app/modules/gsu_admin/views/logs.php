@@ -8,6 +8,13 @@ $controller = new ActivityLogsController();
 $tableFilter = $_GET['table'] ?? 'all';
 $actionFilter = $_GET['action'] ?? 'all';
 $dateFilter = $_GET['date'] ?? 'all';
+
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+// ✅ Fetch profile here
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">

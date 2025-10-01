@@ -69,11 +69,11 @@
                     <input type="text" value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>" disabled class="w-full view-field cursor-not-allowed" />
                 </div>
             </div>
-            <div class="flex justify-end">
+            <!-- <div class="flex justify-end">
                 <button type="submit" class="btn btn-primary">
                     Save Changes
                 </button>
-            </div>
+            </div> -->
         </form>
     </div>
 

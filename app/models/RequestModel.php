@@ -246,5 +246,18 @@ public function updateRequestStatus($request_id, $req_status) {
     }
     
 
-    
+    // Get profile data by email
+    public function getProfileByEmail($admin_email)
+    {
+        $stmt = $this->db->prepare("
+            SELECT profile_picture
+            FROM administrator
+            WHERE email = ?
+        ");
+        $stmt->bind_param("s", $admin_email);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        return $result->fetch_assoc(); // returns single row
+    }
 }

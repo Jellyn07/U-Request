@@ -17,6 +17,13 @@ $order = $_GET['order'] ?? 'az';
 
 $materials = $materialController->getFiltered($search, $status, $order);
 
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+// ✅ Fetch profile here
+$profile = $controller->getProfile($_SESSION['email']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,9 +39,10 @@ $materials = $materialController->getFiltered($search, $status, $order);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
 </head>
+
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/gsu_menu.php';?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -106,8 +114,8 @@ $materials = $materialController->getFiltered($search, $status, $order);
 
                           </div>
                           <div class="flex justify-center gap-2 pt-4">
-                              <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                              <button type="submit" name="add_material" class="btn btn-primary px-7">Save</button>
+                            <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" name="add_material" class="btn btn-primary px-7">Save</button>
                           </div>
                         </div>
                       </div>
@@ -181,7 +189,7 @@ $materials = $materialController->getFiltered($search, $status, $order);
 
             <div>
               <label class="text-xs text-text mb-1">Material Code No.</label>
-              <input type="text" name="material_code" :value="selected.material_code || ''" class="w-full input-field" required readonly/>
+              <input type="text" name="material_code" :value="selected.material_code || ''" class="w-full input-field" required readonly />
             </div>
 
             <div>
@@ -224,11 +232,14 @@ $materials = $materialController->getFiltered($search, $status, $order);
         <div x-show="addmaterial" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center  z-50 overflow-auto">
           <div class="bg-white rounded-lg shadow-lg w-1/5 p-6">
             <!-- <h2 class="text-lg font-semibold mb-4">Stock Management</h2> -->
-            <form method="post" action="add_stock.php">
+            <form method="post" action="../../../controllers/MaterialController.php">
+              <input type="hidden" name="material_id" value="<?= $material['material_id'] ?>">
+
               <div class="mb-4">
                 <label class="block text-xs mb-1">Quantity to Add<span class="text-secondary">*</span></label>
                 <input type="number" name="quantity" class="w-full input-field" required>
               </div>
+
               <div class="flex justify-center gap-2">
                 <button type="button" @click="addmaterial = false" class="btn btn-secondary">Cancel</button>
                 <button type="submit" class="btn btn-primary">Add</button>
@@ -244,16 +255,18 @@ $materials = $materialController->getFiltered($search, $status, $order);
   </main>
 
   <script type="module">
-  import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+    import {
+      initTableFilters
+    } from "/public/assets/js/shared/table-filters.js";
 
-  initTableFilters({
-    tableId: "table",         // tbody id
-    searchId: "search",       // search box id
-    filterId: "statusFilter", // dropdown id for status
-    sortId: "sortMaterials",  // dropdown id for sorting
-    searchColumns: [1],       // search in Description column (index starts at 0)
-    filterColumn: 3           // Status column index (Code=0, Desc=1, Qty=2, Status=3)
-  });
+    initTableFilters({
+      tableId: "table", // tbody id
+      searchId: "search", // search box id
+      filterId: "statusFilter", // dropdown id for status
+      sortId: "sortMaterials", // dropdown id for sorting
+      searchColumns: [1], // search in Description column (index starts at 0)
+      filterColumn: 3 // Status column index (Code=0, Desc=1, Qty=2, Status=3)
+    });
 
     function previewProfile(event) {
       const output = document.getElementById('profile-preview');
@@ -263,23 +276,24 @@ $materials = $materialController->getFiltered($search, $status, $order);
     window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
 
     document.addEventListener("DOMContentLoaded", () => {
-    <?php if (isset($_SESSION['material_success'])): ?>
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: <?= json_encode($_SESSION['material_success']) ?>
-      });
-    <?php unset($_SESSION['material_success']); endif; ?>
+      <?php if (isset($_SESSION['material_success'])): ?>
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: <?= json_encode($_SESSION['material_success']) ?>
+        });
+      <?php unset($_SESSION['material_success']);
+      endif; ?>
 
-    <?php if (isset($_SESSION['material_error'])): ?>
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: <?= json_encode($_SESSION['material_error']) ?>
-      });
-    <?php unset($_SESSION['material_error']); endif; ?>
-  });
-
+      <?php if (isset($_SESSION['material_error'])): ?>
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: <?= json_encode($_SESSION['material_error']) ?>
+        });
+      <?php unset($_SESSION['material_error']);
+      endif; ?>
+    });
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>

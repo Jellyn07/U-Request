@@ -202,12 +202,12 @@ $personnels = $model->getAvailableStaff();
               </select>
           </div>
 
-          <div class="flex justify-center pt-2 space-x-2">
+          <!-- <div class="flex justify-center pt-2 space-x-2">
               <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
               <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment">
                   Save Changes
               </button>
-          </div>
+          </div> -->
           </form>
         </div>
       </div>
@@ -232,9 +232,6 @@ $personnels = $model->getAvailableStaff();
     });
   });
 </script>
-
-
-
 <script>
 document.addEventListener("alpine:init", () => {
   window.viewDetails = function(selected) {
@@ -324,21 +321,21 @@ document.getElementById('saveBtn').addEventListener('click', function() {
       return;
   }
 
-  // ✅ Confirmation
-  Swal.fire({
-      title: 'Save Changes?',
-      text: 'Are you sure you want to update this request assignment?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, Save',
-      cancelButtonText: 'Cancel'
-  }).then((result) => {
-      if (result.isConfirmed) {
-          form.submit(); // ✅ Submit the form normally
-      }
-  });
+  // // ✅ Confirmation
+  // Swal.fire({
+  //     title: 'Save Changes?',
+  //     text: 'Are you sure you want to update this request assignment?',
+  //     icon: 'question',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#3085d6',
+  //     cancelButtonColor: '#d33',
+  //     confirmButtonText: 'Yes, Save',
+  //     cancelButtonText: 'Cancel'
+  // }).then((result) => {
+  //     if (result.isConfirmed) {
+  //         form.submit(); // ✅ Submit the form normally
+  //     }
+  // });
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -426,5 +423,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 <?php unset($_SESSION['alert']); endif; ?>
 </script>
-
 </html>

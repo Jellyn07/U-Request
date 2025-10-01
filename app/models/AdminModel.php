@@ -308,6 +308,33 @@ class AdministratorModel extends BaseModel {
         $stmt->close();
         return $rows;
     }
+
+    public function increaseQuantity($material_id, $quantity)
+    {
+        $stmt = $this->db->prepare("
+            UPDATE materials
+            SET quantity = quantity + ?
+            WHERE material_id = ?
+        ");
+        $stmt->bind_param("ii", $quantity, $material_id);
+        return $stmt->execute();
+    }
+
+    // Get profile data by email
+    public function getProfileByEmail($admin_email)
+    {
+        $stmt = $this->db->prepare("
+            SELECT profile_picture
+            FROM administrator
+            WHERE email = ?
+        ");
+        $stmt->bind_param("s", $admin_email);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        return $result->fetch_assoc(); // returns single row
+    }
+    
     // Destructor
     public function __destruct() {
         if ($this->db) {

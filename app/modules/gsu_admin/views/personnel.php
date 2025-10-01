@@ -31,6 +31,13 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
       echo "<script>window.personnelError = " . json_encode($_SESSION['personnel_error']) . "; console.log('Personnel Error:', window.personnelError);</script>";
       unset($_SESSION['personnel_error']);
   }
+
+  if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+// ✅ Fetch profile here
+$profile = $controller->getProfile($_SESSION['email']);
   ?>
 </head>
 <body class="bg-gray-100">

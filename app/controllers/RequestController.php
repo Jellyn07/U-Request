@@ -166,11 +166,11 @@ class RequestController {
             exit;
         }
     }
-    
-    
-    
-    
 
+    public function getProfile($admin_email)
+    {
+        return $this->model->getProfileByEmail($admin_email);
+    }
 }
 
 // Run controller on form submission

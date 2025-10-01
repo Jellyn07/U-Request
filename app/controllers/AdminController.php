@@ -269,7 +269,18 @@ class AdminController {
             echo json_encode([]);
         }
     }
+
+    // Add quantity to an existing material
+    public function addQuantity($material_id, $quantity)
+    {
+        return $this->model->increaseQuantity($material_id, $quantity);
+    }
     
+
+    public function getProfile($admin_email)
+    {
+        return $this->model->getProfileByEmail($admin_email);
+    }
     
 }
 
@@ -294,6 +305,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     }
 
     header("Location: ../modules/superadmin/views/manage_user.php");
+    exit;
+}
+
+// ✅ Handle POST request
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $controller = new AdminController();
+
+    $quantity = $_POST['quantity'] ?? null;
+    $material_id = $_POST['material_id'] ?? null;
+
+    if (!$quantity || !$material_id) {
+        $_SESSION['error'] = "Invalid request. Missing material or quantity.";
+    } else {
+        if ($controller->addQuantity($material_id, (int)$quantity)) {
+            $_SESSION['success'] = "Quantity added successfully.";
+        } else {
+            $_SESSION['error'] = "Failed to update material quantity.";
+        }
+    }
+
+    // redirect back to material list page (adjust path as needed)
+    header("Location: ../modules/gsu_admin/views/inventory.php");
     exit;
 }
 

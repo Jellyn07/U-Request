@@ -132,6 +132,11 @@ class PersonnelController {
         header("Location: ../modules/gsu_admin/views/personnel.php");
         exit;
     }
+
+    public function getProfile($admin_email)
+    {
+        return $this->model->getProfileByEmail($admin_email);
+    }
 }
 
 // ✅ Safe session start
