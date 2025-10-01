@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
 
-class MaterialModel extends BaseModel {
+class MaterialModel extends BaseModel
+{
     private $table = "materials";
 
     //mother division
-    public function getFilteredMaterials($search = '', $status = 'all', $order = 'az') {
+    public function getFilteredMaterials($search = '', $status = 'all', $order = 'az')
+    {
         $sql = "SELECT * FROM " . $this->table . " WHERE 1=1";
         $params = [];
         $types = "";
@@ -42,23 +44,26 @@ class MaterialModel extends BaseModel {
 
 
     // Fetch all materials
-    public function getAll() {
+    public function getAll()
+    {
         $sql = "SELECT * FROM " . $this->table;
         $result = $this->db->query($sql);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     // Fetch one material
-    public function search($keyword) {
-    $stmt = $this->db->prepare("SELECT * FROM " . $this->table . " 
+    public function search($keyword)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM " . $this->table . " 
                                 WHERE material_desc LIKE CONCAT('%', ?, '%')");
-    $stmt->bind_param("s", $keyword);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->bind_param("s", $keyword);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     // Insert material
-    public function addmaterial($code, $description, $quantity, $status) {
+    public function addmaterial($code, $description, $quantity, $status)
+    {
         $stmt = $this->db->prepare("
             INSERT INTO " . $this->table . " (material_code, material_desc, qty, material_status) 
             VALUES (?, ?, ?, ?)
@@ -68,7 +73,8 @@ class MaterialModel extends BaseModel {
     }
 
     //filter status
-    public function filterByStatus($status) {
+    public function filterByStatus($status)
+    {
         if ($status === "all") {
             $sql = "SELECT * FROM " . $this->table;
             $result = $this->db->query($sql);
@@ -82,17 +88,19 @@ class MaterialModel extends BaseModel {
     }
 
     //sort a-z vice versa
-    public function sortByName($order = "az") {
-    $direction = ($order === "za") ? "DESC" : "ASC";
+    public function sortByName($order = "az")
+    {
+        $direction = ($order === "za") ? "DESC" : "ASC";
 
-    $sql = "SELECT * FROM " . $this->table . " ORDER BY material_desc $direction";
-    $result = $this->db->query($sql);
+        $sql = "SELECT * FROM " . $this->table . " ORDER BY material_desc $direction";
+        $result = $this->db->query($sql);
 
-    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     // Update material
-    public function update($code, $desc, $qty, $status) {
+    public function update($code, $desc, $qty, $status)
+    {
         $sql = "UPDATE materials 
                 SET material_desc = ?, qty = ?, material_status = ? 
                 WHERE material_code = ?";
@@ -103,7 +111,8 @@ class MaterialModel extends BaseModel {
 
 
     // Fetch single material (for details panel if needed)
-    public function find($id) {
+    public function find($id)
+    {
         $stmt = $this->db->prepare("SELECT * FROM " . $this->table . " WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -111,7 +120,8 @@ class MaterialModel extends BaseModel {
     }
 
     // Check if material_code or material_desc already exists
-    public function exists($code, $description) {
+    public function exists($code, $description)
+    {
         // Check duplicate material_code
         $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM " . $this->table . " WHERE material_code = ?");
         $stmt->bind_param("s", $code);
@@ -120,7 +130,7 @@ class MaterialModel extends BaseModel {
         if ($result['count'] > 0) {
             return "code"; // duplicate code
         }
-    
+
         // Check duplicate material_desc
         $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM " . $this->table . " WHERE material_desc = ?");
         $stmt->bind_param("s", $description);
@@ -129,11 +139,12 @@ class MaterialModel extends BaseModel {
         if ($result['count'] > 0) {
             return "description"; // duplicate description
         }
-    
+
         return false; // no duplicate
     }
 
-    public function existsForUpdate($code, $description, $currentId) {
+    public function existsForUpdate($code, $description, $currentId)
+    {
         // Check duplicate code excluding current record
         $stmt = $this->db->prepare("SELECT COUNT(*) as count 
                                     FROM " . $this->table . " 
@@ -144,7 +155,7 @@ class MaterialModel extends BaseModel {
         if ($result['count'] > 0) {
             return "code";
         }
-    
+
         // Check duplicate description excluding current record
         $stmt = $this->db->prepare("SELECT COUNT(*) as count 
                                     FROM " . $this->table . " 
@@ -155,11 +166,14 @@ class MaterialModel extends BaseModel {
         if ($result['count'] > 0) {
             return "description";
         }
-    
+
         return false;
     }
-    
-    
 
-
+    public function addQuantity($material_code, $quantity_to_add)
+    {
+        $stmt = $this->db->prepare("UPDATE materials SET qty = qty + ? WHERE material_code = ?");
+        $stmt->bind_param("ii", $quantity_to_add, $material_code);
+        return $stmt->execute();
+    }
 }

@@ -6,46 +6,56 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-class MaterialController extends BaseModel {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+class MaterialController extends BaseModel
+{
     private $model;
 
-    public function __construct() {
+    public function __construct()
+    {
+        parent::__construct(); // ✅ Base model constructor
         $this->model = new MaterialModel();
     }
 
-    // Mother division filter
-    public function getFiltered($search = '', $status = 'all', $order = 'az') {
+    // Get filtered materials
+    public function getFiltered($search = '', $status = 'all', $order = 'az')
+    {
         return $this->model->getFilteredMaterials($search, $status, $order);
     }
 
-    // Display all materials
-    public function index() {
+    // Get all materials
+    public function index()
+    {
         return $this->model->getAll();
     }
 
-    // Search materials
-    public function search($keyword) {
+    // Search
+    public function search($keyword)
+    {
         return $this->model->search($keyword);
     }
 
-    // Filter by status
-    public function filter($status) {
+    // Filter
+    public function filter($status)
+    {
         return $this->model->filterByStatus($status);
     }
 
-    // Sort by name
-    public function sort($order = 'az') {
+    // Sort
+    public function sort($order = 'az')
+    {
         return $this->model->sortByName($order);
     }
 
-    // Update existing material
-    public function update($data) {
-        // check duplicates first
+    // Update
+    public function update($data)
+    {
         $duplicate = $this->model->existsForUpdate($data['material_code'], $data['material_desc'], $data['material_code']);
-        if ($duplicate) {
-            return $duplicate; // "code" or "description"
-        }
-    
+        if ($duplicate) return $duplicate;
+
         return $this->model->update(
             $data['material_code'],
             $data['material_desc'],
@@ -53,17 +63,15 @@ class MaterialController extends BaseModel {
             $data['material_status']
         );
     }
-    
 
-    // Add new material
-    public function store($data) {
+    // Store new material
+    public function store($data)
+    {
         $duplicate = $this->model->exists($data['material_code'], $data['material_desc']);
-        if ($duplicate) {
-            return $duplicate; // "code" or "description"
-        }
-    
+        if ($duplicate) return $duplicate;
+
         $status = ($data['qty'] == 0) ? 'Unavailable' : 'Available';
-    
+
         return $this->model->addmaterial(
             $data['material_code'],
             $data['material_desc'],
@@ -71,23 +79,45 @@ class MaterialController extends BaseModel {
             $status
         );
     }
-    
 
-    // Get one material by id
-    public function show($id) {
+    // Show single material
+    public function show($id)
+    {
         return $this->model->find($id);
+    }
+
+    // Get next material code
+    public function getNextMaterialCode()
+    {
+        $stmt = $this->db->prepare("SELECT MAX(material_code) AS max_code FROM materials");
+
+        if (!$stmt) return 1;
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+
+        $maxCode = $row['max_code'] ?? 0;
+        return $maxCode + 1;
+    }
+
+    // Add stock
+    public function addStock($material_code, $quantity)
+    {
+        return $this->model->addQuantity($material_code, $quantity);
     }
 }
 
-// Handle form submissions
+//
+// ✅ Handle Form Submissions Below
+//
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    session_start();
     $controller = new MaterialController();
 
-    // Handle add
+    // ✅ Add Material
     if (isset($_POST['add_material'])) {
         $result = $controller->store($_POST);
-    
+
         if ($result === "code") {
             $_SESSION['material_error'] = "Material Code already exists!";
         } elseif ($result === "description") {
@@ -97,16 +127,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $_SESSION['material_error'] = "Failed to add material.";
         }
-    
+
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
     }
-    
 
-    // Handle update
+    // ✅ Update Material
     if (isset($_POST['update_material'])) {
         $result = $controller->update($_POST);
-    
+
         if ($result === "code") {
             $_SESSION['material_error'] = "Material Code already exists!";
         } elseif ($result === "description") {
@@ -116,9 +145,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $_SESSION['material_error'] = "Failed to update material.";
         }
-    
+
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
     }
-    
+
+    // ✅ Add Stock
+    if (isset($_POST['add_stock'])) {
+        $material_code = $_POST['material_code'] ?? null;
+        $quantity_to_add = $_POST['quantity'] ?? 0;
+
+        if (!$material_code || $quantity_to_add <= 0) {
+            $_SESSION['material_error'] = "Invalid stock data submitted.";
+            header("Location: ../views/inventory.php");
+            exit();
+        }
+
+        if ($controller->addStock($material_code, $quantity_to_add)) {
+            $_SESSION['material_success'] = "Stock added successfully!";
+        } else {
+            $_SESSION['material_error'] = "Failed to update stock.";
+        }
+
+        header("Location: /app/modules/gsu_admin/views/inventory.php");
+        exit();
+    }
 }

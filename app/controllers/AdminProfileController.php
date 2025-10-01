@@ -13,8 +13,10 @@ class AdminProfileController extends BaseModel
 
     public function __construct()
     {
+        parent::__construct(); // ✅ this initializes $this->db from BaseModel
         $this->model = new AdminProfileModel();
     }
+
 
     // Load profile info
     public function getProfile($admin_email)
@@ -47,7 +49,26 @@ class AdminProfileController extends BaseModel
     {
         return $this->model->verifyPassword($email, $filePath);
     }
-    
+
+    //check if there is an existing profile
+    public function getProfilePicture($email)
+    {
+        $stmt = $this->db->prepare("SELECT profile_picture FROM administrator WHERE email = ?");
+        if (!$stmt) {
+            // Optional: log or handle prepare() failure
+            return null;
+        }
+
+        $stmt->bind_param("s", $email); // "s" = string
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            return !empty($row['profile_picture']) ? $row['profile_picture'] : null;
+        }
+
+        return null;
+    }
 }
 
 // AJAX endpoint: verify old password
@@ -102,15 +123,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             if (!is_dir($uploadFileDir)) {
                 mkdir($uploadFileDir, 0755, true);
             }
+
             $destPath = $uploadFileDir . $newFileName;
             $relativePath = '/uploads/profile_pics/' . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $destPath)) {
                 $controller = new AdminProfileController();
+
+                // Get old picture path from DB before saving new one
+                $oldProfilePic = $controller->getProfilePicture($email);
+
+                // Only try to delete if the old profile pic exists and isn't the default
+                if (!empty($oldProfilePic) && $oldProfilePic !== '/uploads/profile_pics/default.png') {
+                    $oldFilePath = $_SERVER['DOCUMENT_ROOT'] . $oldProfilePic;
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
+
+                // Save new picture path in DB
                 if ($controller->saveProfilePicture($email, $relativePath)) {
                     $_SESSION['success'] = "Profile picture updated successfully.";
                 } else {
                     $_SESSION['error'] = "Failed to update profile picture in database.";
+                    // Rollback by deleting the newly uploaded file
+                    if (file_exists($destPath)) {
+                        unlink($destPath);
+                    }
                 }
             } else {
                 $_SESSION['error'] = "Error moving uploaded file.";

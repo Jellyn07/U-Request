@@ -16,15 +16,17 @@ $status = $_GET['status'] ?? 'all';
 $order = $_GET['order'] ?? 'az';
 
 $materials = $materialController->getFiltered($search, $status, $order);
+$nextCode = $materialController->getNextMaterialCode();
 
 if (!isset($_SESSION['email'])) {
-    header("Location: modules/shared/views/admin_login.php");
-    exit;
+  header("Location: modules/shared/views/admin_login.php");
+  exit;
 }
+
 // ✅ Fetch profile here
 $profile = $controller->getProfile($_SESSION['email']);
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,7 +44,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php';?>
+  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -91,7 +93,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                           <h2 class="text-base font-medium mb-3">Add Materials</h2>
                           <div>
                             <label class="text-xs text-text mb-1">Material Code No.<span class="text-secondary"></span></label>
-                            <input type="text" name="material_code" class="w-full input-field" required />
+                            <input type="text" name="material_code" value="<?= htmlspecialchars($nextCode) ?>" class="w-full input-field" required readonly />
                           </div>
 
                           <div>
@@ -104,15 +106,14 @@ $profile = $controller->getProfile($_SESSION['email']);
                             <input type="number" name="qty" class="w-full input-field" required />
                           </div>
 
-                          <div>
+                          <!-- <div>
                             <label class="text-xs text-text mb-1">Status<span class="text-secondary"></span></label>
                             <select name="material_status" class="w-full input-field">
                               <option value="Available">Available</option>
-                              <option value="Low Stock">Low Stock</option>
-                              <option value="Out of Stock">Out of Stock</option>
+                              <option value="Unavailable">Unavailable</option>
                             </select>
 
-                          </div>
+                          </div> -->
                           <div class="flex justify-center gap-2 pt-4">
                             <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
                             <button type="submit" name="add_material" class="btn btn-primary px-7">Save</button>
@@ -200,7 +201,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             <div>
               <label class="text-xs text-text mb-1">Current Quantity</label>
               <div class="w-full flex gap-2">
-                <input type="number" name="qty" :value="selected.qty || ''" class="w-full input-field" required />
+                <input type="number" name="qty" :value="selected.qty || ''" class="w-full input-field" required readonly />
                 <button type="button" @click="addmaterial = true" title="Add Stock" class="btn btn-secondary py-0.5 px-4">
                   <img src="/public/assets/img/add.png" class="size-3" alt="Add Stock">
                 </button>
@@ -218,8 +219,10 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div> -->
 
             <div class="flex justify-center gap-2 pt-2">
+              <!-- <button type="button" title="Material Used History" class="btn btn-secondary"> -->
               <!-- <button type="button" title="Material Used History" class="btn btn-secondary">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="Material Used History">
+              </button>
               </button> -->
               <button type="submit" name="update_material" class="btn btn-primary">Save Changes</button>
             </div>
@@ -232,17 +235,18 @@ $profile = $controller->getProfile($_SESSION['email']);
         <div x-show="addmaterial" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center  z-50 overflow-auto">
           <div class="bg-white rounded-lg shadow-lg w-1/5 p-6">
             <!-- <h2 class="text-lg font-semibold mb-4">Stock Management</h2> -->
-            <form method="post" action="../../../controllers/MaterialController.php">
-              <input type="hidden" name="material_id" value="<?= $material['material_id'] ?>">
+            <form id="addStockForm" method="post" action="../../../controllers/MaterialController.php" class="space-y-4">
+              <input type="hidden" name="add_stock" value="1"> <!-- ensures correct handling -->
+              <input type="hidden" name="material_code" :value="selected.material_code">
 
               <div class="mb-4">
-                <label class="block text-xs mb-1">Quantity to Add<span class="text-secondary">*</span></label>
+                <label class="block text-xs mb-1">Quantity to Add</label>
                 <input type="number" name="quantity" class="w-full input-field" required>
               </div>
 
               <div class="flex justify-center gap-2">
                 <button type="button" @click="addmaterial = false" class="btn btn-secondary">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add</button>
+                <button type="button" class="btn btn-primary" onclick="validateAndSubmit()">Add</button>
               </div>
             </form>
           </div>
@@ -299,6 +303,26 @@ $profile = $controller->getProfile($_SESSION['email']);
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
 
+//new alert
+<script>
+  function validateAndSubmit() {
+    const form = document.getElementById('addStockForm');
+    const quantityInput = form.querySelector('input[name="quantity"]');
+    const quantity = parseInt(quantityInput.value);
+
+    if (isNaN(quantity) || quantity <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Quantity',
+        text: 'The entered quantity must be above 0.',
+      });
+    } else {
+      form.submit(); // Just submit — no SweetAlert here
+    }
+  }
+</script>
+
+
 </html>
 
 <?php
@@ -306,14 +330,3 @@ $profile = $controller->getProfile($_SESSION['email']);
 unset($_SESSION['admin_success']);
 unset($_SESSION['admin_error']);
 ?>
-
-
-
-
-<!-- 
-NOTE:
-1. dapat ang availability kay naka depend sa quantity
-2. script for add and update materials
-3. sort by what is shown
-4. add by name or id no duplicate
--->

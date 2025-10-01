@@ -55,13 +55,6 @@ class AdminProfileModel extends BaseModel
         return $dbPassword === $oldPassword;
     }
 }
-
-
-
-
-
-
-
 // <?php
 // require_once __DIR__ . '/../core/BaseModel.php';
 
