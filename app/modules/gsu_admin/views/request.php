@@ -112,19 +112,27 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
                     <td class="px-4 py-3">  <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?></td>
                     <td class="px-4 py-3">
-                        <select 
-                            class="status-dropdown px-2 py-1 rounded-full text-xs <?= 
-                                $row['req_status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' : 
-                                ($row['req_status'] === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') 
-                            ?>" 
-                            data-request-id="<?= $row['request_id'] ?>"
-                            data-current-status="<?= $row['req_status'] ?>"
-                        >
-                            <option value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
-                            <option value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-                            <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
-                        </select>
-                    </td>
+    <?php if ($row['req_status'] === 'Completed'): ?>
+        <!-- ✅ Show label only when Completed -->
+        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+            Completed
+        </span>
+    <?php else: ?>
+        <!-- ✅ Show dropdown if NOT completed -->
+        <select 
+            class="status-dropdown px-2 py-1 rounded-full text-xs <?= 
+                $row['req_status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' 
+            ?>" 
+            data-request-id="<?= $row['request_id'] ?>"
+            data-current-status="<?= $row['req_status'] ?>"
+        >
+            <option value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
+            <option value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+            <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
+        </select>
+    <?php endif; ?>
+</td>
+
 
 
                 </tr>
@@ -189,32 +197,47 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Priority Level</label>
-              <select name="prio_level" id="prioritySelect" class="w-full input-field" x-model="selected.priority_status">
-                  <option value="">Select Priority Level</option>
-                  <option value="Low">Low</option>
-                  <option value="High">High</option>
-              </select>
-          </div>
+                <label class="text-xs text-text mb-1">Priority Level</label>
+                <select name="prio_level" id="prioritySelect" 
+                        class="w-full input-field" 
+                        x-model="selected.priority_status"
+                        :disabled="selected.req_status === 'Completed'">
 
-          <div>
-              <label class="text-xs text-text mb-1">Assign Personnel</label>
-              <select name="staff_id" id="staffSelect" class="w-full input-field" x-model="selected.staff_id">
-                  <option value="" disabled selected>Select Personnel</option>
-                  <?php foreach ($personnels as $person): ?>
-                      <option value="<?= $person['staff_id'] ?>">
-                          <?= htmlspecialchars($person['full_name']) ?>
-                      </option>
-                  <?php endforeach; ?>
-              </select>
-          </div>
+                    <!-- Fallback if no priority -->
+                    <option value="" x-show="!selected.priority_status">No Priority Level</option>
 
-          <!-- <div class="flex justify-center pt-2 space-x-2">
-              <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
-              <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment">
-                  Save Changes
-              </button>
-          </div> -->
+                    <option value="Low">Low</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="text-xs text-text mb-1">Assign Personnel</label>
+                <select name="staff_id" id="staffSelect" 
+                        class="w-full input-field" 
+                        x-model="selected.staff_id"
+                        :disabled="selected.req_status === 'Completed'">
+                    
+                    <!-- Fallback if none -->
+                    <option value="" x-show="!selected.staff_id">No Assigned Personnel</option>
+
+                    <?php foreach ($personnels as $person): ?>
+                        <option value="<?= $person['staff_id'] ?>">
+                            <?= htmlspecialchars($person['full_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="flex justify-center pt-2 space-x-2">
+                <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
+
+                <!-- Save button hidden if status is Completed -->
+                <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment"
+                        x-show="selected.req_status !== 'Completed'">
+                    Save Changes
+                </button>
+            </div>
           </form>
         </div>
       </div>
