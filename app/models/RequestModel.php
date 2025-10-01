@@ -80,29 +80,25 @@ class RequestModel extends BaseModel {
 
       // Get all requests from vw_requests
       public function getAllRequests() {
-        $sql = "
-          SELECT 
-                vw.*,
-                r.*,
-                ra.*,
-                rap.staff_id,
-                vwg.full_name
-            FROM vw_requests vw
-            INNER JOIN request r 
-                ON vw.request_id = r.request_id
-            LEFT JOIN request_assignment ra
-                ON r.request_id = ra.request_id
-            LEFT JOIN request_assigned_personnel rap
-                ON r.request_id = rap.request_id
-            LEFT JOIN vw_gsu_personnel vwg
-                ON rap.staff_id = vwg.staff_id
-            WHERE rap.staff_id IS NULL OR rap.staff_id = (
-                SELECT MIN(staff_id) 
-                FROM request_assigned_personnel 
-                WHERE request_id = r.request_id
-            )
-            ORDER BY vw.request_date DESC;
-            ";
+        $sql = "        
+                SELECT 
+                    vw.*,
+                    r.*,
+                    ra.*,
+                    rap.staff_id,
+                    vwg.full_name
+                FROM vw_requests vw
+                INNER JOIN request r 
+                    ON vw.request_id = r.request_id
+                LEFT JOIN request_assignment ra
+                    ON r.request_id = ra.request_id
+                LEFT JOIN request_assigned_personnel rap
+                    ON r.request_id = rap.request_id
+                LEFT JOIN vw_gsu_personnel vwg
+                    ON rap.staff_id = vwg.staff_id
+                GROUP BY r.request_id
+                ORDER BY vw.request_date DESC;
+                ";
         $result = $this->db->query($sql);
 
         $data = [];
