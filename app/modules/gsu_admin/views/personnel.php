@@ -209,7 +209,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                       status: '<?= htmlspecialchars($person['status']) ?>',
                       profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
                   }; showDetails = true"
-                  class="cursor-pointer hover:bg-gray-100"
+                  class="cursor-pointer hover:bg-gray-100 border-b border-gray-100"
                 >
                   <td class="pl-4 py-2">
                     <img src="<?= !empty($person['profile_picture']) 

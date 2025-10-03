@@ -55,7 +55,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             </select>
             <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>
-              <option value="INSERT" <?= $actionFilter==='INSERT'?'selected':'' ?>>Added</option>
+              <option value="INSERT" <?= $actionFilter==='INSERT'?'selected':'' ?>>Insert</option>
               <option value="UPDATE" <?= $actionFilter==='UPDATE'?'selected':'' ?>>Updated</option>
               <option value="DELETE" <?= $actionFilter==='DELETE'?'selected':'' ?>>Deleted</option>
             </select>

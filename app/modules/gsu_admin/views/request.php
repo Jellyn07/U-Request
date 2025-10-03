@@ -40,7 +40,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       <h1 class="text-2xl font-bold mb-4">Repair Request</h1>
 
         <div id="tabs" class="flex gap-2 mt-4 text-xs text-gray-700">
-            <button class="ml-5 btn bg-white hover:bg-red-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg">
+            <button class="ml-5 btn">
                 <p>All</p>
             </button>
             <button class="btn">
@@ -453,4 +453,58 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 <?php unset($_SESSION['alert']); endif; ?>
 </script>
+<script type="module">
+import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tableId = "requestsTable";
+  const tabs = document.querySelectorAll("#tabs button");
+
+  initTableFilters({
+    tableId: tableId,
+    searchId: "searchRequests",
+    filterId: "filterCategory",
+    sortId: "sortCategory",
+    searchColumns: [0, 1],
+    filterAttr: "data-category",
+  });
+
+  function setActiveTab(activeTab) {
+    tabs.forEach((tab, index) => {
+      const isAllTab = index === 0; // First tab = All
+      if (tab === activeTab) {
+        tab.className =  isAllTab ? "ml-5 btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg" : "btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg";
+      } else {
+        tab.className = isAllTab ? "ml-5 btn" : "btn";
+      }
+    });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const status = tab.textContent.trim();
+
+      // Set active tab styling
+      setActiveTab(tab);
+
+      // Filter table rows by status
+      const rows = document.querySelectorAll(`#${tableId} tr`);
+      rows.forEach(row => {
+        const rowStatus = row.dataset.status;
+        if (status === "All" || rowStatus === status) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    });
+  });
+
+  // Trigger "All" tab on page load
+  tabs[0].click();
+});
+</script>
+
+
+
 </html>

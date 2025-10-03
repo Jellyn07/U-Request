@@ -155,7 +155,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   ?>
                     <tr
                       @click="selected = <?= $rowJson ?>; showDetails = true"
-                      class="hover:bg-gray-100 cursor-pointer text-left">
+                      class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
                       <td class="pl-8 py-3"><?= htmlspecialchars($row['material_code']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['material_desc']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['qty']) ?></td>

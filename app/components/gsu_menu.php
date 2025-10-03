@@ -42,13 +42,17 @@
             <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Users</span>
           </a>
-          <!-- <a href="location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/campus-locations.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Campus Locations</span>
-          </a> -->
+          </a>
           <a href="logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
+          </a>
+          <a href="feedback.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+            <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+            <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
           </a>
 
       </ul>
