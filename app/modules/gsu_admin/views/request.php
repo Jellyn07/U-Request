@@ -29,6 +29,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
   
 </head>
 <body class="bg-gray-100">
@@ -112,29 +113,26 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
                     <td class="px-4 py-3">  <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?></td>
                     <td class="px-4 py-3">
-    <?php if ($row['req_status'] === 'Completed'): ?>
-        <!-- ✅ Show label only when Completed -->
-        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-            Completed
-        </span>
-    <?php else: ?>
-        <!-- ✅ Show dropdown if NOT completed -->
-        <select 
-            class="status-dropdown px-2 py-1 rounded-full text-xs <?= 
-                $row['req_status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' 
-            ?>" 
-            data-request-id="<?= $row['request_id'] ?>"
-            data-current-status="<?= $row['req_status'] ?>"
-        >
-            <option value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
-            <option value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-            <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
-        </select>
-    <?php endif; ?>
-</td>
-
-
-
+                        <?php if ($row['req_status'] === 'Completed'): ?>
+                            <!-- ✅ Show label only when Completed -->
+                            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                                Completed
+                            </span>
+                        <?php else: ?>
+                            <!-- ✅ Show dropdown if NOT completed -->
+                            <select 
+                                class="status-dropdown px-2 py-1 rounded-full text-xs <?= 
+                                    $row['req_status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' 
+                                ?>" 
+                                data-request-id="<?= $row['request_id'] ?>"
+                                data-current-status="<?= $row['req_status'] ?>"
+                            >
+                                <option value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
+                                <option value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                                <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
+                            </select>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
           </tbody>
@@ -262,249 +260,4 @@ $profile = $controller->getProfile($_SESSION['email']);
     });
   });
 </script>
-<script>
-document.addEventListener("alpine:init", () => {
-  window.viewDetails = function(selected) {
-    Swal.fire({
-      html: `
-        <div class="text-left text-sm max-w-full overflow-x-auto"> <!-- Scrollable wrapper -->
-          <h2 class="text-base font-bold mb-2">Repair Information</h2>
-          <img src="${selected.image_path 
-                      ? '/public/uploads/' + selected.image_path 
-                      : '/public/assets/img/default-img.png'}"
-               onerror="this.src='/public/assets/img/default-img.png'"
-               class="w-6/12 shadow-lg mx-auto rounded-lg mb-3"/>
-
-          <div class="mb-2"><label class="text-xs">Date Request</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.request_date}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Tracking No.</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.tracking_id}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Requester</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.Name}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Category</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.request_Type}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Description</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.request_desc}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Unit</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.unit}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Location</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.location}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Priority Level</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.priority_status || 'No Priority Level'}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Assigned Personnel</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" 
-                  value="${selected.full_name || 'Not Assigned'}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Status</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.req_status}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Date Finished</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.date_finished || 'Pending'}" readonly />
-          </div>
-        </div>
-      `,
-      width: '600px',
-      confirmButtonText: 'Close',
-      confirmButtonColor: '#d33'
-    });
-  }
-});
-document.getElementById('saveBtn').addEventListener('click', function() {
-  const priority = document.getElementById('prioritySelect').value;
-  const staff = document.getElementById('staffSelect').value;
-  const form = document.getElementById('assignmentForm');
-
-  // ✅ Validate
-  if (!priority) {
-      Swal.fire({
-          icon: 'warning',
-          title: 'Missing Priority Level',
-          text: 'Please select a priority level before saving.'
-      });
-      return;
-  }
-
-  if (!staff) {
-      Swal.fire({
-          icon: 'warning',
-          title: 'Missing Personnel',
-          text: 'Please assign a personnel before saving.'
-      });
-      return;
-  }
-
-   // ✅ Confirmation
-   Swal.fire({
-       title: 'Save Changes?',
-       text: 'Are you sure you want to update this request assignment?',
-       icon: 'question',
-       showCancelButton: true,
-       confirmButtonColor: '#3085d6',
-       cancelButtonColor: '#d33',
-       confirmButtonText: 'Yes, Save',
-       cancelButtonText: 'Cancel'
-   }).then((result) => {
-       if (result.isConfirmed) {
-           form.submit(); // ✅ Submit the form normally
-        }
-   });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const dropdowns = document.querySelectorAll(".status-dropdown");
-
-    dropdowns.forEach(dropdown => {
-        dropdown.addEventListener("change", function() {
-            const requestId = this.dataset.requestId;
-            const oldStatus = this.dataset.currentStatus;
-            const newStatus = this.value;
-
-            // If no change, do nothing
-            if (oldStatus === newStatus) return;
-
-            Swal.fire({
-                title: 'Update Status?',
-                text: `Are you sure you want to change status to "${newStatus}"?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, update',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // AJAX request
-                    fetch('../../../controllers/RequestController.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: new URLSearchParams({
-                            action: 'updateStatus',
-                            request_id: requestId,
-                            req_status: newStatus
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Status Updated',
-                                text: data.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                            dropdown.dataset.currentStatus = newStatus;
-                            // Update dropdown color
-                            dropdown.className = `status-dropdown px-2 py-1 rounded-full text-xs ${
-                                newStatus === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                                (newStatus === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800')
-                            }`;
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: data.message
-                            });
-                            dropdown.value = oldStatus; // revert
-                        }
-                    })
-                    .catch(err => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'AJAX Error',
-                            text: 'Something went wrong. Try again.'
-                        });
-                        dropdown.value = oldStatus; // revert
-                    });
-                } else {
-                    // Cancelled, revert selection
-                    dropdown.value = oldStatus;
-                }
-            });
-        });
-    });
-});
-
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-<?php if(isset($_SESSION['alert'])): ?>
-  Swal.fire({
-    icon: '<?php echo $_SESSION['alert']['type']; ?>',
-    title: '<?php echo $_SESSION['alert']['title']; ?>',
-    text: '<?php echo $_SESSION['alert']['message']; ?>'
-  });
-<?php unset($_SESSION['alert']); endif; ?>
-</script>
-<script type="module">
-import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
-
-document.addEventListener("DOMContentLoaded", () => {
-  const tableId = "requestsTable";
-  const tabs = document.querySelectorAll("#tabs button");
-
-  initTableFilters({
-    tableId: tableId,
-    searchId: "searchRequests",
-    filterId: "filterCategory",
-    sortId: "sortCategory",
-    searchColumns: [0, 1],
-    filterAttr: "data-category",
-  });
-
-  function setActiveTab(activeTab) {
-    tabs.forEach((tab, index) => {
-      const isAllTab = index === 0; // First tab = All
-      if (tab === activeTab) {
-        tab.className =  isAllTab ? "ml-5 btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg" : "btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg";
-      } else {
-        tab.className = isAllTab ? "ml-5 btn" : "btn";
-      }
-    });
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      const status = tab.textContent.trim();
-
-      // Set active tab styling
-      setActiveTab(tab);
-
-      // Filter table rows by status
-      const rows = document.querySelectorAll(`#${tableId} tr`);
-      rows.forEach(row => {
-        const rowStatus = row.dataset.status;
-        if (status === "All" || rowStatus === status) {
-          row.style.display = "";
-        } else {
-          row.style.display = "none";
-        }
-      });
-    });
-  });
-
-  // Trigger "All" tab on page load
-  tabs[0].click();
-});
-</script>
-
-
-
 </html>

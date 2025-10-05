@@ -19,7 +19,7 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
-  <script src="<?php echo PUBLIC_URL; ?>/assets/js/popup.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
 
   <?php
   // ✅ Pass PHP session values into JavaScript after scripts are loaded
