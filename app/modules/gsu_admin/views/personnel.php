@@ -19,7 +19,8 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
-  
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/popup.js"></script>
+
   <?php
   // ✅ Pass PHP session values into JavaScript after scripts are loaded
   if (isset($_SESSION['personnel_success'])) {
@@ -307,7 +308,10 @@ $profile = $controller->getProfile($_SESSION['email']);
 
 
             <div class="flex justify-center gap-2 pt-2">
-              <button type="button" title="Work History" class="btn btn-secondary">
+              <button type="button" 
+                title="Work History" 
+                class="btn btn-secondary" 
+                @click="viewWorkHistory(selected.staff_id)">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="work history">
               </button>
                 <button type="submit" name="update_personnel"  class="btn btn-primary">Save Changes</button>

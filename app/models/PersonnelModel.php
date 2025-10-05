@@ -198,4 +198,21 @@ class PersonnelModel extends BaseModel {
         $result = $stmt->get_result();
         return $result->fetch_assoc(); // returns single row
     }
+
+    // Get GSU Personnel Work History
+    public function getWorkHistory($staff_id) {
+    $sql = "SELECT request_id, request_Type, date_finished 
+            FROM vw_work_history 
+            WHERE staff_id = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("i", $staff_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    return $data;
+}
+
 }

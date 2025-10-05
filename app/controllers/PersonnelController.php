@@ -162,3 +162,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_personnel'])) 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['delete'])) {
     $controller->deletePersonnel($_GET['delete']);
 }
+
+$personnelModel = new PersonnelModel();
+if (isset($_POST['get_work_history'])) {
+    $staff_id = $_POST['staff_id'];
+    $history = $personnelModel->getWorkHistory($staff_id);
+    echo json_encode($history);
+    exit;
+}
