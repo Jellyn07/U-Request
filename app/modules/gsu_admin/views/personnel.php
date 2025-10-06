@@ -253,14 +253,46 @@ $profile = $controller->getProfile($_SESSION['email']);
           <h2 class="text-lg font-bold mb-2">Personnel Information</h2>
 
           <!-- Profile Picture -->
-          <img id="profile-preview"  
+          <!-- <img id="profile-preview"  
             :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
             alt=""
             class="w-24 h-24 rounded-full object-cover shadow-sm mx-auto"
-          />
+          /> -->
 
           <!-- Form -->
-          <form id="personnelForm" class="space-y-2" method="post" action="../../../controllers/PersonnelController.php" >
+          <form id="personnelForm"   class="space-y-2"  method="post" action="../../../controllers/PersonnelController.php">
+            <div class="rounded-xl flex flex-col items-center">
+              <div class="relative">
+                <!-- Profile Picture Preview -->
+                <img 
+                  id="profile-preview"
+                  src="<?= isset($person['profile_picture']) && $person['profile_picture'] 
+                      ? '/public/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
+                      : '/public/assets/img/user-default.png' ?>"
+                  alt="Profile Picture"
+                  class="w-24 h-24 rounded-full object-cover shadow-sm"
+                />
+
+                <!-- Edit Button -->
+                <label for="profile_picture" title="Change Profile Picture"
+                  class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036
+                        a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </label>
+
+                <!-- Hidden File Input -->
+                <input 
+                  type="file" 
+                  id="profile_picture" 
+                  name="profile_picture" 
+                  accept="image/*" 
+                  class="hidden" 
+                  onchange="previewProfile(event)">
+              </div>
+            </div>
             <div>
               <label class="text-xs text-text mb-1">Staff ID No.</label>
               <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field" readonly/>

@@ -6,8 +6,8 @@ export function initTableFilters({
   searchColumns = [],
   filterAttr = null,
   filterColumn = null,
-  statusTabs = null,   // ✅ NEW
-  dateColumnIndex = null // ✅ NEW: column index for request_date
+  statusTabs = null,
+  dateColumnIndex = null
 }) {
   const searchInput = document.getElementById(searchId);
   const filterSelect = filterId ? document.getElementById(filterId) : null;
@@ -15,7 +15,7 @@ export function initTableFilters({
   const tableBody = document.getElementById(tableId);
   const tabs = statusTabs ? document.querySelectorAll(statusTabs) : null;
 
-  let activeStatus = "All"; // ✅ track which tab is active
+  let activeStatus = "All";
 
   function applyFilters() {
     const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : "";
@@ -25,13 +25,13 @@ export function initTableFilters({
     const rows = Array.from(tableBody.querySelectorAll("tr"));
 
     rows.forEach(row => {
-      // ✅ Search across multiple columns
+      // 🔍 Search
       const searchMatches = searchColumns.some(idx => {
         const text = row.children[idx]?.textContent.toLowerCase().trim() || "";
         return text.includes(searchValue);
       });
 
-      // ✅ Filter by category (dropdown)
+      // 📂 Filter by category
       let rowFilterValue = "all";
       if (filterAttr) {
         rowFilterValue = row.getAttribute(filterAttr)?.toLowerCase().trim() || "";
@@ -40,25 +40,23 @@ export function initTableFilters({
       }
       const filterMatches = (filterValue === "all" || rowFilterValue === filterValue);
 
-      // ✅ Filter by Status tab
+      // 🏷️ Filter by status
       const rowStatus = row.getAttribute("data-status");
       const statusMatches = (activeStatus === "All" || rowStatus === activeStatus);
 
       row.style.display = (searchMatches && filterMatches && statusMatches) ? "" : "none";
     });
 
-    // ✅ Sorting visible rows
+    // 🔃 Sort visible rows
     const visibleRows = rows.filter(row => row.style.display !== "none");
 
     if (dateColumnIndex !== null) {
-      // Always sort by request_date newest first
       visibleRows.sort((a, b) => {
         const dateA = new Date(a.children[dateColumnIndex]?.textContent.trim() || 0);
         const dateB = new Date(b.children[dateColumnIndex]?.textContent.trim() || 0);
-        return dateB - dateA; // ✅ Newest first
+        return dateB - dateA; // Newest first
       });
     } else {
-      // fallback to alphabetical sort
       visibleRows.sort((a, b) => {
         const textA = a.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
         const textB = b.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
@@ -69,23 +67,40 @@ export function initTableFilters({
     visibleRows.forEach(row => tableBody.appendChild(row));
   }
 
-  // 🔗 Event bindings
+  // 🎚️ Events
   if (searchInput) searchInput.addEventListener("input", applyFilters);
   if (filterSelect) filterSelect.addEventListener("change", applyFilters);
   if (sortSelect) sortSelect.addEventListener("change", applyFilters);
 
-  // ✅ Status tab click binding
+  // 🧩 Tabs integration (moved here)
   if (tabs) {
+    function setActiveTab(activeTab) {
+      tabs.forEach((tab, index) => {
+        const isAllTab = index === 0;
+        if (tab === activeTab) {
+          tab.className = isAllTab
+            ? "ml-5 btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg"
+            : "btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg";
+        } else {
+          tab.className = isAllTab ? "ml-5 btn" : "btn";
+        }
+      });
+    }
+
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
-        activeStatus = tab.innerText.trim(); // e.g., "In Progress"
-        tabs.forEach(t => t.classList.remove("bg-red-100", "shadow-lg"));
-        tab.classList.add("bg-red-100", "shadow-lg");
+        activeStatus = tab.textContent.trim();
+        setActiveTab(tab);
         applyFilters();
       });
     });
+
+    // Trigger "All" tab by default
+    if (tabs.length > 0) {
+      tabs[0].click();
+    }
   }
 
-  // Initial run
+  // Initial filter run
   applyFilters();
 }

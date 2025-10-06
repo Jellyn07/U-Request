@@ -251,12 +251,12 @@ $profile = $controller->getProfile($_SESSION['email']);
     initTableFilters({
       tableId: "requestsTable",
       searchId: "searchRequests",
-      filterId: "filterCategory",  
-      sortId: "sortCategory",      
-      searchColumns: [0, 1],       
-      filterAttr: "data-category", 
-      statusTabs: "#tabs button",  // ✅ NEW: listen for tab clicks
-      dateColumnIndex: 5           // ✅ request_date column index (adjust if different)
+      filterId: "filterCategory",
+      sortId: "sortCategory",
+      searchColumns: [0, 1],
+      filterAttr: "data-category",
+      statusTabs: "#tabs button",
+      dateColumnIndex: 5
     });
   });
 </script>

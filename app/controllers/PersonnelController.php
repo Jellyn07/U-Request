@@ -101,7 +101,7 @@ class PersonnelController {
             'contact'   => $postData['contact_no'] ?? '',
             'hire_date' => $postData['hire_date'] ?? '',
             'unit'      => $postData['unit'] ?? '',
-            'profile_picture'=> $filename 
+            'profile_picture'=> $profile_picture_path
         ];
 
         $ok = $this->model->updatePersonnel($data);
