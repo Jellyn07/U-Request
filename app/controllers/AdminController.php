@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/encryption.php'; 
 require_once __DIR__ . '/../models/AdminModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../config/helpers.php';
 
 $login_error = "";
 
@@ -80,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
     $staff_id       = $_POST['staff_id'] ?? '';
     $email          = $_POST['email'] ?? '';
-    $first_name     = $_POST['first_name'] ?? '';
-    $last_name      = $_POST['last_name'] ?? '';
+    $first_name     = formatName($_POST['first_name'] ?? '');
+    $last_name      = formatName($_POST['last_name'] ?? '');
     $contact_no     = $_POST['contact_no'] ?? '';
     $access_level   = $_POST['access_level'] ?? '';
     $password_raw   = $_POST['password'] ?? '';

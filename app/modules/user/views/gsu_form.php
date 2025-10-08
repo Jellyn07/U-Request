@@ -17,7 +17,7 @@ require_once __DIR__ . '/../../../config/auth.php';
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
-  
+    <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   </head>
   <body class="bg-background">
     <form name="repair-request" action="../../../controllers/RequestController.php" method="post" enctype="multipart/form-data" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
