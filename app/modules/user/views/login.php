@@ -14,6 +14,8 @@ unset($_SESSION['signup_success']);
 $old_email = $_SESSION['old_email'] ?? '';
 unset($_SESSION['old_email']);
 
+$is_locked = isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time'];
+$remaining = $is_locked ? $_SESSION['lock_time'] - time() : 0;
 
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../models/UserModel.php';
@@ -48,7 +50,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           <label for="email" class="text-sm text-text mb-1">
             USeP Email Address
           </label>
-          <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" value="<?php echo htmlspecialchars($old_email); ?>"  required>
+          <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" value="<?= htmlspecialchars($_SESSION['old_email'] ?? '') ?>"
+            <?= $is_locked ? 'disabled' : '' ?> required>
         </div>
 
         <!-- Password -->
@@ -56,7 +59,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           <label for="password" class="text-sm text-text mb-1">
             Password
           </label>
-          <input type="password" id="password" name="password" class="w-full input-field" placeholder="atleast 8 characters" required>
+          <input type="password" id="password" name="password" class="w-full input-field" placeholder="atleast 8 characters" <?= $is_locked ? 'disabled' : '' ?>  required>
         </div>
 
         <p class="text-right">
@@ -66,7 +69,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
         </p>
 
         <!-- Login Button -->
-        <button type="submit" name="signin" class="mt-3 w-full btn btn-primary">
+        <button type="submit" name="signin" class="mt-3 w-full btn btn-primary"   <?= $is_locked ? 'disabled' : '' ?> >
           Login
         </button>
 
@@ -74,6 +77,16 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           Don't have an account? 
           <a href="signup.php" class="text-primary hover:underline">Sign Up</a>
         </p>
+
+           <?php if ($is_locked): ?>
+        <p class="text-red-600 text-sm mt-3">
+            Too many failed attempts. Please wait 
+            <span id="countdown"><?= $remaining ?></span> seconds before trying again.
+        </p>
+    <?php elseif (!empty($_SESSION['login_error'])): ?>
+        <p class="text-red-600 text-sm mt-3"><?= htmlspecialchars($_SESSION['login_error']) ?></p>
+    <?php endif; ?>
+    
       </form>
     </div>
   </div>
@@ -114,4 +127,21 @@ require_once __DIR__ . '/../../../models/UserModel.php';
   if (loginError) {
       showErrorAlert(loginError);
   }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const countdown = document.getElementById("countdown");
+  if (countdown) {
+    let timeLeft = parseInt(countdown.textContent);
+    const timer = setInterval(() => {
+      timeLeft--;
+      countdown.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        location.reload();
+      }
+    }, 1000);
+  }
+});
 </script>
