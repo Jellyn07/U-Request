@@ -40,6 +40,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
 </head>
 
 <body class="bg-gray-100">

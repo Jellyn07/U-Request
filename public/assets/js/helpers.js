@@ -23,3 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
       rows.forEach(row => tableBody.appendChild(row));
     });
   });
+
+  // Capitalize each word in a name
+function formatNameJS(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Automatically apply when typing or leaving the input field
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('input[name="first_name"], input[name="last_name"], input[name="first_name[]"], input[name="last_name[]"], input[name="material_desc"], textarea[name="description"], input[name="purpose_of_trip"], input[name="travel_destination"]'
+    
+  ).forEach(input => {
+    input.addEventListener('blur', () => {
+      input.value = formatNameJS(input.value);
+    });
+  });
+});

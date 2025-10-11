@@ -11,6 +11,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="public/assets/js/alert.js"></script>
+    <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   </head>
   <body class="bg-background">
     <form id="vehicle-form" action="../../../controllers/VehicleRequestController.php" method="POST" class="w-1/2 m-5 mx-auto rounded-lg border border-gray-100 bg-white p-4 shadow-lg transition hover:shadow-lg sm:p-6">
