@@ -6,9 +6,8 @@ class RequestModel extends BaseModel {
     public $lastError = null;
 
     public function createRequest($tracking_id, $nature, $req_id, $description, $unit, $location, $dateNoticed, $filePath) {
-        // Step 1: Insert into REQUEST
-        $stmt = $this->db->prepare("
-            CALL spAddRequest(?, ?, ?, ?, ?, ?, ?, ?)");
+        // Step 1: Insert into REQUEST using stored procedure
+        $stmt = $this->db->prepare("CALL spAddRequest(?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
             "ssisssss",
             $tracking_id, $nature, $req_id, $description,
@@ -21,13 +20,15 @@ class RequestModel extends BaseModel {
             return false; // ❌ Insert failed
         }
 
-        // Get the newly inserted request_id directly
-        $request_id_int = $this->db->insert_id;
+        // ✅ Fetch the newly inserted request_id from the procedure's SELECT result
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $request_id_int = $row['request_id'] ?? 0;
         $stmt->close();
 
         if (!$request_id_int) {
-            $this->lastError = 'Failed to retrieve insert_id';
-            return false; // ❌ Could not get insert ID
+            $this->lastError = 'Failed to retrieve new request ID.';
+            return false; // ❌ Could not get request ID
         }
 
         // Step 2: Insert into REQUEST_ASSIGNMENT
@@ -47,6 +48,7 @@ class RequestModel extends BaseModel {
         // ✅ Return the new request_id
         return $request_id_int;
     }
+
 
     public function checkDuplicateRequest($unit, $location, $nature) {
         $sql = "

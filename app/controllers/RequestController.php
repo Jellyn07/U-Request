@@ -48,16 +48,16 @@ class RequestController {
             if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
 
             $newFileName = uniqid("img_", true) . "." . $fileExt;
-            $targetPath = $targetDir . $newFileName;
+            $targetPath = $targetDir . $fileName;
 
             if (move_uploaded_file($fileTmp, $targetPath)) {
-                $filePath = '/public/uploads/' . $newFileName;
+                $filePath = '/public/uploads/' . $fileName;
             } else {
                 $_SESSION['alert'] = [
                     'type'=>'error',
                     'title'=>'Upload Failed',
                     'message'=>'There was a problem uploading your file.',
-                    'redirect'=>"/app/modules/user/views/request.php"
+                    'redirect'=>"../modules/user/views/request.php"
                 ];
                 header("Location: ../modules/user/views/request.php");
                 exit;
@@ -70,7 +70,7 @@ class RequestController {
                 'type' => 'warning',
                 'title' => 'Duplicate Request',
                 'message' => 'A request with the same unit, location, and type already exists.',
-                'redirect' => "/app/modules/user/views/request.php"
+                'redirect' => "../modules/user/views/request.php"
             ];
             header("Location: ../modules/user/views/request.php");
             exit;
@@ -79,7 +79,7 @@ class RequestController {
         // Save request to DB
         $request_id = $this->model->createRequest(
             $tracking_id, $nature, $req_id, $description,
-            $unit, $location, $dateNoticed, $filePath
+            $unit, $location, $dateNoticed, $fileName 
         );
 
         if ($request_id) {
