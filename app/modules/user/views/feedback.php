@@ -165,7 +165,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           </section>
 
           <div class="text-center mt-5">
-            <button type="button" class="btn btn-secondary mr-2">Back</button>
+            <a href="tracking.php" class="btn btn-secondary mr-2">Back</a>
             <button type="submit" class="btn btn-primary">Submit Feedback</button>
           </div>
         </form>

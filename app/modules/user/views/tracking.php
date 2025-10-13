@@ -94,6 +94,12 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
                 </span>
               </p>
               <div class="mt-4 text-right">
+                <?php if ($track['req_status'] === 'Completed') { ?>
+                  <a href="feedback.php?tracking_id=<?php echo urlencode($track['tracking_id']); ?>" 
+                    class="btn btn-secondary mr-3">
+                    Give Feedback
+                  </a>
+                <?php } ?>
                 <button class="btn btn-primary" onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
                   View Details
                 </button>
