@@ -228,6 +228,49 @@ BEGIN
 END $$
 DELIMITER ;
 
+---------------------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS `spAddRequest`;
+DELIMITER $$
+
+-- 🔹 Create updated procedure
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spAddRequest`(
+    IN `p_tracking_id` VARCHAR(100),
+    IN `p_request_Type` VARCHAR(70),
+    IN `p_req_id` INT UNSIGNED,
+    IN `p_request_desc` VARCHAR(500),
+    IN `p_unit` VARCHAR(50),
+    IN `p_location` VARCHAR(250),
+    IN `p_request_date` DATE,
+    IN `p_image_path` VARCHAR(255)
+)
+BEGIN
+    INSERT INTO REQUEST (
+        tracking_id,
+        request_Type,
+        req_id,
+        request_desc,
+        unit,
+        location,
+        request_date,
+        image_path
+    )
+    VALUES (
+        p_tracking_id,
+        p_request_Type,
+        p_req_id,
+        p_request_desc,
+        p_unit,
+        p_location,
+        p_request_date,
+        p_image_path
+    );
+
+    -- ✅ Return the newly inserted request ID
+    SELECT LAST_INSERT_ID() AS request_id;
+END$$
+DELIMITER ;
+
 
 
 
