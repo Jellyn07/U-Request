@@ -8,6 +8,8 @@ if (!isset($_SESSION['email'])) {
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../config/auth.php';
 require_once __DIR__ . '/../../../controllers/TrackingController.php';
+require_once __DIR__ . '/../../../models/FeedbackModel.php';
+$feedbackModel = new FeedbackModel();
 
 $trackingController = new TrackingController();
 $repairList = $trackingController->listRepairTracking($_SESSION['email']);
@@ -60,51 +62,66 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
       </div>
 
 
-      <!-- ================= Repair Requests ================= -->
+    <!-- ================= Repair Requests ================= -->
       <div class="mt-10">
-        <!-- <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Repair Requests</h2> -->
         <?php if (!empty($repairList)) { ?>
           <?php foreach ($repairList as $track): ?>
             <article class="w-3/4 md:w-1/2 m-5 mx-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition sm:p-6">
               <div class="flex justify-start mb-3">
                 <img src="<?php echo PUBLIC_URL; ?>/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
               </div>
+
               <h3 class="text-lg font-semibold text-gray-800">
                 Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
               </h3>
+
               <p class="mt-2 text-xs text-gray-700">
                 <span class="font-medium">Description:</span>
                 <?php echo htmlspecialchars($track['request_desc']); ?>
               </p>
+
               <p class="mt-2 text-sm">
                 <span class="font-medium">Status:</span>
                 <?php
-                  $status = strtolower($track['req_status']);
+                  $req_status = htmlspecialchars($track['req_status']);
                   $statusClass = "bg-gray-100 text-gray-700";
-                  if ($status === "pending") {
-                      $statusClass = "bg-yellow-100 text-yellow-700";
-                  } elseif ($status === "approved" || $status === "fixed") {
-                      $statusClass = "bg-green-100 text-green-700";
-                  } elseif ($status === "disapproved") {
-                      $statusClass = "bg-red-100 text-red-700";
+                  if ($req_status === "To Inspect") {
+                      $statusClass = "bg-yellow-100 text-yellow-500";
+                  } elseif ($req_status === "In Progress") {
+                      $statusClass = "bg-green-100 text-green-500";
+                  } elseif ($req_status === "Completed") {
+                      $statusClass = "bg-red-100 text-red-500";
                   }
                 ?>
-                <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium <?php echo $statusClass; ?>">
-                  <?php echo htmlspecialchars($track['req_status']); ?>
+                <span class="px-2 py-1 rounded-full <?= $statusClass ?>">
+                  <?= $req_status ?>
                 </span>
               </p>
+
+              <!-- Hidden Form to carry tracking_id -->
+              <form action="feedback.php" method="GET" class="hidden" id="form_<?php echo $track['tracking_id']; ?>">
+                <input type="hidden" name="tracking_id" value="<?php echo htmlspecialchars($track['tracking_id']); ?>">
+              </form>
+
               <div class="mt-4 text-right">
                 <?php if ($track['req_status'] === 'Completed') { ?>
-                  <a href="feedback.php?tracking_id=<?php echo urlencode($track['tracking_id']); ?>" 
-                    class="btn btn-secondary mr-3">
-                    Give Feedback
-                  </a>
+                    <?php if ($feedbackModel->hasFeedback($track['tracking_id'])) { ?>
+                        <button class="btn btn-secondary mr-3" disabled>Feedback Completed</button>
+                    <?php } else { ?>
+                        <button 
+                          type="button" 
+                          class="btn btn-secondary mr-3"
+                          onclick="document.getElementById('form_<?php echo $track['tracking_id']; ?>').submit();">
+                          Give Feedback
+                        </button>
+                    <?php } ?>
                 <?php } ?>
+
                 <button class="btn btn-primary" onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
                   View Details
                 </button>
               </div>
-            </article>
+              </article>
           <?php endforeach; ?>
         <?php } else { ?>
           <p class="text-center text-accent mt-4 text-sm">No Repair Request</p>

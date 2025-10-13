@@ -16,11 +16,7 @@ class TrackingModel extends BaseModel {
                 t.req_status,
                 t.date_finished,
                 t.req_id,
-                t.request_desc,
-                NULL AS trip_purpose,
-                NULL AS travel_destination,
-                NULL AS travel_date,
-                NULL AS return_date
+                t.request_desc
             FROM vw_rqtrack t
             INNER JOIN requester r ON t.req_id = r.req_id
             WHERE r.email = ?

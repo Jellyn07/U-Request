@@ -1,6 +1,18 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
+
+if (!isset($_GET['tracking_id'])) {
+    die("Missing tracking ID.");
+}
+
+$tracking_id = $_GET['tracking_id'] ?? null;
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +22,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
       .star {
         width: 22px;
@@ -43,6 +56,7 @@ require_once __DIR__ . '/../../../config/constants.php';
         </div>
 
         <form id="feedbackForm" action="#" method="POST" class="mt-5">
+          <input type="hidden" name="tracking_id" value="<?php echo htmlspecialchars($tracking_id); ?>">
           <p class="text-sm">
             INSTRUCTION: Kindly evaluate the service rendered based on the level of your satisfaction by clicking 
             <b>5-Very Satisfied</b> to <b>1-Very Dissatisfied</b>.
@@ -234,6 +248,57 @@ require_once __DIR__ . '/../../../config/constants.php';
           group.appendChild(star);
         }
       }
+    </script>
+    <script>
+    document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Prepare data
+      const form = e.target;
+      const data = new FormData(form);
+      data.append('ratings_A', JSON.stringify(ratings.A));
+      data.append('ratings_B', JSON.stringify(ratings.B));
+      data.append('ratings_C', JSON.stringify(ratings.C));
+
+      // Compute average for overall rating
+      let all = [];
+      for (let s in ratings) for (let i in ratings[s]) all.push(ratings[s][i]);
+      const overall = all.length ? (all.reduce((a,b)=>a+b)/all.length).toFixed(2) : 0;
+      data.append('overall_rating', overall);
+
+      fetch('../../../controllers/FeedbackController.php', {
+        method: 'POST',
+        body: data
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === 'success') {
+          Swal.fire({
+            title: 'Feedback Submitted!',
+            text: res.message,
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.href = 'tracking.php';
+          });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: res.message,
+            icon: 'error',
+            confirmButtonText: 'Try Again'
+          });
+        }
+      })
+      .catch(() => {
+        Swal.fire({
+          title: 'Submission Failed!',
+          text: 'Failed to submit feedback. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+    });
     </script>
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
   </body>
