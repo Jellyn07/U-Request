@@ -41,7 +41,7 @@
 
   /* Primary */
   .btn-primary {
-    @apply bg-secondary text-background rounded-md text-sm hover:bg-primary;
+    @apply bg-primary text-background rounded-md text-sm hover:bg-secondary;
   }
 
   /* Secondary */

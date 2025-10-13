@@ -87,7 +87,7 @@ $averageRating = round($total / count($feedbackData), 1);
               <!-- Profile -->
               <img src="/public/assets/img/user-default.png" alt="User photo" class="w-14 h-14 rounded-full object-cover">
               <div class="flex flex-col">
-                <p class="font-semibold text-sm"><?= htmlspecialchars($feedback['name']) ?></p>
+                <p class="font-semibold text-sm mb-1"><?= htmlspecialchars($feedback['name']) ?></p>
                 <p class="text-xs text-gray-600">
                   <span class="font-medium text-xs">Total Repair Request: </span><?= htmlspecialchars($feedback['total_request']) ?><br>
                   <span class="font-medium text-xs">Total Feedback:</span> <?= htmlspecialchars($feedback['total_review']) ?>

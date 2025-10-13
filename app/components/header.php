@@ -29,7 +29,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     content: url('/public/assets/img/logout-white.png');
   }
 </style>
-<header class="sticky top-0 z-50 bg-background text-text p-3">
+<header class="sticky top-0 z-50 bg-red-30 text-text p-3 bg-gray-200">
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
     <div class="flex h-16 items-center justify-between w-full">
       <!-- Logo Left -->

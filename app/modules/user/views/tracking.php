@@ -26,7 +26,7 @@ $vehicleList = $trackingController->listVehicleTracking($_SESSION['email']);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/alert.js"></script>
   </head>
-  <body class="flex flex-col min-h-screen bg-background text-text">
+  <body class="flex flex-col min-h-screen bg-gray-200 text-text">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
     <main class="flex-1 px-4 sm:px-8 lg:px-20">
       <!-- Page Heading -->

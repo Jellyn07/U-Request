@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../../config/auth.php';
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   </head>
-  <body class="flex flex-col min-h-screen bg-background text-text">
+  <body class="flex flex-col min-h-screen bg-gray-200 text-text">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
     <main class="flex-1">
       <div class="text-center mt-8 mb-6">

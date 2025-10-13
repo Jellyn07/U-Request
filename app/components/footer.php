@@ -1,4 +1,4 @@
-<footer class="bg-background text-text w-full">
+<footer class="text-text w-full">
   <div class="mx-auto max-w-screen-xl px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-5">
     <div class="mt-5 border-t border-secondary pt-6">
       <div class="text-center sm:flex sm:justify-between sm:text-left">

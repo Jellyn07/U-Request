@@ -25,7 +25,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   </head>
-  <body class="bg-background min-h-screen flex flex-col">
+  <body class="bg-gray-200 min-h-screen flex flex-col">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
 
     <main class="w-1/2 container mx-auto px-4 py-10 flex-1">
@@ -38,7 +38,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
       <div class="max-w-4xl mx-auto space-y-8 m-2">
         <!-- Profile Picture -->
         <form method="post" action="../../../controllers/ProfileController.php" enctype="multipart/form-data">
-          <div class="bg-background rounded-xl flex flex-col items-center">
+          <div class="flex flex-col items-center">
             <div class="relative">
               <img id="profile-preview"  
                   src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
@@ -199,16 +199,6 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           </form>
         </div> -->
 
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-3">
-          <button 
-            type="button"
-            onclick="window.location.href='/app/controllers/LogoutController.php';"
-            class="flex-1 btn btn-secondary"
-          >
-            Logout
-          </button>
-        </div>
       </div>
     </main>
 
