@@ -1,20 +1,6 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../controllers/ActivityLogsController.php';
-$controller = new ActivityLogsController();
-
-// Default filters
-$tableFilter = $_GET['table'] ?? 'all';
-$actionFilter = $_GET['action'] ?? 'all';
-$dateFilter = $_GET['date'] ?? 'all';
-
-if (!isset($_SESSION['email'])) {
-    header("Location: modules/shared/views/admin_login.php");
-    exit;
-}
-// ✅ Fetch profile here
-$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +18,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -46,26 +32,26 @@ $profile = $controller->getProfile($_SESSION['email']);
             <input type="text" id="search" placeholder="Search Activities" class="flex-1 min-w-[200px] input-field">
             <form method="GET" id="filterForm">
             <select name="table" onchange="document.getElementById('filterForm').submit()" class="input-field">
-              <option value="all" <?= $tableFilter==='all'?'selected':'' ?>>All</option>
-              <option value="gsu_personnel" <?= $tableFilter==='gsu_personnel'?'selected':'' ?>>GSU Personnel</option>
-              <option value="materials" <?= $tableFilter==='materials'?'selected':'' ?>>Materials</option>
-              <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
-              <option value="status" <?= $tableFilter==='status'?'selected':'' ?>>Status</option>
-              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
+              <option value="all">All</option>
+              <option value="driver">Driver</option>
+              <option value="materials">Materials</option>
+              <option value="request">Request</option>
+              <option value="status">Status</option>
+              <option value="assigned_personnel">Assigned Driver</option>
             </select>
             <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
-              <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>
-              <option value="INSERT" <?= $actionFilter==='INSERT'?'selected':'' ?>>Insert</option>
-              <option value="UPDATE" <?= $actionFilter==='UPDATE'?'selected':'' ?>>Updated</option>
-              <option value="DELETE" <?= $actionFilter==='DELETE'?'selected':'' ?>>Deleted</option>
+              <option value="all">All Activity Type</option>
+              <option value="INSERT">Insert</option>
+              <option value="UPDATE">Updated</option>
+              <option value="DELETE">Deleted</option>
             </select>
             <select name="date" onchange="document.getElementById('filterForm').submit()" class="input-field">
-                <option value="all" <?= $dateFilter==='all'?'selected':'' ?>>All Dates</option>
-                <option value="today" <?= $dateFilter==='today'?'selected':'' ?>>Today</option>
-                <option value="yesterday" <?= $dateFilter==='yesterday'?'selected':'' ?>>Yesterday</option>
-                <option value="7" <?= $dateFilter==='7'?'selected':'' ?>>Last 7 days</option>
-                <option value="14" <?= $dateFilter==='14'?'selected':'' ?>>Last 14 days</option>
-                <option value="30" <?= $dateFilter==='30'?'selected':'' ?>>Last 30 days</option>
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30">Last 30 days</option>
             </select>
             </form>
             <button title="Print data in the table" class="input-field">
@@ -92,7 +78,20 @@ $profile = $controller->getProfile($_SESSION['email']);
               </tr>
             </thead>
             <tbody id="table" class="text-sm">
-                 <?= $controller->renderLogs($tableFilter, $actionFilter, $dateFilter) ?>
+            <?php 
+              for ($i = 0; $i < 15; $i++) {
+                echo '<tr class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
+                    <td class="pl-8 py-2">October 20, 2025</td>
+                    <td class="px-4 py-2">Driver</td>
+                    <td class="px-4 py-2">Deleted</td>
+                    <td class="px-4 py-2">Something</td>
+                    <td class="px-4 py-2">New request added at SOM/SCIENCE BUILDING - SOM Library</td>
+                  </tr>';
+              }
+              if ($i === 0) {
+                echo '<tr><td colspan="5" class="text-center py-4 text-gray-500">No activity logs found.</td></tr>';
+              }
+            ?>
             </tbody>
           </table>
           </div>

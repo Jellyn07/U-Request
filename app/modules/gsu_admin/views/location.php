@@ -55,8 +55,8 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[580px] overflow-y-auto rounded-b-lg shadow">
-            <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-b-lg p-2">
+          <div class="overflow-x-auto max-h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Added</th>

@@ -1,0 +1,13 @@
+BUGS LISTS
+
+Super Admin
+-
+
+Motorpool Admin
+-
+
+GSU Admin
+- can be completed even if request have no assigned personel
+
+Users
+-

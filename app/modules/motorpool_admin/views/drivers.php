@@ -1,17 +1,13 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../controllers/PersonnelController.php';
-
-$controller = new PersonnelController(); $personnels = $controller->getAllPersonnel();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U-Request | Personnels</title>
+  <title>U-Request | Drivers</title>
   <link rel="stylesheet" href="/public/assets/css/output.css" />
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -20,45 +16,25 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
-
-  <?php
-  // ✅ Pass PHP session values into JavaScript after scripts are loaded
-  if (isset($_SESSION['personnel_success'])) {
-      echo "<script>window.personnelSuccess = " . json_encode($_SESSION['personnel_success']) . "; console.log('Personnel Success:', window.personnelSuccess);</script>";
-      unset($_SESSION['personnel_success']);
-  }
-
-  if (isset($_SESSION['personnel_error'])) {
-      echo "<script>window.personnelError = " . json_encode($_SESSION['personnel_error']) . "; console.log('Personnel Error:', window.personnelError);</script>";
-      unset($_SESSION['personnel_error']);
-  }
-
-  if (!isset($_SESSION['email'])) {
-    header("Location: modules/shared/views/admin_login.php");
-    exit;
-}
-// ✅ Fetch profile here
-$profile = $controller->getProfile($_SESSION['email']);
-  ?>
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-4">Personnels</h1>
+      <h1 class="text-2xl font-bold mb-4">Drivers</h1>
       <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field" id="statusFilter">
+            <!-- <select class="input-field" id="statusFilter">
               <option value="all">All</option>
               <option value="Available">Available</option>
               <option value="Fixing">Fixing</option>
-            </select>
+            </select> -->
 
             <select class="input-field" id="sortUsers">
                 <option value="az">Sort A-Z</option>
@@ -73,7 +49,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             <!-- Add Admin Modal -->
                 <div x-data="{ showModal: false }">
             <!-- Trigger Button (example only) -->
-            <button @click="showModal = true" title="Add new personnel" class="btn btn-secondary">
+            <button @click="showModal = true" title="Add new driver" class="btn btn-secondary">
                 <img src="/public/assets/img/add-admin.png" alt="User" class="size-4 my-0.5">
             </button>
 
@@ -83,7 +59,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <!-- Modal Content -->
                 <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
                   <!-- Profile Picture -->
-                  <form method="post" action="../../../controllers/PersonnelController.php" enctype="multipart/form-data">
+                  <form method="post" action="../../../controllers/driverController.php" enctype="multipart/form-data">
                     <div class="rounded-xl flex flex-col items-center">
                       <div class="relative">
                         <img id="profile-preview"  
@@ -108,7 +84,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <!-- Identity Information -->
                   <div class="flex justify-center">
                     <div class="w-full">
-                      <h2 class="text-base font-medium">Personnel Credentials</h2>
+                      <h2 class="text-base font-medium">Driver Credentials</h2>
                       <!-- <form class="space-y-4" method="post"> -->
                         <div>
                           <label class="text-xs text-text mb-1">Staff ID No.<span class="text-secondary">*</span></label>
@@ -146,18 +122,6 @@ $profile = $controller->getProfile($_SESSION['email']);
                         </div>
 
                         <div>
-                          <label class="text-xs text-text mb-1">Department<span class="text-secondary">*</span></label>
-                          <select name="department" class="w-full input-field" required>
-                            <option value="" disabled selected>Select department</option>
-                            <option value="Janitorial">Janitorial</option>
-                            <option value="Utility">Utility</option>
-                            <option value="Landscaping">Landscaping</option>
-                            <option value="Ground Maintenance">Ground Maintenance</option>
-                            <option value="Building Repair And Maintenance">Building Repair And Maintenance</option>
-                          </select>
-                        </div>
-
-                        <div>
                             <label class="text-xs text-text mb-1">Hire Date<span class="text-secondary">*</span></label>
                             <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
                         </div>
@@ -169,7 +133,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <!-- Action Buttons -->
                   <div class="flex justify-center gap-2 pt-4">
                     <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" name="add_personnel" class="btn btn-primary px-7">Save</button>
+                    <button type="submit" name="add_driver" class="btn btn-primary px-7">Save</button>
                   </div>
                   </form>
                 </main>
@@ -187,13 +151,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Department</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
               
-            <?php if (!empty($personnels)): ?>
-              <?php foreach ($personnels as $person): ?>
+            <?php if (!empty($drivers)): ?>
+              <?php foreach ($drivers as $person): ?>
 
                 <tr 
                   data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
@@ -203,7 +166,6 @@ $profile = $controller->getProfile($_SESSION['email']);
                       staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
                       firstName: '<?= htmlspecialchars($person['firstName']) ?>',
                       lastName: '<?= htmlspecialchars($person['lastName']) ?>',
-                      department: '<?= htmlspecialchars($person['department']) ?>',
                       contact: '<?= htmlspecialchars($person['contact']) ?>',
                       hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
                       unit: '<?= htmlspecialchars($person['unit']) ?>',
@@ -227,14 +189,11 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
                       <?= htmlspecialchars($person['status']) ?>
                   </td>
-                  <td class="px-4 py-2">
-                    <?= htmlspecialchars($person['department']) ?>
-                  </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="5" class="text-center py-4 text-gray-500">No personnel records found.</td>
+                <td colspan="5" class="text-center py-4 text-gray-500">No driver records found.</td>
               </tr>
             <?php endif; ?>
           </tbody>
@@ -250,7 +209,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
 
-          <h2 class="text-lg font-bold mb-2">Personnel Information</h2>
+          <h2 class="text-lg font-bold mb-2">Driver Information</h2>
 
           <!-- Profile Picture -->
           <!-- <img id="profile-preview"  
@@ -260,7 +219,7 @@ $profile = $controller->getProfile($_SESSION['email']);
           /> -->
 
           <!-- Form -->
-          <form id="personnelForm"   class="space-y-2"  method="post" action="../../../controllers/PersonnelController.php">
+          <form id="driverForm"   class="space-y-2"  method="post" action="../../../controllers/driverController.php">
             <div class="rounded-xl flex flex-col items-center">
               <div class="relative">
                 <!-- Profile Picture Preview -->
@@ -323,17 +282,6 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
 
             <div>
-                <label class="text-xs text-text mb-1">Department</label>
-                <select name="department" class="w-full input-field">
-                  <option value="Janitorial" :selected="selected.department === 'Janitorial'">Janitorial</option>
-                  <option value="Utility" :selected="selected.department === 'Utility'">Utility</option>
-                  <option value="Landscaping" :selected="selected.department === 'Landscaping'">Landscaping</option>
-                  <option value="Ground Maintenance" :selected="selected.department === 'Ground Maintenance'">Ground Maintenance</option>
-                  <option value="Building Repair And Maintenance" :selected="selected.department === 'Building Repair And Maintenance'">Building Repair And Maintenance</option>
-                </select>
-            </div>
-
-            <div>
               <label class="text-xs text-text mb-1">Hire Date</label>
               <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
             </div>
@@ -346,7 +294,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 @click="viewWorkHistory(selected.staff_id)">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="work history">
               </button>
-                <button type="submit" name="update_personnel"  class="btn btn-primary">Save Changes</button>
+                <button type="submit" name="update_driver"  class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>

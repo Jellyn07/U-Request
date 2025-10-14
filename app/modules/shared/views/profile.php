@@ -33,7 +33,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <div class="flex w-1/2 mx-auto flex-col sm:flex-row gap-3 mb-10">
     <button 
         type="button"
-        onclick="window.location.href='dashboard.php';"
+        onclick="window.history.back();"
         class="flex-1 btn btn-secondary ml-4">Back</button>
     <button 
       type="button"

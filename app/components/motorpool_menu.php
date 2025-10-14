@@ -26,7 +26,7 @@
           <img src="/public/assets/img/request-for-proposal.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Request</span>
         </a>
-        <a href="request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="vehicles.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/car-admin.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Vehicle</span>
         </a>
@@ -93,7 +93,7 @@
     </div>
     <!-- Dropdown -->
     <div id="profileMenu" class="hidden absolute bottom-4 left-20 md:bottom-20 md:left-4 w-48 bg-white text-black rounded-lg border-gray-400 shadow-lg">
-      <a href="profile.php" class="block rounded-lg px-4 py-2 hover:bg-gray-100 text-sm">
+      <a href="../../shared/views/profile.php" class="block rounded-lg px-4 py-2 hover:bg-gray-100 text-sm">
         My Profile
       </a>
       <a href="/app/modules/shared/views/admin_login.php" class="flex text-sm rounded-lg px-4 py-2 text-accent hover:bg-gray-100 items-center gap-1">

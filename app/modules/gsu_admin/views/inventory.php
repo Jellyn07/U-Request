@@ -133,8 +133,8 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow">
-            <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg p-2">
+          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow bg-white">
+            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
               <thead class="bg-gray-50">
                 <tr>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>

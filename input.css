@@ -56,7 +56,7 @@
 
   /*text input field */
   .input-field {
-    @apply px-3 py-2 rounded-lg border border-gray-700  text-text text-sm focus:border-secondary outline-none transition;
+    @apply px-3 py-2 rounded-lg border border-gray-700 text-text text-sm focus:border-secondary outline-none transition;
   }
 
   /* View field */
@@ -71,11 +71,11 @@
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
   .clip-diagonal1 {
-    background: linear-gradient(145deg, transparent 60%, #d11100  40%);
+    background: linear-gradient(145deg, transparent 60%, #d11100 40%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
   .clip-diagonal2 {
-    background: linear-gradient(165deg, transparent 70%, #750000  30%);
+    background: linear-gradient(165deg, transparent 70%, #750000 30%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
 
@@ -84,17 +84,64 @@
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
   .clip-diagonal5 {
-    background: linear-gradient(215deg, transparent 60%, #d11100  40%);
+    background: linear-gradient(215deg, transparent 60%, #d11100 40%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
   .clip-diagonal6 {
-    background: linear-gradient(195deg, transparent 70%, #750000  30%);
+    background: linear-gradient(195deg, transparent 70%, #750000 30%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
-  /* .clip-diagonal {
-    clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
-    background: url('/public/assets/img/background.jpg') no-repeat center center;
-    background-size: cover;
-  } */
-}
 
+  /* ---------- UNIVERSAL SCROLLBAR STYLES ---------- */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Transparent track */
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--secondary), var(--primary));
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    min-height: 28px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    filter: brightness(0.95);
+    cursor: pointer;
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    filter: brightness(0.9);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Optional compact version */
+  .u-request-scroll--compact::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .u-request-scroll--compact {
+    scrollbar-width: thin;
+  }
+
+  /* Focus-visible scrollbar highlight */
+  .u-request-scroll:focus-visible::-webkit-scrollbar-thumb {
+    box-shadow: 0 0 0 3px rgba(117, 0, 0, 0.18);
+    border-radius: 10px;
+  }
+}
