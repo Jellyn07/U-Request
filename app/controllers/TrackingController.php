@@ -33,19 +33,47 @@ class TrackingController {
         return $this->model->getTrackingDetails($trackingId, $email);
     }
 
-    // public function getTrackingDetails($tracking_id, $email) {
-    //     // Try repair first
-    //     $repair = $this->model->getRepairTrackingDetails($tracking_id, $email);
-    //     if ($repair) return $repair;
-    
-    //     // Otherwise, try vehicle
-    //     $vehicle = $this->model->getVehicleTrackingDetails($tracking_id, $email);
-    //     if ($vehicle) return $vehicle;
-    
-    //     return null;
-    // }
-    
+     public function getFilteredTracking($email, $type = 'repair', $statusFilter = '', $sort = 'newest') {
+        // Fetch appropriate list
+        $repairList = $this->model->getRepairTrackingByEmail($email);
+        $vehicleList = $this->model->getVehicleTrackingByEmail($email);
+        $list = ($type === 'vehicle') ? $vehicleList : $repairList;
 
-    
-    
+        // --- Filter by status ---
+        if (!empty($statusFilter)) {
+            $list = array_filter($list, function($item) use ($statusFilter) {
+                $itemStatus = $item['req_status'] ?? '';
+                return strcasecmp($itemStatus, $statusFilter) === 0;
+            });
+        }
+
+        // --- Sort by status order then by date ---
+        $statusOrderRepair = [
+            'To Inspect'   => 1,
+            'In Progress'  => 2,
+            'Completed'    => 3
+        ];
+
+        $statusOrderVehicle = [
+            'Pending'      => 1,
+            'Approved'     => 2,
+            'Disapproved'  => 3
+        ];
+
+        $statusOrder = ($type === 'vehicle') ? $statusOrderVehicle : $statusOrderRepair;
+
+        usort($list, function ($a, $b) use ($statusOrder, $sort) {
+            $statusA = $statusOrder[$a['req_status']] ?? 999;
+            $statusB = $statusOrder[$b['req_status']] ?? 999;
+
+            if ($statusA !== $statusB) return $statusA - $statusB;
+
+            $dateA = !empty($a['date_request']) ? strtotime($a['date_request']) : 0;
+            $dateB = !empty($b['date_request']) ? strtotime($b['date_request']) : 0;
+
+            return ($sort === 'oldest') ? $dateA - $dateB : $dateB - $dateA;
+        });
+
+        return $list;
+    }
 }
