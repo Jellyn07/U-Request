@@ -54,9 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             $_SESSION['login_error'] = "Invalid email or password. Attempt {$_SESSION['login_attempts']} of 3.";
         }
 
-        // ✅ Preserve the email (and password temporarily)
+        // Preserve the email (and password temporarily)
         $_SESSION['old_email'] = $email;
-        $_SESSION['old_password'] = $input_pass; // Optional (see note below)
+        $_SESSION['old_password'] = $input_pass; 
 
         header("Location: ../modules/user/views/login.php");
         exit;

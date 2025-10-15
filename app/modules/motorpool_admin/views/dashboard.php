@@ -1,6 +1,18 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+
+$controller = new DashboardController();
+$year = $_GET['year'] ?? date('Y');
+$data = $controller->getDashboardData($year);
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
+
+// ✅ Fetch profile here
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +57,7 @@ require_once __DIR__ . '/../../../config/constants.php';
         <div class="bg-white shadow rounded-lg p-4 text-center">
           <h2 class="text-gray-600 text-xs">Total Vehicle Requests</h2>
           <p class="text-xl font-bold text-primary" id="totalrRequests">
-              <?= isset($data['summary']['total_rrequests']) ? $data['summary']['total_rrequests'] : 0 ?>
+              <?= isset($data['summary']['total_vrequests']) ? $data['summary']['total_vrequests'] : 0 ?>
           </p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 text-center">
