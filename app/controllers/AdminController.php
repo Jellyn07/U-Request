@@ -18,8 +18,14 @@ if (!isset($_SESSION['login_attempts'])) {
 }
 
 // ✅ Check if locked
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['lock_time'] = null;
+}
+
 if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
-    $_SESSION['login_error'] = "Too many failed attempts. Please wait 60 seconds before trying again.";
+    $remaining = $_SESSION['lock_time'] - time();
+    $_SESSION['login_error'] = "Too many failed attempts. Please wait {$remaining} seconds before trying again.";
     header("Location: ../modules/shared/views/admin_login.php");
     exit();
 }
@@ -30,9 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
     $userModel = new UserModel();
     $admin = $userModel->getAdminUserByEmail($email);
-    // if ($admin && $userModel->verifyPassword($input_pass, $admin['password']))
-    if ($admin &&($input_pass== $admin['password'])) {
-        // ✅ SUCCESS: reset attempts
+
+    if ($admin && ($input_pass == $admin['password'])) {
+        // ✅ SUCCESS
         $_SESSION['login_attempts'] = 0;
         $_SESSION['lock_time'] = null;
 
@@ -41,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         $_SESSION['access_level'] = $admin['accessLevel_id'];
         $_SESSION['full_name'] = $admin['first_name'] . ' ' . $admin['last_name'];
 
-        // 🔀 Redirect based on access level
+        // Redirect based on access level
         switch ($admin['accessLevel_id']) {
             case 1:
                 header("Location: ../modules/superadmin/views/dashboard.php");
@@ -56,20 +62,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
                 $_SESSION['login_error'] = "Unknown access level.";
                 header("Location: ../modules/shared/views/admin_login.php");
         }
-
         exit;
     } else {
-        // ❌ FAILED: increment
+        // ❌ FAILED ATTEMPT
         $_SESSION['login_attempts']++;
 
         if ($_SESSION['login_attempts'] >= 3) {
             $_SESSION['lock_time'] = time() + 60; // lock for 60s
-            $_SESSION['login_error'] = "Too many failed attempts. Login locked for 60 seconds.";
+            $remaining = 60;
+            $_SESSION['login_error'] = "Too many failed attempts. Login locked for {$remaining} seconds.";
         } else {
             $_SESSION['login_error'] = "Invalid email or password. Attempt {$_SESSION['login_attempts']} of 3.";
         }
 
         $_SESSION['old_email'] = $email;
+        $_SESSION['old_password'] = $input_pass;
         header("Location: ../modules/shared/views/admin_login.php");
         exit;
     }
