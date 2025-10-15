@@ -6,13 +6,11 @@ require_once __DIR__ . '/../models/UserModel.php';
 
 $login_error = "";
 
-// ✅ Initialize login attempts if not set
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
     $_SESSION['lock_time'] = null;
 }
 
-// ✅ Check if locked
 if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
     $_SESSION['login_error'] = "Too many failed attempts. Please wait 60 seconds before trying again.";
     header("Location: ../modules/user/views/login.php");
@@ -20,8 +18,8 @@ if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
-    $email = $_POST['email'] ?? '';
-    $input_pass = $_POST['password'] ?? '';
+    $email = trim($_POST['email'] ?? '');
+    $input_pass = trim($_POST['password'] ?? '');
 
     $userModel = new UserModel();
     $user = $userModel->getUserByEmail($email);
@@ -46,17 +44,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             exit;
         }
     } else {
-        // ❌ FAILED: increment
+        // ❌ FAILED LOGIN ATTEMPT
         $_SESSION['login_attempts']++;
 
         if ($_SESSION['login_attempts'] >= 3) {
-            $_SESSION['lock_time'] = time() + 60; // lock for 60s
+            $_SESSION['lock_time'] = time() + 60; // Lock for 60 seconds
             $_SESSION['login_error'] = "Too many failed attempts. Login locked for 60 seconds.";
         } else {
             $_SESSION['login_error'] = "Invalid email or password. Attempt {$_SESSION['login_attempts']} of 3.";
         }
 
+        // ✅ Preserve the email (and password temporarily)
         $_SESSION['old_email'] = $email;
+        $_SESSION['old_password'] = $input_pass; // Optional (see note below)
+
         header("Location: ../modules/user/views/login.php");
         exit;
     }

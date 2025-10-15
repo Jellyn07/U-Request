@@ -14,6 +14,9 @@ unset($_SESSION['signup_success']);
 $old_email = $_SESSION['old_email'] ?? '';
 unset($_SESSION['old_email']);
 
+$old_password = $_SESSION['old_password'] ?? '';
+unset($_SESSION['old_password']);
+
 $is_locked = isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time'];
 $remaining = $is_locked ? $_SESSION['lock_time'] - time() : 0;
 
@@ -50,7 +53,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           <label for="email" class="text-sm text-text mb-1">
             USeP Email Address
           </label>
-          <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" value="<?= htmlspecialchars($_SESSION['old_email'] ?? '') ?>"
+          <input type="email" id="email" name="email" class="mb-1 w-full input-field" placeholder="your@usep.edu.ph" value="<?= htmlspecialchars($old_email) ?>"
             <?= $is_locked ? 'disabled' : '' ?> required>
         </div>
 
@@ -59,7 +62,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
           <label for="password" class="text-sm text-text mb-1">
             Password
           </label>
-          <input type="password" id="password" name="password" class="w-full input-field" placeholder="atleast 8 characters" <?= $is_locked ? 'disabled' : '' ?>  required>
+          <input type="password" id="password" name="password" class="w-full input-field" placeholder="atleast 8 characters"  value="<?= htmlspecialchars($old_password) ?>"
+             <?= $is_locked ? 'disabled' : '' ?>  required>
         </div>
 
         <p class="text-right">
@@ -144,4 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 });
+  window.addEventListener('load', () => {
+    const pwd = document.getElementById('password');
+    if (pwd && performance.navigation.type === 1) pwd.value = '';
+  });
 </script>
