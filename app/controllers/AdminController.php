@@ -31,13 +31,13 @@ if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
-    $email = $_POST['email'] ?? '';
-    $input_pass = $_POST['password'] ?? '';
+    $email = trim($_POST['email'] ?? '');
+    $input_pass = trim($_POST['password'] ?? '');
 
     $userModel = new UserModel();
     $admin = $userModel->getAdminUserByEmail($email);
 
-    if ($admin && ($input_pass == $admin['password'])) {
+    if ($admin && $userModel->verifyPassword($input_pass, $admin['password'])) {
         // ✅ SUCCESS
         $_SESSION['login_attempts'] = 0;
         $_SESSION['lock_time'] = null;

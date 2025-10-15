@@ -7,7 +7,7 @@ class AdministratorModel extends BaseModel {
 
     // ADD ADMINISTRATOR
     public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
-        // $encrypted_pass = encrypt($password);
+        $encrypted_pass = encrypt($password);
 
         $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
@@ -15,7 +15,7 @@ class AdministratorModel extends BaseModel {
             return false;
         }
 
-        $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture);
+        $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
         $result = $stmt->execute();
 
         if (!$result) {
