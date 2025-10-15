@@ -1,8 +1,12 @@
 <?php
-session_start();
+// session_start();
+// if (!isset($_SESSION['email'])) {
+//     header("Location: admin_login.php");
+//     exit;
+// }
+// require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/DashboardController.php';
-
 $controller = new DashboardController();
 $year = $_GET['year'] ?? date('Y');
 $data = $controller->getDashboardData($year);

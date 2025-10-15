@@ -1,4 +1,9 @@
 <?php
+// if (!isset($_SESSION['email'])) {
+//     header("Location: admin_login.php");
+//     exit;
+// }
+// require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 
 if (session_status() === PHP_SESSION_NONE) {
