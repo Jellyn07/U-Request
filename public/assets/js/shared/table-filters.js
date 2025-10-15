@@ -20,18 +20,19 @@ export function initTableFilters({
   function applyFilters() {
     const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : "";
     const filterValue = filterSelect ? filterSelect.value.toLowerCase().trim() : "all";
-    const sortValue = sortSelect ? sortSelect.value : "az";
-
+    const sortValue = sortSelect ? sortSelect.value.toLowerCase().trim() : "all";
     const rows = Array.from(tableBody.querySelectorAll("tr"));
+    const now = new Date();
 
+    // Loop all rows for search, filter, and date
     rows.forEach(row => {
-      // 🔍 Search
+      // 🔍 Search filter
       const searchMatches = searchColumns.some(idx => {
         const text = row.children[idx]?.textContent.toLowerCase().trim() || "";
         return text.includes(searchValue);
       });
 
-      // 📂 Filter by category
+      // 📂 Category / Status filter
       let rowFilterValue = "all";
       if (filterAttr) {
         rowFilterValue = row.getAttribute(filterAttr)?.toLowerCase().trim() || "";
@@ -40,50 +41,85 @@ export function initTableFilters({
       }
       const filterMatches = (filterValue === "all" || rowFilterValue === filterValue);
 
-      // 🏷️ Filter by status
+      // 🏷️ Status tab filter
       const rowStatus = row.getAttribute("data-status");
       const statusMatches = (activeStatus === "All" || rowStatus === activeStatus);
 
-      row.style.display = (searchMatches && filterMatches && statusMatches) ? "" : "none";
+      // 📅 Date range filter
+      let dateMatches = true;
+      if (dateColumnIndex !== null) {
+        const dateText = row.children[dateColumnIndex]?.getAttribute("data-date") || "";
+        const rowDate = new Date(dateText);
+        if (!isNaN(rowDate)) {
+          const diffDays = Math.floor((now - rowDate) / (1000 * 60 * 60 * 24));
+          switch (sortValue) {
+            case "today":
+              dateMatches = diffDays === 0;
+              break;
+            case "yesterday":
+              dateMatches = diffDays === 1;
+              break;
+            case "7":
+              dateMatches = diffDays <= 7;
+              break;
+            case "14":
+              dateMatches = diffDays <= 14;
+              break;
+            case "30":
+              dateMatches = diffDays <= 30;
+              break;
+            default:
+              dateMatches = true;
+          }
+        }
+      }
+
+      // ✅ Show or hide row
+      row.style.display = (searchMatches && filterMatches && statusMatches && dateMatches) ? "" : "none";
     });
 
-    // 🔃 Sort visible rows
+    // 🧩 Sorting logic
     const visibleRows = rows.filter(row => row.style.display !== "none");
 
-    if (dateColumnIndex !== null) {
+    // Case 1: Sort by Date (if column specified)
+    if (dateColumnIndex !== null && ["today", "yesterday", "7", "14", "30"].includes(sortValue)) {
       visibleRows.sort((a, b) => {
         const dateA = new Date(a.children[dateColumnIndex]?.textContent.trim() || 0);
         const dateB = new Date(b.children[dateColumnIndex]?.textContent.trim() || 0);
-        return dateB - dateA; // Newest first
+        return dateB - dateA; // newest first
       });
-    } else {
+    }
+    // Case 2: Sort A–Z or Z–A
+    else if (sortValue === "az" || sortValue === "za") {
+      const colIndex = searchColumns[0] ?? 0; // default column for sorting
       visibleRows.sort((a, b) => {
-        const textA = a.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
-        const textB = b.children[searchColumns[0]]?.textContent.toLowerCase().trim() || "";
-        return sortValue === "az" ? textA.localeCompare(textB) : textB.localeCompare(textA);
+        const textA = a.children[colIndex]?.textContent.toLowerCase().trim() || "";
+        const textB = b.children[colIndex]?.textContent.toLowerCase().trim() || "";
+        return sortValue === "az"
+          ? textA.localeCompare(textB)
+          : textB.localeCompare(textA);
       });
     }
 
+    // Re-append sorted rows
     visibleRows.forEach(row => tableBody.appendChild(row));
   }
 
-  // 🎚️ Events
+  // 🎚️ Event bindings
   if (searchInput) searchInput.addEventListener("input", applyFilters);
   if (filterSelect) filterSelect.addEventListener("change", applyFilters);
   if (sortSelect) sortSelect.addEventListener("change", applyFilters);
 
-  // 🧩 Tabs integration (moved here)
+  // 🧩 Tabs integration
   if (tabs) {
     function setActiveTab(activeTab) {
       tabs.forEach((tab, index) => {
         const isAllTab = index === 0;
-        if (tab === activeTab) {
-          tab.className = isAllTab
-            ? "ml-5 btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg"
-            : "btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg";
-        } else {
-          tab.className = isAllTab ? "ml-5 btn" : "btn";
-        }
+        tab.className = (tab === activeTab)
+          ? (isAllTab
+              ? "ml-5 btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg"
+              : "btn bg-white hover:bg-gray-100 border border-gray-200 border-b-0 rounded-t-lg shadow-lg")
+          : (isAllTab ? "ml-5 btn" : "btn");
       });
     }
 
@@ -95,12 +131,10 @@ export function initTableFilters({
       });
     });
 
-    // Trigger "All" tab by default
-    if (tabs.length > 0) {
-      tabs[0].click();
-    }
+    // Activate first tab by default
+    if (tabs.length > 0) tabs[0].click();
   }
 
-  // Initial filter run
+  // Initial load
   applyFilters();
 }

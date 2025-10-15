@@ -262,63 +262,85 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".historyBtn").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const requesterId = this.dataset.requesterId;
+document.addEventListener('DOMContentLoaded', () => {
+  // adjust this path so it points to the controller PHP file (relative to the current page)
+  const fetchUrl = '/app/controllers/UserController.php'; // <<— CHANGE if necessary
 
-      fetch(`app/modules/superadmin/views/manage_user.php?requester_id=${requesterId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data.length) {
-            Swal.fire({
-              icon: "info",
-              title: "No Request History",
-              text: "This user has no request history."
-            });
-            return;
-          }
+  document.querySelectorAll('.uhistoryBtn').forEach(button => {
+    button.addEventListener('click', () => {
+      const requesterId = button.getAttribute('data-requester-id');
+      if (!requesterId) {
+        Swal.fire('Error', 'Missing requester id', 'error');
+        return;
+      }
 
-          let tableHtml = `
-            <table class="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th class="border px-2 py-1">Type</th>
-                  <th class="border px-2 py-1">Request ID</th>
-                  <th class="border px-2 py-1">Status</th>
-                  <th class="border px-2 py-1">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
+      fetch(fetchUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          action: 'get_history',
+          requester_id: requesterId
+        }).toString()
+      })
+      .then(async response => {
+        // help debugging: if response not JSON show its text
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch (err) {
+          throw new Error('Invalid JSON from server: ' + text);
+        }
+      })
+      .then(data => {
+        if (!data) throw new Error('Empty response');
+        if (!data.success) {
+          const errMsg = data.error || 'No History Found';
+          return Swal.fire('No History', errMsg, 'info');
+        }
 
-          data.forEach(row => {
-            tableHtml += `
+        const rows = data.records || [];
+        let historyHtml = `
+          <div style="max-height:60vh; overflow:auto;">
+          <table class="min-w-full border text-sm text-left">
+            <thead class="bg-gray-100">
               <tr>
-                <td class="border px-2 py-1">${row.type}</td>
-                <td class="border px-2 py-1">${row.id}</td>
-                <td class="border px-2 py-1">${row.status}</td>
-                <td class="border px-2 py-1">${row.date_requested}</td>
+                <th class="p-2 border">Tracking ID</th>
+                <th class="p-2 border">Type</th>
+                <th class="p-2 border">Description</th>
+                <th class="p-2 border">Location</th>
+                <th class="p-2 border">Status</th>
+                <th class="p-2 border">Date Finished</th>
               </tr>
-            `;
-          });
+            </thead>
+            <tbody>
+        `;
 
-          tableHtml += `</tbody></table>`;
-
-          Swal.fire({
-            title: "Request History",
-            html: tableHtml,
-            width: "800px",
-            confirmButtonText: "Close"
-          });
-        })
-        .catch(err => {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Could not load request history."
-          });
+        rows.forEach(row => {
+          historyHtml += `
+            <tr>
+              <td class="p-2 border">${row.tracking_id ?? ''}</td>
+              <td class="p-2 border">${row.request_Type ?? ''}</td>
+              <td class="p-2 border">${row.request_desc ?? ''}</td>
+              <td class="p-2 border">${row.location ?? ''}</td>
+              <td class="p-2 border">${row.req_status ?? ''}</td>
+              <td class="p-2 border">${row.date_finished ?? '-'}</td>
+            </tr>
+          `;
         });
+
+        historyHtml += `</tbody></table></div>`;
+
+        Swal.fire({
+          title: 'Request History',
+          html: historyHtml,
+          width: 900,
+          confirmButtonText: 'Close'
+        });
+      })
+      .catch(err => {
+        console.error('History fetch error:', err);
+        Swal.fire('Error', 'Failed to load request history. Check console or network tab for details.', 'error');
+      });
     });
   });
 });

@@ -93,6 +93,40 @@ class UserModel extends BaseModel  {
         return $result;
     }
 
+    public function getRequestHistory($requester_id) {
+        $records = [];
+        $requester_id = intval($requester_id);
+
+        $query = "
+            SELECT 
+                v.tracking_id,
+                v.request_Type,
+                v.request_desc,
+                v.location,
+                v.req_status,
+                v.date_finished
+            FROM vw_rqtrack v
+            WHERE v.req_id IN (
+                SELECT req_id FROM requester WHERE requester_id = ?
+            )
+            ORDER BY v.date_finished DESC
+        ";
+
+        if ($stmt = $this->db->prepare($query)) {
+            $stmt->bind_param("i", $requester_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $records[] = $row;
+            }
+
+            $stmt->close();
+        }
+
+        return $records;
+    }
+
     // Destructor
     public function __destruct() {
         if ($this->db) {

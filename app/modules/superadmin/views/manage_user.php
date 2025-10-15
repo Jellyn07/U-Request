@@ -170,12 +170,15 @@ $requesters = $controller->getAllRequesters();
           </div>
 
           <div class="flex justify-center gap-2">
-            <!-- <button type="button" 
-                    class="btn btn-secondary historyBtn"
+            <form name="get_history" method="post" action="">
+              <input type="hidden" name="requester_id" :value="selected.requester_id || ''">
+              <input type="hidden" name="action" value="get_history">
+            <button type="button" 
+                    class="btn btn-secondary uhistoryBtn"
                     data-requester-id="<?= htmlspecialchars($req['requester_id']) ?>"
                     title="Request History">
               <img src="/public/assets/img/work-history.png" class="size-4" alt="Request history">
-            </button> -->
+            </button></form>
             <button type="button" id="updateBtn" name="update_user" class="btn btn-primary">Save Changes</button>
           </div>
         </form>

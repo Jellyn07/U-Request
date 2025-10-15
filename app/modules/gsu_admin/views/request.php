@@ -72,8 +72,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option>Others</option>
             </select>
             <select id="sortCategory" class="input-field">
-                <option value="az">Sort A-Z</option>
-                <option value="za">Sort Z-A</option>
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30">Last 30 days</option>
             </select>
             <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
@@ -111,7 +115,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
-                    <td class="px-4 py-3">  <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?></td>
+                    <td class="px-4 py-3" data-date="<?= htmlspecialchars($row['request_date']) ?>">
+                        <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?>
+                    </td>
                     <td class="px-4 py-3">
                         <?php if ($row['req_status'] === 'Completed'): ?>
                             <!-- ✅ Show label only when Completed -->
@@ -256,7 +262,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       searchColumns: [0, 1],
       filterAttr: "data-category",
       statusTabs: "#tabs button",
-      dateColumnIndex: 5
+      dateColumnIndex: 4
     });
   });
 </script>
