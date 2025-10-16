@@ -153,19 +153,31 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
             <input type="hidden" name="action" value="change_password">
 
-            <div>
+            <div class="relative">
               <label for="old_password" class="text-sm text-text mb-1">Old Password</label>
               <input type="password" id="old_password" name="old_password" class="w-full input-field" placeholder="Enter old password" required />
+              <span class="absolute right-3 cursor-pointer" data-password-toggle="old_password">
+                <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+                <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+              </span>
             </div>
 
-            <div>
+            <div class="relative">
               <label for="new_password" class="text-sm text-text mb-1">New Password</label>
               <input type="password" id="new_password" name="new_password" class="w-full input-field" placeholder="Enter new password" required />
+              <span class="absolute right-3 cursor-pointer" data-password-toggle="new_password">
+                <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+                <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+              </span>
             </div>
 
-            <div>
+            <div class="relative">
               <label for="confirm_password" class="text-sm text-text mb-1">Confirm Password</label>
               <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" placeholder="Re-enter new password" required />
+              <span class="absolute right-3 cursor-pointer" data-password-toggle="confirm_password">
+                <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+                <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+              </span>
             </div>
 
             <div class="flex justify-end">
@@ -214,5 +226,6 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         reader.readAsDataURL(event.target.files[0]);
       }
     </script>
+    <script src="/public/assets/js/shared/password-visibility.js"></script>
   </body>
 </html>
