@@ -61,11 +61,15 @@ require_once __DIR__ . '/../../../config/constants.php';
         </div>
 
         <!-- Password -->
-        <div>
+        <div class="relative">
           <label for="password" class="text-sm text-text mb-1">Password</label>
           <input type="password" id="password" name="password" class="w-full input-field"
             placeholder="at least 8 characters"
             value="<?= htmlspecialchars($old_password) ?>" <?= $is_locked ? 'disabled' : '' ?> required>
+          <span class="absolute right-3 cursor-pointer" data-password-toggle="password">
+            <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+            <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+          </span>
         </div>
 
         <p class="text-right">
@@ -123,4 +127,6 @@ require_once __DIR__ . '/../../../config/constants.php';
   }, 1000);
   <?php endif; ?>
 </script>
+  <!-- Password Visibility Script -->
+  <script src="/public/assets/js/shared/password-visibility.js"></script>
 </html>

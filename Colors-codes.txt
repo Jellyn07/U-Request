@@ -63,3 +63,24 @@ main.css
   }
 },
 
+:root {
+  --text: #170202;          /* main text */
+  --background: #ffffff;    /* default background */
+  --primary: #750000;       /* dark red, headings/buttons */
+  --secondary: #d11100;     /* bright red, alerts/status */
+  --accent: #ff0000;        /* highlights / important info */
+  --success: #16a34a;       /* green, completed tasks */
+  --info: #2563eb;          /* blue, neutral highlights */
+  --card-bg: #f9fafb;       /* light gray for cards */
+}
+
+.dark {
+  --text: #fde8e8;          /* light text */
+  --background: #292121;    /* dark bg */
+  --primary: #ff8a8a;       /* headings/buttons in dark mode */
+  --secondary: #ff3f2e;     /* alerts/status */
+  --accent: #ff0000;        /* important highlights */
+  --success: #22c55e;       /* green for completed */
+  --info: #3b82f6;           /* blue for info */
+  --card-bg: #3c2c2c;       /* dark card background */
+}
