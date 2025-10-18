@@ -71,7 +71,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                   <td class="px-4 py-2">jdcruz@usep.edu.ph</td>
                   <td class="px-4 py-2">BSIT</td>
                   <td class="px-4 py-2">
-                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                    <span class="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                   </td>
                 </tr>';
               endfor;

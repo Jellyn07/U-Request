@@ -233,7 +233,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <?= htmlspecialchars($person['department']) ?>
                   </td>
                   <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
-                    <span class="inline-block px-4 ml-3 py-1 text-xs font-semibold rounded-xl <?= strtolower($person['status']) === 'available' ? 'bg-green-100 text-green-800' : 'px-6 bg-red-100 text-red-800' ?>">
+                    <span class="inline-block px-4 py-1 text-xs font-semibold rounded-xl <?= strtolower($person['status']) === 'available' ? 'bg-green-100 text-green-800' : 'px-6 bg-red-100 text-red-800' ?>">
                       <?= htmlspecialchars($person['status']) ?>
                     </span>
                   </td>

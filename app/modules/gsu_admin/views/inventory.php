@@ -209,7 +209,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             <div>
               <label class="text-xs text-text mb-1">Current Quantity</label>
               <div class="w-full flex gap-2">
-                <input type="number" name="qty" :value="selected.qty || ''" class="w-full input-field" required readonly />
+                <input type="number" name="qty" :value="selected.qty || ''" class="w-full input-field cursor-not-allowed" required readonly />
                 <button type="button" @click="addmaterial = true" title="Add Stock" class="btn btn-secondary py-0.5 px-4">
                   <img src="/public/assets/img/add.png" class="size-3" alt="Add Stock">
                 </button>
