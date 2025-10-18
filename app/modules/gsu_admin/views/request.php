@@ -132,17 +132,17 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <td class="px-4 py-3">
                         <?php if ($row['req_status'] === 'Completed'): ?>
                             <!-- ✅ Show label only when Completed -->
-                            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                                 Completed
                             </span>
                         <?php elseif ($row['req_status'] === 'To Inspect'): ?>
-                            <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                            <span class="px-5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
                                 To&nbsp;Inspect
                             </span>
                         <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
                             <!-- ✅ Show dropdown if NOT completed -->
                             <select 
-                                class="status-dropdown px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800" 
+                                class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
                                 data-request-id="<?= $row['request_id'] ?>"
                                 data-current-status="<?= $row['req_status'] ?>"
                             >

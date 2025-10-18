@@ -191,8 +191,8 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Department</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
@@ -229,11 +229,13 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
                   </td>
-                  <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
-                      <?= htmlspecialchars($person['status']) ?>
-                  </td>
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['department']) ?>
+                  </td>
+                  <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
+                    <span class="inline-block px-4 ml-3 py-1 text-xs font-semibold rounded-xl <?= strtolower($person['status']) === 'available' ? 'bg-green-100 text-green-800' : 'px-6 bg-red-100 text-red-800' ?>">
+                      <?= htmlspecialchars($person['status']) ?>
+                    </span>
                   </td>
                 </tr>
               <?php endforeach; ?>

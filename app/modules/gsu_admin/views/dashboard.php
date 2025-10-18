@@ -120,7 +120,7 @@ $dateRange = "$startDate - $endDate";
                 <td class="px-4 py-3">PECC-002</td>
                 <td class="px-4 py-3">Oct 13, 2025</td>
                 <td class="px-4 py-3">
-                  <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
                     To Inspect    
                   </span>
                 </td>

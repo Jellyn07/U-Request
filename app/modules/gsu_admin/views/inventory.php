@@ -165,7 +165,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                       <td class="pl-8 py-3"><?= htmlspecialchars($row['material_code']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['material_desc']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['qty']) ?></td>
-                      <td><?php echo $status; ?></td>
+                      <td>
+                        <span class="inline-block px-4 ml-3 py-1 text-xs font-semibold rounded-xl <?= $status === 'Available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' ?>"><?= $status ?></span>
+                      </td>
                     </tr>
                   <?php } ?>
                 <?php } else { ?>
