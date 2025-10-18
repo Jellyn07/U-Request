@@ -28,7 +28,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
   <body class="bg-gray-200 min-h-screen flex flex-col">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
 
-    <main class="w-1/2 container mx-auto px-4 py-10 flex-1">
+    <main class="md:w-1/2 w-full container mx-auto px-4 py-10 flex-1">
       <script>
       function previewProfile(event) {
         const output = document.getElementById('profile-preview');

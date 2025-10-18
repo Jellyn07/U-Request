@@ -56,7 +56,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
             <select class="input-field" id="statusFilter">
@@ -184,9 +184,9 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow bg-white">
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
           <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
-            <thead class="bg-gray-50">
+            <thead class="bg-gray-50 sticky top-0">
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
@@ -250,7 +250,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
         <!-- Right Section (Details) -->
         <div x-show="showDetails" x-cloak
-            class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
+            class="bg-white shadow rounded-lg p-4 h-[640px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
@@ -275,12 +275,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                       ? '/public/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
                       : '/public/assets/img/user-default.png' ?>"
                   alt="Profile Picture"
-                  class="w-24 h-24 rounded-full object-cover shadow-sm"
+                  class="w-24 h-24 rounded-full object-cover shadow-sm border border-primary"
                 />
 
                 <!-- Edit Button -->
                 <label for="profile_picture" title="Change Profile Picture"
-                  class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
+                  class="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036

@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     </div>
   </div>
   <div class="w-1/2 flex items-center justify-center relative z-10">
-    <div class="w-1/2 max-w-md bg-background">
+    <div id="loginForm" class="w-1/2 max-w-md bg-background transition-all duration-1000 opacity-0 translate-y-5">
       <!-- Logo + Title -->
       <div class="text-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
@@ -52,7 +52,7 @@ require_once __DIR__ . '/../../../config/constants.php';
       </div>
 
       <!-- Form -->
-      <form method="post" action="../../../controllers/AdminController.php">
+      <form method="post" action="../../../controllers/AdminController.php" class="login-form">
         <!-- Email -->
         <div>
           <label for="email" class="text-sm text-text mb-1">USeP Email Address</label>
@@ -97,13 +97,11 @@ require_once __DIR__ . '/../../../config/constants.php';
   <div class="absolute inset-0 clip-diagonal5"></div>
   <div class="absolute inset-0 clip-diagonal6"></div>
 </body>
-
 <script>
   const ADMIN_LOGIN = "/app/modules/shared/views/admin_login.php";
   const USER_LOGIN  = "/app/modules/user/views/login.php";
 </script>
 <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
-
 <script>
   // Show error alert (if any)
   let loginError = <?= json_encode($login_error) ?>;
@@ -127,6 +125,6 @@ require_once __DIR__ . '/../../../config/constants.php';
   }, 1000);
   <?php endif; ?>
 </script>
-  <!-- Password Visibility Script -->
-  <script src="/public/assets/js/shared/password-visibility.js"></script>
+<script src="/public/assets/js/shared/password-visibility.js"></script>
+<script src="/public/assets/js/shared/login-form-transition.js"></script>
 </html>

@@ -8,6 +8,9 @@ Motorpool Admin
 
 GSU Admin
 - can be completed even if request have no assigned personel
+- request: no dropdown for request in (to inspect) to avoid updating request without personel
+- request: in progress no option to go back to (to inspect)
+- if admin assigned a personel the status will automatically go to in progress (idunno kung tama)
 
 Users
 -

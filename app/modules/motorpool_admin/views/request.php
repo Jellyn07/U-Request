@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U-Request | Drivers</title>
+  <title>U-Request | Requests</title>
   <link rel="stylesheet" href="/public/assets/css/output.css" />
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -24,21 +24,50 @@ require_once __DIR__ . '/../../../config/constants.php';
     <div class="p-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Request</h1>
-      <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div id="tabs" class="flex gap-2 mt-4 text-xs text-text">
+            <button class="ml-5 btn">
+                <p>All</p>
+            </button>
+            <button class="btn">
+                <p>Pending</p>
+            </button>
+            <button class="btn">
+                <p>Approved</p>
+            </button>
+            <button class="btn">
+                <p>In Progress</p>
+            </button>
+            <button class="btn">
+                <p>Rejected/Cancelled</p>
+            </button>
+            <button class="btn">
+                <p>Completed</p>
+            </button>
+        </div>
+      <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
-            <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
-            <!-- <select class="input-field" id="statusFilter">
-              <option value="all">All</option>
-              <option value="Available">Available</option>
-              <option value="Fixing">Fixing</option>
+            <input type="text" id="searchRequests" placeholder="Search by ID or Requester Name" class="flex-1 min-w-[200px] input-field">
+            <!-- <select class="input-field" id="filterCategory">
+                <option value="all">All</option>
+                <option>Carpentry/Masonry</option>
+                <option>Welding</option>
+                <option>Hauling</option>
+                <option>Plumbing</option>
+                <option>Landscaping</option>
+                <option>Electrical</option>
+                <option>Air-Condition</option>
+                <option>Others</option>
             </select> -->
-
-            <select class="input-field" id="sortUsers">
-                <option value="az">Sort A-Z</option>
-                <option value="za">Sort Z-A</option>
+            <select id="sortCategory" class="input-field">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30">Last 30 days</option>
             </select>
             <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
@@ -47,258 +76,141 @@ require_once __DIR__ . '/../../../config/constants.php';
                 <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
-                <div x-data="{ showModal: false }">
-            <!-- Trigger Button (example only) -->
-            <button @click="showModal = true" title="Add new driver" class="btn btn-secondary">
-                <img src="/public/assets/img/add-admin.png" alt="User" class="size-4 my-0.5">
-            </button>
-
-            <!-- Modal Background -->
-            <div x-show="showModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
-              <div class="bg-white rounded-xl shadow-xl w-90% md:w-1/3 mx-auto relative overflow-auto">
-                <!-- Modal Content -->
-                <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
-                  <!-- Profile Picture -->
-                  <form method="post" action="../../../controllers/driverController.php" enctype="multipart/form-data">
-                    <div class="rounded-xl flex flex-col items-center">
-                      <div class="relative">
-                        <img id="profile-preview"  
-                            src="/public/assets/img/user-default.png" 
-                            alt="profile picture"
-                            class="w-24 h-24 rounded-full object-cover shadow-sm"
-                        />
-                        <!-- Edit button -->
-                        <label for="profile_picture" title="Change Profile Picture" 
-                          class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition">
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036
-                                    a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                          </svg>
-                        </label>
-                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
-                      </div>
-                    </div>
-                  
-
-                  <!-- Identity Information -->
-                  <div class="flex justify-center">
-                    <div class="w-full">
-                      <h2 class="text-base font-medium">Driver Credentials</h2>
-                      <!-- <form class="space-y-4" method="post"> -->
-                        <div>
-                          <label class="text-xs text-text mb-1">Staff ID No.<span class="text-secondary">*</span></label>
-                          <input type="text" name="staff_id" class="w-full input-field" required />
-                        </div>
-
-                        <!-- <div>
-                          <label class="text-xs text-text mb-1">USeP Email</label>
-                          <input type="email" name="email" class="w-full input-field" required />
-                        </div> -->
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label class="text-xs text-text mb-1">First Name<span class="text-secondary">*</span></label>
-                            <input type="text" name="first_name" class="w-full input-field" required />
-                          </div>
-                          <div>
-                            <label class="text-xs text-text mb-1">Last Name<span class="text-secondary">*</span></label>
-                            <input type="text" name="last_name" class="w-full input-field" required />
-                          </div>
-                        </div>
-
-                        <div>
-                            <label class="text-xs text-text mb-1">Contact No.<span class="text-secondary">*</span></label>
-                            <input type="text" name="contact_no" required minlength="11" maxlength="11" pattern="[0-9]{11}" title="Please enter a valid 11-digit contact number" class="w-full input-field"/>
-                        </div>
-
-                        <div>
-                          <label class="text-xs text-text mb-1">Unit<span class="text-secondary">*</span></label>
-                          <select name="unit" class="w-full input-field" required>
-                            <option value="" disabled selected>Select Unit</option>
-                            <option value="Tagum Unit">Tagum Unit</option>
-                            <option value="Mabini Unit">Mabini Unit</option>
-                          </select>
-                        </div>
-
-                        <div>
-                            <label class="text-xs text-text mb-1">Hire Date<span class="text-secondary">*</span></label>
-                            <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
-                        </div>
-                      <!-- </form> -->
-                    </div>
-                  </div>
-
-
-                  <!-- Action Buttons -->
-                  <div class="flex justify-center gap-2 pt-4">
-                    <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" name="add_driver" class="btn btn-primary px-7">Save</button>
-                  </div>
-                  </form>
-                </main>
-              </div>
+            <div x-data="{ showModal: false }">
             </div>
-          </div>
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow bg-white">
-          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
-            <thead class="bg-gray-50">
+          <div class="overflow-x-auto max-h-[540px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+            <thead class="bg-white sticky top-0">
               <tr>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Request ID</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Travel Date</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Travel Location</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Request</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Status</th>
               </tr>
             </thead>
-            <tbody id="usersTable" class="text-sm">
-              
-            <?php if (!empty($drivers)): ?>
-              <?php foreach ($drivers as $person): ?>
-
-                <tr 
-                  data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
-                  data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
-                  data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
-                  @click="selected = {
-                      staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
-                      firstName: '<?= htmlspecialchars($person['firstName']) ?>',
-                      lastName: '<?= htmlspecialchars($person['lastName']) ?>',
-                      contact: '<?= htmlspecialchars($person['contact']) ?>',
-                      hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
-                      unit: '<?= htmlspecialchars($person['unit']) ?>',
-                      status: '<?= htmlspecialchars($person['status']) ?>',
-                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
-                  }; showDetails = true"
-                  class="cursor-pointer hover:bg-gray-100 border-b border-gray-100"
-                >
-                  <td class="pl-4 py-2">
-                    <img src="<?= !empty($person['profile_picture']) 
-                                  ? '/public/uploads/profile_pics/' . $person['profile_picture'] 
-                                  : '/public/assets/img/user-default.png' ?>"
-                        alt="User" class="size-8 rounded-full object-cover">
-                  </td>
-                  <td class="px-4 py-2">
-                    <?= htmlspecialchars($person['staff_id']) ?>
-                  </td>
-                  <td class="px-4 py-2">
-                    <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
-                  </td>
-                  <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
-                      <?= htmlspecialchars($person['status']) ?>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr>
-                <td colspan="5" class="text-center py-4 text-gray-500">No driver records found.</td>
-              </tr>
-            <?php endif; ?>
-          </tbody>
-
+            <tbody id="requestsTable" class="text-sm">
+              <?php 
+              for ($i = 0; $i < 15; $i++){
+                echo '
+                  <tr class="border-b hover:bg-gray-100">
+                    <td class="px-4 py-3">TRK-0001</td>
+                    <td class="px-4 py-3">Jellyn Omo</td>
+                    <td class="px-4 py-3">Electrical</td>
+                    <td class="px-4 py-3">PECC-002</td>
+                    <td class="px-4 py-3">Oct 13, 2025</td>
+                    <td class="px-4 py-3">To Inspect</td>
+                  </tr>                
+                ';
+              }
+              ?>
+            </tbody>
           </table>
           </div>
+          
         </div>
 
         <!-- Right Section (Details) -->
         <div x-show="showDetails" x-cloak
-            class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
+            class="bg-white shadow rounded-lg p-4 max-h-[602px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
-
-          <h2 class="text-lg font-bold mb-2">Driver Information</h2>
-
-          <!-- Profile Picture -->
-          <!-- <img id="profile-preview"  
-            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
-            alt=""
-            class="w-24 h-24 rounded-full object-cover shadow-sm mx-auto"
-          /> -->
-
+          
           <!-- Form -->
-          <form id="driverForm"   class="space-y-2"  method="post" action="../../../controllers/driverController.php">
-            <div class="rounded-xl flex flex-col items-center">
-              <div class="relative">
-                <!-- Profile Picture Preview -->
-                <img 
-                  id="profile-preview"
-                  src="<?= isset($person['profile_picture']) && $person['profile_picture'] 
-                      ? '/public/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
-                      : '/public/assets/img/user-default.png' ?>"
-                  alt="Profile Picture"
-                  class="w-24 h-24 rounded-full object-cover shadow-sm"
-                />
-
-                <!-- Edit Button -->
-                <label for="profile_picture" title="Change Profile Picture"
-                  class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036
-                        a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </label>
-
-                <!-- Hidden File Input -->
-                <input 
-                  type="file" 
-                  id="profile_picture" 
-                  name="profile_picture" 
-                  accept="image/*" 
-                  class="hidden" 
-                  onchange="previewProfile(event)">
-              </div>
-            </div>
+          <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/RequestController.php">
+            <!-- <input type="hidden" name="request_id" x-model="selected.request_id"> -->
+            <input type="hidden" name="action" value="saveAssignment">
+            <input type="hidden" name="req_id" x-model="selected.req_id">
+            <h2 class="text-lg font-bold mb-2">Repair Information</h2>
+            <img id="profile-preview"
+                :src="selected.image_path 
+                      ? '/public/uploads/' + selected.image_path 
+                      : '/public/assets/img/default-img.png'"
+                @error="$el.src = '/public/assets/img/default-img.png'"
+                alt="Preview"
+                class="w-10/12 shadow-lg mx-auto rounded-lg"
+            />
+            <input type="hidden" name="request_id" x-model="selected.request_id">
             <div>
-              <label class="text-xs text-text mb-1">Staff ID No.</label>
-              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field" readonly/>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="text-xs text-text mb-1">First Name</label>
-                <input type="text" id="first_name" name="first_name" :value="selected.firstName || ''" class="w-full input-field"/>
-              </div>
-              <div>
-                <label class="text-xs text-text mb-1">Last Name</label>
-                <input type="text" id="last_name" name="last_name" :value="selected.lastName || ''" class="w-full input-field"/>
-              </div>
+              <label class="text-xs text-text mb-1">Tracking No.</label>
+              <input type="text" class="w-full view-field"  x-model="selected.tracking_id" readonly />
             </div>
 
             <div>
-                <label class="text-xs text-text mb-1">Contact No.</label>
-                <input type="text" id="contact_no" name="contact_no" :value="selected.contact || ''" class="w-full input-field"/>
+              <label class="text-xs text-text mb-1">Request Date</label>
+              <input type="text" class="w-full view-field"  
+              :value="new Date(selected.request_date).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: '2-digit' 
+              })" 
+              readonly />
             </div>
 
             <div>
-                <label class="text-xs text-text mb-1">Unit</label>
-                <select name="unit" class="w-full input-field">
-                  <option value="Tagum Unit" :selected="selected.unit === 'Tagum Unit'">Tagum Unit</option>
-                  <option value="Mabini Unit" :selected="selected.unit === 'Mabini Unit'">Mabini Unit</option>
+              <label class="text-xs text-text mb-1">Requester</label>
+              <input type="text" class="w-full view-field" x-model="selected.Name" readonly />
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">Category</label>
+              <input type="text" class="w-full view-field" x-model="selected.request_Type" readonly />
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">Location</label>
+              <input type="text" class="w-full view-field" x-model="selected.location" readonly />
+            </div>
+
+            <div>
+                <label class="text-xs text-text mb-1">Priority Level</label>
+                <select name="prio_level" id="prioritySelect" 
+                        class="w-full input-field" 
+                        x-model="selected.priority_status"
+                        :disabled="selected.req_status === 'Completed'">
+
+                    <!-- Fallback if no priority -->
+                    <option value="" x-show="!selected.priority_status">No Priority Level</option>
+
+                    <option value="Low">Low</option>
+                    <option value="High">High</option>
                 </select>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Hire Date</label>
-              <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
+                <label class="text-xs text-text mb-1">Assign Personnel</label>
+                <select name="staff_id" id="staffSelect" 
+                        class="w-full input-field" 
+                        x-model="selected.staff_id"
+                        :disabled="selected.req_status === 'Completed'">
+                    
+                    <!-- Fallback if none -->
+                    <option value="" x-show="!selected.staff_id">No Assigned Personnel</option>
+
+                    <?php foreach ($personnels as $person): ?>
+                        <option value="<?= $person['staff_id'] ?>">
+                            <?= htmlspecialchars($person['full_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
+            <div class="flex justify-center pt-2 space-x-2">
+                <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
 
-            <div class="flex justify-center gap-2 pt-2">
-              <button type="button" 
-                title="Work History" 
-                class="btn btn-secondary" 
-                @click="viewWorkHistory(selected.staff_id)">
-                <img src="/public/assets/img/work-history.png" class="size-4" alt="work history">
-              </button>
-                <button type="submit" name="update_driver"  class="btn btn-primary">Save Changes</button>
+                <!-- Save button hidden if status is Completed -->
+                <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment"
+                        x-show="selected.req_status !== 'Completed'">
+                    Save Changes
+                </button>
             </div>
           </form>
         </div>
-
       </div>
     </div>
   </div>
@@ -321,6 +233,22 @@ require_once __DIR__ . '/../../../config/constants.php';
         output.src = URL.createObjectURL(event.target.files[0]);
       }
   </script>
+  <script type="module">
+  import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initTableFilters({
+      tableId: "requestsTable",
+      searchId: "searchRequests",
+      filterId: "filterCategory",
+      sortId: "sortCategory",
+      searchColumns: [0, 1],
+      filterAttr: "data-category",
+      statusTabs: "#tabs button",
+      dateColumnIndex: 4
+    });
+  });
+</script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 </html>

@@ -45,7 +45,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Repair Request</h1>
 
-        <div id="tabs" class="flex gap-2 mt-4 text-xs text-gray-700">
+        <div id="tabs" class="flex gap-2 mt-4 text-xs text-text">
             <button class="ml-5 btn">
                 <p>All</p>
             </button>
@@ -76,6 +76,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option>Air-Condition</option>
                 <option>Others</option>
             </select>
+            <select id="sort" class="input-field">
+                <option value="Newest">Newest</option>
+                <option value="Oldest">Oldest</option>
+                <option value="AZ">A-Z</option>
+                <option value="ZA">Z-A</option>
+            </select>
             <select id="sortCategory" class="input-field">
                 <option value="all">All Dates</option>
                 <option value="today">Today</option>
@@ -92,11 +98,11 @@ $profile = $controller->getProfile($_SESSION['email']);
             </button>
             <!-- Add Admin Modal -->
             <div x-data="{ showModal: false }">
+            </div>
           </div>
-        </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[540px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <div class="overflow-x-auto h-[545px] overflow-y-auto rounded-b-lg shadow bg-white">
           <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
             <thead class="bg-white sticky top-0">
               <tr>
@@ -105,7 +111,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Request</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Status</th>
+                <th class="px-4 py-2 ml-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Status</th>
               </tr>
             </thead>
             <tbody id="requestsTable" class="text-sm">
@@ -129,19 +135,25 @@ $profile = $controller->getProfile($_SESSION['email']);
                             <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
                                 Completed
                             </span>
-                        <?php else: ?>
+                        <?php elseif ($row['req_status'] === 'To Inspect'): ?>
+                            <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                                To&nbsp;Inspect
+                            </span>
+                        <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
                             <!-- ✅ Show dropdown if NOT completed -->
                             <select 
-                                class="status-dropdown px-2 py-1 rounded-full text-xs <?= 
-                                    $row['req_status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' 
-                                ?>" 
+                                class="status-dropdown px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800" 
                                 data-request-id="<?= $row['request_id'] ?>"
                                 data-current-status="<?= $row['req_status'] ?>"
                             >
-                                <option value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
-                                <option value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-                                <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
+                                <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?> class="bg-gray-100 text-black">In Progress</option>
+                                <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?> class="bg-green-100 text-green-800 border-none rounded-full hover:bg-green-300">Completed</option>
                             </select>
+                        <?php else: ?>
+                            <!-- Fallback for any other statuses -->
+                            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                <?= htmlspecialchars($row['req_status']) ?>
+                            </span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -213,9 +225,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                         :disabled="selected.req_status === 'Completed'">
 
                     <!-- Fallback if no priority -->
-                    <option value="" x-show="!selected.priority_status">No Priority Level</option>
+                    <!-- <option value="" x-show="!selected.priority_status">No Priority Level</option> -->
 
-                    <option value="Low">Low</option>
+                    <option value="Low" x-show="!selected.priority_status">Low</option>
                     <option value="High">High</option>
                 </select>
             </div>
@@ -237,6 +249,15 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <?php endforeach; ?>
                 </select>
             </div>
+
+            <!-- <div>
+                <label class="text-xs text-text mb-1">Status</label>
+                <select name="prio_level" id="status" class="w-full input-field" >
+                  <option value="To Inspect">To Inspect</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+            </div> -->
 
             <div class="flex justify-center pt-2 space-x-2">
                 <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>

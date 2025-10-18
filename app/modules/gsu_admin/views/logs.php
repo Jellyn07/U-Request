@@ -85,7 +85,7 @@ $profile = $controller->getProfile($_SESSION['email']);
         </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
           <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
             <thead class="bg-white sticky top-0">
               <tr>

@@ -25,10 +25,10 @@ if (session_status() === PHP_SESSION_NONE) {
     <nav class="flex-1 overflow-y-auto text-sm text-white mt-2">
       <ul class="space-y-2 p-2">
         <!-- Dashboard -->
-         <a href="dashboard.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
-            <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
-          </a>
+        <a href="dashboard.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+          <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
+        </a>
 
         <!-- Account Management -->
         <li>
@@ -123,18 +123,18 @@ if (session_status() === PHP_SESSION_NONE) {
           </ul>
         </li>
 
-        <!-- Reports -->
-        <li>
-          <button class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-            <img src="/public/assets/img/reports.png" alt="Reports & Analytics" class="size-8 p-1.5 md:p-0 md:size-4 self-center" />
-            <span class="hidden md:flex items-center sidebar-text">Reports & Analytics</span>
-            <img src="/public/assets/img/arrow.png" alt="arrows" class="hidden md:flex size-4 object-cover overflow-hidden mr-2 p-1 ml-auto sidebar-text arrows transform transition-transform duration-300" />
-          </button>
-          <ul class="submenu hidden pl-5 space-y-2 mt-1">
-            <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Activity Logs</a></li>
-            <li><a href="#" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">Export Data</a></li>
-          </ul>
-        </li>
+        <!-- Activity Logs -->
+        <a href="logs.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+          <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
+        </a>
+
+        <!-- Feedbacks -->
+        <a href="feedback.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <img src="/public/assets/img/feedback.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+          <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
+        </a>
+
 
         <!-- Settings -->
         <!-- <li>
@@ -180,10 +180,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
       <!-- Dropdown -->
       <div id="profileMenu" class="hidden absolute bottom-4 left-20 md:bottom-20 md:left-4 w-48 bg-white text-black rounded-lg border-gray-400 shadow-lg">
-        <a href="#" class="block rounded-lg px-4 py-2 hover:bg-gray-100">
+        <a href="#" class="block rounded-lg px-4 py-2 hover:bg-gray-100 text-sm">
           My Profile
         </a>
-        <a href="/app/modules/shared/views/admin_login.php" class="flex rounded-lg px-4 py-2 text-accent hover:bg-gray-100 items-center gap-1">
+        <a href="/app/modules/shared/views/admin_login.php" class="flex rounded-lg px-4 py-2 text-accent hover:bg-gray-100 items-center gap-1 text-sm">
           <img src="/public/assets/img/logout.png" alt="Profile" class="h-4 w-4">
           Logout
         </a>

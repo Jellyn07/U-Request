@@ -26,6 +26,10 @@
           <img src="/public/assets/img/request-for-proposal.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Request</span>
         </a>
+        <a href="schedules.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <img src="/public/assets/img/calendar.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+          <span class="hidden md:flex items-center sidebar-text">Schedule</span>
+        </a>
         <a href="vehicles.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/car-admin.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Vehicle</span>
@@ -38,13 +42,13 @@
         <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
         <span class="hidden md:flex items-center sidebar-text">Users</span>
         </a>
-        <a href="logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
-        <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
-        <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
-        </a>
         <a href="feedback.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
         <img src="/public/assets/img/feedback.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
         <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
+        </a>
+        <a href="logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+        <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
         </a>
       </ul>
     </nav>
@@ -67,26 +71,7 @@
             <?php echo htmlspecialchars($_SESSION['full_name'] ?? 'Guest'); ?>
           </p>
           <p class="text-xs text-gray-300">
-            <?php
-            if (isset($_SESSION['access_level'])) {
-              switch ($_SESSION['access_level']) {
-                case 1:
-                  echo "Super Admin";
-                  break;
-                case 2:
-                  echo "GSU Admin";
-                  break;
-                case 3:
-                  echo "Motorpool Admin";
-                  break;
-                default:
-                  echo "Administrator";
-                  break;
-              }
-            } else {
-              echo "Not Logged In";
-            }
-            ?>
+            Motorpool Admin
           </p>
         </div>
       </button>

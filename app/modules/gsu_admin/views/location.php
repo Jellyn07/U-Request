@@ -55,7 +55,7 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <div class="overflow-x-auto max-h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
             <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
@@ -86,7 +86,7 @@ $profile = $controller->getProfile($_SESSION['email']);
         </div>
 
         <!-- Right Section (Details Panel) -->
-        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
+        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>

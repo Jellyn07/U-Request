@@ -36,8 +36,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
   </head>
 <body class="min-h-screen flex relative overflow-hidden">
   <!-- White Section -->
-  <div class="w-1/2 flex items-center justify-center relative z-10">
-    <div class="w-1/2 max-w-md bg-background">
+  <div class="w-full md:w-1/2 flex items-center justify-center relative z-10">
+    <div id="loginForm" class="w-full md:w-1/2 max-w-md bg-background transition-all duration-1000 opacity-0 translate-y-5">
       <!-- Logo + Title -->
       <div class="text-center">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
   </div>
 
   <!-- Red Section -->
-  <div class="w-1/2 flex items-end justify-end relative z-10 text-white">
+  <div class="w-full md:w-1/2 flex items-end justify-end relative z-10 text-white">
     <div class="text-right p-8">
       <p class="text-sm text-text/70">
           <span class="block sm:inline">&copy; 
@@ -127,10 +127,9 @@ require_once __DIR__ . '/../../../models/UserModel.php';
   const USER_LOGIN  = "/app/modules/user/views/login.php";
 </script>
 <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
-  <!-- Password Visibility Script -->
-  <script src="/public/assets/js/shared/password-visibility.js"></script>
+<script src="/public/assets/js/shared/password-visibility.js"></script>
+<script src="/public/assets/js/shared/login-form-transition.js"></script>
 </html>
-
 <script>
   // Pass PHP variable to JS
   let loginError = <?= json_encode($login_error) ?>;
@@ -138,7 +137,6 @@ require_once __DIR__ . '/../../../models/UserModel.php';
       showErrorAlert(loginError);
   }
 </script>
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const countdown = document.getElementById("countdown");

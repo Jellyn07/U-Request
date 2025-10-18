@@ -733,20 +733,24 @@ video {
   right: 0.75rem;
 }
 
+.right-8 {
+  right: 2rem;
+}
+
 .top-0 {
   top: 0px;
 }
 
-.top-8 {
-  top: 2rem;
+.top-7 {
+  top: 1.75rem;
 }
 
-.right-2\.5 {
-  right: 0.625rem;
+.bottom-1 {
+  bottom: 0.25rem;
 }
 
-.left-3 {
-  left: 0.75rem;
+.right-1 {
+  right: 0.25rem;
 }
 
 .z-0 {
@@ -759,6 +763,14 @@ video {
 
 .z-50 {
   z-index: 50;
+}
+
+.order-1 {
+  order: 1;
+}
+
+.order-2 {
+  order: 2;
 }
 
 .col-span-2 {
@@ -1097,6 +1109,11 @@ video {
   margin-bottom: 0.5rem;
 }
 
+.my-2\.5 {
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
+}
+
 .my-20 {
   margin-top: 5rem;
   margin-bottom: 5rem;
@@ -1205,11 +1222,6 @@ video {
 .my-96 {
   margin-top: 24rem;
   margin-bottom: 24rem;
-}
-
-.my-2\.5 {
-  margin-top: 0.625rem;
-  margin-bottom: 0.625rem;
 }
 
 .mb-0 {
@@ -1891,6 +1903,50 @@ video {
   height: 100vh;
 }
 
+.h-\[540px\] {
+  height: 540px;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.h-\[550px\] {
+  height: 550px;
+}
+
+.h-\[530px\] {
+  height: 530px;
+}
+
+.h-\[580px\] {
+  height: 580px;
+}
+
+.h-\[545px\] {
+  height: 545px;
+}
+
+.h-\[560px\] {
+  height: 560px;
+}
+
+.h-\[570px\] {
+  height: 570px;
+}
+
+.h-\[575px\] {
+  height: 575px;
+}
+
+.h-\[578px\] {
+  height: 578px;
+}
+
+.h-\[640px\] {
+  height: 640px;
+}
+
 .max-h-48 {
   max-height: 12rem;
 }
@@ -1917,6 +1973,34 @@ video {
 
 .max-h-\[642px\] {
   max-height: 642px;
+}
+
+.max-h-1 {
+  max-height: 0.25rem;
+}
+
+.max-h-\[633px\] {
+  max-height: 633px;
+}
+
+.max-h-\[635px\] {
+  max-height: 635px;
+}
+
+.max-h-\[640px\] {
+  max-height: 640px;
+}
+
+.max-h-\[645px\] {
+  max-height: 645px;
+}
+
+.max-h-\[650px\] {
+  max-height: 650px;
+}
+
+.max-h-\[578px\] {
+  max-height: 578px;
 }
 
 .min-h-screen {
@@ -2067,6 +2151,10 @@ video {
   min-width: 200px;
 }
 
+.min-w-\[300px\] {
+  min-width: 300px;
+}
+
 .min-w-full {
   min-width: 100%;
 }
@@ -2093,6 +2181,11 @@ video {
 
 .flex-shrink-0 {
   flex-shrink: 0;
+}
+
+.translate-y-5 {
+  --tw-translate-y: 1.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .transform {
@@ -2304,6 +2397,11 @@ video {
   border-radius: 0.75rem;
 }
 
+.rounded-b-2xl {
+  border-bottom-right-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+}
+
 .rounded-b-lg {
   border-bottom-right-radius: 0.5rem;
   border-bottom-left-radius: 0.5rem;
@@ -2314,9 +2412,24 @@ video {
   border-bottom-right-radius: 1rem;
 }
 
+.rounded-t-2xl {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
 .rounded-t-lg {
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
+}
+
+.rounded-t-xl {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.rounded-b-xl {
+  border-bottom-right-radius: 0.75rem;
+  border-bottom-left-radius: 0.75rem;
 }
 
 .rounded-tl-lg {
@@ -2343,6 +2456,10 @@ video {
   border-top-width: 1px;
 }
 
+.border-none {
+  border-style: none;
+}
+
 .border-accent {
   border-color: var(--accent);
 }
@@ -2367,6 +2484,10 @@ video {
   border-color: rgb(156 163 175 / var(--tw-border-opacity, 1));
 }
 
+.border-primary {
+  border-color: var(--primary);
+}
+
 .border-secondary {
   border-color: var(--secondary);
 }
@@ -2374,6 +2495,16 @@ video {
 .border-white {
   --tw-border-opacity: 1;
   border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
+}
+
+.border-b-gray-300 {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+}
+
+.border-b-gray-400 {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(156 163 175 / var(--tw-border-opacity, 1));
 }
 
 .bg-\[var\(--background\)\] {
@@ -2433,10 +2564,6 @@ video {
 .bg-red-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
-}
-
-.bg-secondary {
-  background-color: var(--secondary);
 }
 
 .bg-white {
@@ -3615,6 +3742,10 @@ video {
   text-decoration-line: underline;
 }
 
+.opacity-0 {
+  opacity: 0;
+}
+
 .shadow {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
@@ -3675,16 +3806,20 @@ video {
   transition-duration: 150ms;
 }
 
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .transition-transform {
   transition-property: transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
 
-.transition-opacity {
-  transition-property: opacity;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+.duration-1000 {
+  transition-duration: 1000ms;
 }
 
 .duration-150 {
@@ -3735,6 +3870,177 @@ video {
 .clip-diagonal6 {
   background: linear-gradient(195deg, transparent 70%, #750000 30%);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* ----------------------------
+      Clip Diagonal Transitions
+    ---------------------------- */
+
+/* Common settings for all layers */
+
+.clip-diagonal,
+    .clip-diagonal1,
+    .clip-diagonal2,
+    .clip-diagonal4,
+    .clip-diagonal5,
+    .clip-diagonal6 {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transition: transform 700ms ease, opacity 500ms ease;
+  opacity: 0;
+}
+
+/* ----------------------------
+      User Login Diagonals
+      .clip-diagonal = lightest (from right)
+      .clip-diagonal1 = medium (from bottom)
+      .clip-diagonal2 = darkest (from bottom)
+    ---------------------------- */
+
+.clip-diagonal {
+  transform: translateX(100%);
+  animation: slideInRight 800ms ease forwards 0ms;
+}
+
+.clip-diagonal1 {
+  transform: translateY(100%);
+  animation: slideInBottom 800ms ease forwards 150ms;
+}
+
+.clip-diagonal2 {
+  transform: translateY(100%);
+  animation: slideInBottom 800ms ease forwards 300ms;
+}
+
+/* ----------------------------
+      Admin Login Diagonals
+      .clip-diagonal4 = lightest (from left)
+      .clip-diagonal5 = medium (from bottom)
+      .clip-diagonal6 = darkest (from bottom)
+    ---------------------------- */
+
+.clip-diagonal4 {
+  transform: translateX(-100%);
+  animation: slideInLeft 800ms ease forwards 0ms;
+}
+
+.clip-diagonal5 {
+  transform: translateY(100%);
+  animation: slideInBottom 800ms ease forwards 150ms;
+}
+
+.clip-diagonal6 {
+  transform: translateY(100%);
+  animation: slideInBottom 800ms ease forwards 300ms;
+}
+
+/* ----------------------------
+      Entrance Keyframes
+    ---------------------------- */
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInBottom {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ----------------------------
+    Diagonal Exit to Original Direction
+  ---------------------------- */
+
+/* User Login Layers */
+
+.clip-diagonal.exit {
+  /* lightest, from right */
+  animation: slideOutRight 700ms ease forwards;
+}
+
+.clip-diagonal1.exit, .clip-diagonal2.exit {
+  /* medium/dark, from bottom */
+  animation: slideOutBottom 700ms ease forwards;
+}
+
+/* Admin Login Layers */
+
+.clip-diagonal4.exit {
+  /* lightest, from left */
+  animation: slideOutLeft 700ms ease forwards;
+}
+
+.clip-diagonal5.exit, .clip-diagonal6.exit {
+  /* medium/dark, from bottom */
+  animation: slideOutBottom 700ms ease forwards;
+}
+
+/* Keyframes: Slide back to original side */
+
+@keyframes slideOutRight {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutBottom {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 /* ---------- UNIVERSAL SCROLLBAR STYLES ---------- */
@@ -3802,6 +4108,11 @@ video {
 .hover\:bg-gray-100:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-green-300:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(134 239 172 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-secondary:hover {

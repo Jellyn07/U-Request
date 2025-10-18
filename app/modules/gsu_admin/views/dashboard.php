@@ -1,10 +1,5 @@
-<?php
+<?php 
 session_start();
-// if (!isset($_SESSION['email'])) {
-//     header("Location: admin_login.php");
-//     exit;
-// }
-// require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/DashboardController.php';
 
@@ -12,13 +7,23 @@ $controller = new DashboardController();
 $year = $_GET['year'] ?? date('Y');
 $data = $controller->getDashboardData($year);
 
+//   if (!isset($_SESSION['email'])) {
+//     header("Location: admin_login.php");
+//     exit;
+// }
+// require_once __DIR__ . '/../../../config/auth-admin.php';
+
 if (!isset($_SESSION['email'])) {
     header("Location: modules/shared/views/admin_login.php");
     exit;
 }
 
-// ✅ Fetch profile here
 $profile = $controller->getProfile($_SESSION['email']);
+
+// ✅ Date range display (example)
+$startDate = "Jan 1";
+$endDate = date('M d');
+$dateRange = "$startDate - $endDate";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,140 +35,106 @@ $profile = $controller->getProfile($_SESSION['email']);
   <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 relative">
   <?php include COMPONENTS_PATH . '/gsu_menu.php';?>
-        <!-- include COMPONENTS_PATH . '/admin_header.php'; -->
-
-<main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
-    <!-- <p class="flex text-sm text-gray-600 p-4">
-      <img src="/public/assets/img/upper_logo.png" class="size-5 m-0.5">
-       > Dashboard
-    </p> -->
-    <div class="p-6">
+  <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
+  <!-- 📅 Date Display -->
+  <div class="absolute top-7 right-8 bg-white p-2 px-4 rounded-xl shadow border border-gray-300 text-sm">
+    Showing stats from <span class="font-semibold"><?= $dateRange ?></span>
+  </div>
+  <div class="p-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-      <!-- Year Selector -->
-      <div class="mb-2 flex items-center">
-        <label for="yearSelect" class="mr-2 text-text text-sm">Select Year:</label>
-        <select id="yearSelect" class="btn btn-secondary text-sm px-10">
-          <option value="2025">2025</option>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-        </select>
-      </div>
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Pending Requests</h2>
-          <p class="text-xl font-bold text-primary" id="total_pending">
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5 bg-white p-6 rounded-2xl shadow">
+        <div class="border-r-2 border-gray-300">
+          <h2 class="font-medium mb-3">Pending Requests</h2>
+          <p class="text-4xl font-bold text-text mt-2">
             <?= isset($data['summary']['total_pending']) ? $data['summary']['total_pending'] : 0 ?>
           </p>
+          <p class="text-xs text-gray-500 font-medium mt-2">Pending request today</p>
         </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Total Repair Requests</h2>
-          <p class="text-xl font-bold text-primary" id="totalrRequests">
-              <?= isset($data['summary']['total_rrequests']) ? $data['summary']['total_rrequests'] : 0 ?>
+        <div class="border-r-2 border-gray-300">
+          <h2 class="font-medium mb-3">Total Repair Request</h2>
+          <p class="text-4xl font-bold text-text mt-2">
+            <?= isset($data['summary']['total_rrequests']) ? $data['summary']['total_rrequests'] : 0 ?>
           </p>
+          <p class="text-xs text-gray-500 font-medium mt-2">Total repair request this year</p>
         </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">GSU Personnels</h2>
-          <p class="text-xl font-bold text-green-500" id="totalgPersonnel">
+        <div class="border-r-2 border-gray-300">
+          <h2 class="font-medium mb-3">GSU Personnels</h2>
+          <p class="text-4xl font-bold text-text mt-2">
             <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
           </p>
+          <p class="text-xs text-gray-500 font-medium mt-2">Total number of GSU personnels this year</p>
         </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Users</h2>
-          <p class="text-xl font-bold text-secondary">
-            <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?>
-          </p>
+        <div>
+          <h2 class="font-medium mb-3">Average Rating</h2>
+          <div class="flex items-center space-x-2 mt-2">
+            <span class="text-4xl font-bold text-yellow-500">4.5</span>
+            <div id="averageStars" class="flex"></div>
+          </div>
+          <p class="text-xs text-gray-500 font-medium mt-2">Average rating this year</p>
         </div>
       </div>
 
-      <!-- Line Graph with Title -->
-      <div class="bg-white shadow rounded-lg p-10 flex flex-col justify-center items-center" style="height: 490px;">
-        <h2 class="text-sm font-semibold mb-2">Monthly Requests Overview</h2>
-        <canvas id="requestsChart" class="w-full h-full"></canvas>
-      </div>      
-    </div>
+      <!-- Charts -->
+      <div class="grid md:grid-cols-2 gap-6 mb-5">
+        <div class="bg-white p-4 rounded-2xl shadow">
+          <h3 class="font-semibold text-text mb-3 text-base text-center">Requests by Building</h3>
+          <div class="w-full h-80">
+            <canvas id="buildingChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow">
+          <h3 class="font-semibold text-text mb-3 text-base text-center">Workload by Request Type</h3>
+          <div class="w-full h-80">
+            <canvas id="workloadChart"></canvas>
+          </div>
+        </div>
+      </div>
 
-    
-  </main>
-
-  <script>
-    // Dummy data for different years
-    const yearData = {
-      2025: {
-        facility: [120,180,250,220,300,280,350,400,370,390,420,450],
-        // vehicle: [80,100,150,130,200,170,220,260,240,250,270,300],
-        total: 1245,
-        pending: 312,
-        approved: 890
-      },
-      2024: {
-        facility: [100,150,200,180,220,250,300,320,310,330,340,360],
-        // vehicle: [60,80,120,100,150,140,180,200,190,210,220,230],
-        total: 1050,
-        pending: 280,
-        approved: 770
-      },
-      2023: {
-        facility: [90,120,160,150,180,200,220,240,230,250,260,280],
-        // vehicle: [50,70,100,90,120,130,150,170,160,180,190,200],
-        total: 900,
-        pending: 200,
-        approved: 700
-      }
-    };
-
-    // Initialize chart
-    const ctx = document.getElementById('requestsChart').getContext('2d');
-    let requestsChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-        datasets: [
-          {
-            label: 'Repair Requests',
-            data: yearData[2025].facility,
-            borderColor: '#ff0000',
-            backgroundColor: 'rgba(117,0,0,0.2)',
-            fill: true,
-            tension: 0.4
+      <!-- Recent Requests -->
+      <div class="flex justify-between bg-white p-4 pb-1 rounded-t-2xl shadow">
+        <h3 class="text-xl font-bold text-primary mb-1 order-1">Recent Requests</h3>
+        <input type="text" id="searchRequests" placeholder="Search by Requester Name" class="flex-right min-w-[300px] input-field order-2">
+      </div>
+      <table class="bg-white rounded-b-2xl shadow  w-full text-sm text-left text-text">
+        <thead class="text-xs uppercase text-gray-700 border-b-gray-400 border-b">
+          <th class="px-4 py-2">Request ID</th>
+          <th class="px-4 py-2">Requester</th>
+          <th class="px-4 py-2">Category</th>
+          <th class="px-4 py-2">Location</th>
+          <th class="px-4 py-2">Date Request</th>
+          <th class="px-4 py-2">Status</th>
+        </thead>
+        <tbody>
+          <?php 
+          for ($i = 0; $i < 15; $i++){
+            echo '
+              <tr class="border-b hover:bg-gray-100">
+                <td class="px-4 py-3">TRK-0001</td>
+                <td class="px-4 py-3">Jellyn Omo</td>
+                <td class="px-4 py-3">Electrical</td>
+                <td class="px-4 py-3">PECC-002</td>
+                <td class="px-4 py-3">Oct 13, 2025</td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                    To Inspect    
+                  </span>
+                </td>
+              </tr>                
+            ';
           }
-        //   {
-        //     label: 'Vehicle Requests',
-        //     data: yearData[2025].vehicle,
-        //     borderColor: '#ff8a8a',
-        //     backgroundColor: 'rgba(255,138,138,0.2)',
-        //     fill: true,
-        //     tension: 0.4
-        //   }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false, // respects container height
-        plugins: { legend: { labels: { color: '#333', font: { size: 10 } } } },
-        scales: {
-          x: { ticks: { color: '#555', font: { size: 9 } } },
-          y: { ticks: { color: '#555', font: { size: 9 } } }
-        }
-      }
-    });
+          ?>
 
-    // Update chart and stats on year change
-    document.getElementById('yearSelect').addEventListener('change', function() {
-      const selectedYear = this.value;
-      requestsChart.data.datasets[0].data = yearData[selectedYear].facility;
-      requestsChart.data.datasets[1].data = yearData[selectedYear].vehicle;
-      requestsChart.update();
-
-      document.getElementById('totalRequests').textContent = yearData[selectedYear].total;
-      document.getElementById('pendingRequests').textContent = yearData[selectedYear].pending;
-      document.getElementById('approvedRequests').textContent = yearData[selectedYear].approved;
-    });
-  </script>
+        </tbody>
+      </table>
+    </div>
+  </main>
 </body>
+<script src="/public/assets/js/gsu_admin/dashboard-charts.js"></script>
 <script src="/public/assets/js/shared/menus.js"></script>
+<script src="/public/assets/js/shared/stars.js"></script>
 </html>

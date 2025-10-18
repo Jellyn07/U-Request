@@ -91,6 +91,135 @@
     background: linear-gradient(195deg, transparent 70%, #750000 30%);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
+    /* ----------------------------
+      Clip Diagonal Transitions
+    ---------------------------- */
+
+    /* Common settings for all layers */
+    .clip-diagonal,
+    .clip-diagonal1,
+    .clip-diagonal2,
+    .clip-diagonal4,
+    .clip-diagonal5,
+    .clip-diagonal6 {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      will-change: transform, opacity;
+      transition: transform 700ms ease, opacity 500ms ease;
+      opacity: 0;
+    }
+
+    /* ----------------------------
+      User Login Diagonals
+      .clip-diagonal = lightest (from right)
+      .clip-diagonal1 = medium (from bottom)
+      .clip-diagonal2 = darkest (from bottom)
+    ---------------------------- */
+    .clip-diagonal { 
+      transform: translateX(100%);
+      animation: slideInRight 800ms ease forwards 0ms;
+    }
+    .clip-diagonal1 { 
+      transform: translateY(100%);
+      animation: slideInBottom 800ms ease forwards 150ms;
+    }
+    .clip-diagonal2 { 
+      transform: translateY(100%);
+      animation: slideInBottom 800ms ease forwards 300ms;
+    }
+
+    /* ----------------------------
+      Admin Login Diagonals
+      .clip-diagonal4 = lightest (from left)
+      .clip-diagonal5 = medium (from bottom)
+      .clip-diagonal6 = darkest (from bottom)
+    ---------------------------- */
+    .clip-diagonal4 { 
+      transform: translateX(-100%);
+      animation: slideInLeft 800ms ease forwards 0ms;
+    }
+    .clip-diagonal5 { 
+      transform: translateY(100%);
+      animation: slideInBottom 800ms ease forwards 150ms;
+    }
+    .clip-diagonal6 { 
+      transform: translateY(100%);
+      animation: slideInBottom 800ms ease forwards 300ms;
+    }
+
+    /* ----------------------------
+      Entrance Keyframes
+    ---------------------------- */
+    @keyframes slideInRight {
+      0% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInLeft {
+      0% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInBottom {
+      0% {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+  /* ----------------------------
+    Diagonal Exit to Original Direction
+  ---------------------------- */
+
+  /* User Login Layers */
+  .clip-diagonal.exit {  /* lightest, from right */
+    animation: slideOutRight 700ms ease forwards;
+  }
+  .clip-diagonal1.exit, .clip-diagonal2.exit {  /* medium/dark, from bottom */
+    animation: slideOutBottom 700ms ease forwards;
+  }
+
+  /* Admin Login Layers */
+  .clip-diagonal4.exit { /* lightest, from left */
+    animation: slideOutLeft 700ms ease forwards;
+  }
+  .clip-diagonal5.exit, .clip-diagonal6.exit { /* medium/dark, from bottom */
+    animation: slideOutBottom 700ms ease forwards;
+  }
+
+  /* Keyframes: Slide back to original side */
+  @keyframes slideOutRight {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+  }
+
+  @keyframes slideOutLeft {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(-100%); opacity: 0; }
+  }
+
+  @keyframes slideOutBottom {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+  }
 
   /* ---------- UNIVERSAL SCROLLBAR STYLES ---------- */
   * {

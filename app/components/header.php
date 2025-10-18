@@ -28,8 +28,17 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
   button:hover .logout-icon {
     content: url('/public/assets/img/logout-white.png');
   }
+
+  .logout-icon-mobile {
+    content: url('/public/assets/img/logout-primary.png');
+    transition: content 0.2s ease-in-out;
+  }
+
+  button:hover .logout-icon-mobile {
+    content: url('/public/assets/img/logout.png');
+  }
 </style>
-<header class="sticky top-0 z-50 bg-red-30 text-text p-3 bg-gray-200">
+<header class="sticky top-0 z-50 bg-red-30 text-text p-1 md:p-3 bg-gray-200">
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
     <div class="flex h-16 items-center justify-between w-full">
       <!-- Logo Left -->
@@ -54,7 +63,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
               <img 
                 src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
                 alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>" 
-                class="w-9 h-9 rounded-full object-cover border border-secondary shadow-sm mr-2" 
+                class="w-9 h-9 rounded-full object-cover border border-primary shadow-sm mr-2" 
               />
               <span>
                 <?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>
@@ -83,9 +92,12 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
             </div>
           </div>
         </div>
+
+
+
         <!-- Mobile menu button -->
-        <div class="block md:hidden">
-          <button id="mobile-menu-btn" class="rounded-sm bg-secondary p-2 text-text transition hover:text-accent focus:outline-none">
+        <div class="block md:hidden sticky">
+          <button id="mobile-menu-btn" class="rounded-sm p-1 text-text transition hover:text-accent focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -96,8 +108,8 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     <!-- Mobile nav: only visible on mobile, slides down -->
     <nav id="mobile-menu" class="md:hidden mt-2 hidden">
       <ul class="flex flex-col items-start gap-2 text-sm bg-background p-4 rounded shadow">
-        <li><a class="text-text transition hover:text-accent <?php echo $current_page === 'request.php' ? 'active-underline' : ''; ?>" href="/src/pages/user/request.php">Request</a></li>
-        <li><a class="text-text transition hover:text-accent <?php echo $current_page === 'tracking.php' ? 'active-underline' : ''; ?>" href="/src/pages/user/tracking.php">Tracking</a></li>
+        <li><a class="text-text transition hover:text-accent <?php echo $current_page === 'request.php' ? 'active-underline' : ''; ?>" href="request.php">Request</a></li>
+        <li><a class="text-text transition hover:text-accent <?php echo $current_page === 'tracking.php' ? 'active-underline' : ''; ?>" href="tracking.php">Tracking</a></li>
         <li class="w-full border-t border-secondary my-2"></li>
         <li>
           <!-- <button id="mobile-toggle-dark" type="button" class="flex items-center gap-2 w-full text-left rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-accent transition">
@@ -109,14 +121,12 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           </button> -->
         </li>
         <li>
-          <a href="#" class="block rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-accent transition">My Profile</a>
+          <a href="profile.php" class="block rounded-lg px-4 py-2 text-sm text-text hover:bg-secondary hover:text-accent transition">My Profile</a>
         </li>
         <li>
-          <form method="POST" action="#">
-            <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-accent hover:bg-secondary transition" role="menuitem">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-              </svg>
+          <form method="POST" onclick="window.location.href='/app/controllers/LogoutController.php';">
+            <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-primary hover:text-accent transition" role="menuitem">
+              <img src="/public/assets/img/logout.png" alt="User" class="size-4 object-cover overflow-hidden logout-icon-mobile" />
               Logout
             </button>
           </form>

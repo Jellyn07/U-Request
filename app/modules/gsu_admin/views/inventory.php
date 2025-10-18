@@ -48,7 +48,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 overflow-hidden">
   <!-- Superadmin Menu & Header -->
   <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
@@ -58,7 +58,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="search" placeholder="Search by material name" class="flex-1 min-w-[200px] input-field">
             <!-- Filter -->
@@ -138,9 +138,9 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow bg-white">
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
             <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
-              <thead class="bg-gray-50">
+              <thead class="bg-gray-50 sticky top-0">
                 <tr>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
@@ -182,7 +182,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
         <!-- Right Section (Details) -->
         <div x-show="showDetails" x-cloak
-          class="bg-white shadow rounded-lg p-4 max-h-[630px] overflow-y-auto">
+          class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
