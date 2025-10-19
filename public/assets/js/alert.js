@@ -119,11 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener("DOMContentLoaded", function () {
   const adminForm = document.getElementById("adminForm");
   const personnelForm = document.getElementById("personnelForm");
+  const driverForm = document.getElementById("driverForm");
 
+  // ADMIN UPDATE CONFIRMATION
   if (adminForm) {
     adminForm.addEventListener("submit", function (e) {
-      e.preventDefault(); 
-
+      e.preventDefault();
       Swal.fire({
         title: "Are you sure?",
         text: "Do you want to update this administrator's details?",
@@ -141,10 +142,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // PERSONNEL UPDATE CONFIRMATION
   if (personnelForm) {
     personnelForm.addEventListener("submit", function (e) {
-      e.preventDefault(); 
-
+      e.preventDefault();
       Swal.fire({
         title: "Are you sure?",
         text: "Do you want to update this personnel's details?",
@@ -156,12 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          // Ensure routing flag is present because programmatic submit omits the clicked button name
           if (!personnelForm.querySelector('input[name="update_personnel"]')) {
-            const hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = 'update_personnel';
-            hidden.value = '1';
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "update_personnel";
+            hidden.value = "1";
             personnelForm.appendChild(hidden);
           }
           personnelForm.submit();
@@ -170,8 +170,79 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Show success alert after redirect
+  // DRIVER UPDATE CONFIRMATION
+  if (driverForm) {
+    driverForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to update this driver's details?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update it",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (!driverForm.querySelector('input[name="update_driver"]')) {
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "update_driver";
+            hidden.value = "1";
+            driverForm.appendChild(hidden);
+          }
+          driverForm.submit();
+        }
+      });
+    });
+  }
+
+  // GENERIC USER FORM CONFIRMATION
+  const userForm = document.getElementById("userForm");
+  if (userForm) {
+    userForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save these changes?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          e.target.submit();
+        }
+      });
+    });
+  }
+
+  // UPDATE BUTTON CONFIRMATION
+  const updateBtn = document.getElementById("updateBtn");
+  if (updateBtn) {
+    updateBtn.addEventListener("click", function (e) {
+      Swal.fire({
+        title: "Update User Details?",
+        text: "Are you sure you want to save these changes?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById("userForm").submit();
+        }
+      });
+    });
+  }
+
+  // ✅ SUCCESS OR ERROR ALERT AFTER REDIRECT
   const urlParams = new URLSearchParams(window.location.search);
+
   if (urlParams.get("updated") === "1") {
     Swal.fire({
       title: "Updated!",
@@ -188,46 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-
-const userForm = document.getElementById("userForm");
-if (userForm) {
-  userForm.addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to save these changes?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, save it!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        e.target.submit();
-      }
-    });
-  });
-}
-
-const updateBtn = document.getElementById('updateBtn');
-if (updateBtn) {
-  updateBtn.addEventListener('click', function(e) {
-    Swal.fire({
-        title: 'Update User Details?',
-        text: "Are you sure you want to save these changes?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, update!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('userForm').submit();
-        }
-    })
-  });
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   // debug lines — remove when stable
@@ -343,4 +374,40 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+});
+
+// DRIVER ALERT
+document.addEventListener('DOMContentLoaded', () => {
+  // --- Driver Alerts ---
+  if (window.driverSuccess) {
+    const msg = (typeof window.driverSuccess === 'string')
+      ? window.driverSuccess
+      : (window.driverSuccess.message || JSON.stringify(window.driverSuccess));
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Driver Added Successfully',
+      text: msg,
+      timer: 2000,
+      timerProgressBar: true,
+      showConfirmButton: false
+    });
+    window.driverSuccess = null;
+  }
+
+  if (window.driverError) {
+    const msg = (typeof window.driverError === 'string')
+      ? window.driverError
+      : (window.driverError.message || JSON.stringify(window.driverError));
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Driver Action Failed',
+      text: msg,
+      timer: 4000,
+      timerProgressBar: true,
+      showConfirmButton: true
+    });
+    window.driverError = null;
+  }
 });

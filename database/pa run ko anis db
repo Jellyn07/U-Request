@@ -288,4 +288,50 @@ CREATE TABLE feedback (
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-----------------------------------------------------------------------------------------
+// DRIVER db
 
+CREATE TABLE driver (
+    driver_id INT(10) UNSIGNED PRIMARY KEY,
+    firstName VARCHAR(50) NOT NULL,
+    lastName VARCHAR(50) NOT NULL,
+    contact VARCHAR(11),
+    hire_date DATE,
+    profile_picture VARCHAR(255)
+);
+
+DELIMITER $$
+CREATE PROCEDURE spAddDriver (
+	IN p_driver_id INT(10),
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_contact VARCHAR(11),
+    IN p_hire_date DATE,
+    IN p_profile_picture VARCHAR(255)
+)
+BEGIN
+    INSERT INTO driver (driver_id, firstName, lastName, contact, hire_date, profile_picture)
+    VALUES (p_driver_id, p_firstName, p_lastName, p_contact, p_hire_date, p_profile_picture);
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE spUpdateDriver (
+    IN p_driver_id INT(10),
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_contact VARCHAR(11),
+    IN p_hire_date DATE,
+    IN p_profile_picture VARCHAR(255)
+)
+BEGIN
+    UPDATE driver
+    SET 
+        firstName = p_firstName,
+        lastName = p_lastName,
+        contact = p_contact,
+        hire_date = p_hire_date,
+        profile_picture = p_profile_picture
+    WHERE driver_id = p_driver_id;
+END $$
+DELIMITER ;

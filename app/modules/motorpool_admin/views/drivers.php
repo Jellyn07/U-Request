@@ -1,6 +1,22 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/DriverController.php';
+if (isset($_SESSION['driver_success'])) {
+    echo "<script>window.driverSuccess = " . json_encode($_SESSION['driver_success']) . ";</script>";
+    unset($_SESSION['driver_success']);
+}
+
+if (isset($_SESSION['driver_error'])) {
+    echo "<script>window.driverError = " . json_encode($_SESSION['driver_error']) . ";</script>";
+    unset($_SESSION['driver_error']);
+}
+
+if (!isset($_SESSION['email'])) {
+    header('Location: modules/shared/views/admin_login.php');
+    exit;
+}
+$controller = new DriverController(); $drivers = $controller->getAllDriver();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,7 +75,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                 <!-- Modal Content -->
                 <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
                   <!-- Profile Picture -->
-                  <form method="post" action="../../../controllers/driverController.php" enctype="multipart/form-data">
+                  <form method="post" action="../../../controllers/DriverController.php" enctype="multipart/form-data">
                     <div class="rounded-xl flex flex-col items-center">
                       <div class="relative">
                         <img id="profile-preview"  
@@ -87,7 +103,7 @@ require_once __DIR__ . '/../../../config/constants.php';
                       <h2 class="text-base font-medium">Driver Credentials</h2>
                       <!-- <form class="space-y-4" method="post"> -->
                         <div>
-                          <label class="text-xs text-text mb-1">Staff ID No.<span class="text-secondary">*</span></label>
+                          <label class="text-xs text-text mb-1">Staff ID / Driver ID No.<span class="text-secondary">*</span></label>
                           <input type="text" name="staff_id" class="w-full input-field" required />
                         </div>
 
@@ -112,14 +128,14 @@ require_once __DIR__ . '/../../../config/constants.php';
                             <input type="text" name="contact_no" required minlength="11" maxlength="11" pattern="[0-9]{11}" title="Please enter a valid 11-digit contact number" class="w-full input-field"/>
                         </div>
 
-                        <div>
+                        <!-- <div>
                           <label class="text-xs text-text mb-1">Unit<span class="text-secondary">*</span></label>
                           <select name="unit" class="w-full input-field" required>
                             <option value="" disabled selected>Select Unit</option>
                             <option value="Tagum Unit">Tagum Unit</option>
                             <option value="Mabini Unit">Mabini Unit</option>
                           </select>
-                        </div>
+                        </div> -->
 
                         <div>
                             <label class="text-xs text-text mb-1">Hire Date<span class="text-secondary">*</span></label>
@@ -148,7 +164,7 @@ require_once __DIR__ . '/../../../config/constants.php';
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Driver ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
@@ -159,16 +175,15 @@ require_once __DIR__ . '/../../../config/constants.php';
               <?php foreach ($drivers as $person): ?>
 
                 <tr 
-                  data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
+                  data-staffid="<?= htmlspecialchars($person['driver_id']) ?>"
                   data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
                   data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
                   @click="selected = {
-                      staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
+                      staff_id: '<?= htmlspecialchars($person['driver_id']) ?>',
                       firstName: '<?= htmlspecialchars($person['firstName']) ?>',
                       lastName: '<?= htmlspecialchars($person['lastName']) ?>',
                       contact: '<?= htmlspecialchars($person['contact']) ?>',
                       hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
-                      unit: '<?= htmlspecialchars($person['unit']) ?>',
                       status: '<?= htmlspecialchars($person['status']) ?>',
                       profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
                   }; showDetails = true"
@@ -176,12 +191,12 @@ require_once __DIR__ . '/../../../config/constants.php';
                 >
                   <td class="pl-4 py-2">
                     <img src="<?= !empty($person['profile_picture']) 
-                                  ? '/public/uploads/profile_pics/' . $person['profile_picture'] 
+                                  ? '/uploads/profile_pics/' . $person['profile_picture'] 
                                   : '/public/assets/img/user-default.png' ?>"
                         alt="User" class="size-8 rounded-full object-cover">
                   </td>
                   <td class="px-4 py-2">
-                    <?= htmlspecialchars($person['staff_id']) ?>
+                    <?= htmlspecialchars($person['driver_id']) ?>
                   </td>
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
@@ -219,19 +234,18 @@ require_once __DIR__ . '/../../../config/constants.php';
           /> -->
 
           <!-- Form -->
-          <form id="driverForm"   class="space-y-2"  method="post" action="../../../controllers/driverController.php">
+          <form id="driverForm"   class="space-y-2"  method="post" action="../../../controllers/DriverController.php">
             <div class="rounded-xl flex flex-col items-center">
               <div class="relative">
                 <!-- Profile Picture Preview -->
-                <img 
+              <img 
                   id="profile-preview"
                   src="<?= isset($person['profile_picture']) && $person['profile_picture'] 
-                      ? '/public/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
+                      ? '/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
                       : '/public/assets/img/user-default.png' ?>"
                   alt="Profile Picture"
                   class="w-24 h-24 rounded-full object-cover shadow-sm"
                 />
-
                 <!-- Edit Button -->
                 <label for="profile_picture" title="Change Profile Picture"
                   class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
@@ -288,12 +302,12 @@ require_once __DIR__ . '/../../../config/constants.php';
 
 
             <div class="flex justify-center gap-2 pt-2">
-              <button type="button" 
+              <!-- <button type="button" 
                 title="Work History" 
                 class="btn btn-secondary" 
                 @click="viewWorkHistory(selected.staff_id)">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="work history">
-              </button>
+              </button> -->
                 <button type="submit" name="update_driver"  class="btn btn-primary">Save Changes</button>
             </div>
           </form>
