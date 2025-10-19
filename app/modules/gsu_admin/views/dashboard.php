@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/DashboardController.php';
-
+require_once __DIR__ . '/../../../controllers/RequestController.php';
 $controller = new DashboardController();
 $year = $_GET['year'] ?? date('Y');
 $data = $controller->getDashboardData($year);
@@ -19,6 +19,9 @@ if (!isset($_SESSION['email'])) {
 }
 
 $profile = $controller->getProfile($_SESSION['email']);
+$c = new RequestController();
+$d = $c->index();
+$requests = $d['requests'];
 
 // ✅ Date range display (example)
 $startDate = "Jan 1";
@@ -109,27 +112,51 @@ $dateRange = "$startDate - $endDate";
           <th class="px-4 py-2">Date Request</th>
           <th class="px-4 py-2">Status</th>
         </thead>
-        <tbody>
-          <?php 
-          for ($i = 0; $i < 15; $i++){
-            echo '
-              <tr class="border-b hover:bg-gray-100">
-                <td class="px-4 py-3">TRK-0001</td>
-                <td class="px-4 py-3">Jellyn Omo</td>
-                <td class="px-4 py-3">Electrical</td>
-                <td class="px-4 py-3">PECC-002</td>
-                <td class="px-4 py-3">Oct 13, 2025</td>
-                <td class="px-4 py-3">
-                  <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-                    To Inspect    
-                  </span>
-                </td>
-              </tr>                
-            ';
-          }
-          ?>
-
-        </tbody>
+         <tbody id="requestsTable" class="text-sm">
+            <?php foreach ($requests as $row): ?>
+                <tr 
+                    data-category="<?= htmlspecialchars($row['request_Type']) ?>" 
+                    data-status="<?= htmlspecialchars($row['req_status']) ?>" 
+                    @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; showDetails = true"
+                     class="border-b hover:bg-gray-100"
+                >
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['request_id']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
+                    <td class="px-4 py-3" data-date="<?= htmlspecialchars($row['request_date']) ?>">
+                        <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?>
+                    </td>
+                    <td class="px-4 py-3">
+                        <?php if ($row['req_status'] === 'Completed'): ?>
+                            <!-- ✅ Show label only when Completed -->
+                            <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                Completed
+                            </span>
+                        <?php elseif ($row['req_status'] === 'To Inspect'): ?>
+                            <span class="px-5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                To&nbsp;Inspect
+                            </span>
+                        <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
+                            <!-- ✅ Show dropdown if NOT completed -->
+                            <select 
+                                class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
+                                data-request-id="<?= $row['request_id'] ?>"
+                                data-current-status="<?= $row['req_status'] ?>"
+                            >
+                                <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?> class="bg-gray-100 text-black">In Progress</option>
+                                <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?> class="bg-green-100 text-green-800 border-none rounded-full hover:bg-green-300">Completed</option>
+                            </select>
+                        <?php else: ?>
+                            <!-- Fallback for any other statuses -->
+                            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                <?= htmlspecialchars($row['req_status']) ?>
+                            </span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+          </tbody>
       </table>
     </div>
   </main>
@@ -137,4 +164,20 @@ $dateRange = "$startDate - $endDate";
 <script src="/public/assets/js/gsu_admin/dashboard-charts.js"></script>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/stars.js"></script>
+<script type="module">
+  import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+  document.addEventListener("DOMContentLoaded", () => {
+    initTableFilters({
+      tableId: "requestsTable",
+      searchId: "searchRequests",
+      filterId: "filterCategory",
+      sortId: "sortCategory",
+      searchColumns: [0, 1],
+      filterAttr: "data-category",
+      statusTabs: "#tabs button",
+      dateColumnIndex: 4
+    });
+  });
+</script>
+
 </html>
