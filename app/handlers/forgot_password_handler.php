@@ -10,8 +10,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$db = new BaseModel(); // ✅ Connects to database
-
+$db = new BaseModel();
 $action = $_POST['action'] ?? '';
 
 switch ($action) {
@@ -25,15 +24,30 @@ switch ($action) {
             exit;
         }
 
-        // ✅ Check if user exists
-        $stmt = $db->db->prepare("SELECT requester_id FROM requester WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        // ✅ Check if user exists in requester or administrator
+        $table = null;
 
-        if (!$user) {
+        $stmt1 = $db->db->prepare("SELECT requester_id FROM requester WHERE email = ?");
+        $stmt1->bind_param("s", $email);
+        $stmt1->execute();
+        $result1 = $stmt1->get_result();
+        if ($result1->num_rows > 0) {
+            $table = 'requester';
+        }
+        $stmt1->close();
+
+        if (!$table) {
+            $stmt2 = $db->db->prepare("SELECT staff_id FROM administrator WHERE email = ?");
+            $stmt2->bind_param("s", $email);
+            $stmt2->execute();
+            $result2 = $stmt2->get_result();
+            if ($result2->num_rows > 0) {
+                $table = 'administrator';
+            }
+            $stmt2->close();
+        }
+
+        if (!$table) {
             echo json_encode(['success' => false, 'message' => 'No account found with that email.']);
             exit;
         }
@@ -43,6 +57,7 @@ switch ($action) {
         $_SESSION['otp'] = $otp;
         $_SESSION['otp_email'] = $email;
         $_SESSION['otp_expire'] = time() + 300; // valid for 5 minutes
+        $_SESSION['otp_table'] = $table;
 
         // ✅ Send Email
         $mail = new PHPMailer(true);
@@ -50,8 +65,8 @@ switch ($action) {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'jonagujol@gmail.com'; // ⚠️ change this
-            $mail->Password = 'wqhb eszj mxiz rmmh';   // ⚠️ change this
+            $mail->Username = 'jonagujol@gmail.com'; // ⚠️ Change this
+            $mail->Password = 'wqhb eszj mxiz rmmh'; // ⚠️ Change this
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
@@ -108,18 +123,28 @@ switch ($action) {
             exit;
         }
 
-        $encrypt= encrypt($new_password);
+        if (!isset($_SESSION['otp_table'])) {
+            echo json_encode(['success' => false, 'message' => 'Session expired or invalid.']);
+            exit;
+        }
 
-        $stmt = $db->db->prepare("UPDATE requester SET pass = ? WHERE email = ?");
+        $table = $_SESSION['otp_table'];
+        $encrypt = encrypt($new_password);
+
+        if ($table === 'requester') {
+            $stmt = $db->db->prepare("UPDATE requester SET pass = ? WHERE email = ?");
+        } else {
+            $stmt = $db->db->prepare("UPDATE administrator SET password = ? WHERE email = ?");
+        }
+
         $stmt->bind_param("ss", $encrypt, $email);
         $stmt->execute();
         $stmt->close();
 
-        unset($_SESSION['otp'], $_SESSION['otp_email'], $_SESSION['otp_expire']);
+        unset($_SESSION['otp'], $_SESSION['otp_email'], $_SESSION['otp_expire'], $_SESSION['otp_table']);
         echo json_encode(['success' => true, 'message' => 'Password has been reset successfully.']);
         break;
 
-    // ──────────────── INVALID ACTION ────────────────
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid request.']);
         break;
