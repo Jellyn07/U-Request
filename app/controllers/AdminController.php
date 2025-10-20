@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     $userModel = new UserModel();
     $admin = $userModel->getAdminUserByEmail($email);
 
-    if ($admin && $input_pass == $admin['password']) {   ////temporary ni sya by jonalyn
+    if ($admin && $userModel->verifyPassword($input_pass, $admin['password']))  {   ////temporary ni sya by jonalyn
     //if ($admin && $userModel->verifyPassword($input_pass, $admin['password'])) {
         // ✅ SUCCESS
         $_SESSION['login_attempts'] = 0;
