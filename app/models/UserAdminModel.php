@@ -107,43 +107,63 @@ class UserAdminModel extends BaseModel
     }
 
     // Get GSU Personnel Work History
-    public function getRequestHistory($requester_id)
-    {
-        $sql = "SELECT tracking_id, request_Type, date_finished 
-                FROM vw_rqtrack
-                WHERE requester_id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("i", $requester_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-        return $data;
-    }
+  public function getRequestHistory($requester_id) {
+        $records = [];
+        $requester_id = intval($requester_id);
 
-    public function getWorkHistory($req_id) {
-    try {
-        $sql = "
+        $query = "
             SELECT 
-                rt.request_id,
-                rt.req_id,
-                rt.request_title,
-                rt.req_status,
-                rt.date_requested,
-                rt.date_completed
-            FROM requester_status rt
-            WHERE rt.req_id = ?
-            ORDER BY rt.date_requested DESC
+                v.tracking_id,
+                v.request_Type,
+                v.request_desc,
+                v.location,
+                v.req_status,
+                v.date_finished
+            FROM vw_rqtrack v
+            WHERE v.req_id IN (
+                SELECT req_id FROM requester WHERE requester_id = ?
+            )
+            ORDER BY v.date_finished DESC
         ";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$req_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        error_log('getWorkHistory Error: ' . $e->getMessage());
-        return [];
+        if ($stmt = $this->db->prepare($query)) {
+            $stmt->bind_param("i", $requester_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $records[] = $row;
+            }
+
+            $stmt->close();
+        }
+
+        return $records;
     }
-}
+
+
+
+//     public function getWorkHistory($req_id) {
+//     try {
+//         $sql = "
+//             SELECT 
+//                 rt.request_id,
+//                 rt.req_id,
+//                 rt.request_title,
+//                 rt.req_status,
+//                 rt.date_requested,
+//                 rt.date_completed
+//             FROM requester_status rt
+//             WHERE rt.req_id = ?
+//             ORDER BY rt.date_requested DESC
+//         ";
+
+//         $stmt = $this->db->prepare($sql);
+//         $stmt->execute([$req_id]);
+//         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+//     } catch (PDOException $e) {
+//         error_log('getWorkHistory Error: ' . $e->getMessage());
+//         return [];
+//     }
+// }
 }
