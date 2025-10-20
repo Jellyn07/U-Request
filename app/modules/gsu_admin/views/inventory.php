@@ -228,10 +228,10 @@ $profile = $controller->getProfile($_SESSION['email']);
 
             <div class="flex justify-center gap-2 pt-2">
               <!-- <button type="button" title="Material Used History" class="btn btn-secondary"> -->
-              <!-- <button type="button" title="Material Used History" class="btn btn-secondary">
+              <button type="button" title="Material Used History" class="btn btn-secondary">
                 <img src="/public/assets/img/work-history.png" class="size-4" alt="Material Used History">
               </button>
-              </button> -->
+              </button>
               <button type="submit" name="update_material" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
