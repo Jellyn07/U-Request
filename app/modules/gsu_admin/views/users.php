@@ -212,7 +212,8 @@ async function viewRequestHistory(requester_id) {
         </div>
       `,
       width: 800,
-      confirmButtonText: "Close"
+      confirmButtonText: "Close",
+      confirmButtonColor: "#800000"
     });
   } catch (err) {
     console.error(err);
