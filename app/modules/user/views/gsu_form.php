@@ -41,39 +41,89 @@ require_once __DIR__ . '/../../../config/auth.php';
 
         <!-- SECTION: Location Info -->
         <h4 class="text-base font-semibold mb-2">Location Details</h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label for="unit" class="text-sm  mb-1 block">
+        <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6 items-start"> -->
+          <div class="mb-6">
+            <label for="unit" class="text-sm mb-1 block">
               Unit <span class="text-red-500">*</span>
             </label>
-            <select id="unit" name="unit" required class="input-field w-full ">
+            <select id="unit" name="unit" required class="input-field w-full">
               <option value="" selected disabled>Select Unit</option>
               <option value="Tagum Unit">Tagum Unit</option>
               <option value="Mabini Unit">Mabini Unit</option>
             </select>
           </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="buildingLoc" class="text-sm mb-1 block">
+                Building Location <span class="text-red-500">*</span>
+              </label>
+              <input type="text" name="exLocb" id="exLocb" placeholder="Ex. PECC" required class="input-field w-full">
+            </div>
 
-          <div>
-            <label for="buildingLoc" class="text-sm  mb-1 block">
-              Building Location <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="exLocb" id="exLocb" placeholder="Ex. PECC" required class="input-field w-full ">
+            <div>
+              <label for="roomLoc" class="text-sm mb-1 block">
+                Room Location <span class="text-red-500">*</span>
+              </label>
+              <input type="text" name="exLocr" id="exLocr" placeholder="Ex. Clinic" required class="input-field w-full">
+            </div>
           </div>
+        <!-- </div> -->
 
-          <div>
-            <label for="roomLoc" class="text-sm  mb-1 block">
-              Room Location <span class="text-red-500">*</span>
+          <hr class="my-6 border-gray-400">
+          <div class="w-full">
+            <label for="picture" class="text-sm mb-1 block font-medium">
+              Photo Evidence <span class="text-red-500">*</span>
             </label>
-            <input type="text" name="exLocr" id="exLocr" placeholder="Ex. Clinic" required class="input-field w-full ">
-          </div>
 
-          <div>
-            <label for="picture" class="text-sm  mb-1 block">
-              Photo <span class="text-red-500">*</span>
-            </label>
-            <input type="file" id="img" name="picture" required class="block w-full px-3 py-1.5 input-field text-sm file:mr-3 file:py-1 file:text-xs file:px-3 file:rounded-md file:border-0 file:text-white file:hover:bg-secondary file:bg-primary">
+            <!-- Upload Area -->
+            <div 
+              id="upload-area" 
+              class="relative border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition duration-300 cursor-pointer p-6 flex flex-col items-center justify-center text-center"
+              onclick="document.getElementById('img').click()"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              ondrop="handleDrop(event)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16l5-5 4 4L21 7M16 7h5v5" />
+              </svg>
+              <p class="text-sm text-gray-600">Click or drag to upload a photo</p>
+              <p class="text-xs text-gray-400 mt-1">Accepted formats: JPG, PNG, JPEG</p>
+
+              <input 
+                type="file" 
+                id="img" 
+                name="picture" 
+                accept="image/*" 
+                required 
+                class="hidden"
+                onchange="previewImage(event)"
+              >
+            </div>
+
+            <!-- Image Preview -->
+            <div id="preview-container" class="mt-3 hidden">
+              <!-- <p class="text-sm font-medium text-gray-700 mb-1">Preview (click to change):</p> -->
+              <div 
+                id="preview-wrapper" 
+                class="relative border border-gray-200 rounded-lg overflow-hidden shadow-sm cursor-pointer group"
+                onclick="document.getElementById('img').click()"
+              >
+                <img id="preview" src="#" alt="Preview" class="max-h-64 w-auto object-contain rounded-lg mx-auto transition duration-300 group-hover:opacity-80">
+                <div class="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-medium transition">
+                  Click to change photo
+                </div>
+                <button 
+                  type="button" 
+                  onclick="removePreview(event)" 
+                  class="absolute top-2 right-2 bg-white bg-opacity-70 hover:bg-opacity-100 text-gray-700 rounded-full p-1 shadow-sm transition"
+                  title="Remove image"
+                >
+                  <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
 
         <hr class="my-6 border-gray-400">
 
@@ -81,17 +131,16 @@ require_once __DIR__ . '/../../../config/auth.php';
         <h4 class="text-base font-semibold mb-2">Request Information</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label for="dateNoticed" class="text-sm  mb-1 block">
+            <label for="dateNoticed" class="text-sm mb-1 block">
               Date the Issue was Noticed <span class="text-red-500">*</span>
             </label>
-            <input type="date" id="dateNoticed" name="dateNoticed" class="input-field w-full cursor-not-allowed" value="<?php echo date('Y-m-d'); ?>" readonly
-            >
+            <input type="date" id="dateNoticed" name="dateNoticed" class="input-field w-full cursor-not-allowed" value="<?php echo date('Y-m-d'); ?>" readonly>
           </div>
         </div>
 
         <!-- Nature of Request -->
         <div class="mb-6">
-          <label class="text-sm  mb-2 block font-medium">
+          <label class="text-sm mb-2 block font-medium">
             Nature of Request <span class="text-red-500">*</span>
           </label>
 
@@ -113,7 +162,7 @@ require_once __DIR__ . '/../../../config/auth.php';
             ?>
             <div class="flex items-center space-x-2 p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
               <input type="radio" id="others" name="nature-request" value="Others" class="text-red-600 focus:ring-red-600">
-              <label for="others" class="text-sm ">Others:</label>
+              <label for="others" class="text-sm">Others:</label>
               <input type="text" name="other-details" class="border-b border-b-gray-700 focus:border-b-accent px-2 py-0 text-sm w-1/2 focus:outline-none">
             </div>
           </div>
@@ -129,10 +178,10 @@ require_once __DIR__ . '/../../../config/auth.php';
 
         <!-- Certification -->
         <div class="flex items-start mb-6">
-            <input type="checkbox" name="certify" required class="mt-0.5 mr-2 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-600">
-            <p class="text-sm">
+          <input type="checkbox" name="certify" required class="mt-0.5 mr-2 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-600">
+          <p class="text-sm">
             I hereby certify that all information provided in this form is true and correct.
-            </p>
+          </p>
         </div>
 
         <!-- BUTTONS -->
@@ -153,5 +202,57 @@ require_once __DIR__ . '/../../../config/auth.php';
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="<?php echo PUBLIC_URL; ?>/assets/js/user/forms.js"></script>
+
+    <!-- Image Preview & Drag-and-Drop JS -->
+    <script>
+      function previewImage(event) {
+        const file = event.target.files[0];
+        const previewContainer = document.getElementById("preview-container");
+        const preview = document.getElementById("preview");
+        const uploadArea = document.getElementById("upload-area");
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.classList.remove("hidden");
+            uploadArea.classList.add("hidden"); // Hide drag-drop area when uploaded
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function removePreview(e) {
+        e.stopPropagation();
+        const fileInput = document.getElementById("img");
+        const previewContainer = document.getElementById("preview-container");
+        const uploadArea = document.getElementById("upload-area");
+
+        fileInput.value = "";
+        previewContainer.classList.add("hidden");
+        uploadArea.classList.remove("hidden");
+      }
+
+      function handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add("bg-gray-200");
+      }
+
+      function handleDragLeave(e) {
+        e.preventDefault();
+        e.currentTarget.classList.remove("bg-gray-200");
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        e.currentTarget.classList.remove("bg-gray-200");
+        const fileInput = document.getElementById("img");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          fileInput.files = files;
+          previewImage({ target: fileInput });
+        }
+      }
+    </script>
   </body>
 </html>
