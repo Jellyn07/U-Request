@@ -1,5 +1,5 @@
 {
-    "name": "jonalyns.gujol/gsusystem",
+    "name": "jonalyns.gujol/u-request",
     "authors": [
         {
             "name": "J.",
@@ -7,6 +7,6 @@
         }
     ],
     "require": {
-        "phpmailer/phpmailer": "^6.10"
+        "phpmailer/phpmailer": "^7.0"
     }
 }

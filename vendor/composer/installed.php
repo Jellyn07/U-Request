@@ -1,28 +1,28 @@
 <?php return array(
     'root' => array(
-        'name' => 'jonalyns.gujol/gsusystem',
+        'name' => 'jonalyns.gujol/u-request',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'e6418c4b43aa7c4af7ff03d80a14ee8ffcacc0d4',
+        'reference' => '1525e5cc6cefbcfff034106825605ea87447eb34',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
-        'jonalyns.gujol/gsusystem' => array(
+        'jonalyns.gujol/u-request' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'e6418c4b43aa7c4af7ff03d80a14ee8ffcacc0d4',
+            'reference' => '1525e5cc6cefbcfff034106825605ea87447eb34',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
         'phpmailer/phpmailer' => array(
-            'pretty_version' => 'v6.10.0',
-            'version' => '6.10.0.0',
-            'reference' => 'bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144',
+            'pretty_version' => 'v7.0.0',
+            'version' => '7.0.0.0',
+            'reference' => 'c7111310c6116ba508a6a170a89eaaed2129bd42',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpmailer/phpmailer',
             'aliases' => array(),
