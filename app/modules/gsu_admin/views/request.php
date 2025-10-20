@@ -43,7 +43,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-4">Repair Request</h1>
+      <h1 class="text-2xl font-bold mb-4">Request</h1>
 
         <div id="tabs" class="flex gap-2 mt-4 text-xs text-text">
             <button class="ml-5 btn">
