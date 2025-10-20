@@ -17,6 +17,16 @@ if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['lock_time'] = null;
 }
 
+
+
+
+
+
+
+
+
+
+
 // ✅ Check if locked
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
