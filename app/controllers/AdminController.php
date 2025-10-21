@@ -17,16 +17,6 @@ if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['lock_time'] = null;
 }
 
-
-
-
-
-
-
-
-
-
-
 // ✅ Check if locked
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
@@ -300,6 +290,10 @@ class AdminController {
     {
         return $this->model->getProfileByEmail($admin_email);
     }
+
+    public function getAllFeedbacks() {
+        return $this->model->getAllFeedbacks();
+    }
     
 }
 
@@ -349,4 +343,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-
+///////////////////////////////// FOR FEEDBACK ///////////////////////////////////////////

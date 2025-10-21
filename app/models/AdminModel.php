@@ -341,4 +341,48 @@ class AdministratorModel extends BaseModel {
             $this->db->close();
         }
     }
+
+        ///////////////////////////////// FOR FEEDBACK ///////////////////////////////////////////
+
+    public function getAllFeedbacks() {
+        $sql = "SELECT 
+            f.tracking_id,
+            f.ratings_A,
+            f.ratings_B,
+            f.ratings_C,
+            f.overall_rating,
+            f.suggest_process,
+            f.suggest_frontline,
+            f.suggest_facility,
+            f.suggest_overall,
+            f.submitted_at,
+            r.req_id,
+            rq.profile_pic,
+            COUNT(f.tracking_id) OVER (PARTITION BY r.req_id) AS total_feedback
+        FROM feedback AS f
+        JOIN request AS r 
+            ON f.tracking_id = r.tracking_id
+        JOIN requester AS rq 
+            ON r.req_id = rq.req_id
+        ORDER BY f.submitted_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
+            return [];
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $feedbacks = [];
+        while ($row = $result->fetch_assoc()) {
+            $feedbacks[] = $row;
+        }
+
+        $stmt->close();
+        return $feedbacks;
+    }
 }
+
+
