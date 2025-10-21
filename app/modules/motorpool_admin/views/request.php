@@ -60,7 +60,7 @@ require_once __DIR__ . '/../../../config/constants.php';
           </div>
 
           <!-- TABLE -->
-          <div class="overflow-x-auto h-[540px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <div class="overflow-x-auto h-[545px] overflow-y-auto rounded-b-lg shadow bg-white">
             <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
@@ -108,7 +108,7 @@ require_once __DIR__ . '/../../../config/constants.php';
 
         <!-- RIGHT SECTION -->
         <div x-show="showDetails" x-transition x-cloak
-             class="bg-white shadow rounded-lg p-4 max-h-[602px] overflow-y-auto">
+             class="bg-white shadow rounded-lg p-4 max-h-[607px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
