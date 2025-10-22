@@ -335,3 +335,14 @@ BEGIN
     WHERE driver_id = p_driver_id;
 END $$
 DELIMITER ;
+
+-----------------------------------------------------------------------------
+// GSU location
+
+CREATE TABLE campus_locations (
+  location_id INT AUTO_INCREMENT PRIMARY KEY,
+  unit VARCHAR(100) NOT NULL,
+  building VARCHAR(100) NOT NULL,
+  exact_location VARCHAR(150) NOT NULL,
+  date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

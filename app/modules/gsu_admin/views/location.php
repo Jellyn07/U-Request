@@ -3,6 +3,13 @@ session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/UserController.php';
 require_once __DIR__ . '/../../../controllers/AdminController.php';
+require_once __DIR__ . '/../../../controllers/LocationController.php';
+
+$locationController = new LocationController();
+$locations = $locationController->getAllLocations();
+$building = $locationController->getAllBuildings();
+$locationController = new LocationController();
+$locationController->addLocation($_POST);
 
 $controller = new AdminController();
 $admins = $controller->getAllAdmins();
@@ -30,8 +37,8 @@ $admins = $controller->getAllAdmins();
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
-            <input type="text" id="search" placeholder="Search Location" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
+            <input type="text" id="searchInput" placeholder="Search Location" class="flex-1 min-w-[200px] input-field">
+            <select class="input-field" id="unitFilter">
                 <option value="all">All Unit</option>
                 <option>Tagum Unit</option>
                 <option>Mabini Unit</option>
@@ -60,23 +67,23 @@ $admins = $controller->getAllAdmins();
                 </tr>
               </thead>
               <tbody id="table" class="text-sm">
-                <?php for($i=0; $i<20; $i++){
-                    $rowJson = htmlspecialchars(json_encode([
-                      'date_added' => 'Jan 07, 2025',
-                      'unit' => 'Tagum Unit',
-                      'building' => 'PECC',
-                      'exact_location' => 'Clinic'
-                    ]), ENT_QUOTES, 'UTF-8');
-                    echo'
-                        <tr @click="selected = '.$rowJson.'; showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
-                            <td class="pl-8 py-3">Jan 07, 2025</td>
-                            <td class="px-4 py-3">Tagum Unit</td>
-                            <td class="px-4 py-3">PECC</td>
-                            <td class="px-4 py-3">Clinic</td>
-                        </tr>                    
-                    ';
-                } 
-                ?>
+                <?php foreach ($locations as $row): ?>
+                  <?php 
+                    $rowJson = htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8');
+                  ?>
+                  <tr 
+                    @click="selected = <?= $rowJson ?>; showDetails = true"
+                    class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
+                  >
+                    <!-- Hidden ID column -->
+                    <td class="hidden" x-text="<?= htmlspecialchars($row['location_id']) ?>"></td>
+
+                    <td class="pl-8 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_added']))) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['unit']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['building']) ?></td>
+                    <td class="px-4 py-3"><?= htmlspecialchars($row['exact_location']) ?></td>
+                  </tr>
+                <?php endforeach; ?>
               </tbody>
             </table>
           </div>
@@ -90,7 +97,16 @@ $admins = $controller->getAllAdmins();
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
 
-          <form id="locationForm" class="space-y-5 mt-6">
+          <form 
+            id="locationForm" 
+            method="post" 
+            action="../../../controllers/LocationController.php" 
+            class="space-y-5 mt-6"
+          >
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="location_id" :value="selected.location_id">
+            
+
             <h2 class="text-lg font-bold">Location Information</h2>
 
             <div>
@@ -114,88 +130,128 @@ $admins = $controller->getAllAdmins();
             </div>
 
             <div class="flex justify-center gap-2 pt-4">
-              <button type="button" class="btn btn-secondary">
+              <!-- Delete -->
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                @click="deleteLocation(selected.location_id)"
+              >
                 <img src="/public/assets/img/delete.png" class="size-4" alt="Delete">
               </button>
-              <button type="button" class="btn btn-primary">Save Changes</button>
+
+              <!-- Save Changes -->
+              <button type="button" class="btn btn-primary" onclick="confirmUpdate()">
+                Save Changes </button>
             </div>
           </form>
         </div>
 
         <!-- Add New Location Modal -->
-        <div x-show="addLocation" x-cloak
-          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
-          <div class="bg-white rounded-xl shadow-xl w-90% md:w-1/5 mx-auto relative overflow-auto">
+        <div  x-show="addLocation" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
+          <div class="bg-white rounded-xl shadow-xl w-90% md:w-1/4 mx-auto relative overflow-auto">
             <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
-              <form id="addLocationForm" method="post" class="space-y-4">
+              <form id="addLocationForm" method="post" action="../../../controllers/LocationController.php" class="space-y-4">
+                <input type="hidden" name="action" value="add">
                 <h2 class="text-base font-medium mb-3">Add Location</h2>
 
+                <!-- UNIT -->
                 <div>
                   <label class="text-xs text-text mb-1">Unit</label>
-                  <select class="w-full input-field">
-                    <option>Tagum Unit</option>
-                    <option>Mabini Unit</option>
+                  <select name="unit" class="w-full input-field" required>
+                    <option value="">Select Unit</option>
+                    <option value="Tagum Unit">Tagum Unit</option>
+                    <option value="Mabini Unit">Mabini Unit</option>
                   </select>
                 </div>
 
+                <!-- BUILDING SELECTION -->
                 <div class="space-y-2">
                   <h2 class="text-xs text-text mb-1 mt-2">Select Building</h2>
 
                   <div class="flex items-center gap-4 pl-2">
                     <label class="flex items-center gap-2">
-                      <input type="radio" name="buildingOption" value="existing" checked onclick="toggleBuildingOption('existing')">
+                      <input 
+                        type="radio" 
+                        name="buildingOption" 
+                        value="existing" 
+                        checked 
+                        onclick="toggleBuildingOption('existing')"
+                      >
                       <span class="text-xs">Choose Existing</span>
                     </label>
                     <label class="flex items-center gap-2">
-                      <input type="radio" name="buildingOption" value="new" onclick="toggleBuildingOption('new')">
+                      <input 
+                        type="radio" 
+                        name="buildingOption" 
+                        value="new" 
+                        onclick="toggleBuildingOption('new')"
+                      >
                       <span class="text-xs">Add New</span>
                     </label>
                   </div>
 
-                  <!-- Existing building dropdown -->
+                  <!-- EXISTING BUILDING DROPDOWN -->
                   <div id="existingBuilding">
                     <label class="text-xs text-text mb-1">Existing Building</label>
-                    <select class="w-full input-field">
+                    <select name="existing_building" class="w-full input-field">
                       <option value="">Select Building</option>
-                      <option>Main Building</option>
-                      <option>Science Hall</option>
-                      <option>Library</option>
+                      <?php foreach ($building as $b): ?>
+                        <option value="<?= htmlspecialchars($b['building']) ?>">
+                          <?= htmlspecialchars($b['building']) ?>
+                        </option>
+                      <?php endforeach; ?>
                     </select>
                   </div>
 
-                  <!-- New building input -->
+                  <!-- NEW BUILDING INPUT -->
                   <div id="newBuilding" class="hidden">
                     <label class="text-xs text-text mb-1">New Building Name</label>
-                    <input type="text" class="w-full input-field">
+                    <input 
+                      type="text" 
+                      name="new_building" 
+                      class="w-full input-field" 
+                      placeholder="Enter building name"
+                    >
                   </div>
                 </div>
 
+                <!-- EXACT LOCATION -->
                 <div>
                   <label class="text-xs text-text mb-1">Exact Location</label>
-                  <input type="text" class="w-full input-field" required />
+                  <input 
+                    type="text" 
+                    name="exact_location" 
+                    class="w-full input-field" 
+                    required
+                  />
                 </div>
 
+                <!-- BUTTONS -->
                 <div class="flex justify-center gap-2 pt-4">
-                  <button type="button" @click="addLocation = false" class="btn btn-secondary">Cancel</button>
-                  <button type="submit" class="btn btn-primary px-7">Save</button>
+                  <button 
+                    type="button" 
+                    @click="addLocation = false" 
+                    class="btn btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary px-7"
+                  >
+                    Save
+                  </button>
                 </div>
               </form>
             </main>
           </div>
         </div>
-
       </div>
     </div>
   </main>
 
   <script src="/public/assets/js/shared/menus.js"></script>
-  <script src="/public/assets/js/shared/search.js"></script>
-
-  <script>
-  function toggleBuildingOption(option) {
-    document.getElementById("existingBuilding").classList.toggle("hidden", option !== "existing");
-    document.getElementById("newBuilding").classList.toggle("hidden", option !== "new");
-  }
-  </script>
+  <script src="/public/assets/js/shared/search.js"></script>          
+  <script src="/public/assets/js/gsu_admin/location.js"></script>  
 </body>
 </html>
