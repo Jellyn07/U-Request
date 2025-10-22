@@ -129,9 +129,9 @@ class RequestModel extends BaseModel {
     }
 
    // In RequestModel.php
-   public function addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level, $date_finished = null) {
+   public function addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level, $date_finished) {
     try {
-        // ✅ 0. Check if request assignment already exists
+        // 0️⃣ Check if already assigned
         $checkStmt = $this->db->prepare("SELECT COUNT(*) AS count FROM REQUEST_ASSIGNMENT WHERE request_id = ?");
         $checkStmt->bind_param("i", $request_id);
         $checkStmt->execute();
@@ -140,66 +140,43 @@ class RequestModel extends BaseModel {
         $checkStmt->close();
 
         if ($count > 0) {
-            $_SESSION['alert'] = [
-                "type" => "warning",
-                "title" => "Already Assigned",
-                "message" => "This request already has an assignment. No duplicate created."
-            ];
+            $_SESSION['alert'] = ["type" => "warning", "title" => "Already Assigned", "message" => "This request already has an assignment."];
             return false;
         }
 
         // 1️⃣ Add Request Assignment
-        $stmt = $this->db->prepare("CALL spAddRequestAssignment(?, ?, ?, ?)");
-        if (!$stmt) {
-            $_SESSION['alert'] = [
-                "type" => "error",
-                "title" => "Database Error",
-                "message" => "Add Assignment failed: " . $this->db->error
-            ];
-            return false;
-        }
-        $stmt->bind_param("iiss", $request_id, $req_id, $req_status, $date_finished);
-        $stmt->execute();
-        $stmt->close();
+        // $stmt = $this->db->prepare("CALL spAddRequestAssignment(?, ?, ?, ?)");
+        // $stmt->bind_param("iiss", $request_id, $req_id, $req_status, $date_finished);
+        // $stmt->execute();
+        // $stmt->close();
+        // while ($this->db->more_results() && $this->db->next_result()) {;}
 
-        // 2️⃣ Update Priority Status
+        // 2️⃣ Update Priority
         $stmt2 = $this->db->prepare("CALL spUpdateRequestPriorityStatus(?, ?)");
-        if (!$stmt2) {
-            $_SESSION['alert'] = [
-                "type" => "error",
-                "title" => "Database Error",
-                "message" => "Update Priority failed: " . $this->db->error
-            ];
-            return false;
-        }
         $stmt2->bind_param("is", $request_id, $prio_level);
         $stmt2->execute();
         $stmt2->close();
+        while ($this->db->more_results() && $this->db->next_result()) {;}
 
         // 3️⃣ Assign Personnel
         $stmt3 = $this->db->prepare("CALL spAssignPersonnel(?, ?)");
-        if (!$stmt3) {
-            $_SESSION['alert'] = [
-                "type" => "error",
-                "title" => "Database Error",
-                "message" => "Assign Personnel failed: " . $this->db->error
-            ];
-            return false;
-        }
         $stmt3->bind_param("ii", $request_id, $staff_id);
         $stmt3->execute();
         $stmt3->close();
+        while ($this->db->more_results() && $this->db->next_result()) {;}
 
-        // ✅ Success
+        // ✅ Commit
+        $this->db->commit();
+
         $_SESSION['alert'] = [
             "type" => "success",
             "title" => "Success",
             "message" => "Assignment, priority, and personnel saved successfully."
         ];
-
         return true;
 
     } catch (Exception $e) {
+        $this->db->rollback();
         $_SESSION['alert'] = [
             "type" => "error",
             "title" => "Error",
@@ -208,6 +185,7 @@ class RequestModel extends BaseModel {
         return false;
     }
 }
+
 
 public function updateRequestStatus($request_id, $req_status) {
     try {
@@ -258,4 +236,33 @@ public function updateRequestStatus($request_id, $req_status) {
         $result = $stmt->get_result();
         return $result->fetch_assoc(); // returns single row
     }
+
+    public function getAllMaterials() {
+    $sql = "SELECT material_code, material_desc 
+            FROM materials 
+            WHERE qty > ?";
+
+    // Prepare the statement
+    $stmt = $this->db->prepare($sql);
+    if (!$stmt) {
+        throw new Exception("Failed to prepare statement: " . $this->db->error);
+    }
+
+    // Bind parameters (qty > 0)
+    $minQty = 0;
+    $stmt->bind_param("i", $minQty);
+
+    // Execute
+    $stmt->execute();
+
+    // Get result
+    $result = $stmt->get_result();
+    $materials = $result->fetch_all(MYSQLI_ASSOC);
+
+    // Close
+    $stmt->close();
+
+    return $materials;
+}
+
 }

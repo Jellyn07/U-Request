@@ -8,6 +8,9 @@ session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/RequestController.php';
 
+$materialController = new RequestController();
+$materials = $materialController->getAllMaterials();
+
 $controller = new RequestController();
 $data = $controller->index();
 $requests = $data['requests'];
@@ -35,6 +38,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/gsu_admin/request.js"></script>
   
 </head>
 <body class="bg-gray-100">
@@ -59,7 +63,21 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <p>Completed</p>
             </button>
         </div>
-      <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div 
+        x-data="{ 
+          showDetails: false, 
+          selected: {}, 
+          addmaterial: false,
+          materials: [{ material_code: '', qty: 1 }],
+          selectedMaterialCodes: [],
+          updateMaterialOptions() {
+            this.selectedMaterialCodes = this.materials
+              .map(m => m.material_code)
+              .filter(code => code !== '');
+          }
+        }" 
+        class="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
@@ -115,51 +133,63 @@ $profile = $controller->getProfile($_SESSION['email']);
               </tr>
             </thead>
             <tbody id="requestsTable" class="text-sm">
-            <?php foreach ($requests as $row): ?>
-                <tr 
-                    data-category="<?= htmlspecialchars($row['request_Type']) ?>" 
-                    data-status="<?= htmlspecialchars($row['req_status']) ?>" 
-                    @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; showDetails = true"
-                    class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
-                >
-                    <td class="pl-8 py-3"><?= htmlspecialchars($row['request_id']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
-                    <td class="px-4 py-3" data-date="<?= htmlspecialchars($row['request_date']) ?>">
-                        <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?>
-                    </td>
-                    <td class="px-4 py-3">
-                        <?php if ($row['req_status'] === 'Completed'): ?>
-                            <!-- ✅ Show label only when Completed -->
-                            <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                Completed
-                            </span>
-                        <?php elseif ($row['req_status'] === 'To Inspect'): ?>
-                            <span class="px-5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                To&nbsp;Inspect
-                            </span>
-                        <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
-                            <!-- ✅ Show dropdown if NOT completed -->
-                            <select 
-                                class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
-                                data-request-id="<?= $row['request_id'] ?>"
-                                data-current-status="<?= $row['req_status'] ?>"
-                            >
-                                <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?> class="bg-gray-100 text-black">In Progress</option>
-                                <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?> class="bg-green-100 text-green-800 border-none rounded-full hover:bg-green-300">Completed</option>
-                            </select>
-                        <?php else: ?>
-                            <!-- Fallback for any other statuses -->
-                            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                                <?= htmlspecialchars($row['req_status']) ?>
-                            </span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-          </tbody>
+              <?php foreach ($requests as $row): ?>
+                  <tr 
+                      data-category="<?= htmlspecialchars($row['request_Type']) ?>" 
+                      data-status="<?= htmlspecialchars($row['req_status']) ?>" 
+                      @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; showDetails = true"
+                      class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
+                  >
+                      <td class="pl-8 py-3"><?= htmlspecialchars($row['request_id']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
+                      <td class="px-4 py-3">
+                          <?= !empty($row['priority_status']) ? htmlspecialchars($row['priority_status']) : 'No Selected Priority Level' ?>
+                      </td>
+                      <td class="px-4 py-3" data-date="<?= htmlspecialchars($row['request_date']) ?>">
+                          <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?>
+                      </td>
+                      <td class="px-4 py-3">
+                          <?php if ($row['req_status'] === 'Completed'): ?>
+                              <!-- ✅ Show label only when Completed -->
+                              <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                  Completed
+                              </span>
 
+                          <?php elseif ($row['req_status'] === 'To Inspect'): ?>
+                              <!-- ✅ Dropdown for 'To Inspect' -->
+                              <select 
+                                  class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800" 
+                                  data-request-id="<?= $row['request_id'] ?>"
+                                  data-current-status="<?= $row['req_status'] ?>"
+                              >
+                                  <option class="hidden" disabled value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
+                                  <option value="In Progress" class="bg-blue-100 text-blue-800">In Progress</option>
+                                  <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                              </select>
+
+                          <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
+                              <!-- ✅ Dropdown for 'In Progress' -->
+                              <select 
+                                  class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
+                                  data-request-id="<?= $row['request_id'] ?>"
+                                  data-current-status="<?= $row['req_status'] ?>"
+                              >
+                                  <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                                  <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                              </select>
+
+                          <?php else: ?>
+                              <!-- Fallback for other statuses -->
+                              <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                  <?= htmlspecialchars($row['req_status']) ?>
+                              </span>
+                          <?php endif; ?>
+                      </td>
+                  </tr>
+              <?php endforeach; ?>
+          </tbody>
           </table>
           </div>
         </div>
@@ -232,32 +262,185 @@ $profile = $controller->getProfile($_SESSION['email']);
                 </select>
             </div>
 
-            <div>
-                <label class="text-xs text-text mb-1">Assign Personnel</label>
-                <select name="staff_id" id="staffSelect" 
-                        class="w-full input-field" 
-                        x-model="selected.staff_id"
-                        :disabled="selected.req_status === 'Completed'">
-                    
-                    <!-- Fallback if none -->
-                    <option value="" x-show="!selected.staff_id">No Assigned Personnel</option>
-
-                    <?php foreach ($personnels as $person): ?>
-                        <option value="<?= $person['staff_id'] ?>">
+           <!-- Personnel Section -->
+          <div>
+            <template x-if="selected.req_status !== 'Completed'">
+              <div 
+                id="personnel-fields" 
+                class="space-y-3 mb-6"
+                x-data="{ 
+                  personnel: [{ staff_id: '' }],
+                  selectedStaffIds: [],
+                  updatePersonnelOptions() {
+                    this.selectedStaffIds = this.personnel
+                      .map(p => p.staff_id)
+                      .filter(id => id !== '');
+                  }
+                }"
+              >
+                <template x-for="(p, index) in personnel" :key="index">
+                  <div class="flex gap-2 personnel-row items-end">
+                    <!-- Dropdown -->
+                    <div class="w-full">
+                      <label class="text-xs text-text mb-1">Personnel</label>
+                      <select 
+                        :name="'staff_id[' + index + ']'"
+                        x-model="p.staff_id"
+                        @change="updatePersonnelOptions()"
+                        class="input-field w-full staff-select"
+                      >
+                        <option value="">Select Personnel</option>
+                        <?php foreach ($personnels as $person): ?>
+                          <option 
+                            value="<?= $person['staff_id'] ?>"
+                            x-bind:disabled="selectedStaffIds.includes('<?= $person['staff_id'] ?>') && p.staff_id !== '<?= $person['staff_id'] ?>'"
+                          >
                             <?= htmlspecialchars($person['full_name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
 
-            <!-- <div>
-                <label class="text-xs text-text mb-1">Status</label>
-                <select name="prio_level" id="status" class="w-full input-field" >
+                    <!-- Add / Remove buttons -->
+                    <div class="flex items-center gap-1">
+                      <button 
+                        type="button"
+                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
+                        @click="personnel.push({ staff_id: '' }); updatePersonnelOptions();"
+                        title="Add Personnel"
+                      >
+                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
+                      </button>
+
+                      <button 
+                        type="button"
+                        class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex items-center justify-center"
+                        @click="personnel.splice(index, 1); updatePersonnelOptions();"
+                        title="Remove Personnel"
+                      >
+                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
+                      </button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <!-- Read-only view when Completed -->
+            <template x-if="selected.req_status === 'Completed'">
+              <div class="space-y-2">
+                <label class="text-sm mb-1 block font-medium">Assigned Personnel</label>
+                <template x-for="person in selected.assignedPersonnel" :key="person.staff_id">
+                  <div class="w-full input-field bg-gray-100 text-gray-700 cursor-default">
+                    <span x-text="person.full_name"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+          <div>
+              <label class="text-xs text-text mb-1">Status</label>
+
+              <!-- Completed: show plain label -->
+              <template x-if="selected.req_status === 'Completed'">
+                <span class="block w-full input-field bg-green-100 text-green-800 cursor-default" x-text="selected.req_status"></span>
+              </template>
+
+              <!-- In Progress: dropdown without "To Inspect" -->
+              <template x-if="selected.req_status === 'In Progress'">
+                <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field">
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </template>
+
+              <!-- Other (e.g. To Inspect) : full dropdown -->
+              <template x-if="selected.req_status !== 'Completed' && selected.req_status !== 'In Progress'">
+                <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field">
                   <option value="To Inspect">To Inspect</option>
                   <option value="In Progress">In Progress</option>
                   <option value="Completed">Completed</option>
                 </select>
-            </div> -->
+              </template>
+            </div>
+
+            <!-- ✅ MATERIALS SECTION -->
+          <div x-show="selected.req_status === 'In Progress' || selected.req_status === 'Completed'" 
+              class="mt-3 border-t border-gray-200 pt-3">
+
+            <h3 class="text-sm font-semibold mb-2">Materials Needed</h3>
+
+            <!-- Editable (In Progress) -->
+            <template x-if="selected.req_status === 'In Progress'">
+              <div id="material-fields" class="space-y-3 mb-6">
+                <template x-for="(item, index) in materials" :key="index">
+                  <div class="flex gap-2 material-row items-end">
+                    
+                    <!-- Material Dropdown -->
+                    <div class="w-1/2">
+                      <label class="text-sm mb-1 block">Material</label>
+                      <select 
+                        :name="'materials[' + index + '][material_code]'"
+                        class="input-field w-full material-select"
+                        x-model="item.material_code"
+                        @change="updateMaterialOptions()">
+                        <option value="">Select Material</option>
+                        <?php foreach ($materials as $mat): ?>
+                          <option 
+                            value="<?= $mat['material_code'] ?>" 
+                            x-show="!selectedMaterialCodes.includes('<?= $mat['material_code'] ?>') || item.material_code === '<?= $mat['material_code'] ?>'">
+                            <?= htmlspecialchars($mat['material_desc']) ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="w-1/4">
+                      <label class="text-sm mb-1 block">Qty</label>
+                      <input 
+                        type="number" 
+                        :name="'materials[' + index + '][qty]'"
+                        x-model="item.qty"
+                        min="1"
+                        class="input-field w-full" />
+                    </div>
+
+                    <!-- Add / Remove Buttons -->
+                    <div class="flex items-center gap-1">
+                      <button 
+                        type="button"
+                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
+                        @click="materials.push({ material_code: '', qty: 1 }); updateMaterialOptions();"
+                        title="Add Material">
+                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
+                      </button>
+
+                      <button 
+                        type="button"
+                        class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex justify-center items-center"
+                        @click="materials.splice(index, 1); updateMaterialOptions();"
+                        title="Remove Material">
+                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Remove" class="w-3 h-3">
+                      </button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <!-- Read-Only (Completed) -->
+            <template x-if="selected.req_status === 'Completed'">
+              <div class="space-y-2">
+                <template x-for="mat in materials" :key="mat.material_code">
+                  <div class="flex justify-between w-full input-field bg-gray-100 text-gray-700 cursor-default px-3 py-2 rounded">
+                    <span x-text="mat.material_desc"></span>
+                    <span x-text="'Qty: ' + mat.qty"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+            </div>
 
             <div class="flex justify-center pt-2 space-x-2">
                 <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>

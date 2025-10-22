@@ -12,6 +12,10 @@ class RequestController {
         $this->model = new RequestModel();
     }
 
+      public function getAllMaterials() {
+        return $this->model->getAllMaterials();
+    }
+
     public function submitRequest() {
         $tracking_id = 'TRK-' . date("Ymd") . '-' . substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"), 0, 5);
 
@@ -125,13 +129,13 @@ class RequestController {
 
     // In RequestController.php
     public function saveAssignment() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'saveAssignment') {
+        
             $request_id = $_POST['request_id'] ?? null;
             $req_id     = $_POST['req_id'] ?? null;
             $req_status = $_POST['req_status'] ?? 'To Inspect';
             $prio_level = $_POST['prio_level'] ?? null;
             $staff_id   = $_POST['staff_id'] ?? null;
-    
+            $date_finished = null; // You can set this based on your logic
             if (!$request_id || !$req_id || !$prio_level || !$staff_id) {
                 $_SESSION['alert'] = [
                     "type" => "warning",
@@ -142,11 +146,10 @@ class RequestController {
                 exit;
             }
     
-            $this->model->addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level);
+            $this->model->addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level,$date_finished);
             header("Location: ../modules/gsu_admin/views/request.php");
             exit;
         }
-    }
 
     public function updateStatus() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'updateStatus') {
