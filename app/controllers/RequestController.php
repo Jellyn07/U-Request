@@ -129,27 +129,48 @@ class RequestController {
 
     // In RequestController.php
     public function saveAssignment() {
-        
-            $request_id = $_POST['request_id'] ?? null;
-            $req_id     = $_POST['req_id'] ?? null;
-            $req_status = $_POST['req_status'] ?? 'To Inspect';
-            $prio_level = $_POST['prio_level'] ?? null;
-            $staff_id   = $_POST['staff_id'] ?? null;
-            $date_finished = null; // You can set this based on your logic
-            if (!$request_id || !$req_id || !$prio_level || !$staff_id) {
-                $_SESSION['alert'] = [
-                    "type" => "warning",
-                    "title" => "Missing Fields",
-                    "message" => "Please fill in all required fields."
-                ];
-                header("Location: ../modules/gsu_admin/views/request.php");
-                exit;
-            }
-    
-            $this->model->addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level,$date_finished);
+        $request_id   = $_POST['request_id'] ?? null;
+        $req_id       = $_POST['req_id'] ?? null;
+        $req_status   = $_POST['req_status'] ?? 'To Inspect';
+        $prio_level   = $_POST['prio_level'] ?? null;
+        $staff_ids    = $_POST['staff_id'] ?? []; // May be array
+        $materials    = $_POST['materials'] ?? []; // May be array of arrays
+        $date_finished = null; // You can adjust this logic later if needed
+
+        // ✅ Basic validation (only for required ones)
+        if (!$request_id || !$req_id) {
+            $_SESSION['alert'] = [
+                "type" => "warning",
+                "title" => "Missing Fields",
+                "message" => "Request ID and Req ID are required."
+            ];
             header("Location: ../modules/gsu_admin/views/request.php");
             exit;
         }
+
+        // ✅ Sanitize and skip empty staff/materials safely
+        $validStaff = array_filter($staff_ids, fn($id) => !empty($id));
+        $validMaterials = array_filter($materials, fn($m) => !empty($m['material_code']));
+
+        if ($req_status === 'Completed') {
+        $date_finished = date('Y-m-d H:i:s');
+    }
+        // ✅ Call model (handles all logic and skips nulls)
+        $success = $this->model->addAssignment(
+            $request_id,
+            $req_id,
+            $req_status,
+            $validStaff,
+            $prio_level,
+            $validMaterials,
+            $date_finished
+        );
+
+        // ✅ Feedback message handled by the model (via $_SESSION['alert'])
+        // But still do redirect for user flow
+        header("Location: ../modules/gsu_admin/views/request.php");
+        exit;
+    }
 
     public function updateStatus() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'updateStatus') {
@@ -190,29 +211,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $controller->submitRequest();
     }
 }
-
-
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === "saveAssignment") {
-    
-//     // Safely get POST values with null coalescing
-//     $request_id = $_POST['request_id'] ?? null;
-//     $req_id = $_POST['req_id'] ?? null;
-//     $req_status = $_POST['req_status'] ?? 'To Inspect';
-//     $prio_level = $_POST['prio_level'] ?? null;
-//     $staff_id = $_POST['staff_id'] ?? null; // ⚡ safely handle optional picture
-    
-//     // Validate required fields
-//     if (!$request_id || !$req_id || !$prio_level || !$staff_id) {
-//         echo json_encode([
-//             "success" => false,
-//             "message" => "Please fill in all required fields."
-//         ]);
-//         exit;
-//     }
-
-//     // Call model to save assignment
-//     $result = $model->addAssignment($request_id, $req_id, $req_status, $staff_id, $prio_level);
-
-//     echo json_encode($result);
-//     exit;
-// }

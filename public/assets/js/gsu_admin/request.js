@@ -35,3 +35,22 @@ function updateMaterialOptions() {
       }
     }));
   });
+
+  document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+  e.preventDefault(); // stop immediate submit
+  
+  Swal.fire({
+    title: 'Save Changes?',
+    text: "Do you really want to save your changes?",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#aaa',
+    confirmButtonText: 'Yes, save it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      e.target.submit(); // proceed with form submission
+    }
+  });
+});

@@ -144,9 +144,6 @@ $profile = $controller->getProfile($_SESSION['email']);
                       <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
-                      <td class="px-4 py-3">
-                          <?= !empty($row['priority_status']) ? htmlspecialchars($row['priority_status']) : 'No Selected Priority Level' ?>
-                      </td>
                       <td class="px-4 py-3" data-date="<?= htmlspecialchars($row['request_date']) ?>">
                           <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?>
                       </td>
@@ -203,7 +200,7 @@ $profile = $controller->getProfile($_SESSION['email']);
           
           <!-- Form -->
           <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/RequestController.php">
-            <!-- <input type="hidden" name="request_id" x-model="selected.request_id"> -->
+            <input type="hidden" name="request_id" x-model="selected.request_id">
             <input type="hidden" name="action" value="saveAssignment">
             <input type="hidden" name="req_id" x-model="selected.req_id">
             <h2 class="text-lg font-bold mb-2">Repair Information</h2>
@@ -215,7 +212,6 @@ $profile = $controller->getProfile($_SESSION['email']);
                 alt="Preview"
                 class="w-10/12 shadow-lg mx-auto rounded-lg"
             />
-            <input type="hidden" name="request_id" x-model="selected.request_id">
             <div>
               <label class="text-xs text-text mb-1">Tracking No.</label>
               <input type="text" class="w-full view-field"  x-model="selected.tracking_id" readonly />
@@ -446,7 +442,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
 
                 <!-- Save button hidden if status is Completed -->
-                <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment"
+                <button type="submit" class="btn btn-primary" id="saveBtn" name="saveAssignment"
                         x-show="selected.req_status !== 'Completed'">
                     Save Changes
                 </button>
@@ -457,6 +453,22 @@ $profile = $controller->getProfile($_SESSION['email']);
     </div>
   </div>
   </main>
+  <script>
+<?php if (isset($_SESSION['alert'])): ?>
+  Swal.fire({
+    icon: '<?= $_SESSION['alert']['type'] ?>',
+    title: '<?= $_SESSION['alert']['title'] ?>',
+    text: '<?= $_SESSION['alert']['message'] ?>',
+    confirmButtonColor: '#3085d6',
+  }).then(() => {
+    <?php if (!empty($_SESSION['alert']['redirect'])): ?>
+      window.location.href = '<?= $_SESSION['alert']['redirect'] ?>';
+    <?php endif; ?>
+  });
+  <?php unset($_SESSION['alert']); ?>
+<?php endif; ?>
+</script>
+
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script type="module">
@@ -474,5 +486,25 @@ $profile = $controller->getProfile($_SESSION['email']);
       dateColumnIndex: 4
     });
   });
+</script>
+<script>
+document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+  e.preventDefault(); // stop immediate submit
+  
+  Swal.fire({
+    title: 'Save Changes?',
+    text: "Do you really want to save your changes?",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#aaa',
+    confirmButtonText: 'Yes, save it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      e.target.submit(); // proceed with form submission
+    }
+  });
+});
 </script>
 </html>

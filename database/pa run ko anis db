@@ -346,3 +346,26 @@ CREATE TABLE campus_locations (
   exact_location VARCHAR(150) NOT NULL,
   date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+------------------------------------------------------------------------------
+// ALTER DB 
+
+ALTER TABLE request_assigned_personnel
+MODIFY COLUMN assigned_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (assigned_id);
+
+ALTER TABLE request_materials_needed
+MODIFY COLUMN request_material_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (request_material_id);
+
+ALTER TABLE request_assigned_personnel_audit
+MODIFY COLUMN audit_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (audit_id);
+
+ALTER TABLE materials_audit
+MODIFY COLUMN audit_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (audit_id);
+
+ALTER TABLE status_audit
+MODIFY COLUMN audit_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (audit_id);
