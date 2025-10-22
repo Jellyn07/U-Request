@@ -52,21 +52,23 @@ require_once __DIR__ . '/../../../config/auth.php';
               <option value="Mabini Unit">Mabini Unit</option>
             </select>
           </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="buildingLoc" class="text-sm mb-1 block">
-                Building Location <span class="text-red-500">*</span>
-              </label>
-              <input type="text" name="exLocb" id="exLocb" placeholder="Ex. PECC" required class="input-field w-full">
+              <label for="exLocb" class="text-sm mb-1 block">Building Location <span class="text-red-500">*</span></label>
+              <select id="exLocb" name="exLocb" required class="input-field w-full">
+                <option value="" selected disabled>Select Building</option>
+              </select>
             </div>
 
             <div>
-              <label for="roomLoc" class="text-sm mb-1 block">
-                Room Location <span class="text-red-500">*</span>
-              </label>
-              <input type="text" name="exLocr" id="exLocr" placeholder="Ex. Clinic" required class="input-field w-full">
+              <label for="exLocr" class="text-sm mb-1 block">Room Location <span class="text-red-500">*</span></label>
+              <select id="exLocr" name="exLocr" required class="input-field w-full">
+                <option value="" selected disabled>Select Room</option>
+              </select>
             </div>
           </div>
+
         <!-- </div> -->
 
           <hr class="my-6 border-gray-400">
@@ -254,5 +256,63 @@ require_once __DIR__ . '/../../../config/auth.php';
         }
       }
     </script>
+    <script>
+document.getElementById('unit').addEventListener('change', function() {
+  const unit = this.value;
+
+  // Reset dropdowns first
+  const buildingSelect = document.getElementById('exLocb');
+  const roomSelect = document.getElementById('exLocr');
+  buildingSelect.innerHTML = '<option value="" selected disabled>Loading...</option>';
+  roomSelect.innerHTML = '<option value="" selected disabled>Select Room</option>';
+
+  fetch('../../../controllers/RequestController.php?action=getLocationsByUnit&unit=' + encodeURIComponent(unit))
+    .then(response => response.json())
+    .then(data => {
+      buildingSelect.innerHTML = '<option value="" selected disabled>Select Building</option>';
+      roomSelect.innerHTML = '<option value="" selected disabled>Select Room</option>';
+
+      if (data.success && data.locations.length > 0) {
+        const buildings = {};
+
+        // Group rooms by building
+        data.locations.forEach(loc => {
+          if (!buildings[loc.building]) {
+            buildings[loc.building] = [];
+          }
+          buildings[loc.building].push(loc.exact_location);
+        });
+
+        // Populate buildings
+        Object.keys(buildings).forEach(building => {
+          const option = document.createElement('option');
+          option.value = building;
+          option.textContent = building;
+          buildingSelect.appendChild(option);
+        });
+
+        // When building changes, populate rooms
+        buildingSelect.addEventListener('change', function() {
+          const selectedBuilding = this.value;
+          roomSelect.innerHTML = '<option value="" selected disabled>Select Room</option>';
+          buildings[selectedBuilding].forEach(room => {
+            const opt = document.createElement('option');
+            opt.value = room;
+            opt.textContent = room;
+            roomSelect.appendChild(opt);
+          });
+        });
+
+      } else {
+        buildingSelect.innerHTML = '<option value="" selected disabled>No buildings found</option>';
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching locations:', err);
+      buildingSelect.innerHTML = '<option value="" selected disabled>Error loading</option>';
+    });
+});
+</script>
+
   </body>
 </html>

@@ -158,12 +158,10 @@ class RequestController {
         // ✅ Call model (handles all logic and skips nulls)
         $success = $this->model->addAssignment(
             $request_id,
-            $req_id,
             $req_status,
             $validStaff,
             $prio_level,
-            $validMaterials,
-            $date_finished
+            $validMaterials
         );
 
         // ✅ Feedback message handled by the model (via $_SESSION['alert'])
@@ -191,6 +189,29 @@ class RequestController {
         }
     }
 
+    public function getLocationsByUnit() {
+        header('Content-Type: application/json');
+
+        if (empty($_GET['unit'])) {
+            echo json_encode(["success" => false, "message" => "Unit is required"]);
+            exit;
+        }
+
+        $unit = $_GET['unit'];
+
+        try {
+            require_once __DIR__ . '/../models/RequestModel.php';
+            $model = new RequestModel();
+            $data = $model->getLocationsByUnit($unit);
+            echo json_encode($data);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+
+        exit;
+    }
+
+
     public function getProfile($admin_email)
     {
         return $this->model->getProfileByEmail($admin_email);
@@ -210,4 +231,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }else {
         $controller->submitRequest();
     }
+}
+
+if (isset($_GET['action']) && $_GET['action'] === 'getLocationsByUnit') {
+    $controller = new RequestController();
+    $controller->getLocationsByUnit();
 }

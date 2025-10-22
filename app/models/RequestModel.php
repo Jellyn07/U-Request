@@ -129,7 +129,7 @@ class RequestModel extends BaseModel {
     }
 
    // In RequestModel.php
-   public function addAssignment($request_id, $req_id, $req_status, $staff_ids, $prio_level, $materials = [], $date_finished = null) {
+   public function addAssignment($request_id, $req_status, $staff_ids, $prio_level, $materials = []) {
     try {
         $this->db->begin_transaction();
 
@@ -329,31 +329,55 @@ class RequestModel extends BaseModel {
     }
 
     public function getAllMaterials() {
-    $sql = "SELECT material_code, material_desc 
-            FROM materials 
-            WHERE qty > ?";
+        $sql = "SELECT material_code, material_desc 
+                FROM materials 
+                WHERE qty > ?";
 
-    // Prepare the statement
-    $stmt = $this->db->prepare($sql);
-    if (!$stmt) {
-        throw new Exception("Failed to prepare statement: " . $this->db->error);
+        // Prepare the statement
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Failed to prepare statement: " . $this->db->error);
+        }
+
+        // Bind parameters (qty > 0)
+        $minQty = 0;
+        $stmt->bind_param("i", $minQty);
+
+        // Execute
+        $stmt->execute();
+
+        // Get result
+        $result = $stmt->get_result();
+        $materials = $result->fetch_all(MYSQLI_ASSOC);
+
+        // Close
+        $stmt->close();
+
+        return $materials;
     }
 
-    // Bind parameters (qty > 0)
-    $minQty = 0;
-    $stmt->bind_param("i", $minQty);
+    public function getLocationsByUnit($unit) {
+        $stmt = $this->db->prepare("
+            SELECT building, exact_location 
+            FROM campus_locations 
+            WHERE unit = ?
+            ORDER BY building, exact_location
+        ");
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $this->db->error);
+        }
 
-    // Execute
-    $stmt->execute();
+        $stmt->bind_param("s", $unit);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    // Get result
-    $result = $stmt->get_result();
-    $materials = $result->fetch_all(MYSQLI_ASSOC);
+        $locations = [];
+        while ($row = $result->fetch_assoc()) {
+            $locations[] = $row;
+        }
 
-    // Close
-    $stmt->close();
+        return ["success" => true, "locations" => $locations];
+    }
 
-    return $materials;
-}
 
 }

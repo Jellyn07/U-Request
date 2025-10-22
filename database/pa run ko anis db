@@ -369,3 +369,27 @@ ADD PRIMARY KEY (audit_id);
 ALTER TABLE status_audit
 MODIFY COLUMN audit_id INT(11) NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (audit_id);
+
+DROP PROCEDURE IF EXISTS `spUpdateRequestStatus`;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spUpdateRequestStatus`(
+  IN p_request_id INT,
+  IN p_status VARCHAR(25)
+)
+BEGIN
+  IF p_status = 'Completed' THEN
+    UPDATE request_assignment
+    SET req_status = p_status,
+        date_finished = NOW()
+    WHERE request_id = p_request_id;
+  ELSE
+    UPDATE request_assignment
+    SET req_status = p_status,
+        date_finished = NULL
+    WHERE request_id = p_request_id;
+  END IF;
+END $$
+DELIMITER ;
+
+ALTER TABLE request 
+MODIFY request_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY;
