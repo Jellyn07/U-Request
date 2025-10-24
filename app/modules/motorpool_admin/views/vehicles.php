@@ -1,7 +1,13 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-$drivers = $drivers ?? []; // Prevent undefined variable error
+require_once __DIR__ . '/../../../controllers/VehicleController.php';
+
+$vehicleController = new VehicleController();
+$vehicleController->addVehicle();
+$drivers = $vehicleController->getDrivers();
+$vehicles = $vehicleController->getVehicles();
+// $drivers = $drivers ?? []; 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,6 +18,8 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
   <link rel="stylesheet" href="/public/assets/css/output.css" />
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/public/assets/js/motorpool_admin/vehicle.js"></script>
 </head>
 <body class="bg-gray-100">
 
@@ -25,10 +33,20 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
-            <input type="text" id="searchUser" placeholder="Search by vehicle name" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field" id="sortUsers">
-              <option value="az">Sort A-Z</option>
-              <option value="za">Sort Z-A</option>
+             <input 
+                type="text" 
+                id="searchUser" 
+                placeholder="Search by vehicle name" 
+                class="flex-1 min-w-[200px] input-field"
+              >
+              <select class="input-field" id="sortVehicle">
+                <option value="">All Types</option>
+                <option value="Sedan">Sedan</option>
+                <option value="SUV">SUV</option>
+                <option value="Van">Van</option>
+                <option value="Truck">Truck</option>
+                <option value="Bus">Bus</option>
+              </select>
             </select>
             <button title="Print data" class="input-field">
               <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
@@ -48,7 +66,7 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
                   <!-- Modal Content -->
                   <main class="flex flex-col transition-all duration-300 p-4 space-y-1 px-5">
                     <h2 class="text-lg font-bold">New Vehicle</h2>
-                    <form method="post" action="#" enctype="multipart/form-data" class="space-y-2">
+                    <form method="post" action="../../../controllers/VehicleController.php" enctype="multipart/form-data" class="space-y-2">
                       <!-- Vehicle Name -->
                       <div>
                         <label class="text-xs text-text mb-1">Vehicle Name<span class="text-red-500">*</span></label>
@@ -76,17 +94,19 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
                           <option value="SUV">SUV</option>
                           <option value="Van">Van</option>
                           <option value="Truck">Truck</option>
+                          <option value="Bus">Bus</option>
                         </select>
                       </div>
 
                       <!-- Vehicle Type -->
                       <div>
                         <label class="text-xs text-text mb-1">Assign Driver<span class="text-red-500">*</span></label>
-                        <select name="vehicle_type" class="w-full input-field" required>
+                        <select name="driver_id" class="w-full input-field" required>
                           <option value="">Select Driver</option>
-                          <option value="Sedan">Sedan</option>
-                          <option value="Juan">Juan</option>
-                        </select>
+                          <?php foreach($drivers as $driver): ?>
+                              <option value="<?= $driver['driver_id'] ?>"><?= htmlspecialchars($driver['driver_name']) ?></option>
+                          <?php endforeach; ?>
+                      </select>
                       </div>
 
                       <div class="w-full">
@@ -145,7 +165,7 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
                       <!-- Modal Buttons -->
                       <div class="flex justify-center gap-2 pt-4">
                         <button type="button" @click="showModal = false" class="btn btn-secondary">Cancel</button>
-                        <button type="submit" name="add_driver" class="btn btn-primary px-7">Save</button>
+                        <button type="submit" name="add_vehicle" class="btn btn-primary px-7">Save</button>
                       </div>
 
                     </form>
@@ -156,39 +176,47 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
           </div>
 
           <!-- Vehicle Cards Grid -->
-          <div 
-            class="grid gap-4 p-4 h-[578px] overflow-y-auto"
-            :class="showDetails ? 'grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'"
-          >
-            <?php for ($i = 0; $i < 8; $i++): ?>
-              <div class="bg-white rounded-lg shadow hover:shadow-lg transition border border-gray-300">
-                <div class="relative">
-                  <span class="absolute top-2 right-2 px-3 py-1 text-[10px] font-semibold rounded-full bg-green-200 text-green-700 z-10">Available</span>
-                  <img src="/public/assets/img/car.jpg" alt="Vehicle" class="w-full h-52 mx-auto rounded-lg object-cover">
-                </div>
-                <div class="p-3 space-y-2">
-                  <h2 class="text-base font-semibold">Lamborgini</h2>
-                  <p class="text-xs">Last Maintenance Date: <span class="font-medium">Oct. 10, 2025</span></p>
-                  <h2 class="text-xs font-semibold text-primary">Assigned Driver:<span class="ml-2">Juan Dela Cruz</span></h2>
-                  <div class="flex text-[9px] text-gray-700 space-x-2">
-                    <p class="bg-gray-300 px-2 py-1 rounded-xl">Plate: <span class="font-medium text-text">ABC 1234</span></p>
-                    <p class="bg-gray-300 px-2 py-1 rounded-xl">Type: <span class="font-medium text-text">Sports Car</span></p>
-                    <p class="bg-gray-300 px-2 py-1 rounded-xl">Capacity: <span class="font-medium text-text">2</span></p>
+         <div id="vehicleContainer" class="grid gap-4 p-4 h-[578px] overflow-y-auto"  :class="showDetails ? 'grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
+          <?php if (!empty($vehicles)): ?>
+              <?php foreach ($vehicles as $vehicle): 
+                  $vehicleData = [
+                      'name' => $vehicle['vehicle_name'],
+                      'driver' => $vehicle['driver_name'] ?? 'Unassigned',
+                      'status' => 'Available',
+                      'photo' => !empty($vehicle['photo']) ? '/../uploads/vehicles/' . $vehicle['photo'] : '/public/assets/img/car.jpg'
+                  ];
+              ?>
+              <div class="vehicle-card bg-white rounded-lg shadow hover:shadow-lg transition border border-gray-300 cursor-pointer"
+                  @click='selected = <?= json_encode($vehicleData) ?>; showDetails = true'
+                  data-name="<?= strtolower($vehicle['vehicle_name']) ?>"
+                  data-type="<?= strtolower($vehicle['vehicle_type']) ?>"
+              >
+                  <div class="relative">
+                      <span class="absolute top-2 right-2 px-3 py-1 text-[10px] font-semibold rounded-full bg-green-200 text-green-700 z-10">
+                          Available
+                      </span>
+                      <img src="<?= !empty($vehicle['photo']) ? '/../uploads/vehicles/' . htmlspecialchars($vehicle['photo']) : '/public/assets/img/car.jpg' ?>"
+                          alt="Vehicle" 
+                          class="w-full h-52 mx-auto rounded-lg object-cover">
                   </div>
-                  <div class="flex justify-end gap-2 pt-2">
-                    <button 
-                      class="btn btn-secondary w-full"
-                      @click="selected = { name: 'Lamborgini', driver: 'Juan Dela Cruz', status: 'Available' }; showDetails = true"
-                    >
-                      Travel History
-                    </button>
+                  <div class="p-3 space-y-2">
+                      <h2 class="text-base font-semibold"><?= htmlspecialchars($vehicle['vehicle_name']) ?></h2>
+                      <p class="text-xs">Last Maintenance Date: <span class="font-medium">—</span></p>
+                      <h2 class="text-xs font-semibold text-primary">
+                          Assigned Driver: <span class="ml-2"><?= htmlspecialchars($vehicle['driver_name'] ?? 'Unassigned') ?></span>
+                      </h2>
+                      <div class="flex text-[9px] text-gray-700 space-x-2">
+                          <p class="bg-gray-300 px-2 py-1 rounded-xl">Plate: <span class="font-medium text-text"><?= htmlspecialchars($vehicle['plate_no']) ?></span></p>
+                          <p class="bg-gray-300 px-2 py-1 rounded-xl">Type: <span class="font-medium text-text"><?= htmlspecialchars($vehicle['vehicle_type']) ?></span></p>
+                          <p class="bg-gray-300 px-2 py-1 rounded-xl">Capacity: <span class="font-medium text-text"><?= htmlspecialchars($vehicle['capacity']) ?></span></p>
+                      </div>
                   </div>
-                </div>
               </div>
-            <?php endfor; ?>
+              <?php endforeach; ?>
+              <?php else: ?>
+                  <p class="col-span-full text-center text-gray-500">No vehicles found.</p>
+              <?php endif; ?>
           </div>
-        </div>
-
         <!-- Right Section -->
         <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-y-auto relative md:col-span-1">
           <button @click="showDetails = false" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
@@ -196,10 +224,12 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
           </button>
 
           <div class="text-center mt-4">
-            <img src="/public/assets/img/car.jpg" alt="Vehicle" class="w-1/2 h-32 mx-auto rounded-lg mb-3">
-            <h2 class="text-lg font-bold" x-text="selected.name">Vehicle Name</h2>
+            <img :src="selected.photo" alt="Vehicle" class="w-1/2 h-32 mx-auto rounded-lg mb-3 object-cover">
+            <h2 class="text-lg font-bold" x-text="selected.name"></h2>
             <p class="text-sm mt-1">Driver: <span x-text="selected.driver"></span></p>
-            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-200 text-green-700 z-10"><span x-text="selected.status"></span></span>
+            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-200 text-green-700 z-10">
+              <span x-text="selected.status"></span>
+            </span>
           </div>
 
           <div class="mt-5">
@@ -217,68 +247,20 @@ $drivers = $drivers ?? []; // Prevent undefined variable error
       </div>
     </div>
   </main>
-
-  <script>
-    function previewProfile(event) {
-      const output = document.getElementById('profile-preview');
-      if (event.target.files.length > 0) {
-        output.src = URL.createObjectURL(event.target.files[0]);
-      }
-    }
-  </script>
-
-  <!-- Image Preview & Drag-and-Drop JS -->
-    <script>
-      function previewImage(event) {
-        const file = event.target.files[0];
-        const previewContainer = document.getElementById("preview-container");
-        const preview = document.getElementById("preview");
-        const uploadArea = document.getElementById("upload-area");
-
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            preview.src = e.target.result;
-            previewContainer.classList.remove("hidden");
-            uploadArea.classList.add("hidden"); // Hide drag-drop area when uploaded
-          };
-          reader.readAsDataURL(file);
-        }
-      }
-
-      function removePreview(e) {
-        e.stopPropagation();
-        const fileInput = document.getElementById("img");
-        const previewContainer = document.getElementById("preview-container");
-        const uploadArea = document.getElementById("upload-area");
-
-        fileInput.value = "";
-        previewContainer.classList.add("hidden");
-        uploadArea.classList.remove("hidden");
-      }
-
-      function handleDragOver(e) {
-        e.preventDefault();
-        e.currentTarget.classList.add("bg-gray-200");
-      }
-
-      function handleDragLeave(e) {
-        e.preventDefault();
-        e.currentTarget.classList.remove("bg-gray-200");
-      }
-
-      function handleDrop(e) {
-        e.preventDefault();
-        e.currentTarget.classList.remove("bg-gray-200");
-        const fileInput = document.getElementById("img");
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-          fileInput.files = files;
-          previewImage({ target: fileInput });
-        }
-      }
-    </script>
-
   <script src="/public/assets/js/shared/menus.js"></script>
+  <?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
+  <?php if (isset($_SESSION['alert'])): ?>
+  <script>
+  Swal.fire({
+      icon: '<?= $_SESSION['alert']['icon'] ?>',
+      title: '<?= $_SESSION['alert']['title'] ?>',
+      text: '<?= $_SESSION['alert']['text'] ?>',
+      confirmButtonText: 'OK'
+  }).then(() => {
+      // Optional: reload or redirect
+  });
+  </script>
+  <?php unset($_SESSION['alert']); ?>
+  <?php endif; ?>
 </body>
 </html>
