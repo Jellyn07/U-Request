@@ -28,7 +28,7 @@ $dateFilter = $_GET['date'] ?? 'all';
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/superadmin_menu.php';?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -50,6 +50,7 @@ $dateFilter = $_GET['date'] ?? 'all';
               <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
               <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
               <option value="driver" <?= $tableFilter==='driver'?'selected':'' ?>>Driver</option>
+              <option value="vehicle" <?= $tableFilter==='vehicle'?'selected':'' ?>>Vehicle</option>
             </select>
             <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>

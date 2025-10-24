@@ -45,9 +45,9 @@ class ActivityLogsModel extends BaseModel {
 
         // 🔹 STEP 3: Define what each role can access
         $accessRules = [
-            'super' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'administrator', 'campus_locations', 'driver'],
+            'super' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'administrator', 'campus_locations', 'driver', 'vehicle'],
             'gsu' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'campus_locations'],
-            'motorpool' => ['driver']
+            'motorpool' => ['driver', 'vehicle']
         ];
 
         // 🔹 STEP 4: Build date condition
@@ -181,6 +181,21 @@ class ActivityLogsModel extends BaseModel {
                         staff_name AS affected_item,
                         description AS details
                       FROM driver_audit";
+            $conditions = [];
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
+            if ($dateCondition) $conditions[] = str_replace('action_date', 'changed_at', $dateCondition);
+            $addConditions($query, $conditions);
+            $sqlParts[] = $query;
+        }
+
+        if (in_array('vehicle', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'vehicle')) {
+            $query = "SELECT 
+                        changed_at AS timestamp,
+                        'Vehicle' AS source,
+                        action AS action_type,
+                        staff_name AS affected_item,
+                        description AS details
+                      FROM vehicle_audit";
             $conditions = [];
             if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = str_replace('action_date', 'changed_at', $dateCondition);

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php'; 
+require_once __DIR__ . '/../config/db_helpers.php';
 class VehicleModel extends BaseModel {
     // Get all drivers
     public function getDrivers() {
@@ -25,6 +26,9 @@ class VehicleModel extends BaseModel {
 
     // Add new vehicle
     public function addVehicle($data) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("INSERT INTO vehicle (vehicle_name, plate_no, capacity, vehicle_type, driver_id, photo) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssisis", 
             $data['vehicle_name'], 
