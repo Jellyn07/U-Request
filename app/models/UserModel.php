@@ -95,7 +95,7 @@ class UserModel extends BaseModel  {
 
     public function getRequestHistory($requester_id) {
         $records = [];
-        $requester_id = intval($requester_id);
+        $requester_id = strval($requester_id);
 
         $query = "
             SELECT 
@@ -113,7 +113,7 @@ class UserModel extends BaseModel  {
         ";
 
         if ($stmt = $this->db->prepare($query)) {
-            $stmt->bind_param("i", $requester_id);
+            $stmt->bind_param("s", $requester_id);
             $stmt->execute();
             $result = $stmt->get_result();
 
