@@ -2,10 +2,14 @@
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/UserController.php';
-require_once __DIR__ . '/../../../controllers/AdminController.php';
+require_once __DIR__ . '/../../../controllers/ActivityLogsController.php';
+$controller_a = new ActivityLogsController();
 
-$controller = new AdminController();
-$admins = $controller->getAllAdmins();
+// Default filters
+$tableFilter = $_GET['table'] ?? 'all';
+$actionFilter = $_GET['action'] ?? 'all';
+$dateFilter = $_GET['date'] ?? 'all';
+
 
 ?>
 <!DOCTYPE html>
@@ -30,35 +34,38 @@ $admins = $controller->getAllAdmins();
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Activity Logs</h1>
 
-      <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+       <div x-data="{ showDetails: false, selected: {}, addmaterial: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="search" placeholder="Search Activities" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
-                <option value="all">All Users</option>
-                <!-- <option>Super Admins</option> -->
-                <option>Admins</option>
-                <option>User</option>
+            <form method="GET" id="filterForm">
+            <select name="table" onchange="document.getElementById('filterForm').submit()" class="input-field">
+              <option value="all" <?= $tableFilter==='all'?'selected':'' ?>>All</option>
+              <option value="gsu_personnel" <?= $tableFilter==='gsu_personnel'?'selected':'' ?>>GSU Personnel</option>
+              <option value="materials" <?= $tableFilter==='materials'?'selected':'' ?>>Materials</option>
+              <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
+              <option value="status" <?= $tableFilter==='status'?'selected':'' ?>>Status</option>
+              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
+              <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
+              <option value="driver" <?= $tableFilter==='driver'?'selected':'' ?>>Driver</option>
             </select>
-            <select class="input-field">
-              <option value="all">Activity Type</option>
-                <option>Added</option>
-                <option>Updated</option>
-                <option>Deleted</option>
-                <option>Approved</option>
-                <option>Rejected</option>
-                <option>Completed</option>
+            <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
+              <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>
+              <option value="INSERT" <?= $actionFilter==='INSERT'?'selected':'' ?>>Insert</option>
+              <option value="UPDATE" <?= $actionFilter==='UPDATE'?'selected':'' ?>>Updated</option>
+              <option value="DELETE" <?= $actionFilter==='DELETE'?'selected':'' ?>>Deleted</option>
             </select>
-            <select class="input-field">
-                <option value="all">All Dates</option>
-                <option>Today</option>
-                <option>Yesterday</option>
-                <option>Last 7 days</option>
-                <option>Last 14 days</option>
-                <option>Last 30 days</option>
+            <select name="date" onchange="document.getElementById('filterForm').submit()" class="input-field">
+                <option value="all" <?= $dateFilter==='all'?'selected':'' ?>>All Dates</option>
+                <option value="today" <?= $dateFilter==='today'?'selected':'' ?>>Today</option>
+                <option value="yesterday" <?= $dateFilter==='yesterday'?'selected':'' ?>>Yesterday</option>
+                <option value="7" <?= $dateFilter==='7'?'selected':'' ?>>Last 7 days</option>
+                <option value="14" <?= $dateFilter==='14'?'selected':'' ?>>Last 14 days</option>
+                <option value="30" <?= $dateFilter==='30'?'selected':'' ?>>Last 30 days</option>
             </select>
+            </form>
             <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
@@ -71,28 +78,19 @@ $admins = $controller->getAllAdmins();
         </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[580px] overflow-y-auto rounded-b-lg shadow">
-          <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-b-lg p-2">
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
             <thead class="bg-white sticky top-0">
               <tr>
                 <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Description</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Affected Items</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Details</th>
               </tr>
             </thead>
             <tbody id="table" class="text-sm">
-                <?php for($i=0; $i<20; $i++){
-                    echo'
-                        <tr @click="showDetails = true" class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
-                            <td class="pl-8 py-3">Jan 07, 2025</td>
-                            <td class="px-4 py-3">Juan Cruz</td>
-                            <td class="px-4 py-3">Added</td>
-                            <td class="px-4 py-3">Added new personnel named Tommy Lim</td>
-                        </tr>                    
-                    ';
-                } 
-                ?>
+                 <?= $controller_a->renderLogs($tableFilter, $actionFilter, $dateFilter) ?>
             </tbody>
           </table>
           </div>
@@ -100,69 +98,55 @@ $admins = $controller->getAllAdmins();
 
         <!-- Right Section (Details) -->
         <div x-show="showDetails" x-cloak
-            class="bg-white shadow rounded-lg p-4 max-h-[602px] overflow-y-auto">
+            class="bg-white shadow rounded-lg p-4 max-h-[642px] overflow-y-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
           
           <!-- Form -->
           <form id="adminForm" class="space-y-1" method="post">
-            <h2 class="text-lg font-bold mb-2">More Information</h2>
+            <!-- <h2 class="text-lg font-bold mb-2">More Information</h2> -->
 
-            <img id="profile-preview"  
-            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/default-img.png'"
-            alt=""
-            class="w-10/12 shadow-lg mx-auto rounded-lg"
-            />
+            <!-- Header -->
+            <div class="flex flex-col items-center text-center mt-4">
+              <img id="profile-preview"  
+                :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
+                alt="Profile"
+                class="w-16 h-16 rounded-full object-cover shadow-md"
+              />
+              <h2 class="mt-1 text-base font-bold text-gray-800" x-text="selected.performed_by || 'Unknown User'"></h2>
+              <p class="text-xs text-gray-500" x-text="selected.role || 'System User'"></p>
+            </div>
 
             <div>
               <label class="text-xs text-text mb-1">Tracking No.</label>
-              <input type="text" class="w-full view-field"/>
+              <input type="text" disabled class="w-full view-field cursor-not-allowed"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Requester</label>
-              <input type="text" class="w-full view-field"/>
+              <label class="text-xs text-text mb-1">User/Staff ID</label>
+              <input type="text" disabled class="w-full view-field cursor-not-allowed"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Category</label>
-              <input type="text" class="w-full view-field"/>
+              <label class="text-xs text-text mb-1">Date & Time</label>
+              <input type="text" disabled class="w-full view-field cursor-not-allowed"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Location</label>
-              <input type="text" class="w-full view-field"/>
+              <label class="text-xs text-text mb-1">Type</label>
+              <input type="text" disabled class="w-full view-field cursor-not-allowed"/>
+            </div>
+
+            <!-- What page it was performed on -->
+            <div>
+              <label class="text-xs text-text mb-1">Page</label>
+              <input type="text" disabled class="w-full view-field cursor-not-allowed"/>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Priority Level</label>
-              <select type="text" class="w-full input-field">
-                <option value="" disabled selected>Select Priority Level</option>
-                <option>Low</option>
-                <option>High</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-xs text-text mb-1">Assign Personnel</label>
-              <select type="text" :value="selected.staff_id || ''" class="w-full input-field">
-                <option value="" disabled selected>Select Personnel</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-                <option>Mike Johnson</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-                <option>Mike Johnson</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-                <option>Mike Johnson</option>
-              </select>
-            </div>
-
-            <div class="flex justify-center pt-2">
-                <!-- Use the request layout in user just add the completion date -->
-                <button type="button" title="View all request information" class="btn btn-primary">Full Details</button>
+              <label class="text-xs text-text mb-1">Description</label>
+              <textarea type="text" class="w-full view-field cursor-not-allowed" rows="4" disabled></textarea>
             </div>
           </form>
         </div>

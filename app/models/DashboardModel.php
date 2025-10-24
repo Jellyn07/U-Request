@@ -31,7 +31,11 @@ class DashboardModel extends BaseModel  {
 
                 (
                    SELECT COUNT(*) FROM vw_requests WHERE req_status IN ('To Inspect', 'In Progress')
-                ) AS total_pending
+                ) AS total_pending,
+
+                (
+                   SELECT COUNT(*) FROM driver
+                ) AS totalDrivers
         ";
     
         $stmt = $this->db->prepare($sql);

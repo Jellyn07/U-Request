@@ -1,6 +1,7 @@
 <?php
 // filepath: app/models/PersonnelModel.php
 require_once __DIR__ . '/../core/BaseModel.php';
+require_once __DIR__ . '/../config/db_helpers.php';
 
 class DriverModel extends BaseModel {
 
@@ -36,17 +37,19 @@ class DriverModel extends BaseModel {
     // Add new driver
     public function addDriver($data) {
         // Check duplicate staff_id
-        $checkStaff = $this->db->prepare("SELECT COUNT(*) as cnt FROM driver WHERE driver_id = ?");
-        $checkStaff->bind_param("i", $data['driver_id']);
-        $checkStaff->execute();
-        $staffResult = $checkStaff->get_result()->fetch_assoc();
-        $checkStaff->close();
+        // $checkStaff = $this->db->prepare("SELECT COUNT(*) as cnt FROM driver WHERE driver_id = ?");
+        // $checkStaff->bind_param("i", $data['driver_id']);
+        // $checkStaff->execute();
+        // $staffResult = $checkStaff->get_result()->fetch_assoc();
+        // $checkStaff->close();
     
-        if ($staffResult['cnt'] > 0) {
-            $_SESSION['driver_error'] = "Driver ID already exists!";
-            return false;
+        // if ($staffResult['cnt'] > 0) {
+        //     $_SESSION['driver_error'] = "Driver ID already exists!";
+        //     return false;
+        // }
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
         }
-    
         // Check duplicate contact number
         $checkContact = $this->db->prepare("SELECT COUNT(*) as cnt FROM driver WHERE contact = ?");
         $checkContact->bind_param("s", $data['contact']);
@@ -60,13 +63,12 @@ class DriverModel extends BaseModel {
         }
     
         // ✅ If no duplicates, proceed with insert
-        $stmt = $this->db->prepare("CALL spAddDriver (?, ?, ?, ?, ?, ?)");
+        $stmt = $this->db->prepare("CALL spAddDriver (?, ?, ?, ?, ?)");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed (AddDriver): " . $this->db->error;
             return false;
         }
-        $stmt->bind_param("isssss", 
-            $data['driver_id'],
+        $stmt->bind_param("sssss", 
             $data['firstName'],
             $data['lastName'],
             $data['contact'],
@@ -85,6 +87,9 @@ class DriverModel extends BaseModel {
 
     // Update driver
    public function updateDriver($data) {
+    if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+    }
     // ✅ Require driver_id (the record to update)
     if (empty($data['driver_id'])) {
         $_SESSION['driver_error'] = "Missing driver identifier.";
@@ -147,7 +152,10 @@ class DriverModel extends BaseModel {
 
     // Delete personnel
     public function deleteDriver($staff_id) {
-        $stmt = $this->db->prepare("DELETE FROM gsu_personnel WHERE staff_id = ?");
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
+        $stmt = $this->db->prepare("DELETE FROM driver WHERE driver_id = ?");
         $stmt->bind_param("i", $staff_id);
         $result = $stmt->execute();
         $stmt->close();

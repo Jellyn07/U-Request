@@ -13,7 +13,6 @@ $controller = new ActivityLogsController();
 $tableFilter = $_GET['table'] ?? 'all';
 $actionFilter = $_GET['action'] ?? 'all';
 $dateFilter = $_GET['date'] ?? 'all';
-
 if (!isset($_SESSION['email'])) {
     header("Location: modules/shared/views/admin_login.php");
     exit;
@@ -57,6 +56,7 @@ $profile = $controller->getProfile($_SESSION['email']);
               <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
               <option value="status" <?= $tableFilter==='status'?'selected':'' ?>>Status</option>
               <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
+              <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
             </select>
             <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>

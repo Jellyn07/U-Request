@@ -2,13 +2,16 @@
 
 require_once __DIR__ . '/../core/BaseModel.php'; 
 require_once __DIR__ . '/../config/encryption.php';
+require_once __DIR__ . '/../config/db_helpers.php';
 
 class AdministratorModel extends BaseModel {
 
     // ADD ADMINISTRATOR
     public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
         $encrypted_pass = encrypt($password);
-
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
@@ -85,6 +88,9 @@ class AdministratorModel extends BaseModel {
 
      // Update admin details
      public function updateAdminDetails($data) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         // Map incoming keys to DB columns and types
         $allowedFields = [
             'staff_id' => ['col' => 'staff_id', 'type' => 's'],

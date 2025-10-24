@@ -65,7 +65,7 @@ $dateRange = "$startDate - $endDate";
         <div class="border-r-2 border-gray-300">
           <h2 class="font-medium mb-3">Drivers</h2>
           <p class="text-4xl font-bold text-text mt-2">
-            <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
+            <?= isset($data['summary']['totalDrivers']) ? $data['summary']['totalDrivers'] : 0 ?>
           </p>
           <p class="text-xs text-gray-500 font-medium mt-2">Total number of Drivers this year</p>
         </div>

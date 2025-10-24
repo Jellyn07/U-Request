@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php'; 
+require_once __DIR__ . '/../config/db_helpers.php';
 
 class LocationModel extends BaseModel{
     // 🟢 Fetch all locations
@@ -20,6 +21,9 @@ class LocationModel extends BaseModel{
 
     // 🟢 Add new location
     public function addLocation($unit, $building, $exact_location) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
     // Check if the location already exists
         $checkStmt = $this->db->prepare("
             SELECT COUNT(*) as count 
@@ -50,6 +54,9 @@ class LocationModel extends BaseModel{
 
     // 🟡 Update location
     public function updateLocation($id, $building, $exact_location) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("
             UPDATE campus_locations
             SET building = ?, exact_location = ?
@@ -61,6 +68,9 @@ class LocationModel extends BaseModel{
 
     // 🔴 Delete location
     public function deleteLocation($id) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("DELETE FROM campus_locations WHERE location_id = ?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();

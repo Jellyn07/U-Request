@@ -1,0 +1,249 @@
+-- Start here if done vehicle and driver table
+
+ALTER TABLE driver 
+MODIFY driver_id INT UNSIGNED AUTO_INCREMENT;
+
+-- Activity Logs
+
+CREATE TABLE administrator_audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_id VARCHAR(100),
+    staff_name VARCHAR(150),
+    action ENUM('INSERT','UPDATE','DELETE'),
+    description TEXT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE campus_locations_audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150),
+    action ENUM('INSERT','UPDATE','DELETE'),
+    description TEXT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE driver_audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150),
+    action ENUM('INSERT','UPDATE','DELETE'),
+    description TEXT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Triggers
+-- -------------------
+-- Administrator
+-- -------------------
+-- INSERT Trigger
+DELIMITER $$
+CREATE TRIGGER trg_admin_insert
+AFTER INSERT ON administrator
+FOR EACH ROW
+BEGIN
+    DECLARE staff_fullname VARCHAR(150);
+    SET staff_fullname = CONCAT(NEW.first_name, ' ', NEW.last_name);
+
+    INSERT INTO administrator_audit(staff_id, staff_name, action, description)
+    VALUES(NEW.staff_id, staff_fullname, 'INSERT', CONCAT(staff_fullname, ' added administrator: ', NEW.first_name,' ',NEW.last_name));
+END$$
+DELIMITER ;
+
+-- UPDATE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_admin_update
+AFTER UPDATE ON administrator
+FOR EACH ROW
+BEGIN
+    DECLARE staff_fullname VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    SET staff_fullname = CONCAT(NEW.first_name, ' ', NEW.last_name);
+
+    IF OLD.first_name != NEW.first_name OR OLD.last_name != NEW.last_name THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.first_name,' ',OLD.last_name,'" to "', NEW.first_name,' ',NEW.last_name,'"; ');
+    END IF;
+    IF OLD.email != NEW.email THEN
+        SET changes = CONCAT(changes, 'Email from "', OLD.email,'" to "', NEW.email,'"; ');
+    END IF;
+    IF OLD.contact_no != NEW.contact_no THEN
+        SET changes = CONCAT(changes, 'Contact from "', OLD.contact_no,'" to "', NEW.contact_no,'"; ');
+    END IF;
+    IF OLD.accessLevel_id != NEW.accessLevel_id THEN
+        SET changes = CONCAT(changes, 'Access Level changed; ');
+    END IF;
+    IF OLD.status != NEW.status THEN
+        SET changes = CONCAT(changes, 'Status from "', OLD.status,'" to "', NEW.status,'"; ');
+    END IF;
+
+    INSERT INTO administrator_audit(staff_id, staff_name, action, description)
+    VALUES(
+        NEW.staff_id,
+        staff_fullname,
+        'UPDATE',
+        CONCAT(staff_fullname, ' updated administrator: ', changes)
+    );
+END$$
+DELIMITER ;
+
+-- DELETE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_admin_delete
+AFTER DELETE ON administrator
+FOR EACH ROW
+BEGIN
+    DECLARE staff_fullname VARCHAR(150);
+    SET staff_fullname = CONCAT(OLD.first_name, ' ', OLD.last_name);
+
+    INSERT INTO administrator_audit(staff_id, staff_name, action, description)
+    VALUES(
+        OLD.staff_id,
+        staff_fullname,
+        'DELETE',
+        CONCAT(staff_fullname, ' was deleted.')
+    );
+END$$
+DELIMITER ;
+
+-- -------------------
+-- Campus Locations
+-- -------------------
+-- INSERT Trigger
+DELIMITER $$
+CREATE TRIGGER trg_campus_insert
+AFTER INSERT ON campus_locations
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    INSERT INTO campus_locations_audit(staff_name, action, description)
+    VALUES(
+        admin_name,
+        'INSERT',
+        CONCAT(admin_name, ' added campus location: ', NEW.unit, ', ', NEW.building, ', ', NEW.exact_location)
+    );
+END$$
+DELIMITER ;
+
+-- UPDATE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_campus_update
+AFTER UPDATE ON campus_locations
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    IF OLD.unit != NEW.unit THEN
+        SET changes = CONCAT(changes, 'Unit from "', OLD.unit,'" to "', NEW.unit,'"; ');
+    END IF;
+    IF OLD.building != NEW.building THEN
+        SET changes = CONCAT(changes, 'Building from "', OLD.building,'" to "', NEW.building,'"; ');
+    END IF;
+    IF OLD.exact_location != NEW.exact_location THEN
+        SET changes = CONCAT(changes, 'Exact Location from "', OLD.exact_location,'" to "', NEW.exact_location,'"; ');
+    END IF;
+
+    INSERT INTO campus_locations_audit(staff_name, action, description)
+    VALUES(
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated campus location: ', changes)
+    );
+END$$
+DELIMITER ;
+
+-- DELETE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_campus_delete
+AFTER DELETE ON campus_locations
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    INSERT INTO campus_locations_audit(staff_name, action, description)
+    VALUES(
+        admin_name,
+        'DELETE',
+        CONCAT(admin_name, ' deleted campus location: ', OLD.unit, ', ', OLD.building, ', ', OLD.exact_location)
+    );
+END$$
+DELIMITER ;
+
+-- -------------------
+-- Driver
+-- -------------------
+-- INSERT Trigger
+
+DELIMITER $$
+CREATE TRIGGER trg_driver_insert
+AFTER INSERT ON driver
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    -- Get the name of the staff performing the insert
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Insert an audit record, including the new driver_id
+    INSERT INTO driver_audit ( staff_name, action, description)
+    VALUES (
+        admin_name,
+        'INSERT',
+        CONCAT(admin_name, ' added driver: ', NEW.firstName, ' ', NEW.lastName)
+    );
+END$$
+DELIMITER ;
+
+
+-- UPDATE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_driver_update
+AFTER UPDATE ON driver
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    IF OLD.firstName != NEW.firstName OR OLD.lastName != NEW.lastName THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.firstName,' ',OLD.lastName,'" to "', NEW.firstName,' ',NEW.lastName,'"; ');
+    END IF;
+    IF OLD.contact != NEW.contact THEN
+        SET changes = CONCAT(changes, 'Contact from "', OLD.contact,'" to "', NEW.contact,'"; ');
+    END IF;
+    IF OLD.hire_date != NEW.hire_date THEN
+        SET changes = CONCAT(changes, 'Hire Date changed; ');
+    END IF;
+
+    INSERT INTO driver_audit(staff_name, action, description)
+    VALUES(
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated driver: ', changes)
+    );
+END$$
+DELIMITER ;
+
+-- DELETE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_driver_delete
+AFTER DELETE ON driver
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    INSERT INTO driver_audit(staff_name, action, description)
+    VALUES(
+        admin_name,
+        'DELETE',
+        CONCAT(admin_name, ' deleted driver: ', OLD.firstName, ' ', OLD.lastName)
+    );
+END$$
+DELIMITER ;

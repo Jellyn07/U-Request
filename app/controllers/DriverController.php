@@ -43,14 +43,12 @@ class DriverController {
     
         // ✅ Collect input data + profile picture
         $data = [
-            'driver_id'       => $postData['staff_id'] ?? '',
             'firstName'      => $postData['first_name'] ?? '',
             'lastName'       => $postData['last_name'] ?? '',
             'contact'        => $postData['contact_no'] ?? '',
             'hire_date'      => $postData['hire_date'] ?? '',
             'profile_picture'=> $filename 
         ];
-    
         $result = $this->model->addDriver($data);
     
         if ($result) {
