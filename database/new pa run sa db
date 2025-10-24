@@ -3,6 +3,22 @@
 ALTER TABLE driver 
 MODIFY driver_id INT UNSIGNED AUTO_INCREMENT;
 
+drop procedure spAddDriver;
+
+DELIMITER $$
+CREATE PROCEDURE spAddDriver (
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_contact VARCHAR(11),
+    IN p_hire_date DATE,
+    IN p_profile_picture VARCHAR(255)
+)
+BEGIN
+    INSERT INTO driver (firstName, lastName, contact, hire_date, profile_picture)
+    VALUES (p_firstName, p_lastName, p_contact, p_hire_date, p_profile_picture);
+END $$
+DELIMITER ;
+
 -- Activity Logs
 
 CREATE TABLE administrator_audit (
@@ -23,6 +39,14 @@ CREATE TABLE campus_locations_audit (
 );
 
 CREATE TABLE driver_audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150),
+    action ENUM('INSERT','UPDATE','DELETE'),
+    description TEXT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE vehicle_audit (
     audit_id INT AUTO_INCREMENT PRIMARY KEY,
     staff_name VARCHAR(150),
     action ENUM('INSERT','UPDATE','DELETE'),
@@ -244,6 +268,107 @@ BEGIN
         admin_name,
         'DELETE',
         CONCAT(admin_name, ' deleted driver: ', OLD.firstName, ' ', OLD.lastName)
+    );
+END$$
+DELIMITER ;
+
+-- Vehicle Trigger
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_insert
+AFTER INSERT ON vehicle
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    -- Get the name of the admin performing the action
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Log the action
+    INSERT INTO vehicle_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'INSERT',
+        CONCAT(admin_name, ' added vehicle: ', NEW.vehicle_name, 
+               ' (Plate: ', NEW.plate_no, ', Type: ', NEW.vehicle_type, ')')
+    );
+END$$
+DELIMITER ;
+
+-- Update
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_update
+AFTER UPDATE ON vehicle
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Detect changes
+    IF OLD.vehicle_name != NEW.vehicle_name THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.vehicle_name, '" to "', NEW.vehicle_name, '"; ');
+    END IF;
+
+    IF OLD.plate_no != NEW.plate_no THEN
+        SET changes = CONCAT(changes, 'Plate No from "', OLD.plate_no, '" to "', NEW.plate_no, '"; ');
+    END IF;
+
+    IF OLD.capacity != NEW.capacity THEN
+        SET changes = CONCAT(changes, 'Capacity from "', OLD.capacity, '" to "', NEW.capacity, '"; ');
+    END IF;
+
+    IF OLD.vehicle_type != NEW.vehicle_type THEN
+        SET changes = CONCAT(changes, 'Type from "', OLD.vehicle_type, '" to "', NEW.vehicle_type, '"; ');
+    END IF;
+
+    IF OLD.driver_id != NEW.driver_id THEN
+        SET changes = CONCAT(changes, 'Driver changed; ');
+    END IF;
+
+    IF OLD.photo != NEW.photo THEN
+        SET changes = CONCAT(changes, 'Photo updated; ');
+    END IF;
+
+    -- Log the action
+    INSERT INTO vehicle_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated vehicle: ', NEW.vehicle_name, '. Changes: ', changes)
+    );
+END$$
+DELIMITER ;
+
+-- Delete
+
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_delete
+AFTER DELETE ON vehicle
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    INSERT INTO vehicle_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'DELETE',
+        CONCAT(admin_name, ' deleted vehicle: ', OLD.vehicle_name, 
+               ' (Plate: ', OLD.plate_no, ', Type: ', OLD.vehicle_type, ')')
     );
 END$$
 DELIMITER ;
