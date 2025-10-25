@@ -45,9 +45,9 @@ class ActivityLogsModel extends BaseModel {
 
         // 🔹 STEP 3: Define what each role can access
         $accessRules = [
-            'super' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'administrator', 'campus_locations', 'driver', 'vehicle'],
+            'super' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'administrator', 'campus_locations', 'driver', 'vehicle', 'vehicle_request'],
             'gsu' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'campus_locations'],
-            'motorpool' => ['driver', 'vehicle']
+            'motorpool' => ['driver', 'vehicle', 'vehicle_request']
         ];
 
         // 🔹 STEP 4: Build date condition
@@ -188,6 +188,7 @@ class ActivityLogsModel extends BaseModel {
             $sqlParts[] = $query;
         }
 
+        // Vehicle Logs
         if (in_array('vehicle', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'vehicle')) {
             $query = "SELECT 
                         changed_at AS timestamp,
@@ -196,6 +197,22 @@ class ActivityLogsModel extends BaseModel {
                         staff_name AS affected_item,
                         description AS details
                       FROM vehicle_audit";
+            $conditions = [];
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
+            if ($dateCondition) $conditions[] = str_replace('action_date', 'changed_at', $dateCondition);
+            $addConditions($query, $conditions);
+            $sqlParts[] = $query;
+        }
+
+        // Vehicle Request Logs
+        if (in_array('vehicle_request', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'vehicle_request')) {
+            $query = "SELECT 
+                        changed_at AS timestamp,
+                        'Vehicle Request' AS source,
+                        action AS action_type,
+                        requester_name AS affected_item,
+                        description AS details
+                      FROM vehicle_request_audit";
             $conditions = [];
             if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = str_replace('action_date', 'changed_at', $dateCondition);

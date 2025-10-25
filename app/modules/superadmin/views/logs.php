@@ -51,6 +51,7 @@ $dateFilter = $_GET['date'] ?? 'all';
               <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
               <option value="driver" <?= $tableFilter==='driver'?'selected':'' ?>>Driver</option>
               <option value="vehicle" <?= $tableFilter==='vehicle'?'selected':'' ?>>Vehicle</option>
+              <option value="vehicle_request" <?= $tableFilter==='vehicle_request'?'selected':'' ?>>Vehicle Request</option>
             </select>
             <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>
