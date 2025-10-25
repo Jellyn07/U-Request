@@ -12,3 +12,10 @@ function setCurrentStaff($conn) {
         $conn->query("SET @current_staff_id = '$staffId'");
     }
 }
+
+function setCurrentRequester($conn) {
+    if (isset($_SESSION['req_id'])) {
+        $reqId = $conn->real_escape_string($_SESSION['req_id']);
+        $conn->query("SET @current_req_id = '$reqId'");
+    }
+}

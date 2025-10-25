@@ -106,10 +106,10 @@ require_once __DIR__ . '/../../../config/constants.php';
       <hr class="my-6 border-gray-400">
 
       <!-- CONTACT & CERTIFICATION -->
-      <div class="mb-6">
+      <!-- <div class="mb-6">
         <label class="text-sm mb-1 block">Contact No <span class="text-red-500">*</span></label>
         <input type="text" name="contactNo" required class="input-field w-full">
-      </div>
+      </div> -->
 
       <div class="flex items-start mb-6">
         <input type="checkbox" name="certify" required class="mt-0.5 mr-2 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-600">
