@@ -40,7 +40,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       >
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
             <select id="statusFilter" class="input-field">
               <option value="all">All</option>
@@ -76,7 +76,7 @@ $profile = $controller->getProfile($_SESSION['email']);
           class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- LEFT: User List -->
           <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-            <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow">
+            <div class="overflow-x-auto max-h-[550px] overflow-y-auto rounded-b-lg shadow">
               <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
                 <thead class="bg-gray-50">
                   <tr>
