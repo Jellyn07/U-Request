@@ -94,12 +94,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option>Air-Condition</option>
                 <option>Others</option>
             </select>
-            <select id="sort" class="input-field">
+            <!-- <select id="sort" class="input-field">
                 <option value="Newest">Newest</option>
                 <option value="Oldest">Oldest</option>
                 <option value="AZ">A-Z</option>
                 <option value="ZA">Z-A</option>
-            </select>
+            </select> -->
             <select id="sortCategory" class="input-field">
                 <option value="all">All Dates</option>
                 <option value="today">Today</option>

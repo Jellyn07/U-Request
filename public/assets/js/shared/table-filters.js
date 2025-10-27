@@ -48,7 +48,7 @@ export function initTableFilters({
       // 📅 Date range filter
       let dateMatches = true;
       if (dateColumnIndex !== null) {
-        const dateText = row.children[dateColumnIndex]?.getAttribute("data-date") || "";
+        const dateText = row.getAttribute("data-date") || row.children[dateColumnIndex]?.textContent.trim() || "";
         const rowDate = new Date(dateText);
         if (!isNaN(rowDate)) {
           const diffDays = Math.floor((now - rowDate) / (1000 * 60 * 60 * 24));

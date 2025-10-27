@@ -109,6 +109,10 @@ class RequestController {
     public function getAllRequesters() {
         return $this->model->getAllRequesters();
     }
+
+    public function showRequests() {
+        $requests = $this->model->getAllVehicleRequests();
+    }
     
     public function getRequesterById($id) {
         return $this->model->getRequesterById($id);
@@ -119,6 +123,14 @@ class RequestController {
         // Pass data to view
         return [
             "requests"   => $requests
+        ];
+    }
+
+    public function indexVehicle() {
+        $requests = $this->model->getAllVehicleRequests();
+
+        return [
+            "requests" => $requests
         ];
     }
 

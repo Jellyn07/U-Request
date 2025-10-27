@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/RequestController.php';
+$controller = new RequestController();
+$data = $controller->indexVehicle();
+$requests = $data['requests'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -73,34 +77,34 @@ require_once __DIR__ . '/../../../config/constants.php';
                 </tr>
               </thead>
               <tbody id="requestsTable" class="text-sm">
-                <?php 
-                for ($i = 0; $i < 15; $i++){
-                  echo '
+                <?php if (!empty($requests)): ?>
+                  <?php foreach ($requests as $row): ?>
                     <tr 
                       class="border-b hover:bg-gray-100 cursor-pointer"
+                      data-status="<?= htmlspecialchars($row['req_status']) ?>"
+                      data-date="<?= htmlspecialchars(date('Y-m-d', strtotime($row['date_request']))) ?>"
                       @click="selectRow({
-                        request_id: \'REQ-00' . ($i+1) . '\',
-                        tracking_id: \'TRK-000' . ($i+1) . '\',
-                        Name: \'Jellyn Omo\',
-                        request_Type: \'Electrical\',
-                        location: \'PECC-002\',
-                        request_date: \'2025-10-13\',
-                        req_status: \'To Inspect\',
-                        image_path: \'\',
-                        priority_status: \'High\',
-                        staff_id: \'\'
+                        control_no: '<?= htmlspecialchars($row['control_no']) ?>',
+                        tracking_id: '<?= htmlspecialchars($row['tracking_id']) ?>',
+                        requester_name: '<?= htmlspecialchars($row['requester_name']) ?>',
+                        travel_destination: '<?= htmlspecialchars($row['travel_destination']) ?>',
+                        date_request: '<?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?>',
+                        travel_date: '<?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?>',
+                        trip_purpose: '<?= htmlspecialchars($row['trip_purpose']) ?>',
+                        req_status: '<?= htmlspecialchars($row['req_status']) ?>'
                       })"
                     >
-                      <td class="px-4 py-3">TRK-000' . ($i+1) . '</td>
-                      <td class="px-4 py-3">Jellyn Omo</td>
-                      <td class="px-4 py-3">Electrical</td>
-                      <td class="px-4 py-3">PECC-002</td>
-                      <td class="px-4 py-3">Oct 13, 2025</td>
-                      <td class="px-4 py-3">To Inspect</td>
-                    </tr>                
-                  ';
-                }
-                ?>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['tracking_id']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['requester_name']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['travel_destination']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['req_status']) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr><td colspan="6" class="text-center py-3 text-gray-400">No vehicle requests found</td></tr>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>
@@ -117,7 +121,7 @@ require_once __DIR__ . '/../../../config/constants.php';
             <input type="hidden" name="action" value="saveAssignment">
             <input type="hidden" name="req_id" x-model="selected.req_id">
 
-            <h2 class="text-lg font-bold mb-2">Request Information</h2>
+            <h2 class="text-lg font-bold mb-2">Vehicle Request Information</h2>
 
             <div>
               <label class="text-xs text-text mb-1">Tracking No.</label>
@@ -127,7 +131,7 @@ require_once __DIR__ . '/../../../config/constants.php';
             <div>
               <label class="text-xs text-text mb-1">Request Date</label>
               <input type="text" class="w-full view-field"  
-              :value="new Date(selected.request_date).toLocaleDateString('en-US', { 
+              :value="new Date(selected.date_request).toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'long', 
                 day: '2-digit' 
@@ -137,17 +141,27 @@ require_once __DIR__ . '/../../../config/constants.php';
 
             <div>
               <label class="text-xs text-text mb-1">Requester</label>
-              <input type="text" class="w-full view-field" x-model="selected.Name" readonly />
+              <input type="text" class="w-full view-field" x-model="selected.requester_name" readonly />
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Category</label>
-              <input type="text" class="w-full view-field" x-model="selected.request_Type" readonly />
+              <label class="text-xs text-text mb-1">Travel Date</label>
+              <input type="text" class="w-full view-field" x-model="selected.travel_date" readonly />
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Location</label>
-              <input type="text" class="w-full view-field" x-model="selected.location" readonly />
+              <label class="text-xs text-text mb-1">Destination</label>
+              <input type="text" class="w-full view-field" x-model="selected.travel_destination" readonly />
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">Trip Purpose</label>
+              <input type="text" class="w-full view-field" x-model="selected.trip_purpose" readonly />
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">No of Passengers</label>
+              <input type="text" class="w-full view-field" x-model="selected.trip_purpose" readonly />
             </div>
 
             <div>
@@ -202,20 +216,19 @@ require_once __DIR__ . '/../../../config/constants.php';
 
   <!-- Table Filters -->
   <script type="module">
-    import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+  import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
+
     document.addEventListener("DOMContentLoaded", () => {
-      initTableFilters({
-        tableId: "requestsTable",
-        searchId: "searchRequests",
-        filterId: "filterCategory",
-        sortId: "sortCategory",
-        searchColumns: [0, 1],
-        filterAttr: "data-category",
-        statusTabs: "#tabs button",
-        dateColumnIndex: 4
-      });
-    });
-  </script>
+    initTableFilters({
+    tableId: "requestsTable",
+    searchId: "searchRequests",
+    sortId: "sortCategory",
+    searchColumns: [0, 1, 3],
+    statusTabs: "#tabs button",
+    dateColumnIndex: 4
+  });
+});
+</script>
 
   <script src="/public/assets/js/shared/menus.js"></script>
 </body>
