@@ -82,10 +82,52 @@ if (!$details) {
     <!-- <p><b>Control No.:</b> <?php echo htmlspecialchars($details['control_no']); ?></p> -->
     <p><b>Travel Destination:</b> <?php echo htmlspecialchars($details['travel_destination']); ?></p>
     <p><b>Purpose:</b> <?php echo htmlspecialchars($details['trip_purpose']); ?></p>
-    <p><b>Date Requested:</b> <?php echo htmlspecialchars($details['date_request']); ?></p>
-    <p><b>Travel Date:</b> <?php echo htmlspecialchars($details['travel_date']); ?></p>
-    <p><b>Return Date:</b> <?php echo htmlspecialchars($details['return_date']); ?></p>
-
+    <p><b>Date Requested:</b>
+      <?php 
+        if (!empty($details['date_request'])) {
+            $date = date("F j, Y", strtotime($details['date_request']));
+            $time = date("g:i A", strtotime($details['date_request']));
+            echo htmlspecialchars($date) . 
+                " <span style='font-size: 0.9em; color: gray;'>(" . htmlspecialchars($time) . ")</span>";
+        } else {
+            echo 'N/A';
+        }
+      ?>
+    </p>
+    <p><b>Travel Date:</b>
+      <?php 
+        echo !empty($details['travel_date']) 
+          ? htmlspecialchars(date("F j, Y", strtotime($details['travel_date']))) 
+          : 'N/A'; 
+      ?>
+    </p>
+    <p><b>Return Date:</b>
+      <?php 
+        echo !empty($details['return_date']) 
+          ? htmlspecialchars(date("F j, Y", strtotime($details['return_date']))) 
+          : 'N/A'; 
+      ?>
+    </p>
+    <p><b>Departure Time:</b>
+      <?php 
+        if (!empty($details['departure_time'])) {
+            $time = date("g:i A", strtotime($details['departure_time']));
+            echo "<span style='color: gray; font-size: 0.9em;'>" . htmlspecialchars($time) . "</span>";
+        } else {
+            echo 'N/A';
+        }
+      ?>
+    </p>
+    <p><b>Return Time:</b>
+      <?php 
+        if (!empty($details['return_time'])) {
+            $time = date("g:i A", strtotime($details['return_time']));
+            echo "<span style='color: gray; font-size: 0.9em;'>" . htmlspecialchars($time) . "</span>";
+        } else {
+            echo 'N/A';
+        }
+      ?>
+    </p>
     <?php if (!empty($details['passengers'])): ?>
       <div class="mt-2">
         <b>Passengers:</b>

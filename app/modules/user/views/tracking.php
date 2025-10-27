@@ -63,7 +63,7 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
         <?php 
           $type = $_GET['type'] ?? 'repair'; 
           $statusOptions = ($type === 'vehicle') 
-            ? ['Pending', 'Approved', 'Disapproved']
+            ? ['Pending', 'Approved', 'Disapproved', 'On Going' ,'Completed']
             : ['To Inspect', 'In Progress', 'Completed'];
         ?>
 

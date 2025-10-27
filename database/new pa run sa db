@@ -19,6 +19,7 @@ BEGIN
 END $$
 DELIMITER ;
 
+-- Edit Vehicle Request Procedure to include call to spAddVehicleRequestAssignment 
 drop procedure spAddVehicleRequest;
 
 DELIMITER $$
@@ -33,6 +34,8 @@ CREATE PROCEDURE spAddVehicleRequest(
     IN p_return_time TIME
 )
 BEGIN
+    DECLARE new_control_no INT;
+
     INSERT INTO vehicle_request (
         req_id,
         date_request,
@@ -56,11 +59,43 @@ BEGIN
         p_return_time
     );
 
-    -- Return the inserted ID
-    SELECT LAST_INSERT_ID() AS control_no;
-END$$
+    SET new_control_no = LAST_INSERT_ID();
+
+    CALL spAddVehicleRequestAssignment(
+        new_control_no,
+        p_req_id,
+        NULL,            -- vehicle_id default NULL
+        NULL,            -- driver_id default NULL
+        'Pending',       -- req_status default
+        NULL             -- approved_by default NULL
+    );
+
+    SELECT new_control_no AS control_no;
+END $$
 DELIMITER ;
 
+-- Add New Table for Vehicle Request Assignment
+CREATE TABLE vehicle_request_assignment (
+    reqAssignment_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    control_no INT(11) NOT NULL,
+    req_id INT(10) UNSIGNED,
+    vehicle_id INT(11) NULL,
+    driver_id INT(10) UNSIGNED NULL,
+    req_status VARCHAR(25) NOT NULL,
+    approved_by VARCHAR(100) NULL,
+
+    CONSTRAINT fk_vra_vehicle_request FOREIGN KEY (control_no)
+        REFERENCES vehicle_request(control_no) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_vra_requester FOREIGN KEY (req_id)
+        REFERENCES requester(req_id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_vra_vehicle FOREIGN KEY (vehicle_id)
+        REFERENCES vehicle(vehicle_id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_vra_driver FOREIGN KEY (driver_id)
+        REFERENCES driver(driver_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Activity Logs
 

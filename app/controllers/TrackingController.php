@@ -57,7 +57,9 @@ class TrackingController {
         $statusOrderVehicle = [
             'Pending'      => 1,
             'Approved'     => 2,
-            'Disapproved'  => 3
+            'Disapproved'  => 3,
+            'On Going'     => 4,
+            'Completed'    => 5
         ];
 
         $statusOrder = ($type === 'vehicle') ? $statusOrderVehicle : $statusOrderRepair;

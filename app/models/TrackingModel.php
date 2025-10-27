@@ -121,14 +121,11 @@ class TrackingModel extends BaseModel {
     public function getVehicleTrackingByEmail($email) {
         $sqlVehicle = "
             SELECT 
-                v.tracking_id,
-                v.travel_destination,
-                v.return_date,
-                v.trip_purpose,
-                v.travel_date,
-                v.return_date
+                v.*,
+                vr.req_status
             FROM vehicle_request v
             INNER JOIN requester r ON v.req_id = r.req_id
+            INNER JOIN vehicle_request_assignment vr ON v.req_id = vr.req_id
             WHERE r.email = ?
         ";
         $stmt = $this->db->prepare($sqlVehicle);
@@ -190,13 +187,7 @@ class TrackingModel extends BaseModel {
         // 2) try vehicle_request
             $sqlVehicle = "
             SELECT 
-                v.tracking_id,
-                v.travel_destination,
-                v.date_request,
-                v.trip_purpose,
-                v.travel_date,
-                v.return_date,
-                v.control_no
+                v.*
             FROM vehicle_request v
             INNER JOIN requester r ON v.req_id = r.req_id
             WHERE r.email = ? AND v.tracking_id = ?
