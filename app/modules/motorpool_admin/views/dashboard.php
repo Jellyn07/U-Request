@@ -7,6 +7,10 @@ session_start();
 // require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/DashboardController.php';
+require_once __DIR__ . '/../../../controllers/RequestController.php';
+$con = new RequestController();
+$data = $con->indexVehicle();
+$requests = $data['requests'];
 
 $controller = new DashboardController();
 $year = $_GET['year'] ?? date('Y');
@@ -51,7 +55,7 @@ $dateRange = "$startDate - $endDate";
         <div class="border-r-2 border-gray-300">
           <h2 class="font-medium mb-3">Pending Requests</h2>
           <p class="text-4xl font-bold text-text mt-2">
-            <?= isset($data['summary']['total_pending']) ? $data['summary']['total_pending'] : 0 ?>
+            <?= isset($data['summary']['total_vrequests_p']) ? $data['summary']['total_vrequests_p'] : 0 ?>
           </p>
           <p class="text-xs text-gray-500 font-medium mt-2">Pending request today</p>
         </div>
@@ -81,15 +85,15 @@ $dateRange = "$startDate - $endDate";
 
       <!-- Charts -->
       <div class="grid md:grid-cols-2 gap-6 mb-5">
-        <div class="bg-white p-4 rounded-2xl shadow">
-          <h3 class="font-semibold text-text text-base text-center">Requests Status</h3>
-          <div class="w-full h-80">
+       <div class="bg-white p-4 rounded-2xl shadow mb-6">
+          <h3 class="font-semibold text-text text-base text-center mb-2">Request Status</h3>
+          <div class="w-full h-80 flex justify-center">
             <canvas id="requestStatusChart"></canvas>
           </div>
         </div>
         <div class="bg-white p-4 rounded-2xl shadow">
-          <h3 class="font-semibold text-text text-base text-center">Vehicle Usage</h3>
-          <div class="w-full h-80">
+          <h3 class="font-semibold text-text text-base text-center mb-2">Vehicle Usage</h3>
+          <div class="w-full h-80 flex justify-center">
             <canvas id="vehicleUsageChart"></canvas>
           </div>
         </div>
@@ -100,42 +104,61 @@ $dateRange = "$startDate - $endDate";
         <h3 class="text-xl font-bold text-primary mb-1 order-1">Recent Requests</h3>
         <input type="text" id="searchRequests" placeholder="Search by Requester Name" class="flex-right min-w-[300px] input-field order-2">
       </div>
-      <table class="bg-white rounded-b-2xl shadow  w-full text-sm text-left text-text">
-        <thead class="text-xs uppercase text-gray-700 border-b-gray-400 border-b">
-          <th class="px-4 py-2">Request ID</th>
-          <th class="px-4 py-2">Requester</th>
-          <th class="px-4 py-2">Category</th>
-          <th class="px-4 py-2">Location</th>
-          <th class="px-4 py-2">Date Request</th>
-          <th class="px-4 py-2">Status</th>
-        </thead>
-        <tbody>
-          <?php 
-          for ($i = 0; $i < 15; $i++){
-            echo '
-              <tr class="border-b hover:bg-gray-100">
-                <td class="px-4 py-3">TRK-0001</td>
-                <td class="px-4 py-3">Jellyn Omo</td>
-                <td class="px-4 py-3">Electrical</td>
-                <td class="px-4 py-3">PECC-002</td>
-                <td class="px-4 py-3">Oct 13, 2025</td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                    To Inspect    
-                  </span>
-                </td>
-              </tr>                
-            ';
-          }
-          ?>
-
-        </tbody>
-      </table>
-
-      
- 
+      <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+        <thead class="bg-white sticky top-0">
+            <tr>
+              <th class="pl-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tracking ID</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Travel Date</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Travel Location</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Request</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Status</th>
+                </tr>
+              </thead>
+              <tbody id="requestsTable" class="text-sm">
+                <?php if (!empty($requests)): ?>
+                  <?php foreach ($requests as $row): ?>
+                    <tr 
+                      class="border-b hover:bg-gray-100 cursor-pointer"
+                      data-status="<?= htmlspecialchars($row['req_status']) ?>"
+                      data-date="<?= htmlspecialchars(date('Y-m-d', strtotime($row['date_request']))) ?>"
+                      @click="selectRow({
+                        control_no: '<?= htmlspecialchars($row['control_no']) ?>',
+                        tracking_id: '<?= htmlspecialchars($row['tracking_id']) ?>',
+                        requester_name: '<?= htmlspecialchars($row['requester_name']) ?>',
+                        travel_destination: '<?= htmlspecialchars($row['travel_destination']) ?>',
+                        date_request: '<?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?>',
+                        travel_date: '<?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?>',
+                        trip_purpose: '<?= htmlspecialchars($row['trip_purpose']) ?>',
+                        req_status: '<?= htmlspecialchars($row['req_status']) ?>'
+                      })"
+                    >
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['tracking_id']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['requester_name']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['travel_destination']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['req_status']) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr><td colspan="6" class="text-center py-3 text-gray-400">No vehicle requests found</td></tr>
+                <?php endif; ?>
+          </tbody>
+       </table>
     </div>
-
+    <script>
+      document.getElementById('searchRequests').addEventListener('input', function() {
+          const filter = this.value.toLowerCase();
+          const rows = document.querySelectorAll('#requestsTable tr'); // use correct ID
+          
+          rows.forEach(row => {
+              const cells = Array.from(row.children);
+              const match = cells.some(cell => cell.textContent.toLowerCase().includes(filter));
+              row.style.display = match ? '' : 'none';
+          });
+      });
+      </script>
   </main>
 </body>
 <script src="/public/assets/js/motorpool_admin/dashboard-charts.js"></script>

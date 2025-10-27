@@ -68,7 +68,7 @@ $requests = $data['requests'];
             <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
-                  <th class="pl-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Request ID</th>
+                  <th class="pl-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tracking ID</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Travel Date</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Travel Location</th>

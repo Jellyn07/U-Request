@@ -35,7 +35,12 @@ class DashboardModel extends BaseModel  {
 
                 (
                    SELECT COUNT(*) FROM driver
-                ) AS totalDrivers
+                ) AS totalDrivers,
+
+                (
+                   SELECT COUNT(*) FROM vehicle_request vr INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id WHERE vra.req_status = 'Pending'
+                ) AS total_vrequests_p
+
         ";
     
         $stmt = $this->db->prepare($sql);
@@ -122,6 +127,63 @@ class DashboardModel extends BaseModel  {
 
         $result = $stmt->get_result();
         return $result->fetch_assoc(); // returns single row
+    }
+
+    // Get number of requests per building (matching by building name)
+    public function getBuildingRequestsData() {
+        $sql = "
+        SELECT 
+        cl.building,
+        COUNT(r.control_no) AS total_requests
+        FROM campus_locations cl
+        LEFT JOIN request r
+            ON LOWER(SUBSTRING_INDEX(TRIM(r.location), ' ', 1)) = LOWER(cl.building)
+        GROUP BY cl.building
+        ORDER BY total_requests DESC;
+        ";
+        $result = $this->db->query($sql);
+        $rows = [];
+        if ($result) {
+            while ($r = $result->fetch_assoc()) {
+                $rows[] = $r;
+            }
+        }
+        return $rows;
+    }
+
+    //Vehicle Request Pie
+    public function getVehicleRequestStatusCounts() {
+        $sql = "
+            SELECT
+                (SELECT COUNT(*) FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                    WHERE vra.req_status = 'Pending') AS pending,
+                (SELECT COUNT(*) FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                    WHERE vra.req_status = 'Approved') AS approved,
+                (SELECT COUNT(*) FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                    WHERE vra.req_status = 'In Progress') AS in_progress,
+                (SELECT COUNT(*) FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                    WHERE vra.req_status = 'Completed') AS completed,
+                (SELECT COUNT(*) FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                    WHERE vra.req_status IN ('Rejected', 'Cancelled')) AS rejected_cancelled
+        ";
+
+        $result = $this->db->query($sql);
+        return $result->fetch_assoc();
+    }
+
+    public function getVehicleUsageData() {
+        $sql = "SELECT vehicle_name FROM vehicle ORDER BY vehicle_name ASC";
+        $res = $this->db->query($sql);
+        $rows = [];
+        if ($res) {
+            while ($r = $res->fetch_assoc()) $rows[] = $r;
+        }
+        return $rows;
     }
 
     // Destructor

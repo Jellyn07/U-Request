@@ -1,50 +1,60 @@
 // ---------- Request Status Chart (Pie) ----------
-const requestStatusCtx = document.getElementById('requestStatusChart').getContext('2d');
-const requestStatusChart = new Chart(requestStatusCtx, {
-    type: 'pie',
-    data: {
-        labels: ['Pending', 'Approved', 'In Progress', 'Completed', 'Rejected/Cancelled'],
-        datasets: [{
-          data: [5, 10, 3, 12, 2], // Example numbers
-          backgroundColor: [
-            '#FFC845', //yellow
-            '#1C7ED6', //blue
-            '#F29C4C', //orange
-            '#6B9A4F', //green
-            '#D11100' //red
-          ], 
-          borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false, // Allow custom sizing
-        aspectRatio: 1,             // Makes the pie circle smaller and compact
-        plugins: {
-            // title: { display: true, text: 'Request Status' },
-            legend: { 
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('../../../controllers/DashboardController.php')
+    .then(response => response.json())
+    .then(data => {
+      const ctx = document.getElementById('requestStatusChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Pending', 'Approved', 'In Progress', 'Completed', 'Rejected/Cancelled'],
+          datasets: [{
+            data: [
+              data.pending,
+              data.approved,
+              data.in_progress,
+              data.completed,
+              data.rejected_cancelled
+            ],
+            backgroundColor: [
+              '#FFC845', // Pending
+              '#1C7ED6', // Approved
+              '#F29C4C', // In Progress
+              '#6B9A4F', // Completed
+              '#D11100'  // Rejected/Cancelled
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: {
+            padding: {
+              top: 10,
+              bottom: 10,
+              left: 10,
+              right: 10
+            }
+          },
+          plugins: {
+            legend: {
               position: 'right',
               labels: {
-                generateLabels: chart => {
-                        return chart.data.labels.map((label, i) => ({
-                            text: label,
-                            fillStyle: chart.data.datasets[0].backgroundColor[i],
-                            strokeStyle: '#f0f0f0',  // border color
-                            lineWidth: 1,            // border width
-                            index: i,
-                            // Custom property for rounded box
-                            borderRadius: 4
-                        }));
-                    },
-                    boxWidth: 15,
-                    boxHeight: 8,
-                    padding: 10
+                boxWidth: 15,
+                boxHeight: 8,
+                padding: 10
               }
             }
-        },
-        radius: '90%'
-    }
+          },
+          radius: '90%' // smaller circle to add spacing inside the div
+        }
+      });
+    })
+    .catch(error => console.error('Error loading chart data:', error));
 });
+
 
 // ---------- Vehicle Usage Chart (Bar) ----------
 const vehicleUsageCtx = document.getElementById('vehicleUsageChart').getContext('2d');
