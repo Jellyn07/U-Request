@@ -82,4 +82,24 @@ try {
 // ✅ Redirect back
 header("Location: ../modules/user/views/request.php");
 exit;
+
+
+$controller = new class {
+    public $model;
+    public function __construct() {
+        $this->model = new VehicleRequestModel();
+    }
+    public function fetchVehicles() {
+        header('Content-Type: application/json');
+        echo json_encode($this->model->getVehicles());
+    }
+    public function fetchPersonnel() {
+        header('Content-Type: application/json');
+        echo json_encode($this->model->getDriver());
+    }
+};
+
+if (isset($_GET['vehicles'])) $controller->fetchVehicles();
+elseif (isset($_GET['drivers'])) $controller->fetchPersonnel();
 ?>
+

@@ -83,17 +83,20 @@ $requests = $data['requests'];
                       class="border-b hover:bg-gray-100 cursor-pointer"
                       data-status="<?= htmlspecialchars($row['req_status']) ?>"
                       data-date="<?= htmlspecialchars(date('Y-m-d', strtotime($row['date_request']))) ?>"
-                      @click="selectRow({
-                        control_no: '<?= htmlspecialchars($row['control_no']) ?>',
-                        tracking_id: '<?= htmlspecialchars($row['tracking_id']) ?>',
-                        requester_name: '<?= htmlspecialchars($row['requester_name']) ?>',
-                        travel_destination: '<?= htmlspecialchars($row['travel_destination']) ?>',
-                        date_request: '<?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?>',
-                        travel_date: '<?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?>',
-                        trip_purpose: '<?= htmlspecialchars($row['trip_purpose']) ?>',
-                        req_status: '<?= htmlspecialchars($row['req_status']) ?>'
-                      })"
-                    >
+                      @click='selectRow({
+                          control_no: "<?= htmlspecialchars($row['control_no'], ENT_QUOTES) ?>",
+                          tracking_id: "<?= htmlspecialchars($row['tracking_id'], ENT_QUOTES) ?>",
+                          requester_name: "<?= htmlspecialchars($row['requester_name'], ENT_QUOTES) ?>",
+                          travel_destination: "<?= htmlspecialchars($row['travel_destination'], ENT_QUOTES) ?>",
+                          date_request: "<?= htmlspecialchars(date('M d, Y', strtotime($row['date_request'])), ENT_QUOTES) ?>",
+                          travel_date: "<?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date'])), ENT_QUOTES) ?>",
+                          return_date: "<?= htmlspecialchars(date('M d, Y', strtotime($row['return_date'])), ENT_QUOTES) ?>",
+                          depret_time: "<?= htmlspecialchars(date('h:i A', strtotime($row['departure_time'])) . ' - ' . date('h:i A', strtotime($row['return_time'])), ENT_QUOTES) ?>",
+                          trip_purpose: "<?= htmlspecialchars($row['trip_purpose'], ENT_QUOTES) ?>",
+                          req_status: "<?= htmlspecialchars($row['req_status'], ENT_QUOTES) ?>",
+                          passenger_count: "<?= count($row['passengers']) ?>",
+                          passengers: <?= htmlspecialchars(json_encode($row['passengers'] ?? []), ENT_QUOTES) ?>
+                      })'>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['tracking_id']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['requester_name']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?></td>
@@ -161,34 +164,24 @@ $requests = $data['requests'];
 
             <div>
               <label class="text-xs text-text mb-1">No of Passengers</label>
-              <input type="text" class="w-full view-field" x-model="selected.trip_purpose" readonly />
+              <input type="text" class="w-full view-field" x-model="selected.passenger_count" readonly />
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Priority Level</label>
-              <select name="prio_level" id="prioritySelect" class="w-full input-field" x-model="selected.priority_status">
-                <option value="">No Priority Level</option>
-                <option value="Low">Low</option>
-                <option value="High">High</option>
-              </select>
+              <label class="text-xs text-text mb-1">Assign Vehicle</label>
+              <select id="vehicleSelect" class="w-full input-field"></select>
             </div>
 
             <div>
-              <label class="text-xs text-text mb-1">Assign Personnel</label>
-              <select name="staff_id" id="staffSelect" class="w-full input-field" x-model="selected.staff_id">
-                <option value="">No Assigned Personnel</option>
-                <?php if (isset($personnels)): ?>
-                  <?php foreach ($personnels as $person): ?>
-                    <option value="<?= $person['staff_id'] ?>">
-                      <?= htmlspecialchars($person['full_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </select>
+              <label class="text-xs text-text mb-1">Assign Driver</label>
+              <select id="staffSelect" class="w-full input-field"></select>
             </div>
 
             <div class="flex justify-center pt-2 space-x-2">
-              <button type="button" class="btn btn-primary">Full Details</button>
+              <button type="button" class="btn btn-primary"
+                      @click="viewFullDetails(selected)">
+                Full Details
+              </button>
               <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment">
                 Save Changes
               </button>
@@ -214,6 +207,117 @@ $requests = $data['requests'];
     });
   </script>
 
+<script>
+fetch('../../../controllers/VehicleRequestController.php?vehicles=1')
+  .then(res => res.json())
+  .then(data => {
+    const vehicleSelect = document.getElementById('vehicleSelect');
+    vehicleSelect.innerHTML = '<option value="">No Vehicle Assigned</option>';
+    data.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.vehicle_id;
+      opt.textContent = v.vehicle_name;
+      vehicleSelect.appendChild(opt);
+    });
+  });
+
+fetch('../../../controllers/VehicleRequestController.php?drivers=1')
+  .then(res => res.json())
+  .then(data => {
+    const staffSelect = document.getElementById('staffSelect');
+    staffSelect.innerHTML = '<option value="">No Assigned Driver</option>';
+    data.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.driver_id; // ✅ corrected
+      opt.textContent = p.full_name;
+      staffSelect.appendChild(opt);
+    });
+  });
+  document.addEventListener("alpine:init", () => {
+  Alpine.data("requestList", () => ({
+    showDetails: false,
+    selected: {},
+
+    selectRow(request) {
+      this.selected = request;
+      this.showDetails = true;
+    },
+
+    viewFullDetails(selected) {
+      Swal.fire({
+        html: `
+          <div class="text-left text-sm max-w-full overflow-x-auto">
+            <h2 class="text-base font-bold mb-2">Vehicle Request Details</h2>
+
+            <div class="mb-2"><label class="text-xs">Tracking No.</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.tracking_id}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Request Date</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.date_request}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Requester</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.requester_name}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Requester Contact No</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.contact_no}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Travel Date</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.travel_date}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Return Travel Date</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.return_date}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Destination</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.travel_destination}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Trip Purpose</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.trip_purpose}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Departure and Return Time</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.depret_time || 'N/A'}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Passengers</label>
+              <ul class="border px-2 py-1 rounded text-sm max-h-40 overflow-y-auto">
+                ${selected.passengers && selected.passengers.length > 0 
+                  ? selected.passengers.map(p => `<li>${p.name || p}</li>`).join('') 
+                  : '<li>No Passengers</li>'}
+              </ul>
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Assigned Vehicle</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.vehicle_name || 'Not Assigned'}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Assigned Driver</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.full_name || 'Not Assigned'}" readonly />
+            </div>
+
+            <div class="mb-2"><label class="text-xs">Status</label>
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.req_status}" readonly />
+            </div>
+
+          </div>
+        `,
+        width: 600,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#800000'
+      });
+    }
+  }));
+});
+
+</script>
+
+</script>
   <!-- Table Filters -->
   <script type="module">
   import { initTableFilters } from "/public/assets/js/shared/table-filters.js";

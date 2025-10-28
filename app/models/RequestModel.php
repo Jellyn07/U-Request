@@ -380,30 +380,49 @@ class RequestModel extends BaseModel {
     }
 
     // Vehicle Requests
-     public function getAllVehicleRequests() {
-        $query = "
-            SELECT 
-                v.*,
-                CONCAT(r.firstName, ' ', r.lastName) AS requester_name,
-                vr.req_status
-            FROM vehicle_request v
-            INNER JOIN requester r ON v.req_id = r.req_id
-            INNER JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no
-            ORDER BY v.date_request DESC
-        ";
+   public function getAllVehicleRequests() {
+    // First, get the main vehicle requests
+    $query = "
+        SELECT 
+            v.*,
+            CONCAT(r.firstName, ' ', r.lastName) AS requester_name,
+            vr.req_status
+        FROM vehicle_request v
+        INNER JOIN requester r ON v.req_id = r.req_id
+        INNER JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no
+        ORDER BY v.date_request DESC
+    ";
 
-        $result = $this->db->query($query);
-
-        if (!$result) {
-            die('Query Error: ' . $this->db->error);
-        }
-
-        $requests = [];
-        while ($row = $result->fetch_assoc()) {
-            $requests[] = $row;
-        }
-
-        return $requests;
+    $result = $this->db->query($query);
+    if (!$result) {
+        die('Query Error: ' . $this->db->error);
     }
+
+    $requests = [];
+    while ($row = $result->fetch_assoc()) {
+        // Fetch passengers for this request
+        $control_no = $row['control_no'];
+        $passengersQuery = "
+            SELECT CONCAT(p.firstName, ' ', p.lastName) AS name
+            FROM passengers p
+            INNER JOIN vehicle_request_passengers vrp ON p.passenger_id = vrp.passenger_id
+            WHERE vrp.control_no = '{$this->db->real_escape_string($control_no)}'
+        ";
+        $passengersResult = $this->db->query($passengersQuery);
+        $passengers = [];
+        if ($passengersResult) {
+            while ($p = $passengersResult->fetch_assoc()) {
+                $passengers[] = $p['name'];
+            }
+        }
+
+        $row['passengers'] = $passengers;                     // Array of passenger names
+        $row['passenger_count'] = count($passengers);         // Number of passengers
+
+        $requests[] = $row;
+    }
+
+    return $requests;
+}
 
 }

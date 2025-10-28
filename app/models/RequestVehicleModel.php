@@ -132,6 +132,45 @@ class VehicleRequestModel extends BaseModel {
         $stmt->close();
         return true; // ✅ success
     }
+    // Fetch all vehicles
+    public function getVehicles() {
+        $sql = "SELECT vehicle_id, vehicle_name FROM vehicle ORDER BY vehicle_name ASC";
+        $res = $this->db->query($sql);
+        $vehicles = [];
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $vehicles[] = $row;
+            }
+        }
+        return $vehicles;
+    }
+
+    // Fetch all personnel (drivers)
+    public function getDriver() {
+        $sql = "SELECT driver_id, CONCAT(firstName, ' ', lastName) AS full_name FROM driver ORDER BY firstName ASC";
+        $res = $this->db->query($sql);
+        $personnels = [];
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $personnels[] = $row;
+            }
+        }
+        return $personnels;
+    }
+
+    // Optional: save assignment
+    public function assignVehicle($request_id, $vehicle_id, $staff_id, $priority_status) {
+        $stmt = $this->db->prepare("
+            INSERT INTO vehicle_request_assignment (request_id, vehicle_id, staff_id, priority_status)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                vehicle_id = VALUES(vehicle_id),
+                staff_id = VALUES(staff_id),
+                priority_status = VALUES(priority_status)
+        ");
+        $stmt->bind_param("iiis", $request_id, $vehicle_id, $staff_id, $priority_status);
+        return $stmt->execute();
+    }
     public function getLastError() {
     return $this->lastError;
 }
