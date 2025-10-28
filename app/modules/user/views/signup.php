@@ -90,28 +90,36 @@ require_once __DIR__ . '/../../../models/UserModel.php';
         </div>
 
         <!-- Password -->
-        <div class="form-group">        
+        <div class="form-group relative">        
           <label for="password" class="text-sm text-text mb-1">
             Password:
             <span class="text-accent">*</span>
           </label>
           <input type="password" id="password" name="pass" class="w-full input-field" required>
+          <span class="absolute right-3 cursor-pointer" data-password-toggle="password">
+            <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+            <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+          </span>
         </div>
 
         <!-- Re-enter Password -->
-        <div class="form-group">     
+        <div class="form-group relative">     
           <label for="repassword" class="text-sm text-text mb-1">
             Re-enter Password:
             <span class="text-accent">*</span>
           </label>                
           <input type="password" id="repassword" name="rpass" class="w-full input-field" required>
+          <span class="absolute right-3 cursor-pointer" data-password-toggle="repassword">
+            <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+            <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+          </span>          
         </div>  
 
         <!-- Data Privacy -->
         <div class="flex items-start space-x-2">
           <input type="checkbox" id="dp" name="dp" class="mt-1.5" required>
           <a href="https://www.usep.edu.ph/usep-data-privacy-statement/" class="text-xs mt-1">
-            By using U-Request, you agree to the USeP Data Privacy Statement.
+            By using U-Request, you agree to the <span class="text-primary hover:underline"> USeP Data Privacy Statement. </span>
           </a>     
         </div>
 
@@ -133,6 +141,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
 
   </body>
 </html>
+<script src="/public/assets/js/shared/password-visibility.js"></script>
 <script>
   let signupError = <?= json_encode($signup_error) ?>;
   let signupSuccess = <?= json_encode($signup_success) ?>;
