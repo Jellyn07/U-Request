@@ -179,5 +179,4 @@ $dateRange = "$startDate - $endDate";
     });
   });
 </script>
-
 </html>

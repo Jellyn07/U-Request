@@ -42,10 +42,16 @@ class DashboardController {
     }
 
     public function fetchBuildingRequestsData() {
-    $data = $this->model->getBuildingRequestsData();
-    header('Content-Type: application/json');
-    echo json_encode($data);
-}
+        $data = $this->model->getBuildingRequestsData();
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
+    public function fetchWorkloadData() {
+        $data = $this->model->getWorkloadData();
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
 
     public function getProfile($admin_email)
     {
@@ -54,14 +60,25 @@ class DashboardController {
     
 }
 if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])) {
-    $database = new DashboardModel();
-    $controller = new DashboardController($database);
-    $controller->fetchRequestStatusData();
-}
-if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])) {
+    $controller = new DashboardController();
+
     if (isset($_GET['building_requests'])) {
-        $controller = new DashboardController();
         $controller->fetchBuildingRequestsData();
-        exit; // important! stop the rest of the HTML
+        exit;
+    }
+
+    if (isset($_GET['request_status'])) {
+        $controller->fetchRequestStatusData();
+        exit;
+    }
+
+    if (isset($_GET['workload_data'])) {
+        $controller->fetchWorkloadData();
+        exit;
+    }
+
+    if (isset($_GET['vehicle_usage'])) {
+        $controller->fetchVehicleUsageData();
+        exit;
     }
 }

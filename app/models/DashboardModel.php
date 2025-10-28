@@ -132,14 +132,8 @@ class DashboardModel extends BaseModel  {
     // Get number of requests per building (matching by building name)
     public function getBuildingRequestsData() {
         $sql = "
-        SELECT 
-        cl.building,
-        COUNT(r.control_no) AS total_requests
-        FROM campus_locations cl
-        LEFT JOIN request r
-            ON LOWER(SUBSTRING_INDEX(TRIM(r.location), ' ', 1)) = LOWER(cl.building)
-        GROUP BY cl.building
-        ORDER BY total_requests DESC;
+         SELECT cl.building, COUNT(r.request_id) AS total_requests FROM campus_locations cl
+            LEFT JOIN request r ON r.location LIKE CONCAT('%', cl.building, '%') GROUP BY cl.building ORDER BY total_requests DESC;
         ";
         $result = $this->db->query($sql);
         $rows = [];
@@ -150,6 +144,33 @@ class DashboardModel extends BaseModel  {
         }
         return $rows;
     }
+
+    public function getWorkloadData() {
+        $sql = "
+             SELECT 
+            rp.firstName,
+            rp.lastName,
+            r.request_Type,
+            COUNT(ra.request_id) AS total
+        FROM gsu_personnel rp
+        LEFT JOIN request_assigned_personnel ra
+            ON rp.staff_id = ra.staff_id
+        LEFT JOIN request r
+            ON ra.request_id = r.request_id
+        GROUP BY rp.staff_id, r.request_Type
+        ORDER BY rp.firstName, r.request_Type;
+        ";
+
+        $result = $this->db->query($sql);
+        $rows = [];
+        if ($result) {
+            while ($r = $result->fetch_assoc()) {
+                $rows[] = $r;
+            }
+        }
+        return $rows;
+    }
+
 
     //Vehicle Request Pie
     public function getVehicleRequestStatusCounts() {
@@ -177,13 +198,33 @@ class DashboardModel extends BaseModel  {
     }
 
     public function getVehicleUsageData() {
-        $sql = "SELECT vehicle_name FROM vehicle ORDER BY vehicle_name ASC";
+        // Fetch all vehicles
+        $vehicles = [];
+        $sql = "SELECT vehicle_id, vehicle_name FROM vehicle ORDER BY vehicle_name ASC";
         $res = $this->db->query($sql);
-        $rows = [];
         if ($res) {
-            while ($r = $res->fetch_assoc()) $rows[] = $r;
+            while ($r = $res->fetch_assoc()) $vehicles[] = $r;
         }
-        return $rows;
+
+        // Fetch trip counts per vehicle from vehicle_request table
+        $counts = [];
+        $sql2 = "SELECT vehicle_id, COUNT(request_id) AS trips FROM vehicle_request GROUP BY vehicle_id";
+        $res2 = $this->db->query($sql2);
+        if ($res2) {
+            while ($r = $res2->fetch_assoc()) {
+                $counts[$r['vehicle_id']] = $r['trips'];
+            }
+        }
+
+        // Merge names and counts, default 0 if no trips
+        $data = [];
+        foreach ($vehicles as $v) {
+            $data[] = [
+                'vehicle_name' => $v['vehicle_name'],
+                'trips' => isset($counts[$v['vehicle_id']]) ? (int)$counts[$v['vehicle_id']] : 0
+            ];
+        }
+        return $data;
     }
 
     // Destructor

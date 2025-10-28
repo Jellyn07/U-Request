@@ -1,6 +1,6 @@
 // ---------- Request Status Chart (Pie) ----------
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('../../../controllers/DashboardController.php')
+  fetch('../../../controllers/DashboardController.php?request_status=1')
     .then(response => response.json())
     .then(data => {
       const ctx = document.getElementById('requestStatusChart').getContext('2d');
@@ -57,34 +57,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ---------- Vehicle Usage Chart (Bar) ----------
-const vehicleUsageCtx = document.getElementById('vehicleUsageChart').getContext('2d');
-const vehicleUsageChart = new Chart(vehicleUsageCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Van 1', 'Van 2', 'Car 1', 'Car 2', 'Truck 1'], // Vehicle names
-        datasets: [{
-            label: 'Trips Completed',
-            data: [12, 8, 15, 6, 10], // Example numbers
-            backgroundColor: [
-              '#FFC845', //yellow
-              '#F29C4C', //orange
-              '#1C7ED6', //blue
-              '#6B9A4F', //green
-              '#D11100' //red
-            ],
-            borderRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            // title: { display: true, text: 'Vehicle Usage' },
-            legend: { display: false }
-        },
-        scales: {
-            y: { beginAtZero: true, title: { display: true, text: 'Number of Trips' } },
-            x: { title: { display: false} }
-        }
-    }
-});
+fetch('../../../controllers/DashboardController.php?vehicle_usage=1')
+  .then(res => res.json())
+  .then(data => {
+    const labels = data.map(d => d.vehicle_name);
+    const values = data.map(d => d.trips);
 
+    const colors = ['#FFC845', '#F29C4C', '#1C7ED6', '#6B9A4F', '#D11100'];
+
+    new Chart(document.getElementById('vehicleUsageChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Trips Completed',
+                data: values,
+                backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Number of Trips' } },
+                x: { title: { display: false } }
+            }
+        }
+    });
+  })
+  .catch(err => console.error('Vehicle Usage chart error:', err));
