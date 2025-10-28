@@ -8,12 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
       new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: ['Pending', 'Approved', 'In Progress', 'Completed', 'Rejected/Cancelled'],
+          labels: ['Pending', 'Approved', 'On Going', 'Completed', 'Rejected/Cancelled'],
           datasets: [{
             data: [
               data.pending,
               data.approved,
-              data.in_progress,
+              data.on_going,
               data.completed,
               data.rejected_cancelled
             ],

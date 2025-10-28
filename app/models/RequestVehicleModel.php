@@ -132,6 +132,19 @@ class VehicleRequestModel extends BaseModel {
         $stmt->close();
         return true; // ✅ success
     }
+
+    // Check if passenger exists by first and last name
+    public function getPassengerByName($first_name, $last_name) {
+        $stmt = $this->db->prepare("SELECT passenger_id FROM passengers WHERE firstName = ? AND lastName = ?");
+        $stmt->bind_param("ss", $first_name, $last_name);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $passenger = $result->fetch_assoc();
+        $stmt->close();
+
+        return $passenger['passenger_id'] ?? null;
+    }
+
     // Fetch all vehicles
     public function getVehicles() {
         $sql = "SELECT vehicle_id, vehicle_name FROM vehicle ORDER BY vehicle_name ASC";

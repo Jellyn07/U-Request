@@ -38,7 +38,11 @@ class DashboardModel extends BaseModel  {
                 ) AS totalDrivers,
 
                 (
-                   SELECT COUNT(*) FROM vehicle_request vr INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id WHERE vra.req_status = 'Pending'
+                   SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
+                    FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra
+                    ON vr.req_id = vra.req_id
+                    WHERE vra.req_status = 'Pending'
                 ) AS total_vrequests_p
 
         ";
@@ -176,20 +180,30 @@ class DashboardModel extends BaseModel  {
     public function getVehicleRequestStatusCounts() {
         $sql = "
             SELECT
-                (SELECT COUNT(*) FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
+                    FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra
+                    ON vr.req_id = vra.req_id
                     WHERE vra.req_status = 'Pending') AS pending,
-                (SELECT COUNT(*) FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
+                    FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra
+                    ON vr.req_id = vra.req_id
                     WHERE vra.req_status = 'Approved') AS approved,
-                (SELECT COUNT(*) FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
-                    WHERE vra.req_status = 'In Progress') AS in_progress,
-                (SELECT COUNT(*) FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
+                    FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra
+                    ON vr.req_id = vra.req_id
+                    WHERE vra.req_status = 'On Going') AS on_going,
+                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
+                    FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra
+                    ON vr.req_id = vra.req_id
                     WHERE vra.req_status = 'Completed') AS completed,
-                (SELECT COUNT(*) FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
+                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
+                    FROM vehicle_request vr
+                    INNER JOIN vehicle_request_assignment vra
+                    ON vr.req_id = vra.req_id
                     WHERE vra.req_status IN ('Rejected', 'Cancelled')) AS rejected_cancelled
         ";
 
