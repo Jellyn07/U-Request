@@ -87,6 +87,7 @@ $requests = $data['requests'];
                           control_no: "<?= htmlspecialchars($row['control_no'], ENT_QUOTES) ?>",
                           tracking_id: "<?= htmlspecialchars($row['tracking_id'], ENT_QUOTES) ?>",
                           requester_name: "<?= htmlspecialchars($row['requester_name'], ENT_QUOTES) ?>",
+                          contact: "<?= htmlspecialchars($row['contact'], ENT_QUOTES) ?>",
                           travel_destination: "<?= htmlspecialchars($row['travel_destination'], ENT_QUOTES) ?>",
                           date_request: "<?= htmlspecialchars(date('M d, Y', strtotime($row['date_request'])), ENT_QUOTES) ?>",
                           travel_date: "<?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date'])), ENT_QUOTES) ?>",
@@ -180,7 +181,7 @@ $requests = $data['requests'];
                 <option value="">Loading drivers...</option>
               </select>
             </div>
-            
+
             <div class="flex justify-center pt-2 space-x-2">
               <button type="button" class="btn btn-primary"
                       @click="viewFullDetails(selected)">

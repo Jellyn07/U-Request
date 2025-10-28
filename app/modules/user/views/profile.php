@@ -24,6 +24,8 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     <title>U-Request | My Profile</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/assets/js/alert.js"></script>
   </head>
   <body class="bg-gray-200 min-h-screen flex flex-col">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
@@ -77,7 +79,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           <h2 class="text-xl font-semibold">
             Profile Information
           </h2>
-          <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
+          <form id="contact-form" class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
             <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
             <div>
               <label class="text-sm text-text mb-1">
@@ -138,11 +140,25 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
 
                   <option value="Others" <?= ($profile['officeOrDept'] ?? '') === 'Others' ? 'selected' : '' ?>>Others</option>
                 </select>
-            </div>
-            <div class="flex justify-end">
-              <button type="submit" class="btn btn-primary">
-                Save Changes
-              </button>
+            </div>        
+              <div>
+                <label class="text-sm text-text mb-1">
+                  Contact Number
+                </label>
+                <input 
+                  type="text" 
+                  name="requester_contact" 
+                  value="<?php echo htmlspecialchars($profile['contact'] ?? ''); ?>" 
+                  class="w-full input-field" 
+                  placeholder="Ex. 09123456789"
+                  required
+                />
+              </div>
+
+              <div class="flex justify-end">
+                <button type="submit" class="btn btn-primary" id="save-contact-btn">
+                  Save Changes
+                </button>
             </div>
           </form>
         </div>
@@ -181,7 +197,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
             </div>
 
             <div class="flex justify-end">
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" >
                 Save New Password
               </button>
             </div>
@@ -226,6 +242,47 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         reader.readAsDataURL(event.target.files[0]);
       }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contact-form');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const contactInput = form.querySelector('input[name="requester_contact"]');
+        const contactValue = contactInput.value.trim();
+
+        // Validate format
+        const pattern = /^09\d{9}$/;
+        if (!pattern.test(contactValue)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Contact',
+                text: 'Contact number must start with 09 and be 11 digits.'
+            });
+            return;
+        }
+
+        // Confirmation before saving
+        Swal.fire({
+            title: 'Confirm Update',
+            text: `You are about to update your contact number to: ${contactValue}`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, save it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Directly save by submitting the form
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+
     <script src="/public/assets/js/shared/password-visibility.js"></script>
   </body>
 </html>

@@ -483,3 +483,20 @@ BEGIN
     );
 END$$
 DELIMITER ;
+
+------------------------------------------------------------------------------------------------------------------
+// Alter add contact requester
+
+ALTER TABLE requester
+CHANGE COLUMN middleInitial contact VARCHAR(11);
+
+CREATE OR REPLACE VIEW vw_requesters AS
+SELECT 
+    r.requester_id,
+    r.firstName,
+    r.lastName,
+    r.contact,
+    r.email,
+    r.officeOrDept,
+    r.profile_pic
+FROM requester r;

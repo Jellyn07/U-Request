@@ -72,6 +72,45 @@ class ProfileController extends BaseModel {
             $data['email']
         ]);
     }
+
+    // Update contact number with validation
+    public function saveContact($req_id, $contact) {
+
+        //  Check uniqueness across other tables
+        if ($this->contactExistsElsewhere($contact)) {
+            $_SESSION['error'] = "Contact number already exists in the system.";
+            return false;
+        }
+
+        // 3. Update contact
+        return $this->model->updateContact($req_id, $contact);
+    }
+
+    // Check if contact exists in gsu_personnel, driver, administrator
+    private function contactExistsElsewhere($contact) {
+        $tables = [
+            'gsu_personnel' => 'contact',
+            'driver'        => 'contact',
+            'administrator' => 'contact_no'
+        ];
+
+        foreach ($tables as $table => $column) {
+            $stmt = $this->model->db->prepare("SELECT COUNT(*) AS count FROM {$table} WHERE {$column} = ?");
+            if (!$stmt) {
+                die("Prepare failed: " . $this->model->db->error);
+            }
+            $stmt->bind_param("s", $contact);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if ($result['count'] > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 // Update Password
@@ -165,3 +204,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['officeOrDept'], $_POS
     header("Location: /app/modules/user/views/profile.php");
     exit;
 }
+$controller = new ProfileController();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requester_contact'])) {
+
+    // Retrieve req_id from session
+    $req_id = $_SESSION['req_id'] ?? null;
+    $contact = $_POST['requester_contact'];
+
+    if (!$req_id) {
+        $_SESSION['error'] = "Unable to identify your account.";
+        header("Location: /app/modules/user/views/profile.php");
+        exit;
+    }
+
+    if ($controller->saveContact($req_id, $contact)) {
+        $_SESSION['success'] = "Contact number updated successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to update contact number.";
+    }
+
+    // Redirect back
+    header("Location: /app/modules/user/views/profile.php");
+    exit;
+}
+

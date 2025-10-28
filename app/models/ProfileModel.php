@@ -6,7 +6,7 @@ class ProfileModel extends BaseModel {
     // Get profile data by requester_id
     public function getProfileByEmail($requester_email) {
         $stmt = $this->db->prepare("
-            SELECT requester_id, firstName, lastName, middleInitial, email, officeOrDept, profile_pic
+            SELECT requester_id, firstName, lastName, contact, email, officeOrDept, profile_pic
             FROM vw_requesters
             WHERE email = ?
         ");
@@ -27,6 +27,14 @@ class ProfileModel extends BaseModel {
         $stmt->bind_param("ss", $officeOrDept, $email);
         return $stmt->execute();
     }
+
+public function updateContact($req_id, $contact) {
+    $stmt = $this->db->prepare("UPDATE requester SET contact = ? WHERE req_id = ?");
+    $stmt->bind_param("si", $contact, $req_id);
+    $success = $stmt->execute();
+    $stmt->close();
+    return $success;
+}
 
     // Update profile picture
     public function updateProfilePicture($fileName, $filePath) {

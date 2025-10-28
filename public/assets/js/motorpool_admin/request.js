@@ -65,7 +65,7 @@ document.addEventListener("alpine:init", () => {
             </div>
 
             <div class="mb-2"><label class="text-xs">Requester Contact No</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.contact_no}" readonly />
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.contact}" readonly />
             </div>
 
             <div class="mb-2"><label class="text-xs">Travel Date</label>
