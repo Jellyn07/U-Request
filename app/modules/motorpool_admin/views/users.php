@@ -11,7 +11,6 @@ $controller = new UserAdminController();
 $users = $controller->getUsers();
 $profile = $controller->getProfile($_SESSION['email']);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,88 +25,70 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
 </head>
-
 <body class="bg-gray-100">
-  <!-- Superadmin Menu & Header -->
+  <!-- Sidebar -->
   <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
 
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Users</h1>
-      <div 
-        x-data="{showDetails: false}" 
-        class="grid grid-cols-1 md:grid-cols-3 gap-4"
-      >
-        <!-- Left Section -->
+
+      <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- LEFT SECTION -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
+            <!-- Search + Sort + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
+
             <select id="statusFilter" class="input-field">
               <option value="all">All</option>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
+
             <select id="sortUsers" class="input-field">
               <option value="az">Sort A–Z</option>
               <option value="za">Sort Z–A</option>
             </select>
-             <button class="input-field">
-              <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-             </button>
-             <button class="input-field">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
-             </button>
+
+            <button class="input-field" title="Print data in the table">
+              <img src="/public/assets/img/printer.png" class="size-4 my-0.5" alt="Print">
+            </button>
+            <button class="input-field" title="Export to Excel">
+              <img src="/public/assets/img/export.png" class="size-4 my-0.5" alt="Export">
+            </button>
           </div>
 
-        <!-- TABLE -->
-        <div 
-          x-data="{
-            showDetails: false,
-            selected: {
-              email: '',
-              firstName: '',
-              lastName: '',
-              requester_id: '',
-              officeOrDept: '',
-              profile_pic: '',
-              account_status: ''
-            }
-          }"
-          class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- LEFT: User List -->
-          <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-            <div class="overflow-x-auto max-h-[550px] overflow-y-auto rounded-b-lg shadow">
-              <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-1 py-2">&nbsp;</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Office / Department</th>
-                  </tr>
-                </thead>
-                <tbody class="text-sm" id="usersTable">
+          <!-- TABLE -->
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
+            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-2">&nbsp;</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Office / Department</th>
+                </tr>
+              </thead>
+              <tbody id="usersTable" class="text-sm">
+                <?php if (!empty($users)): ?>
                   <?php foreach ($users as $user): ?>
                     <tr 
-                      @click="
-                        selected = {
-                          email: '<?= htmlspecialchars($user['email']) ?>',
-                          firstName: '<?= htmlspecialchars($user['firstName']) ?>',
-                          lastName: '<?= htmlspecialchars($user['lastName']) ?>',
-                          requester_id: '<?= htmlspecialchars($user['requester_id']) ?>',
-                          officeOrDept: '<?= htmlspecialchars($user['officeOrDept']) ?>',
-                          profile_pic: '<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>',
-                          account_status: '<?= htmlspecialchars($user['account_status']) ?>'
-                        };
-                        showDetails = true;
-                      "
+                      @click="selected = {
+                        email: '<?= htmlspecialchars($user['email']) ?>',
+                        firstName: '<?= htmlspecialchars($user['firstName']) ?>',
+                        lastName: '<?= htmlspecialchars($user['lastName']) ?>',
+                        requester_id: '<?= htmlspecialchars($user['requester_id']) ?>',
+                        officeOrDept: '<?= htmlspecialchars($user['officeOrDept']) ?>',
+                        profile_pic: '<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>',
+                        account_status: '<?= htmlspecialchars($user['account_status']) ?>'
+                      }; showDetails = true"
                       class="hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                     >
                       <td class="px-2 py-2">
-                        <img src="<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>" 
-                            class="size-8 rounded-full object-cover mx-auto" alt="User">
+                        <img src="<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>" class="size-8 rounded-full object-cover mx-auto">
                       </td>
                       <td class="px-4 py-2"><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?></td>
                       <td class="px-4 py-2">
@@ -118,70 +99,55 @@ $profile = $controller->getProfile($_SESSION['email']);
                       </td>
                       <td class="px-4 py-2"><?= htmlspecialchars($user['email']) ?></td>
                       <td class="px-4 py-2">
-                        <?php if (!empty($user['officeOrDept'])): ?>
-                          <?= htmlspecialchars($user['officeOrDept']) ?>
-                        <?php else: ?>
-                          <span class="text-red-500">Undefined</span>
-                        <?php endif; ?>
+                        <?= !empty($user['officeOrDept']) ? htmlspecialchars($user['officeOrDept']) : '<span class="text-red-500">Undefined</span>' ?>
                       </td>
                     </tr>
                   <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="5" class="text-center py-4 text-gray-500">No user records found.</td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
           </div>
+        </div>
 
-          <!-- RIGHT: User Details -->
-          <div 
-            x-show="showDetails" 
-            x-cloak 
-            class="bg-white shadow rounded-lg p-4 max-h-[580px] overflow-y-auto transition-all duration-300"
-          >
-            <button 
-              @click="showDetails = false" 
-              class="text-sm text-gray-500 hover:text-gray-800 float-right"
-            >
-              <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
-            </button>
+        <!-- RIGHT SECTION: USER DETAILS -->
+        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-y-auto">
+          <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
+            <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
+          </button>
 
-            <h2 class="text-lg font-bold mb-2">User Information</h2>
+          <h2 class="text-lg font-bold mb-2">User Information</h2>
+          <img :src="selected.profile_pic" alt="Profile" class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4">
 
-            <!-- Profile -->
-            <img 
-              :src="selected.profile_pic" 
-              alt="Profile"
-              class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4"
-            >
+          <form id="userForm" method="post" action="../../../controllers/UserAdminController.php" class="space-y-4">
+            <input type="hidden" name="requester_email" :value="selected.email || ''">
+            <input type="hidden" name="update_user" value="1">
 
-            <form id="userForm" method="post" action="../../../controllers/UserAdminController.php" class="space-y-4">
-              <input type="hidden" name="requester_email" :value="selected.email || ''">
-              <input type="hidden" name="update_user" value="1">
-
+            <div>
+              <label class="text-xs text-text mb-1">Email</label>
+              <input type="email" x-model="selected.email" disabled class="w-full view-field cursor-not-allowed">
+            </div>
+            <div>
+              <label class="text-xs text-text mb-1">Student/Staff ID</label>
+              <input type="text" x-model="selected.requester_id" disabled class="w-full view-field cursor-not-allowed">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="text-sm text-gray-600">Email</label>
-                <input type="email" x-model="selected.email" disabled class="w-full view-field cursor-not-allowed">
+                <label class="text-xs text-text mb-1">First Name</label>
+                <input type="text" x-model="selected.firstName" disabled class="w-full view-field cursor-not-allowed">
               </div>
-
               <div>
-                <label class="text-sm text-gray-600">Student/Staff ID</label>
-                <input type="text" x-model="selected.requester_id" disabled class="w-full view-field cursor-not-allowed">
+                <label class="text-xs text-text mb-1">Last Name</label>
+                <input type="text" x-model="selected.lastName" disabled class="w-full view-field cursor-not-allowed">
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="text-sm text-gray-600">First Name</label>
-                  <input type="text" x-model="selected.firstName" disabled class="w-full view-field cursor-not-allowed">
-                </div>
-                <div>
-                  <label class="text-sm text-gray-600">Last Name</label>
-                  <input type="text" x-model="selected.lastName" disabled class="w-full view-field cursor-not-allowed">
-                </div>
-              </div>
-
-              <div>
-                <label class="text-sm text-gray-600">Program/Office</label>
-                <input type="text" x-model="selected.officeOrDept" disabled class="w-full view-field cursor-not-allowed">
-              </div>
+            </div>
+            <div>
+              <label class="text-xs text-text mb-1">Program/Office</label>
+              <input type="text" x-model="selected.officeOrDept" disabled class="w-full view-field cursor-not-allowed">
+            </div>
 
               <div class="flex justify-center gap-2 pt-2">
                 <button type="button" class="btn btn-secondary" 
