@@ -24,6 +24,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -184,7 +185,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
               <div class="flex justify-center gap-2 pt-2">
                 <button type="button" class="btn btn-secondary" 
-                  @click="viewRequestHistory(selected.requester_id)">
+                  @click="viewVehicleRequestHistory(selected.requester_id)">
                   <img src="/public/assets/img/work-history.png" class="size-4" alt="Work History">
                 </button>
               </div>
@@ -194,71 +195,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       </div>
     </div>
   <script src="/public/assets/js/shared/menus.js"></script>
-  </main>
-
-  <script>
-async function viewRequestHistory(requester_id) {
-  if (!requester_id) return;
-
-  try {
-    const formData = new FormData();
-    formData.append("get_request_history", "1");
-    formData.append("requester_id", requester_id);
-
-    const res = await fetch("../../../controllers/UserAdminController.php", {
-      method: "POST",
-      body: formData
-    });
-
-    const history = await res.json();
-
-    if (!Array.isArray(history) || !history.length) {
-      Swal.fire({
-        icon: "info",
-        title: "No Work History Found",
-        text: "This requester has no recorded requests yet."
-      });
-      return;
-    }
-
-    // Create table rows dynamically
-    const rows = history.map(item => `
-      <tr class="hover:bg-gray-50">
-        <td class="px-3 py-1 border">${item.tracking_id}</td>
-        <td class="px-3 py-1 border">${item.request_Type}</td>
-        <td class="px-3 py-1 border">${item.req_status}</td>
-        <td class="px-3 py-1 border">${item.date_finished ?? "—"}</td>
-      </tr>
-    `).join("");
-
-    Swal.fire({
-      title: "Request History",
-      html: `
-        <div class="overflow-x-auto">
-          <table class="w-full border text-sm text-left">
-            <thead>
-              <tr class="bg-gray-100">
-                <th class="px-3 py-1 border">Tracking ID</th>
-                <th class="px-3 py-1 border">Request Type</th>
-                <th class="px-3 py-1 border">Status</th>
-                <th class="px-3 py-1 border">Date Finished</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      `,
-      width: 800,
-      confirmButtonText: "Close",
-      confirmButtonColor: "#800000"
-    });
-  } catch (err) {
-    console.error(err);
-    Swal.fire({ icon: "error", title: "Error", text: "Could not fetch history." });
-  }
-}
-
-  </script>
+</main>
   <!-- load the filter script (defer so DOM is ready) -->
 <script defer src="<?php echo PUBLIC_URL; ?>/assets/js/shared/table-filter.js"></script>
 
@@ -277,8 +214,6 @@ async function viewRequestHistory(requester_id) {
     });
   });
 </script>
-
-
 
 </body>
 </html>

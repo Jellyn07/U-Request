@@ -127,6 +127,27 @@ class UserModel extends BaseModel  {
         return $records;
     }
 
+    public function getVehicleRequestHistory($requester_id) {
+        $stmt = $this->db->prepare("
+            SELECT 
+                vr.tracking_id,
+                vr.trip_purpose,
+                vr.travel_destination,
+                vr.travel_date,
+                vr.return_date,
+                vra.req_status
+            FROM vehicle_request vr
+            inner join vehicle_request_assignment vra on vr.control_no = vra.control_no
+            inner join requester r on vr.req_id = r.req_id
+            WHERE requester_id = ?
+            ORDER BY travel_date DESC
+        ");
+        $stmt->bind_param("s", $requester_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
     // Destructor
     public function __destruct() {
         if ($this->db) {

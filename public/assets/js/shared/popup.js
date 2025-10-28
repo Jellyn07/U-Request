@@ -234,3 +234,83 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+async function viewVehicleRequestHistory(requester_id) {
+  if (!requester_id) return;
+
+  try {
+    const formData = new FormData();
+    formData.append("get_vehicle_request_history", "1");
+    formData.append("requester_id", requester_id);
+
+    const res = await fetch("../../../controllers/UserAdminController.php", {
+      method: "POST",
+      body: formData
+    });
+
+    const history = await res.json();
+
+    if (!Array.isArray(history) || history.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "No Vehicle Request History Found",
+        text: "This requester has no recorded vehicle requests yet."
+      });
+      return;
+    }
+
+    // Helper function to format dates as Month Day, Year
+    const formatDate = (dateString) => {
+      if (!dateString) return "—";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+    };
+
+    // Create table rows dynamically
+    const rows = history.map(item => `
+      <tr class="hover:bg-gray-50">
+        <td class="px-1 py-1 border">${item.tracking_id}</td>
+        <td class="px-1 py-1 border">${item.trip_purpose}</td>
+        <td class="px-1 py-1 border">${item.travel_destination}</td>
+        <td class="px-1 py-1 border">${formatDate(item.travel_date)}</td>
+        <td class="px-1 py-1 border">${formatDate(item.return_date)}</td>
+        <td class="px-1 py-1 border">${item.req_status ?? "—"}</td>
+      </tr>
+    `).join("");
+
+    Swal.fire({
+      title: "Vehicle Request History",
+      html: `
+        <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+          <table class="w-full border text-sm text-left">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="px-1 py-1 border">Tracking No</th>
+                <th class="px-1 py-1 border">Trip Purpose</th>
+                <th class="px-1 py-1 border">Destination</th>
+                <th class="px-1 py-1 border">Date of Travel</th>
+                <th class="px-1 py-1 border">Date of Return</th>
+                <th class="px-1 py-1 border">Status</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `,
+      width: 900,
+      confirmButtonText: "Close",
+      confirmButtonColor: "#800000"
+    });
+  } catch (err) {
+    console.error("Vehicle request history fetch error:", err);
+    Swal.fire({ 
+      icon: "error", 
+      title: "Error", 
+      text: "Unable to fetch vehicle request history." 
+    });
+  }
+}

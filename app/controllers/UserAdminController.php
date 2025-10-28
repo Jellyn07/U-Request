@@ -48,3 +48,14 @@ if (isset($_POST['get_request_history'])) {
     echo json_encode($history);
     exit;
 }
+
+if (isset($_POST['get_vehicle_request_history'])) {
+    $requester_id = $_POST['requester_id'] ?? null;
+    if ($requester_id) {
+        require_once __DIR__ . '/../models/UserModel.php';
+        $model = new UserModel();
+        $history = $model->getVehicleRequestHistory($requester_id);
+        echo json_encode($history);
+        exit;
+    }
+}
