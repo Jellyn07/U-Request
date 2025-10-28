@@ -42,11 +42,11 @@ require_once __DIR__ . '/../../../config/constants.php';
         </div>
         <div>
           <label class="text-sm mb-1 block">Date of Travel <span class="text-red-500">*</span></label>
-          <input type="date" name="date_of_travel" required class="input-field w-full ">
+          <input type="date" id="date_of_travel" name="date_of_travel" required class="input-field w-full">
         </div>
         <div>
           <label class="text-sm mb-1 block">Date of Return <span class="text-red-500">*</span></label>
-          <input type="date" name="date_of_return" required class="input-field w-full ">
+          <input type="date" id="date_of_return" name="date_of_return" required class="input-field w-full">
         </div>
         <div>
           <label class="text-sm mb-1 block">Time of Departure <span class="text-red-500">*</span></label>
@@ -153,6 +153,34 @@ require_once __DIR__ . '/../../../config/constants.php';
         `;
         container.appendChild(newRow);
       }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const travelInput = document.getElementById('date_of_travel');
+        const returnInput = document.getElementById('date_of_return');
+
+        // Helper to format date as YYYY-MM-DD
+        const formatDate = (date) => date.toISOString().split('T')[0];
+
+        const today = new Date();
+
+        // Travel date must be at least 3 days from today
+        const minTravelDate = new Date(today);
+        minTravelDate.setDate(today.getDate() + 3);
+
+        travelInput.min = formatDate(minTravelDate);
+
+        // When travel date changes, set return date min
+        travelInput.addEventListener('change', () => {
+          if (!travelInput.value) return;
+          const travelDate = new Date(travelInput.value);
+
+          // Return must be after travel date
+          const minReturnDate = new Date(travelDate);
+          minReturnDate.setDate(travelDate.getDate() + 0);
+
+          returnInput.min = formatDate(minReturnDate);
+        });
+      });
     </script>
   </body>
 </html>

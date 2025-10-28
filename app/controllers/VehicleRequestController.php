@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../models/RequestVehicleModel.php';
 
@@ -84,6 +83,10 @@ class VehicleRequestController {
         echo json_encode($this->model->getDriver());
         exit;
     }
+
+    public function saveAssignment($reqAssignment_id, $vehicle_id, $driver_id, $req_status, $approved_by) {
+        return $this->model->saveAssignment($reqAssignment_id, $vehicle_id, $driver_id, $req_status, $approved_by);
+    }
 }
 
 // Route requests
@@ -103,5 +106,56 @@ if (isset($_GET['vehicles'])) {
     exit;
 }
 
+$controller = new VehicleRequestController(); // ensure class exists
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+    exit;
+}
 
+$action = $_POST['action'] ?? '';
+
+header('Content-Type: application/json');
+
+switch ($action) {
+    case 'saveAssignment':
+        $reqAssignment_id = $_POST['req_id'] ?? null; // your form uses name=req_id
+        $vehicle_id = $_POST['vehicle_id'] ?? null;
+        $driver_id = $_POST['driver_id'] ?? null;
+        $req_status = $_POST['req_status'] ?? null;
+        $approved_by = $_POST['approved_by'] ?? null;
+
+        // Basic validation (allow approved_by null when not approved)
+        if (!$reqAssignment_id) {
+            echo json_encode(['success' => false, 'message' => 'Request ID missing.']);
+            exit;
+        }
+        if (!$vehicle_id) {
+            echo json_encode(['success' => false, 'message' => 'Vehicle ID missing.']);
+            exit;
+        }
+        // driver_id may be null/empty if vehicle has no driver; adjust if required
+        if ($driver_id === '' || $driver_id === null) {
+            // set to NULL (if SP expects INT, you may need to pass 0 instead)
+            $driver_id = null;
+        }
+
+        // call model and capture result and message
+        try {
+            $result = $controller->saveAssignment($reqAssignment_id, $vehicle_id, $driver_id, $req_status, $approved_by);
+            if ($result['success']) {
+                echo json_encode(['success' => true, 'message' => $result['message'] ?? 'Saved successfully.']);
+            } else {
+                // bubble up message from model
+                echo json_encode(['success' => false, 'message' => $result['message'] ?? 'Failed to save.']);
+            }
+        } catch (Exception $ex) {
+            error_log('saveAssignment exception: ' . $ex->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Server error. Check logs.']);
+        }
+        exit;
+    default:
+        echo json_encode(['success' => false, 'message' => 'Invalid action.']);
+        exit;
+}

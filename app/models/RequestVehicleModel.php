@@ -145,31 +145,75 @@ class VehicleRequestModel extends BaseModel {
         return $passenger['passenger_id'] ?? null;
     }
 
-    // Fetch all vehicles
-    public function getVehicles() {
-        $sql = "SELECT vehicle_id, vehicle_name FROM vehicle ORDER BY vehicle_name ASC";
-        $res = $this->db->query($sql);
-        $vehicles = [];
-        if ($res) {
-            while ($row = $res->fetch_assoc()) {
-                $vehicles[] = $row;
-            }
+// Fetch all vehicles with their assigned driver_id
+public function getVehicles() {
+    $sql = "SELECT vehicle_id, vehicle_name, driver_id FROM vehicle ORDER BY vehicle_name ASC";
+    $res = $this->db->query($sql);
+    $vehicles = [];
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $vehicles[] = $row;
         }
-        return $vehicles;
+    }
+    return $vehicles;
+}
+
+// Fetch all personnel (drivers)
+public function getDriver() {
+    $sql = "SELECT driver_id, CONCAT(firstName, ' ', lastName) AS full_name FROM driver ORDER BY firstName ASC";
+    $res = $this->db->query($sql);
+    $personnels = [];
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $personnels[] = $row;
+        }
+    }
+    return $personnels;
+}
+
+public function saveAssignment($reqAssignment_id, $vehicle_id, $driver_id, $req_status, $approved_by) {
+        // Make sure stored procedure exists and parameter order matches
+        // Use NULL or empty string handling depending on your SP
+        try {
+            // prepare
+            $stmt = $this->db->prepare("CALL spUpdateVehicleRequestAssignment(?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                $err = $this->db->error;
+                error_log("Prepare failed: $err");
+                return ['success' => false, 'message' => "Prepare failed: $err"];
+            }
+
+            // If driver_id can be null, convert to null + bind as integer or null appropriately
+            // mysqli doesn't handle nulls in bind_param gracefully; pass as int or empty string as needed.
+            // We'll bind driver_id as integer (0 if null). If your SP expects NULL, you could use a different approach.
+            $bind_driver = ($driver_id === null || $driver_id === '') ? 0 : (int)$driver_id;
+            $bind_req_status = $req_status ?? '';
+            $bind_approved_by = $approved_by ?? '';
+
+            // bind params: iiiss (int,int,int,string,string)
+            if (!$stmt->bind_param('iiiss', $reqAssignment_id, $vehicle_id, $bind_driver, $bind_req_status, $bind_approved_by)) {
+                $err = $stmt->error;
+                error_log("Bind failed: $err");
+                return ['success' => false, 'message' => "Bind failed: $err"];
+            }
+
+            if (!$stmt->execute()) {
+                $err = $stmt->error;
+                error_log("Execute failed: $err");
+                return ['success' => false, 'message' => "Execute failed: $err"];
+            }
+
+            // optionally check affected rows
+            $affected = $stmt->affected_rows;
+            $stmt->close();
+            return ['success' => true, 'message' => "Saved. Rows affected: $affected"];
+        } catch (Exception $e) {
+            error_log("saveAssignment exception: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Exception: ' . $e->getMessage()];
+        }
     }
 
-    // Fetch all personnel (drivers)
-    public function getDriver() {
-        $sql = "SELECT driver_id, CONCAT(firstName, ' ', lastName) AS full_name FROM driver ORDER BY firstName ASC";
-        $res = $this->db->query($sql);
-        $personnels = [];
-        if ($res) {
-            while ($row = $res->fetch_assoc()) {
-                $personnels[] = $row;
-            }
-        }
-        return $personnels;
-    }
+
 
     // Optional: save assignment
     public function assignVehicle($request_id, $vehicle_id, $staff_id, $priority_status) {

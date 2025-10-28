@@ -121,7 +121,7 @@ $requests = $data['requests'];
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
 
-          <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/RequestController.php">
+          <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/VehicleRequestController.php">
             <input type="hidden" name="action" value="saveAssignment">
             <input type="hidden" name="req_id" x-model="selected.req_id">
 
@@ -170,18 +170,37 @@ $requests = $data['requests'];
 
             <div>
               <label class="text-xs text-text mb-1">Assign Vehicle</label>
-              <select id="vehicleSelect" class="w-full input-field">
+              <select id="vehicleSelect"  name="vehicle_id"  class="w-full input-field">
                 <option value="">Loading vehicles...</option>
               </select>
             </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">Assign Driver</label>
-              <select id="staffSelect" class="w-full input-field">
-                <option value="">Loading drivers...</option>
-              </select>
-            </div>
+            <div x-data>
+              <!-- STATUS -->
+              <div>
+                <label class="text-xs text-text mb-1">Status</label>
+                <select id="status"  name="req_status"  x-model="selected.req_status" class="w-full input-field">
+                  <option value="" disabled>Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Rejected/Cancelled">Rejected/Cancelled</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
 
+              <!-- APPROVED BY -->
+              <div x-show="selected.req_status === 'Approved'" x-cloak>
+                <label class="text-xs text-text mb-1 mt-2">Approved By</label>
+                <select id="approvedBy" name="approved_by" x-model="selected.approved_by" class="w-full input-field">
+                  <option value="" disabled>Select Approver</option>
+                  <option value="Dr. Shirley Villanueva">Dr. Shirley Villanueva</option>
+                  <option value="Engr. John Dela Cruz">Engr. John Dela Cruz</option>
+                  <option value="Ms. Maria Santos">Ms. Maria Santos</option>
+                </select>
+              </div>
+            </div>
+             
             <div class="flex justify-center pt-2 space-x-2">
               <button type="button" class="btn btn-primary"
                       @click="viewFullDetails(selected)">
@@ -195,6 +214,52 @@ $requests = $data['requests'];
         </div>
       </div>
     </div>
+    <script>
+      document.getElementById('saveBtn').addEventListener('click', async () => {
+        const form = document.getElementById('assignmentForm');
+        const formData = new FormData(form);
+
+        console.log("Form action:", form.action);
+        // optional: show formData contents for debug
+        for (const pair of formData.entries()) { console.log(pair[0]+':', pair[1]); }
+
+        const confirm = await Swal.fire({
+          title: 'Confirm Save?',
+          text: 'Do you want to save these changes?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Save it!'
+        });
+        if (!confirm.isConfirmed) return;
+
+        Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+          const res = await fetch(form.action, { method: 'POST', body: formData });
+          const text = await res.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            Swal.close();
+            console.error('Non-JSON response:', text);
+            Swal.fire({ icon: 'error', title: 'Server error', html: `<pre style="white-space:pre-wrap;text-align:left;">${text}</pre>` });
+            return;
+          }
+
+          Swal.close();
+          if (data.success) {
+            Swal.fire({ icon: 'success', title: 'Saved!', text: data.message || 'Saved successfully.' });
+          } else {
+            Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Unknown server error.' });
+          }
+        } catch (err) {
+          Swal.close();
+          console.error('Fetch error:', err);
+          Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to connect to server or invalid response.' });
+        }
+      });
+      </script>
   </main>
 </script>
   <!-- Table Filters -->
@@ -212,7 +277,6 @@ $requests = $data['requests'];
   });
 });
 </script>
-
-  <script src="/public/assets/js/shared/menus.js"></script>
+<script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>

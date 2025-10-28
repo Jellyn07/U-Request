@@ -1,51 +1,16 @@
-document.addEventListener("alpine:init", () => {
-  Alpine.data("requestList", () => ({
+document.addEventListener('alpine:init', () => {
+  Alpine.data('requestList', () => ({
     showDetails: false,
     selected: {},
 
-    selectRow(request) {
-    his.selected = request;
-    this.showDetails = true;
-  },
-}));
-});
-
-fetch('../../../controllers/VehicleRequestController.php?vehicles=1')
-  .then(res => res.json())
-  .then(data => {
-    const vehicleSelect = document.getElementById('vehicleSelect');
-    vehicleSelect.innerHTML = '<option value="">No Vehicle Assigned</option>';
-    data.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v.vehicle_id;
-      opt.textContent = v.vehicle_name;
-      vehicleSelect.appendChild(opt);
-    });
-});
-
-fetch('../../../controllers/VehicleRequestController.php?drivers=1')
-  .then(res => res.json())
-  .then(data => {
-    const staffSelect = document.getElementById('staffSelect');
-    staffSelect.innerHTML = '<option value="">No Assigned Driver</option>';
-    data.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p.driver_id; // ✅ corrected
-      opt.textContent = p.full_name;
-      staffSelect.appendChild(opt);
-    });
-});
-
-document.addEventListener("alpine:init", () => {
-  Alpine.data("requestList", () => ({
-    showDetails: false,
-    selected: {},
-
+    // Called when user clicks a table row
     selectRow(request) {
       this.selected = request;
       this.showDetails = true;
+      console.log('Selected request:', request);
     },
 
+    // Optional: open modal or show a full details view
     viewFullDetails(selected) {
       Swal.fire({
         html: `
@@ -116,4 +81,51 @@ document.addEventListener("alpine:init", () => {
       });
     }
   }));
+});
+
+let drivers = []; // to store all drivers initially
+
+// Fetch all drivers first
+fetch('../../../controllers/VehicleRequestController.php?drivers=1')
+  .then(res => res.json())
+  .then(data => {
+    drivers = data; // store drivers globally
+    const staffSelect = document.getElementById('staffSelect');
+    staffSelect.innerHTML = '<option value="">No Assigned Driver</option>';
+  });
+
+// Fetch all vehicles
+fetch('../../../controllers/VehicleRequestController.php?vehicles=1')
+  .then(res => res.json())
+  .then(data => {
+    const vehicleSelect = document.getElementById('vehicleSelect');
+    vehicleSelect.innerHTML = '<option value="">No Vehicle Assigned</option>';
+
+    data.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.vehicle_id;
+      opt.textContent = v.vehicle_name;
+      opt.dataset.driverId = v.driver_id; // store assigned driver
+      vehicleSelect.appendChild(opt);
+    });
+
+    // Listen for vehicle selection
+    vehicleSelect.addEventListener('change', function() {
+      const driverSelect = document.getElementById('staffSelect');
+      driverSelect.innerHTML = '<option value="">No Assigned Driver</option>'; // reset
+
+      const selectedOption = vehicleSelect.selectedOptions[0];
+      const driverId = selectedOption ? selectedOption.dataset.driverId : '';
+
+      if (driverId) {
+        // Filter the drivers array to find the assigned driver
+        const assignedDriver = drivers.find(d => d.driver_id == driverId);
+        if (assignedDriver) {
+          const opt = document.createElement('option');
+          opt.value = assignedDriver.driver_id;
+          opt.textContent = assignedDriver.full_name;
+          driverSelect.appendChild(opt);
+        }
+      }
+    });
 });
