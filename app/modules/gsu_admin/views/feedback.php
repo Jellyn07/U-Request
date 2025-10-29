@@ -28,14 +28,16 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
 
       <!-- Feedback Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5 bg-white p-6 rounded-2xl shadow">
-        <div class="border-r-2 border-gray-300">
-          <h2 class="font-medium mb-3">Average Rating</h2>
-          <div class="flex items-center space-x-2 mt-2">
-            <span class="text-4xl font-bold"><?= $averageRating ?></span>
-            <div id="averageStars" class="flex"></div>
+        <a href="../../gsu_admin/views/average_feedback.php" class="btn btn-primar">
+          <div class="border-r-2 border-gray-300">
+            <h2 class="font-medium mb-3">Average Rating</h2>
+            <div class="flex items-center space-x-2 mt-2">
+              <span class="text-4xl font-bold"><?= $averageRating ?></span>
+              <div id="averageStars" class="flex"></div>
+            </div>
+            <p class="text-xs text-gray-500 font-medium mt-2">Average rating this year</p>
           </div>
-          <p class="text-xs text-gray-500 font-medium mt-2">Average rating this year</p>
-        </div>
+        </a>
         <div class="border-r-2 border-gray-300">
           <h2 class="font-medium mb-3">Total Feedback</h2>
           <p class="text-4xl font-bold text-primary mt-2"><?= count($feedbackData) ?></p>
@@ -49,11 +51,11 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
       <!-- Feedback Cards Section -->
       <div class="bg-white p-6 rounded-2xl shadow">
         <div class="mb-5 flex items-center justify-end gap-2">
-          <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
+          <!-- <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
           <select id="sortSelect" class="input-field">
             <option value="desc">Sort by Rating Desc</option>
             <option value="asc">Sort by Rating Asc</option>
-          </select>
+          </select> -->
         </div>
 
         <!-- <hr class="mb-2 border-b border-gray-300 mx-10"> -->
@@ -64,15 +66,15 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
             <div class="feedback-card border-b border-gray-400 p-6" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
               <div class="flex items-start gap-4">
                 <!-- Profile -->
-                <img src="<?= !empty($feedback['profile_pic']) ? htmlspecialchars($feedback['profile_pic']) : '/public/assets/img/user-default.png' ?>" 
-                alt="User photo" 
-                class="w-14 h-14 rounded-full object-cover">
+                <img src="<?= !empty($feedback['profile_pic']) ? htmlspecialchars($feedback['profile_pic']) : '/public/assets/img/user-default.png' ?>"
+                  alt="User photo"
+                  class="w-14 h-14 rounded-full object-cover">
                 <div class="flex flex-col">
                   <p class="font-semibold text-sm mb-1">
                     <?= htmlspecialchars($feedback['tracking_id'] ?? 'Anonymous User') ?>
                   </p>
                   <p class="text-xs text-gray-600">
-                    <span class="font-medium text-xs">Total Repair Request: </span><?= htmlspecialchars($feedback['total_request'] ?? 0) ?><br>
+                    <span class="font-medium text-xs">Total Repair Request: </span><?= htmlspecialchars($feedback['total_requests'] ?? 0) ?><br>
                     <span class="font-medium text-xs">Total Feedback:</span> <?= htmlspecialchars($feedback['total_feedback'] ?? 0) ?>
                   </p>
                 </div>
@@ -103,8 +105,10 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
                   </p>
 
                   <div class="flex items-center gap-3 mt-5 justify-end">
-                    <button class="btn btn-primary">Detailed Feedback</button>
-                    <button class="btn btn-secondary">View Request</button>
+                    <a href="../../user/views/feedback.php?tracking_id=<?= urlencode($feedback['tracking_id']) ?>"
+                      class="btn btn-primary">
+                      Detailed Feedback
+                    </a>
                   </div>
                 </div>
               </div>
@@ -196,6 +200,7 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
       feedbackContainer.innerHTML = '';
       sorted.forEach(card => feedbackContainer.appendChild(card));
     });
+
   </script>
 </body>
 

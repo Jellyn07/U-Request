@@ -364,8 +364,9 @@ class AdministratorModel extends BaseModel {
             f.submitted_at,
             r.req_id,
             rq.profile_pic,
-            COUNT(f.tracking_id) OVER (PARTITION BY r.req_id) AS total_feedback
-        FROM feedback AS f
+            COUNT(f.tracking_id) OVER (PARTITION BY r.req_id) AS total_feedback,
+            COUNT(r.req_id) OVER (PARTITION BY r.req_id) AS total_requests
+        FROM VW_feedback AS f 
         JOIN request AS r 
             ON f.tracking_id = r.tracking_id
         JOIN requester AS rq 

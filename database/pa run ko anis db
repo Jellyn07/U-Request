@@ -394,20 +394,35 @@ DELIMITER ;
 ALTER TABLE request 
 MODIFY request_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY;
 
-ALTER TABLE requester
-MODIFY req_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY;
+///////////////////////////////////////   BFELL   //////////////////////////////////////////
+CREATE VIEW VW_feedback AS
+SELECT 
+    tracking_id,
+    ratings_A,
+    ratings_B,
+    ratings_C,
+    overall_rating,
+    suggest_process,
+    suggest_frontline,
+    suggest_facility,
+    suggest_overall,
+    submitted_at
+FROM feedback;
 
 
-----------------------------------------------------------------------------------------------------
-START HERE IF U HAVE NEW DB U_REQUEST
 
-CREATE TABLE vehicle (
-    vehicle_id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_name VARCHAR(100) NOT NULL,
-    plate_no VARCHAR(20) NOT NULL,
-    capacity INT NOT NULL,
-    vehicle_type VARCHAR(50) NOT NULL,
-    driver_id INT UNSIGNED,
-    photo VARCHAR(255),
-    FOREIGN KEY (driver_id) REFERENCES driver(driver_id) ON DELETE SET NULL
-);
+/////////////////////////////////////////////////////////////////////////////////// new bfelll
+
+CREATE VIEW VW_feedback AS
+SELECT 
+    tracking_id,
+    ratings_A,
+    ratings_B,
+    ratings_C,
+    overall_rating,
+    suggest_process,
+    suggest_frontline,
+    suggest_facility,
+    suggest_overall,
+    submitted_at
+FROM feedback;

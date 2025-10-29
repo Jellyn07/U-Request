@@ -2,23 +2,6 @@
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 
-if (!isset($_SESSION['email'])) {
-  header("Location: login.php");
-  exit;
-}
-
-if (!isset($_GET['tracking_id'])) {
-  die("Missing tracking ID.");
-}
-
-$tracking_id = $_GET['tracking_id'] ?? null;
-
-$isReadonly = false;
-if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedback.php') !== false) {
-    $isReadonly = true;
-}
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,8 +86,6 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
               ?>
             </tbody>
           </table>
-          <p class="text-sm mt-4 mb-1">What would you suggest we do to further improve the processes?</p>
-          <textarea name="suggest_process" placeholder="" class="w-full input-field"></textarea>
         </section>
 
         <!-- B. Frontline Personnel -->
@@ -137,8 +118,6 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
               ?>
             </tbody>
           </table>
-          <p class="text-sm mt-4 mb-1">What would you suggest we do to further improve the Customer Service?</p>
-          <textarea name="suggest_frontline" placeholder="" class="w-full input-field"></textarea>
         </section>
 
         <!-- C. Facilities -->
@@ -168,8 +147,6 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
               ?>
             </tbody>
           </table>
-          <p class="text-sm mt-4 mb-1">What would you suggest we do to further improve the facilities?</p>
-          <textarea name="suggest_facility" placeholder="" class="w-full input-field"></textarea>
         </section>
 
         <!-- D. Overall Performance -->
@@ -190,104 +167,95 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
               </tr>
             </tbody>
           </table>
-          <p class="text-sm mt-4 mb-1">Comments & Suggestions:</p>
-          <textarea name="suggest_overall" placeholder="" class="w-full input-field"></textarea>
         </section>
 
-        <?php
-        // Detect origin automatically (from GET referrer or session)
-        $back_url = '/app/modules/user/views/tracking.php'; // default
-        $show_submit = true; // default: show submit button
-
-        // If accessed from admin feedback page, return there instead
-        if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedback.php') !== false) {
-          $back_url = '/app/modules/gsu_admin/views/feedback.php';
-          $show_submit = false; // hide submit for admin view
-        } elseif (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/user/views/feedback.php') !== false) {
-          $back_url = '/app/modules/user/views/tracking.php';
-        }
-        ?>
         <div class="text-center mt-5">
-          <a href="<?php echo htmlspecialchars($back_url); ?>" class="btn btn-secondary mr-2">Back</a>
-          <?php if ($show_submit): ?>
-            <button type="submit" class="btn btn-primary">Submit Feedback</button>
-          <?php endif; ?>
+          <a href="feedback.php" class="btn btn-secondary mr-2">Back</a>
         </div>
       </form>
     </div>
   </main>
 
   <script>
-    const isReadonly = <?php echo json_encode($isReadonly); ?>;
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('../../../controllers/FeedbackController.php')
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success' && res.data) {
+            const data = res.data;
 
-    // Render 5 stars for each .star-group
-    document.querySelectorAll('.star-group').forEach(group => {
-      for (let i = 1; i <= 5; i++) {
-        const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        star.setAttribute('viewBox', '0 0 24 24');
-        star.classList.add('star', 'empty');
-        star.dataset.value = i;
-        star.innerHTML = '<path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.335 24 12 19.897 4.665 24 6 15.6 0 9.753l8.332-1.735z"/>';
-        group.appendChild(star);
-      }
-    });
+            // ✅ Display averages per section (A, B, C)
+            displayAverageRatings('A', data.avgA);
+            displayAverageRatings('B', data.avgB);
+            displayAverageRatings('C', data.avgC);
 
-    // Ratings storage
-    const ratings = {
-      A: {},
-      B: {},
-      C: {}
-    };
-
-    // Click behavior for sections A–C
-    document.querySelectorAll('.star-group').forEach(group => {
-      if (group.id === 'overallStars') return; // skip D (auto)
-      const section = group.dataset.section;
-      const index = group.dataset.index;
-      const stars = group.querySelectorAll('.star');
-
-      stars.forEach(star => {
-        star.addEventListener('click', () => {
-          const value = parseInt(star.dataset.value);
-          ratings[section][index] = value;
-
-          // fill stars
-          stars.forEach(s => {
-            s.classList.toggle('filled', parseInt(s.dataset.value) <= value);
-            s.classList.toggle('empty', parseInt(s.dataset.value) > value);
-          });
-
-          updateOverall();
+            // ✅ Compute overall rating (average of all section averages)
+            displayOverallAverage(data);
+          } else {
+            console.warn('No feedback data available yet.');
+            displayNoDataMessage();
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching averages:', err);
+          displayNoDataMessage();
         });
-      });
     });
 
-    // Update D automatically
-    function updateOverall() {
-      let allRatings = [];
-      for (let s in ratings) {
-        for (let i in ratings[s]) {
-          allRatings.push(ratings[s][i]);
-        }
-      }
-      const avg = allRatings.length ? (allRatings.reduce((a, b) => a + b) / allRatings.length) : 0;
-      renderOverall(avg);
+    // ✅ Displays per-section averages inline
+    function displayAverageRatings(section, averages) {
+      if (!averages || Object.keys(averages).length === 0) return;
+
+      Object.entries(averages).forEach(([index, avg]) => {
+        const group = document.querySelector(`.star-group[data-section="${section}"][data-index="${index}"]`);
+        if (!group) return;
+
+        // Clear any previous placeholders
+        group.innerHTML = '';
+
+        // Append inline average number (right side of row)
+        const avgSpan = document.createElement('span');
+        avgSpan.textContent = parseFloat(avg).toFixed(2);
+        avgSpan.classList.add('text-sm', 'font-semibold', 'text-gray-700');
+
+        group.appendChild(avgSpan);
+      });
     }
 
-    function renderOverall(rating) {
-      const group = document.getElementById('overallStars');
-      group.innerHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        star.setAttribute('viewBox', '0 0 24 24');
-        star.classList.add('star', rating >= i ? 'filled' : 'empty');
-        star.innerHTML = '<path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.335 24 12 19.897 4.665 24 6 15.6 0 9.753l8.332-1.735z"/>';
-        group.appendChild(star);
+    // ✅ Compute and display overall rating average (section D)
+    function displayOverallAverage(data) {
+      const allAverages = [
+        ...Object.values(data.avgA || {}),
+        ...Object.values(data.avgB || {}),
+        ...Object.values(data.avgC || {})
+      ];
+
+      if (allAverages.length === 0) {
+        const group = document.querySelector('#overallStars');
+        group.innerHTML = `<span class="text-xs text-gray-400 italic">No data yet</span>`;
+        return;
       }
+
+      const sum = allAverages.reduce((a, b) => a + parseFloat(b), 0);
+      const overallAvg = sum / allAverages.length;
+
+      const group = document.querySelector('#overallStars');
+      group.innerHTML = ''; // clear
+      const avgSpan = document.createElement('span');
+      avgSpan.textContent = overallAvg.toFixed(2);
+      avgSpan.classList.add('text-base', 'font-bold', 'text-blue-700');
+      group.appendChild(avgSpan);
+    }
+
+    // ✅ Show "No data yet" if no averages found
+    function displayNoDataMessage() {
+      document.querySelectorAll('.star-group').forEach(group => {
+        group.innerHTML = `
+      <span class="text-xs text-gray-400 italic">No data yet</span>
+    `;
+      });
     }
   </script>
-
-  
   <script>
     document.getElementById('feedbackForm').addEventListener('submit', function(e) {
       e.preventDefault();
