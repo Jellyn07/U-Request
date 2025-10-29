@@ -1,12 +1,11 @@
 <?php
+error_reporting(0);
+header('Content-Type: application/json');
+
 require_once __DIR__ . '/../models/FeedbackModel.php';
 require_once __DIR__ . '/../config/constants.php';
 
-header('Content-Type: application/json');
-
 $model = new FeedbackModel();
-
-// ✅ Determine request type
 $method = $_SERVER['REQUEST_METHOD'];
 
 // ======================================================
@@ -33,8 +32,14 @@ if ($method === 'POST') {
     try {
         $saved = $model->saveFeedback(
             $tracking_id,
-            $ratings_A, $ratings_B, $ratings_C, $overall_rating,
-            $suggest_process, $suggest_frontline, $suggest_facility, $suggest_overall
+            $ratings_A,
+            $ratings_B,
+            $ratings_C,
+            $overall_rating,
+            $suggest_process,
+            $suggest_frontline,
+            $suggest_facility,
+            $suggest_overall
         );
 
         echo json_encode([
@@ -46,12 +51,24 @@ if ($method === 'POST') {
     } catch (Exception $e) {
         echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
     }
-
     exit;
 }
 
 // ======================================================
-// 📊 GET — Fetch averages from VW_feedback
+// 🆕 GET — Fetch individual feedback by tracking_id
+// ======================================================
+if ($method === 'GET' && isset($_GET['tracking_id'])) {
+    try {
+        $data = $model->getFeedbackByTrackingId($_GET['tracking_id']);
+        echo json_encode(['status' => 'success', 'data' => $data]);
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Error fetching specific feedback.']);
+    }
+    exit;
+}
+
+// ======================================================
+// 📊 GET — Fetch all feedback averages
 // ======================================================
 try {
     $feedbackList = $model->getAllFeedback();
@@ -83,7 +100,6 @@ try {
         }
     }
 
-    // ✅ Compute averages
     $averages = [
         'avgA' => [],
         'avgB' => [],

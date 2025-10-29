@@ -125,4 +125,12 @@ class FeedbackModel extends BaseModel {
         $stmt->close();
         return $feedback;
     }
+    ///////////////////////////////////////////////////for individual feedback retrieval
+    public function getFeedbackByTrackingId($tracking_id) {
+    $stmt = $this->db->prepare("SELECT * FROM VW_feedback WHERE tracking_id = ?");
+    $stmt->bind_param("s", $tracking_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
 }

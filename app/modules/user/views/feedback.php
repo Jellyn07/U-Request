@@ -15,8 +15,9 @@ $tracking_id = $_GET['tracking_id'] ?? null;
 
 $isReadonly = false;
 if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedback.php') !== false) {
-    $isReadonly = true;
+  $isReadonly = true;
 }
+
 
 
 ?>
@@ -219,18 +220,7 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
 
   <script>
     const isReadonly = <?php echo json_encode($isReadonly); ?>;
-
-    // Render 5 stars for each .star-group
-    document.querySelectorAll('.star-group').forEach(group => {
-      for (let i = 1; i <= 5; i++) {
-        const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        star.setAttribute('viewBox', '0 0 24 24');
-        star.classList.add('star', 'empty');
-        star.dataset.value = i;
-        star.innerHTML = '<path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.335 24 12 19.897 4.665 24 6 15.6 0 9.753l8.332-1.735z"/>';
-        group.appendChild(star);
-      }
-    });
+    const trackingId = <?php echo json_encode($tracking_id); ?>;
 
     // Ratings storage
     const ratings = {
@@ -239,19 +229,36 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
       C: {}
     };
 
-    // Click behavior for sections A–C
+    // --- Render stars (initial empty display) ---
+    function renderStars() {
+      document.querySelectorAll('.star-group').forEach(group => {
+        group.innerHTML = ''; // clear before re-rendering
+        for (let i = 1; i <= 5; i++) {
+          const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          star.setAttribute('viewBox', '0 0 24 24');
+          star.classList.add('star', 'empty');
+          star.dataset.value = i;
+          star.innerHTML = '<path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.335 24 12 19.897 4.665 24 6 15.6 0 9.753l8.332-1.735z"/>';
+          group.appendChild(star);
+        }
+      });
+    }
+
+    renderStars(); // initialize
+
+    // --- Star click behavior (only when editable) ---
     document.querySelectorAll('.star-group').forEach(group => {
-      if (group.id === 'overallStars') return; // skip D (auto)
+      if (group.id === 'overallStars') return;
       const section = group.dataset.section;
       const index = group.dataset.index;
       const stars = group.querySelectorAll('.star');
 
       stars.forEach(star => {
         star.addEventListener('click', () => {
+          if (isReadonly) return; // disable for admin view
           const value = parseInt(star.dataset.value);
           ratings[section][index] = value;
 
-          // fill stars
           stars.forEach(s => {
             s.classList.toggle('filled', parseInt(s.dataset.value) <= value);
             s.classList.toggle('empty', parseInt(s.dataset.value) > value);
@@ -262,7 +269,7 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
       });
     });
 
-    // Update D automatically
+    // --- Update overall rating ---
     function updateOverall() {
       let allRatings = [];
       for (let s in ratings) {
@@ -285,21 +292,67 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
         group.appendChild(star);
       }
     }
-  </script>
 
-  
-  <script>
+    // --- Fill stars based on data ---
+    function fillStars(section, ratingObj) {
+      const groups = document.querySelectorAll(`.star-group[data-section="${section}"]`);
+      Object.keys(ratingObj).forEach(index => {
+        const group = groups[parseInt(index)];
+        if (!group) return;
+        const value = parseInt(ratingObj[index]);
+        group.querySelectorAll('.star').forEach(s => {
+          s.classList.toggle('filled', parseInt(s.dataset.value) <= value);
+          s.classList.toggle('empty', parseInt(s.dataset.value) > value);
+        });
+      });
+    }
+
+
+    // --- ADMIN (READONLY) MODE ---
+    if (isReadonly) {
+      document.querySelectorAll('textarea, button[type="submit"]').forEach(el => el.disabled = true);
+
+      fetch(`../../../controllers/FeedbackController.php?action=getFeedback&tracking_id=${trackingId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.data) {
+            const fb = data.data;
+
+            // Parse JSON ratings safely
+            const ratingsA = JSON.parse(fb.ratings_A || '{}');
+            const ratingsB = JSON.parse(fb.ratings_B || '{}');
+            const ratingsC = JSON.parse(fb.ratings_C || '{}');
+            const overall = parseFloat(fb.overall_rating || 0);
+
+            // ✅ FIX: Remove re-render here to avoid losing data attributes
+            // renderStars(); ❌ (removed)
+            // ✅ Instead, directly fill existing stars:
+            fillStars('A', ratingsA);
+            fillStars('B', ratingsB);
+            fillStars('C', ratingsC);
+            renderOverall(overall);
+
+            // Fill suggestions
+            document.querySelector('textarea[name="suggest_process"]').value = fb.suggest_process || '';
+            document.querySelector('textarea[name="suggest_frontline"]').value = fb.suggest_frontline || '';
+            document.querySelector('textarea[name="suggest_facility"]').value = fb.suggest_facility || '';
+            document.querySelector('textarea[name="suggest_overall"]').value = fb.suggest_overall || '';
+          }
+        })
+        .catch(err => console.error('Failed to load feedback:', err));
+    }
+
+    // --- Handle submission ---
     document.getElementById('feedbackForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      if (isReadonly) return;
 
-      // Prepare data
       const form = e.target;
       const data = new FormData(form);
       data.append('ratings_A', JSON.stringify(ratings.A));
       data.append('ratings_B', JSON.stringify(ratings.B));
       data.append('ratings_C', JSON.stringify(ratings.C));
 
-      // Compute average for overall rating
       let all = [];
       for (let s in ratings)
         for (let i in ratings[s]) all.push(ratings[s][i]);
@@ -318,26 +371,12 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
               text: res.message,
               icon: 'success',
               confirmButtonText: 'OK'
-            }).then(() => {
-              window.location.href = 'tracking.php';
-            });
+            }).then(() => window.location.href = 'tracking.php');
           } else {
-            Swal.fire({
-              title: 'Error!',
-              text: res.message,
-              icon: 'error',
-              confirmButtonText: 'Try Again'
-            });
+            Swal.fire('Error!', res.message, 'error');
           }
         })
-        .catch(() => {
-          Swal.fire({
-            title: 'Submission Failed!',
-            text: 'Failed to submit feedback. Please try again later.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        });
+        .catch(() => Swal.fire('Submission Failed!', 'Please try again later.', 'error'));
     });
   </script>
   <?php include COMPONENTS_PATH . '/footer.php'; ?>
