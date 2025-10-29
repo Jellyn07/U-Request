@@ -444,9 +444,21 @@ $vehicles = $vehicleController->getVehicles();
                   <!-- Driver -->
                   <div>
                     <label class="text-xs text-text mb-1">Driver<span class="text-red-500">*</span></label>
-                    <input type="text" class="w-full input-field" x-model="selected.driver" required>
-                  </div>
+                    <select class="w-full input-field" x-model="selected.driver_id" required>
+                      <!-- First option: current driver -->
+                      <option :value="selected.driver_id" x-text="selected.driver" selected></option>
 
+                      <!-- Other drivers from PHP -->
+                      <?php foreach($drivers as $driver): ?>
+                        <option 
+                          value="<?= $driver['driver_id'] ?>" 
+                          x-show="<?= $driver['driver_id'] ?> != selected.driver_id"
+                        >
+                          <?= htmlspecialchars($driver['driver_name']) ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
                   <!-- Status -->
                   <div>
                     <label class="text-xs text-text mb-1">Status<span class="text-red-500">*</span></label>
