@@ -38,7 +38,7 @@ $admins = $controller->getAllAdmins();
       <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
             <select id="roleFilter" class="input-field">
@@ -172,8 +172,8 @@ $admins = $controller->getAllAdmins();
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto max-h-[550px] overflow-y-auto mt-4 rounded-lg shadow">
-          <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg p-2">
+          <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <table class="min-w-full divide-y divide-gray-200 p-2">
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-1 py-2 rounded-tl-lg">&nbsp;</th>
@@ -202,7 +202,7 @@ $admins = $controller->getAllAdmins();
                         accessLevel_desc: '<?php echo $admin['accessLevel_desc']; ?>',
                         status: '<?php echo $admin['status']; ?>'
                       }"
-                      class="cursor-pointer hover:bg-gray-100"
+                      class="cursor-pointer hover:bg-gray-100 border-b border-gray-200"
                     >
                     <td class="pl-8 py-2">
                     <img src="<?php echo !empty($admin['profile_picture']) 
@@ -236,7 +236,7 @@ $admins = $controller->getAllAdmins();
         </div>
 
         <!-- Right Section (Details) -->
-        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4">
+        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px]">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
@@ -320,7 +320,6 @@ $admins = $controller->getAllAdmins();
       window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
   </script>
 </body>
-<script src="/public/assets/js/shared/menus.js"></script>
 </html>
 
 <?php

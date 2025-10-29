@@ -193,4 +193,5 @@ sortSelect.addEventListener('change', () => {
 });
 </script>
 </body>
+<script src="/public/assets/js/shared/menuS.js"></script>
 </html>

@@ -14,7 +14,7 @@ $trips = $controller->fetchTrips();
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
 </head>
 <body class="bg-gray-100">
-  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
 
   <main class="ml-16 md:ml-64 p-6 flex flex-col min-h-screen">
     <h1 class="text-2xl font-bold mb-4">Schedules</h1>

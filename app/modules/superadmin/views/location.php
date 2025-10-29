@@ -28,7 +28,7 @@ $admins = $controller->getAllAdmins();
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-4">Campus Locations</h1>

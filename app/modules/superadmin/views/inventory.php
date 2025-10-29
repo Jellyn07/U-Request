@@ -50,7 +50,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
 <body class="bg-gray-100 overflow-hidden">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -310,8 +310,6 @@ $profile = $controller->getProfile($_SESSION['email']);
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
-
-//new alert
 <script>
   function validateAndSubmit() {
     const form = document.getElementById('addStockForm');

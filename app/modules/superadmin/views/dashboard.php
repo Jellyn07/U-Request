@@ -1,170 +1,222 @@
 <?php
-// session_start();
-// if (!isset($_SESSION['email'])) {
-//     header("Location: admin_login.php");
-//     exit;
-// }
-// require_once __DIR__ . '/../../../config/auth-admin.php';
+session_start();
 require_once __DIR__ . '/../../../config/constants.php';
-require_once __DIR__ . '/../../../controllers/DashboardController.php';
-$controller = new DashboardController();
-$year = $_GET['year'] ?? date('Y');
-$data = $controller->getDashboardData($year);
+
+// ✅ Date range display (example)
+$startDate = "Jan 1";
+$endDate = date('M d');
+$dateRange = "$startDate - $endDate";
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>U-Request</title>
-  <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
-  <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U-Request | Superadmin Dashboard</title>
+  <link rel="stylesheet" href="/public/assets/css/output.css" />
+  <link rel="icon" href="/public/assets/img/upper_logo.png"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100">
-  <?php include COMPONENTS_PATH . '/superadmin_menu.php';?>
-        <!-- include COMPONENTS_PATH . '/admin_header.php'; -->
+  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
-    <!-- <p class="flex text-sm text-gray-600 p-4">
-      <img src="/public/assets/img/upper_logo.png" class="size-5 m-0.5">
-       > Dashboard
-    </p> -->
-    <div class="p-6">
+    <!-- 📅 Date Display -->
+    <div class="absolute top-7 right-8 bg-white p-2 px-4 rounded-xl shadow border border-gray-300 text-sm">
+      Showing stats from <span class="font-semibold"><?= $dateRange ?></span>
+    </div>
+    <div class="p-6 space-y-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-      <!-- Year Selector -->
-      <div class="mb-2 flex items-center">
-        <label for="yearSelect" class="mr-2 text-text text-sm">Select Year:</label>
-        <select id="yearSelect" class="btn btn-secondary text-sm px-10">
-          <option value="2025">2025</option>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-        </select>
-      </div>
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Repair Requests</h2>
-          <p class="text-xl font-bold text-primary" id="totalrRequests">
-              <?= isset($data['summary']['total_rrequests']) ? $data['summary']['total_rrequests'] : 0 ?>
-          </p>
-
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5 bg-white p-6 rounded-2xl shadow">
+        <div class="border-r-2 border-gray-300">
+          <h2 class="font-medium mb-3">Overall Requests</h2>
+          <p class="text-4xl font-bold text-text mt-2">199</p>
+          <p class="text-xs text-gray-500 font-medium mt-2">Overall request this year</p>
         </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Vehicle Request</h2>
-          <p class="text-xl font-bold text-yellow-500" id="totalrvRequests">
-            <?= isset($data['summary']['total_vrequests']) ? $data['summary']['total_vrequests'] : 0 ?>
-          </p>
+        <div class="border-r-2 border-gray-300">
+          <h2 class="font-medium mb-3">Pending Vehicle Requests</h2>
+          <p class="text-4xl font-bold text-text mt-2">56</p>
+          <p class="text-xs text-gray-500 font-medium mt-2">Total pending vehicle requests</p>
         </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">GSU Personnels</h2>
-          <p class="text-xl font-bold text-green-500" id="totalgPersonnel">
-            <?= isset($data['summary']['totalgPersonnel']) ? $data['summary']['totalgPersonnel'] : 0 ?>
-          </p>
+        <div class="border-r-2 border-gray-300">
+          <h2 class="font-medium mb-3">Pending Repair Requests</h2>
+          <p class="text-4xl font-bold text-text mt-2">89</p>
+          <p class="text-xs text-gray-500 font-medium mt-2">Total pending repair requests</p>
         </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Drivers</h2>
-          <p class="text-xl font-bold text-secondary">3</p>
-        </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Users</h2>
-          <p class="text-xl font-bold text-secondary">
-            <?= isset($data['summary']['total_user']) ? $data['summary']['total_user'] : 0 ?>
-          </p>
-        </div>
-        <div class="bg-white shadow rounded-lg p-4 text-center">
-          <h2 class="text-gray-600 text-xs">Admins</h2>
-          <p class="text-xl font-bold text-secondary">
-            <?= isset($data['summary']['total_admin']) ? $data['summary']['total_admin'] : 0 ?> 
-          </p>
+        <div>
+          <h2 class="font-medium mb-3">Average Rating</h2>
+          <div class="flex items-center space-x-2 mt-2">
+            <span class="text-4xl font-bold text-yellow-500">4.5</span>
+            <div id="averageStars" class="flex"></div>
+          </div>
+          <p class="text-xs text-gray-500 font-medium mt-2">Average rating this year</p>
         </div>
       </div>
 
-      <!-- Line Graph with Title -->
-      <div class="bg-white shadow rounded-lg p-10 flex flex-col justify-center items-center" style="height: 490px;">
-        <h2 class="text-sm font-semibold mb-2">Monthly Requests Overview</h2>
-        <canvas id="requestsChart" class="w-full h-full"></canvas>
-      </div>      
-    </div>
+      <!-- Charts -->
+      <div class="grid md:grid-cols-2 gap-6 mb-5">
+       <div class="bg-white p-4 rounded-2xl shadow">
+          <h3 class="font-semibold text-text text-base text-center mb-2">Monthly Request Overview</h3>
+          <div class="w-full h-64 flex justify-center">
+            <canvas id="monthlyLineChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow">
+          <h3 class="font-semibold text-text text-base text-center mb-2">Request Distribution</h3>
+          <div class="w-full h-64 flex justify-center">
+            <canvas id="requestPieChart"></canvas>
+          </div>
+        </div>
+      </div>
 
-    
+      <!-- Recent Activities -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Vehicle Requests -->
+        <div class="bg-white rounded-2xl shadow-md pt-5 pb-0">
+          <h2 class="text-lg font-bold mb-3 pl-5 text-primary">Recent Vehicle Requests</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 text-sm text-left">
+              <thead class="text-xs uppercase text-gray-700 border-b-gray-400 border-b">
+                <tr>
+                  <th class="px-4 py-2">Date</th>
+                  <th class="px-4 py-2">Requester</th>
+                  <th class="px-4 py-2">Vehicle</th>
+                  <th class="px-4 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php for($i=0;$i<10;$i++){
+                  echo '<tr class="border-b hover:bg-gray-100 cursor-pointer text-xs">
+                    <td class="px-4 py-3">Oct 25, 2025</td>
+                    <td class="px-4 py-3">John Dela Cruz</td>
+                    <td class="px-4 py-3">N/A</td>
+                    <td class="px-4 py-3"><span class="font-semibold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">Pending</span></td>
+                  </tr>';
+                 } ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Repair Requests -->
+        <div class="bg-white rounded-2xl shadow-md pt-5 pb-0">
+          <h2 class="text-lg font-bold mb-3 pl-5 text-primary">Recent Repair Requests</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 text-sm text-left">
+              <thead class="text-xs uppercase text-gray-700 border-b-gray-400 border-b">
+                <tr>
+                  <th class="px-4 py-2">Date</th>
+                  <th class="px-4 py-2">Requester</th>
+                  <th class="px-4 py-2">Facility</th>
+                  <th class="px-4 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php for($i=0;$i<10;$i++){
+                  echo '<tr class="border-b hover:bg-gray-100 cursor-pointer text-xs">
+                    <td class="px-4 py-3">Oct 25, 2025</td>
+                    <td class="px-4 py-3">Ben Dela Cruz</td>
+                    <td class="px-4 py-3">Admin Office</td>
+                    <td class="px-4 py-3"><span class="font-semibold bg-green-200 text-green-800 px-3 py-1 rounded-full">Completed</span></td>
+                  </tr>';
+                 } ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
   </main>
 
-  <script>
-    // Dummy data for different years
-    const yearData = {
-      2025: {
-        facility: [120,180,250,220,300,280,350,400,370,390,420,450],
-        vehicle: [80,100,150,130,200,170,220,260,240,250,270,300],
-        total: 1245,
-        pending: 312,
-        approved: 890
-      },
-      2024: {
-        facility: [100,150,200,180,220,250,300,320,310,330,340,360],
-        vehicle: [60,80,120,100,150,140,180,200,190,210,220,230],
-        total: 1050,
-        pending: 280,
-        approved: 770
-      },
-      2023: {
-        facility: [90,120,160,150,180,200,220,240,230,250,260,280],
-        vehicle: [50,70,100,90,120,130,150,170,160,180,190,200],
-        total: 900,
-        pending: 200,
-        approved: 700
-      }
-    };
+  <script src="/public/assets/js/shared/menus.js"></script>
 
-    // Initialize chart
-    const ctx = document.getElementById('requestsChart').getContext('2d');
-    let requestsChart = new Chart(ctx, {
+  <!-- Chart Scripts -->
+  <script>
+    // Monthly Line Chart
+    const lineCtx = document.getElementById('monthlyLineChart').getContext('2d');
+    new Chart(lineCtx, {
       type: 'line',
       data: {
         labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
         datasets: [
           {
-            label: 'Repair Requests',
-            data: yearData[2025].facility,
-            borderColor: '#ff0000',
-            backgroundColor: 'rgba(117,0,0,0.2)',
-            fill: true,
-            tension: 0.4
+            label: 'Vehicle Requests',
+            data: [10,15,12,18,20,25,22,19,30,28,35,40],
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37,99,235,0.1)',
+            tension: 0.3,
+            fill: true
           },
           {
-            label: 'Vehicle Requests',
-            data: yearData[2025].vehicle,
-            borderColor: '#ff8a8a',
-            backgroundColor: 'rgba(255,138,138,0.2)',
-            fill: true,
-            tension: 0.4
+            label: 'Repair Requests',
+            data: [8,10,14,16,19,22,20,23,25,29,32,38],
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22,163,74,0.1)',
+            tension: 0.3,
+            fill: true
           }
         ]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false, // respects container height
-        plugins: { legend: { labels: { color: '#333', font: { size: 10 } } } },
-        scales: {
-          x: { ticks: { color: '#555', font: { size: 9 } } },
-          y: { ticks: { color: '#555', font: { size: 9 } } }
-        }
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true } }
       }
     });
 
-    // Update chart and stats on year change
-    document.getElementById('yearSelect').addEventListener('change', function() {
-      const selectedYear = this.value;
-      requestsChart.data.datasets[0].data = yearData[selectedYear].facility;
-      requestsChart.data.datasets[1].data = yearData[selectedYear].vehicle;
-      requestsChart.update();
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('../../../controllers/DashboardController.php?request_status=1')
+        .then(response => response.json())
+        .then(data => {
+          const ctx = document.getElementById('requestPieChart').getContext('2d');
 
-      document.getElementById('totalRequests').textContent = yearData[selectedYear].total;
-      document.getElementById('pendingRequests').textContent = yearData[selectedYear].pending;
-      document.getElementById('approvedRequests').textContent = yearData[selectedYear].approved;
+          new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: ['Vehicle Requests', 'Repair Requests'],
+              datasets: [{
+                data: [
+                  20,
+                  30
+                ],
+                backgroundColor: [
+                  '#16a34a',
+                  '#2563eb'
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: {
+                padding: {
+                  top: 10,
+                  bottom: 10,
+                  left: 10,
+                  right: 10
+                }
+              },
+              plugins: {
+                legend: {
+                  position: 'right',
+                  labels: {
+                    boxWidth: 15,
+                    boxHeight: 8,
+                    padding: 10
+                  }
+                }
+              },
+              radius: '100%' // smaller circle to add spacing inside the div
+            }
+          });
+        })
+        .catch(error => console.error('Error loading chart data:', error));
     });
+
+
   </script>
+  <script src="/public/assets/js/shared/stars.js"></script>
 </body>
-<script src="/public/assets/js/shared/menus.js"></script>
 </html>
