@@ -49,6 +49,8 @@ class VehicleModel extends BaseModel {
                     v.capacity,
                     v.vehicle_type,
                     v.photo,
+                    v.status,
+                    v.driver_id,
                     CONCAT(d.firstName, ' ', d.lastName) AS driver_name
                   FROM vehicle v
                   LEFT JOIN driver d ON v.driver_id = d.driver_id
@@ -64,5 +66,119 @@ class VehicleModel extends BaseModel {
         }
 
         return $vehicles;
+    }
+
+    public function updateVehicle($data) {
+        $photo = $data['photo'] ?? null;
+
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db);
+        }
+
+        // Step 1: Check if new vehicle name already exists for another vehicle
+        $stmtCheckName = $this->db->prepare("SELECT vehicle_id FROM vehicle WHERE vehicle_name = ? AND vehicle_id != ?");
+        if (!$stmtCheckName) {
+            error_log("Prepare failed (name check): " . $this->db->error);
+            return ['success' => false, 'error' => 'Database error.'];
+        }
+        $stmtCheckName->bind_param("si", $data['vehicle_name'], $data['vehicle_id']);
+        $stmtCheckName->execute();
+        $resultName = $stmtCheckName->get_result();
+        if ($resultName->num_rows > 0) {
+            return ['success' => false, 'error' => 'Vehicle name already exists.'];
+        }
+        $stmtCheckName->close();
+
+        // Step 2: Check if new plate number already exists for another vehicle
+        $stmtCheckPlate = $this->db->prepare("SELECT vehicle_id FROM vehicle WHERE plate_no = ? AND vehicle_id != ?");
+        if (!$stmtCheckPlate) {
+            error_log("Prepare failed (plate check): " . $this->db->error);
+            return ['success' => false, 'error' => 'Database error.'];
+        }
+        $stmtCheckPlate->bind_param("si", $data['plate_no'], $data['vehicle_id']);
+        $stmtCheckPlate->execute();
+        $resultPlate = $stmtCheckPlate->get_result();
+        if ($resultPlate->num_rows > 0) {
+            return ['success' => false, 'error' => 'Plate number already exists.'];
+        }
+        $stmtCheckPlate->close();
+
+        // Step 3: Fetch current values
+        $stmtCheck = $this->db->prepare("SELECT vehicle_name, plate_no, capacity, vehicle_type, driver_id, status, photo FROM vehicle WHERE vehicle_id = ?");
+        if (!$stmtCheck) {
+            error_log("Prepare failed (fetch current): " . $this->db->error);
+            return ['success' => false, 'error' => 'Database error.'];
+        }
+        $stmtCheck->bind_param("i", $data['vehicle_id']);
+        $stmtCheck->execute();
+        $current = $stmtCheck->get_result()->fetch_assoc();
+        $stmtCheck->close();
+
+        // Step 4: Check for redundant update
+        if (
+            $current['vehicle_name'] === $data['vehicle_name'] &&
+            $current['plate_no'] === $data['plate_no'] &&
+            (int)$current['capacity'] === (int)$data['capacity'] &&
+            $current['vehicle_type'] === $data['vehicle_type'] &&
+            ((int)$current['driver_id'] === (int)$data['driver_id']) &&
+            $current['status'] === $data['status'] &&
+            (($photo === null) || $current['photo'] === $photo)
+        ) {
+            return ['success' => false, 'error' => 'No changes detected.'];
+        }
+
+        // Step 5: Perform update
+        $query = "UPDATE vehicle 
+                SET vehicle_name = ?, 
+                    plate_no = ?, 
+                    capacity = ?, 
+                    vehicle_type = ?, 
+                    driver_id = ?, 
+                    status = ?, 
+                    photo = COALESCE(?, photo)
+                WHERE vehicle_id = ?";
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Prepare failed (update): " . $this->db->error);
+            return ['success' => false, 'error' => 'Database error.'];
+        }
+
+        $stmt->bind_param(
+            "ssisissi",
+            $data['vehicle_name'],
+            $data['plate_no'],
+            $data['capacity'],
+            $data['vehicle_type'],
+            $data['driver_id'],
+            $data['status'],
+            $photo,
+            $data['vehicle_id']
+        );
+
+        if ($stmt->execute()) {
+            return ['success' => true];
+        } else {
+            error_log("Execute failed: " . $stmt->error);
+            return ['success' => false, 'error' => 'Update failed.'];
+        }
+    }
+    
+    public function getVehicleTravelHistory($vehicle_id) {
+        $stmt = $this->db->prepare("
+            SELECT vra.reqAssignment_id, vra.control_no, vra.req_id, vra.vehicle_id, vra.driver_id, vra.req_status, vra.approved_by,
+                   CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
+                   vr.trip_purpose, vr.travel_date
+            FROM vehicle_request_assignment vra
+            LEFT JOIN vehicle_request vr ON vra.req_id = vr.req_id
+            LEFT JOIN driver d ON vra.driver_id = d.driver_id
+            WHERE vra.vehicle_id = ?
+            ORDER BY vr.travel_date DESC
+        ");
+        $stmt->bind_param("i", $vehicle_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $result;
     }
 }

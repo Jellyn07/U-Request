@@ -75,3 +75,48 @@ function previewProfile(event) {
         output.src = URL.createObjectURL(event.target.files[0]);
     }
 }
+
+  function toggleHistory(vehicle_id, btn) {
+    const container = btn.nextElementSibling; // travel-history div
+    if (!container) return;
+
+    const isVisible = !container.classList.contains('hidden');
+    if (isVisible) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    container.innerHTML = '<p class="text-sm text-gray-500">Loading...</p>';
+
+    fetch('../../../controllers/VehicleController.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `get_travel_history=1&vehicle_id=${vehicle_id}`
+    })
+    .then(res => res.text()) // temporarily as text
+    .then(text => {
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (err) {
+            console.error('Invalid JSON:', text);
+            container.innerHTML = '<p class="text-sm text-red-500">Failed to load travel history</p>';
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p class="text-sm text-gray-500">No Travel History</p>';
+        } else {
+            const listItems = data.map(h => {
+                const date = new Date(h.travel_date).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+                return `<li class="text-sm p-1 border-b border-gray-200">${date} - ${h.trip_purpose} - Driver: ${h.driver_name}</li>`;
+            }).join('');
+            container.innerHTML = `<ul class="space-y-1">${listItems}</ul>`;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        container.innerHTML = '<p class="text-sm text-red-500">Failed to load travel history</p>';
+    });
+}

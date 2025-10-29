@@ -99,6 +99,55 @@ class VehicleController {
             exit;
         }
     }
+
+    public function updateVehicle() {
+        $data = [
+            'vehicle_id' => $_POST['vehicle_id'] ?? null,
+            'vehicle_name' => $_POST['vehicle_name'] ?? '',
+            'plate_no' => $_POST['plate_no'] ?? '',
+            'capacity' => $_POST['capacity'] ?? 0,
+            'vehicle_type' => $_POST['vehicle_type'] ?? '',
+            'driver_id' => $_POST['driver_id'] ?? 0,
+            'status' => $_POST['status'] ?? '',
+        ];
+
+        // Handle optional file upload
+        if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../uploads/vehicles/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+            $fileTmp = $_FILES['picture']['tmp_name'];
+            $fileName = basename($_FILES['picture']['name']);
+            $filePath = $uploadDir . $fileName;
+
+            if (move_uploaded_file($fileTmp, $filePath)) {
+                $data['photo'] = $fileName;
+            }
+        }
+
+        $success = $this->vehicleModel->updateVehicle($data);
+
+    // Ensure proper JSON response
+        header('Content-Type: application/json');
+        echo json_encode($success );
+        exit; 
+        exit;
+    }
+
+    public function fetchTravelHistory() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['get_travel_history'])) {
+            $vehicle_id = intval($_POST['vehicle_id'] ?? 0);
+
+            $history = [];
+            if ($vehicle_id > 0) {
+                $history = $this->vehicleModel->getVehicleTravelHistory($vehicle_id);
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode($history);
+            exit;
+        }
+    }
 }
 
 // --- Handle POST request ---
@@ -107,22 +156,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_vehicle'])) {
     $controller->addVehicle();
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_vehicle'])) {
+    $controller = new VehicleController();
+    $controller->updateVehicle();
+}
 
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_driver'])) {
-//     $controller = new vehicleController();
-//     $controller->updateDriver($_POST);
-// }
-
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['get_travel_history'])) {
+    $controller = new VehicleController();
+    $controller->fetchTravelHistory();
+}
 // --- HANDLE GET REQUEST (DELETE) ---
 // if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['delete'])) {
 //     $controller->deleteDriver($_GET['delete']);
-// }
-
-// $driverModel = new DriverModel();
-// if (isset($_POST['get_work_history'])) {
-//     $staff_id = $_POST['staff_id'];
-//     $history = $personnelModel->getWorkHistory($staff_id);
-//     echo json_encode($history);
-//     exit;
 // }

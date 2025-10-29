@@ -500,3 +500,65 @@ SELECT
     r.officeOrDept,
     r.profile_pic
 FROM requester r;
+
+// UPDATE VEHICLE ALTER RATHER ALSO DELETE TRIGGER 
+
+ALTER TABLE vehicle
+ADD COLUMN status VARCHAR(25) NOT NULL DEFAULT 'Available';
+
+drop trigger trg_vehicle_update;
+
+-- Update
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_update
+AFTER UPDATE ON vehicle
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Detect changes
+    IF OLD.vehicle_name != NEW.vehicle_name THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.vehicle_name, '" to "', NEW.vehicle_name, '"; ');
+    END IF;
+
+    IF OLD.plate_no != NEW.plate_no THEN
+        SET changes = CONCAT(changes, 'Plate No from "', OLD.plate_no, '" to "', NEW.plate_no, '"; ');
+    END IF;
+
+    IF OLD.capacity != NEW.capacity THEN
+        SET changes = CONCAT(changes, 'Capacity from "', OLD.capacity, '" to "', NEW.capacity, '"; ');
+    END IF;
+
+    IF OLD.vehicle_type != NEW.vehicle_type THEN
+        SET changes = CONCAT(changes, 'Type from "', OLD.vehicle_type, '" to "', NEW.vehicle_type, '"; ');
+    END IF;
+
+    IF OLD.driver_id != NEW.driver_id THEN
+        SET changes = CONCAT(changes, 'Driver changed; ');
+    END IF;
+
+    IF OLD.photo != NEW.photo THEN
+        SET changes = CONCAT(changes, 'Photo updated; ');
+    END IF;
+
+    IF OLD.status != NEW.status THEN
+        SET changes = CONCAT(changes, 'Status from "', OLD.status, '" to "', NEW.status, '"; ');
+    END IF;
+
+    -- Log the action
+    INSERT INTO vehicle_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated vehicle: ', NEW.vehicle_name, '. Changes: ', changes)
+    );
+END$$
+DELIMITER ;
