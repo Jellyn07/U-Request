@@ -13,12 +13,26 @@ if (!isset($_GET['tracking_id'])) {
 
 $tracking_id = $_GET['tracking_id'] ?? null;
 
+// -------------------------
+// Readonly / Back URL Logic
+// -------------------------
 $isReadonly = false;
-if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedback.php') !== false) {
-  $isReadonly = true;
+$back_url = '/app/modules/user/views/tracking.php'; // default back
+$show_submit = true; // default show submit
+
+$adminFeedbackPages = [
+    '/app/modules/gsu_admin/views/feedback.php',
+    '/app/modules/motorpool_admin/views/feedback.php'
+];
+
+foreach ($adminFeedbackPages as $page) {
+    if (strpos($_SERVER['HTTP_REFERER'] ?? '', $page) !== false) {
+        $isReadonly = true;
+        $back_url = $page; // send back to admin feedback page
+        $show_submit = false; // hide submit button for admin view
+        break;
+    }
 }
-
-
 
 ?>
 <!DOCTYPE html>
@@ -45,12 +59,10 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
 
     .star.filled {
       fill: #facc15;
-      /* yellow-400 */
     }
 
     .star.empty {
       fill: #d1d5db;
-      /* gray-300 */
     }
 
     .star-group {
@@ -80,13 +92,12 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
         <!-- A. Process/Transaction -->
         <section class="pb-0 p-4 rounded-lg mt-3">
           <table class="w-full text-sm">
-            <thead class="">
+            <thead>
               <tr>
                 <th class="text-left p-2 w-3/4">A. PROCESS / TRANSACTION</th>
-                <!-- <th class="p-2 text-center">RATING</th> -->
               </tr>
             </thead>
-            <tbody class="">
+            <tbody>
               <?php
               $processItems = [
                 'Process/Transaction is completed within the prescribed time.',
@@ -114,10 +125,9 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
             <thead class="bg-gray-50">
               <tr>
                 <th class="text-left p-2 w-3/4">B. FRONTLINE PERSONNEL</th>
-                <!-- <th class="p-2 text-center">RATING</th> -->
               </tr>
             </thead>
-            <tbody class="">
+            <tbody>
               <?php
               $frontlineItems = [
                 'Attends to my needs and concerns promptly, whether in face-to-face or online transactions.',
@@ -148,10 +158,9 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
             <thead class="bg-gray-50">
               <tr>
                 <th class="text-left p-2 w-3/4">C. FACILITIES</th>
-                <!-- <th class="p-2 text-center">RATING</th> -->
               </tr>
             </thead>
-            <tbody class="">
+            <tbody>
               <?php
               $facilityItems = [
                 'The customer service area is clean and organized.',
@@ -179,10 +188,9 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
             <thead class="bg-gray-50">
               <tr>
                 <th class="text-left p-2 w-3/4">D. OVERALL PERFORMANCE (auto-generated) </th>
-                <!-- <th class="p-2 text-center">RATING</th> -->
               </tr>
             </thead>
-            <tbody class="">
+            <tbody>
               <tr>
                 <td class='p-2'>Your overall satisfaction with the services provided by the office.</td>
                 <td class='text-center'>
@@ -195,44 +203,34 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
           <textarea name="suggest_overall" placeholder="" class="w-full input-field"></textarea>
         </section>
 
-        <?php
-        // Detect origin automatically (from GET referrer or session)
-        $back_url = '/app/modules/user/views/tracking.php'; // default
-        $show_submit = true; // default: show submit button
-
-        // If accessed from admin feedback page, return there instead
-        if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedback.php') !== false) {
-          $back_url = '/app/modules/gsu_admin/views/feedback.php';
-          $show_submit = false; // hide submit for admin view
-        } elseif (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/user/views/feedback.php') !== false) {
-          $back_url = '/app/modules/user/views/tracking.php';
-        }
-        ?>
         <div class="text-center mt-5">
-          <a href="<?php echo htmlspecialchars($back_url); ?>" class="btn btn-secondary mr-2">Back</a>
+          <button type="button" onclick="goBack()" class="btn btn-secondary mr-2">Back</button>
           <?php if ($show_submit): ?>
             <button type="submit" class="btn btn-primary">Submit Feedback</button>
           <?php endif; ?>
         </div>
+
       </form>
     </div>
   </main>
 
   <script>
+    function goBack() {
+      if (document.referrer) {
+        window.location.href = document.referrer;
+      } else {
+        window.location.href = '<?php echo htmlspecialchars($back_url); ?>';
+      }
+    }
+
     const isReadonly = <?php echo json_encode($isReadonly); ?>;
     const trackingId = <?php echo json_encode($tracking_id); ?>;
 
-    // Ratings storage
-    const ratings = {
-      A: {},
-      B: {},
-      C: {}
-    };
+    const ratings = { A: {}, B: {}, C: {} };
 
-    // --- Render stars (initial empty display) ---
     function renderStars() {
       document.querySelectorAll('.star-group').forEach(group => {
-        group.innerHTML = ''; // clear before re-rendering
+        group.innerHTML = '';
         for (let i = 1; i <= 5; i++) {
           const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           star.setAttribute('viewBox', '0 0 24 24');
@@ -244,39 +242,30 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
       });
     }
 
-    renderStars(); // initialize
+    renderStars();
 
-    // --- Star click behavior (only when editable) ---
     document.querySelectorAll('.star-group').forEach(group => {
       if (group.id === 'overallStars') return;
       const section = group.dataset.section;
       const index = group.dataset.index;
       const stars = group.querySelectorAll('.star');
-
       stars.forEach(star => {
         star.addEventListener('click', () => {
-          if (isReadonly) return; // disable for admin view
+          if (isReadonly) return;
           const value = parseInt(star.dataset.value);
           ratings[section][index] = value;
-
           stars.forEach(s => {
             s.classList.toggle('filled', parseInt(s.dataset.value) <= value);
             s.classList.toggle('empty', parseInt(s.dataset.value) > value);
           });
-
           updateOverall();
         });
       });
     });
 
-    // --- Update overall rating ---
     function updateOverall() {
       let allRatings = [];
-      for (let s in ratings) {
-        for (let i in ratings[s]) {
-          allRatings.push(ratings[s][i]);
-        }
-      }
+      for (let s in ratings) for (let i in ratings[s]) allRatings.push(ratings[s][i]);
       const avg = allRatings.length ? (allRatings.reduce((a, b) => a + b) / allRatings.length) : 0;
       renderOverall(avg);
     }
@@ -293,7 +282,6 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
       }
     }
 
-    // --- Fill stars based on data ---
     function fillStars(section, ratingObj) {
       const groups = document.querySelectorAll(`.star-group[data-section="${section}"]`);
       Object.keys(ratingObj).forEach(index => {
@@ -307,8 +295,6 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
       });
     }
 
-
-    // --- ADMIN (READONLY) MODE ---
     if (isReadonly) {
       document.querySelectorAll('textarea, button[type="submit"]').forEach(el => el.disabled = true);
 
@@ -317,22 +303,11 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
         .then(data => {
           if (data.status === 'success' && data.data) {
             const fb = data.data;
+            fillStars('A', JSON.parse(fb.ratings_A || '{}'));
+            fillStars('B', JSON.parse(fb.ratings_B || '{}'));
+            fillStars('C', JSON.parse(fb.ratings_C || '{}'));
+            renderOverall(parseFloat(fb.overall_rating || 0));
 
-            // Parse JSON ratings safely
-            const ratingsA = JSON.parse(fb.ratings_A || '{}');
-            const ratingsB = JSON.parse(fb.ratings_B || '{}');
-            const ratingsC = JSON.parse(fb.ratings_C || '{}');
-            const overall = parseFloat(fb.overall_rating || 0);
-
-            // ✅ FIX: Remove re-render here to avoid losing data attributes
-            // renderStars(); ❌ (removed)
-            // ✅ Instead, directly fill existing stars:
-            fillStars('A', ratingsA);
-            fillStars('B', ratingsB);
-            fillStars('C', ratingsC);
-            renderOverall(overall);
-
-            // Fill suggestions
             document.querySelector('textarea[name="suggest_process"]').value = fb.suggest_process || '';
             document.querySelector('textarea[name="suggest_frontline"]').value = fb.suggest_frontline || '';
             document.querySelector('textarea[name="suggest_facility"]').value = fb.suggest_facility || '';
@@ -342,7 +317,6 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
         .catch(err => console.error('Failed to load feedback:', err));
     }
 
-    // --- Handle submission ---
     document.getElementById('feedbackForm').addEventListener('submit', function(e) {
       e.preventDefault();
       if (isReadonly) return;
@@ -354,24 +328,16 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
       data.append('ratings_C', JSON.stringify(ratings.C));
 
       let all = [];
-      for (let s in ratings)
-        for (let i in ratings[s]) all.push(ratings[s][i]);
+      for (let s in ratings) for (let i in ratings[s]) all.push(ratings[s][i]);
       const overall = all.length ? (all.reduce((a, b) => a + b) / all.length).toFixed(2) : 0;
       data.append('overall_rating', overall);
 
-      fetch('../../../controllers/FeedbackController.php', {
-          method: 'POST',
-          body: data
-        })
+      fetch('../../../controllers/FeedbackController.php', { method: 'POST', body: data })
         .then(res => res.json())
         .then(res => {
           if (res.status === 'success') {
-            Swal.fire({
-              title: 'Feedback Submitted!',
-              text: res.message,
-              icon: 'success',
-              confirmButtonText: 'OK'
-            }).then(() => window.location.href = 'tracking.php');
+            Swal.fire({ title: 'Feedback Submitted!', text: res.message, icon: 'success', confirmButtonText: 'OK' })
+              .then(() => window.location.href = 'tracking.php');
           } else {
             Swal.fire('Error!', res.message, 'error');
           }
@@ -381,5 +347,4 @@ if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/app/modules/gsu_admin/views/feedbac
   </script>
   <?php include COMPONENTS_PATH . '/footer.php'; ?>
 </body>
-
 </html>

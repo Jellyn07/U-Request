@@ -170,8 +170,15 @@ require_once __DIR__ . '/../../../config/constants.php';
         </section>
 
         <div class="text-center mt-5">
-          <a href="feedback.php" class="btn btn-secondary mr-2">Back</a>
+          <button type="button" onclick="goBack()" class="btn btn-secondary mr-2">Back</button>
         </div>
+
+        <script>
+          function goBack() {
+            // Go to previous page in browser history
+            window.history.back();
+          }
+        </script>
       </form>
     </div>
   </main>
@@ -257,6 +264,14 @@ require_once __DIR__ . '/../../../config/constants.php';
     }
   </script>
   <script>
+    function goBack() {
+      if (document.referrer) {
+        window.location.href = document.referrer; // redirect to previous page
+      } else {
+        window.location.href = 'tracking.php'; // fallback
+      }
+    }
+
     document.getElementById('feedbackForm').addEventListener('submit', function(e) {
       e.preventDefault();
 

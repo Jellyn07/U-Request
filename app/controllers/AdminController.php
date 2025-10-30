@@ -294,6 +294,10 @@ class AdminController {
     public function getAllFeedbacks() {
         return $this->model->getAllFeedbacks();
     }
+
+    public function getAllMotorpoolFeedbacks() {
+        return $this->model->getAllMotorpoolFeedbacks();
+    }
     
 }
 
@@ -343,4 +347,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-///////////////////////////////// FOR FEEDBACK ///////////////////////////////////////////
+///////////////////////////////// FOR MOTORPOOL FEEDBACK ///////////////////////////////////////////

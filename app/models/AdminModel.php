@@ -352,26 +352,73 @@ class AdministratorModel extends BaseModel {
 
     public function getAllFeedbacks() {
         $sql = "SELECT 
-            f.tracking_id,
-            f.ratings_A,
-            f.ratings_B,
-            f.ratings_C,
-            f.overall_rating,
-            f.suggest_process,
-            f.suggest_frontline,
-            f.suggest_facility,
-            f.suggest_overall,
-            f.submitted_at,
-            r.req_id,
-            rq.profile_pic,
-            COUNT(f.tracking_id) OVER (PARTITION BY r.req_id) AS total_feedback,
-            COUNT(r.req_id) OVER (PARTITION BY r.req_id) AS total_requests
-        FROM VW_feedback AS f 
-        JOIN request AS r 
-            ON f.tracking_id = r.tracking_id
-        JOIN requester AS rq 
-            ON r.req_id = rq.req_id
-        ORDER BY f.submitted_at DESC";
+        f.tracking_id,
+        f.ratings_A,
+        f.ratings_B,
+        f.ratings_C,
+        f.overall_rating,
+        f.suggest_process,
+        f.suggest_frontline,
+        f.suggest_facility,
+        f.suggest_overall,
+        f.submitted_at,
+        r.req_id,
+        rq.profile_pic,
+        COUNT(f.tracking_id) OVER (PARTITION BY r.req_id) AS total_feedback,
+        -- count total requests from VW_rqtrack
+        (SELECT COUNT(*) 
+        FROM VW_rqtrack v
+        WHERE v.req_id = r.req_id
+        ) AS total_requests
+    FROM VW_feedback AS f 
+    JOIN request AS r 
+        ON f.tracking_id = r.tracking_id
+    JOIN requester AS rq 
+        ON r.req_id = rq.req_id
+    WHERE f.tracking_id NOT LIKE '%VR%'
+    ORDER BY f.submitted_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
+            return [];
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $feedbacks = [];
+        while ($row = $result->fetch_assoc()) {
+            $feedbacks[] = $row;
+        }
+
+        $stmt->close();
+        return $feedbacks;
+    }
+
+/////////////////////////////////////////////motorpool feedback///////////////////////////////////////////
+    public function getAllMotorpoolFeedbacks() {
+        $sql = "SELECT 
+        f.tracking_id,
+        f.ratings_A,
+        f.ratings_B,
+        f.ratings_C,
+        f.overall_rating,
+        f.suggest_process,
+        f.suggest_frontline,
+        f.suggest_facility,
+        f.suggest_overall,
+        f.submitted_at,
+        r.req_id,
+        rq.profile_pic,
+        COUNT(f.tracking_id) OVER (PARTITION BY r.req_id) AS total_feedback,
+        COUNT(r.req_id) OVER (PARTITION BY r.req_id) AS total_requests
+    FROM VW_feedback AS f
+    LEFT JOIN request AS r ON f.tracking_id = r.tracking_id
+    LEFT JOIN requester AS rq ON r.req_id = rq.req_id
+    WHERE f.tracking_id LIKE '%VR%'
+    ORDER BY f.submitted_at DESC;
+    ";
 
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
