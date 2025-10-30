@@ -95,6 +95,9 @@ $requests = $data['requests'];
                           depret_time: "<?= htmlspecialchars(date('h:i A', strtotime($row['departure_time'])) . ' - ' . date('h:i A', strtotime($row['return_time'])), ENT_QUOTES) ?>",
                           trip_purpose: "<?= htmlspecialchars($row['trip_purpose'], ENT_QUOTES) ?>",
                           req_status: "<?= htmlspecialchars($row['req_status'], ENT_QUOTES) ?>",
+                          vehicle_name: "<?= htmlspecialchars($row['vehicle_name'] ?? '', ENT_QUOTES) ?>",
+                          driver_name: "<?= htmlspecialchars($row['driver_name'] ?? '', ENT_QUOTES) ?>",
+                          approved_by: "<?= htmlspecialchars($row['approved_by'] ?? '', ENT_QUOTES) ?>",
                           passenger_count: "<?= count($row['passengers']) ?>",
                           passengers: <?= htmlspecialchars(json_encode($row['passengers'] ?? []), ENT_QUOTES) ?>
                       })'>
@@ -122,8 +125,8 @@ $requests = $data['requests'];
           </button>
 
           <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/VehicleRequestController.php">
-            <input type="hidden" name="action" value="saveAssignment">
-            <input type="hidden" name="req_id" x-model="selected.req_id">
+            <input type="hidden" name="form_action" value="saveAssignment">
+            <input type="hidden" name="control_no" x-model="selected.control_no">
 
             <h2 class="text-lg font-bold mb-2">Vehicle Request Information</h2>
 
@@ -168,12 +171,38 @@ $requests = $data['requests'];
               <input type="text" class="w-full view-field" x-model="selected.passenger_count" readonly />
             </div>
 
-            <div>
+          <div x-data="vehicleDropdown" x-init="init()">
+            <label class="text-xs text-text mb-1">Assign Vehicle</label>
+            <select 
+              id="vehicleSelect"  
+              name="vehicle_id"  
+              x-model="selected.vehicle_id"  
+              class="w-full input-field"
+            >
+              <option value="">Select Vehicle</option>
+
+              <!-- show all vehicles dynamically -->
+              <template x-for="v in vehicles" :key="v.vehicle_id">
+                <option 
+                  :value="v.vehicle_id" 
+                  x-text="v.vehicle_name"
+                ></option>
+              </template>
+            </select>
+
+            <!-- Display currently assigned vehicle -->
+            <p class="text-xs text-gray-500 mt-1">
+              Current Assigned Vehicle: 
+              <span x-text="selected.vehicle_name"></span>
+            </p>
+          </div>
+
+            <!-- <div x-show="selected.req_status === 'Approved'" x-cloak>
               <label class="text-xs text-text mb-1">Assign Vehicle</label>
-              <select id="vehicleSelect"  name="vehicle_id"  class="w-full input-field">
-                <option value="">Loading vehicles...</option>
+              <select id="vehicleSelect" name="vehicle_id" class="w-full input-field">
+                <option value="">Select a vehicle</option>
               </select>
-            </div>
+            </div> -->
 
             <div x-data>
               <!-- STATUS -->
@@ -201,12 +230,19 @@ $requests = $data['requests'];
               </div>
             </div>
              
+            <!-- <button 
+              type="button" type="hidden"
+              class="btn btn-primary sendEmailBtn"
+              data-control-no="<?= htmlspecialchars($row['control_no'], ENT_QUOTES) ?>">
+              Send Email to Top Management
+            </button> -->
+
             <div class="flex justify-center pt-2 space-x-2">
               <button type="button" class="btn btn-primary"
                       @click="viewFullDetails(selected)">
                 Full Details
               </button>
-              <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment">
+              <button type="button" class="btn btn-primary" id="saveBtn">
                 Save Changes
               </button>
             </div>
@@ -214,52 +250,6 @@ $requests = $data['requests'];
         </div>
       </div>
     </div>
-    <script>
-      document.getElementById('saveBtn').addEventListener('click', async () => {
-        const form = document.getElementById('assignmentForm');
-        const formData = new FormData(form);
-
-        console.log("Form action:", form.action);
-        // optional: show formData contents for debug
-        for (const pair of formData.entries()) { console.log(pair[0]+':', pair[1]); }
-
-        const confirm = await Swal.fire({
-          title: 'Confirm Save?',
-          text: 'Do you want to save these changes?',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, Save it!'
-        });
-        if (!confirm.isConfirmed) return;
-
-        Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-        try {
-          const res = await fetch(form.action, { method: 'POST', body: formData });
-          const text = await res.text();
-          let data;
-          try {
-            data = JSON.parse(text);
-          } catch (e) {
-            Swal.close();
-            console.error('Non-JSON response:', text);
-            Swal.fire({ icon: 'error', title: 'Server error', html: `<pre style="white-space:pre-wrap;text-align:left;">${text}</pre>` });
-            return;
-          }
-
-          Swal.close();
-          if (data.success) {
-            Swal.fire({ icon: 'success', title: 'Saved!', text: data.message || 'Saved successfully.' });
-          } else {
-            Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Unknown server error.' });
-          }
-        } catch (err) {
-          Swal.close();
-          console.error('Fetch error:', err);
-          Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to connect to server or invalid response.' });
-        }
-      });
-      </script>
   </main>
 </script>
   <!-- Table Filters -->
@@ -280,3 +270,93 @@ $requests = $data['requests'];
 <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>
+    <script>
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+  const form = document.getElementById('assignmentForm');
+  const formData = new FormData(form);
+
+  const confirm = await Swal.fire({
+    title: 'Confirm Save?',
+    text: 'Do you want to save these changes?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Save it!'
+  });
+  if (!confirm.isConfirmed) return;
+
+  Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+  try {
+    const res = await fetch(form.action, { method: 'POST', body: formData });
+    const text = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      Swal.close();
+      console.error('Non-JSON response:', text);
+      Swal.fire({ icon: 'error', title: 'Server error', html: `<pre>${text}</pre>` });
+      return;
+    }
+
+    Swal.close();
+    if (data.success) {
+      Swal.fire({ icon: 'success', title: 'Saved!', text: data.message || 'Saved successfully.' });
+    } else {
+      Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Unknown server error.' });
+    }
+  } catch (err) {
+    Swal.close();
+    console.error('Fetch error:', err);
+    Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to connect to server.' });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.sendEmailBtn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault(); // stop form submission
+      const controlNo = btn.dataset.controlNo;
+
+      const confirm = await Swal.fire({
+        title: 'Send Email?',
+        text: `Do you want to notify Top Management about vehicle request ${controlNo}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, send it'
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: 'Sending Email...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const res = await fetch(`../../../controllers/VehicleController.php?send_email=1&control_no=${encodeURIComponent(controlNo)}`);
+        const text = await res.text();
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error(text);
+        }
+
+        Swal.close();
+        if (data.success) {
+          Swal.fire({ icon: 'success', title: 'Sent!', text: data.message });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Email failed to send.' });
+        }
+      } catch (err) {
+        Swal.close();
+        Swal.fire({ icon: 'error', title: 'Error', html: `<pre>${err.message}</pre>` });
+      }
+    });
+  });
+});
+</script>

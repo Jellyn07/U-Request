@@ -170,50 +170,12 @@ public function getDriver() {
     }
     return $personnels;
 }
-
-public function saveAssignment($reqAssignment_id, $vehicle_id, $driver_id, $req_status, $approved_by) {
-        // Make sure stored procedure exists and parameter order matches
-        // Use NULL or empty string handling depending on your SP
-        try {
-            // prepare
-            $stmt = $this->db->prepare("CALL spUpdateVehicleRequestAssignment(?, ?, ?, ?, ?)");
-            if (!$stmt) {
-                $err = $this->db->error;
-                error_log("Prepare failed: $err");
-                return ['success' => false, 'message' => "Prepare failed: $err"];
-            }
-
-            // If driver_id can be null, convert to null + bind as integer or null appropriately
-            // mysqli doesn't handle nulls in bind_param gracefully; pass as int or empty string as needed.
-            // We'll bind driver_id as integer (0 if null). If your SP expects NULL, you could use a different approach.
-            $bind_driver = ($driver_id === null || $driver_id === '') ? 0 : (int)$driver_id;
-            $bind_req_status = $req_status ?? '';
-            $bind_approved_by = $approved_by ?? '';
-
-            // bind params: iiiss (int,int,int,string,string)
-            if (!$stmt->bind_param('iiiss', $reqAssignment_id, $vehicle_id, $bind_driver, $bind_req_status, $bind_approved_by)) {
-                $err = $stmt->error;
-                error_log("Bind failed: $err");
-                return ['success' => false, 'message' => "Bind failed: $err"];
-            }
-
-            if (!$stmt->execute()) {
-                $err = $stmt->error;
-                error_log("Execute failed: $err");
-                return ['success' => false, 'message' => "Execute failed: $err"];
-            }
-
-            // optionally check affected rows
-            $affected = $stmt->affected_rows;
-            $stmt->close();
-            return ['success' => true, 'message' => "Saved. Rows affected: $affected"];
-        } catch (Exception $e) {
-            error_log("saveAssignment exception: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Exception: ' . $e->getMessage()];
-        }
+    public function updateRequestStatusByToken($token, $status) {
+        $sql = "UPDATE vehicle_request SET req_status = ? WHERE approval_token = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ss", $status, $token);
+        return $stmt->execute();
     }
-
-
 
     // Optional: save assignment
     public function assignVehicle($request_id, $vehicle_id, $staff_id, $priority_status) {
@@ -231,5 +193,106 @@ public function saveAssignment($reqAssignment_id, $vehicle_id, $driver_id, $req_
     public function getLastError() {
     return $this->lastError;
 }
+public function getVehicleRequestByControlNo($controlNo) {
+    $sql = "SELECT vr.*, CONCAT(r.firstName, ' ', r.lastName) AS requester_name
+            FROM vehicle_request vr
+            JOIN requester r ON vr.req_id = r.req_id
+            WHERE vr.control_no = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("s", $controlNo);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+public function updateApprovalToken($controlNo, $token) {
+    $sql = "
+        UPDATE vehicle_request_assignment vra
+        JOIN vehicle_request vr ON vra.control_no = vr.control_no
+        SET vra.approval_token = ?
+        WHERE vr.control_no = ?
+    ";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("ss", $token, $controlNo);
+    $stmt->execute();
+}
+public function updateVehicleRequestStatusByToken($token, $status) {
+    $sql = "
+        UPDATE vehicle_request_assignment
+        SET req_status = ?, approval_token = NULL
+        WHERE approval_token = ?
+    ";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("ss", $status, $token);
+    $stmt->execute();
+    return $stmt->affected_rows > 0;
+}
+
+public function updateAssignment($control_no, $vehicle_id = null, $req_status = null, $approved_by = null) {
+    if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db);
+        }
+    try {
+        // Optional: retrieve driver_id if vehicle_id is provided
+        $driver_id = null;
+        if (!empty($vehicle_id)) {
+            $driverQuery = "SELECT driver_id FROM vehicle WHERE vehicle_id = ?";
+            $stmtDriver = $this->db->prepare($driverQuery);
+            $stmtDriver->bind_param("i", $vehicle_id);
+            $stmtDriver->execute();
+            $driverResult = $stmtDriver->get_result();
+            if ($driverRow = $driverResult->fetch_assoc()) {
+                $driver_id = $driverRow['driver_id'];
+            }
+            $stmtDriver->close();
+        }
+
+        // Dynamically build query — update only provided fields
+        $fields = [];
+        $params = [];
+        $types = "";
+
+        if (!empty($vehicle_id)) {
+            $fields[] = "vehicle_id = ?";
+            $params[] = $vehicle_id;
+            $types .= "i";
+        }
+        if (!is_null($driver_id)) {
+            $fields[] = "driver_id = ?";
+            $params[] = $driver_id;
+            $types .= "i";
+        }
+        if (!empty($req_status)) {
+            $fields[] = "req_status = ?";
+            $params[] = $req_status;
+            $types .= "s";
+        }
+        if (!empty($approved_by)) {
+            $fields[] = "approved_by = ?";
+            $params[] = $approved_by;
+            $types .= "s";
+        }
+
+        if (empty($fields)) {
+            throw new Exception("No fields to update.");
+        }
+
+        // Add WHERE condition
+        $query = "UPDATE vehicle_request_assignment SET " . implode(", ", $fields) . " WHERE control_no = ?";
+        $params[] = $control_no;
+        $types .= "s";
+
+        // Prepare and bind
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+
+        return $stmt->affected_rows > 0;
+    } catch (Exception $e) {
+        error_log('Error updating assignment: ' . $e->getMessage());
+        return false;
+    }
+}
+
+
 
 }

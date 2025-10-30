@@ -66,7 +66,7 @@ document.addEventListener('alpine:init', () => {
             </div>
 
             <div class="mb-2"><label class="text-xs">Assigned Driver</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.full_name || 'Not Assigned'}" readonly />
+              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.driver_name || 'Not Assigned'}" readonly />
             </div>
 
             <div class="mb-2"><label class="text-xs">Status</label>
@@ -82,24 +82,11 @@ document.addEventListener('alpine:init', () => {
     }
   }));
 });
-
-let drivers = []; // to store all drivers initially
-
-// Fetch all drivers first
-fetch('../../../controllers/VehicleRequestController.php?drivers=1')
-  .then(res => res.json())
-  .then(data => {
-    drivers = data; // store drivers globally
-    const staffSelect = document.getElementById('staffSelect');
-    staffSelect.innerHTML = '<option value="">No Assigned Driver</option>';
-  });
-
-// Fetch all vehicles
 fetch('../../../controllers/VehicleRequestController.php?vehicles=1')
   .then(res => res.json())
   .then(data => {
     const vehicleSelect = document.getElementById('vehicleSelect');
-    vehicleSelect.innerHTML = '<option value="">No Vehicle Assigned</option>';
+    vehicleSelect.innerHTML = '<option value="">Vehicle Assigned</option>';
 
     data.forEach(v => {
       const opt = document.createElement('option');
@@ -128,4 +115,4 @@ fetch('../../../controllers/VehicleRequestController.php?vehicles=1')
         }
       }
     });
-});
+}); 

@@ -45,9 +45,9 @@ class ActivityLogsModel extends BaseModel {
 
         // 🔹 STEP 3: Define what each role can access
         $accessRules = [
-            'super' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'administrator', 'campus_locations', 'driver', 'vehicle', 'vehicle_request'],
+            'super' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'administrator', 'campus_locations', 'driver', 'vehicle', 'vehicle_request', 'vehicle_request_assignment'],
             'gsu' => ['gsu_personnel', 'materials', 'request', 'status', 'assigned_personnel', 'campus_locations'],
-            'motorpool' => ['driver', 'vehicle', 'vehicle_request']
+            'motorpool' => ['driver', 'vehicle', 'vehicle_request', 'vehicle_request_assignment']
         ];
 
         // 🔹 STEP 4: Build date condition
@@ -213,6 +213,22 @@ class ActivityLogsModel extends BaseModel {
                         requester_name AS affected_item,
                         description AS details
                       FROM vehicle_request_audit";
+            $conditions = [];
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
+            if ($dateCondition) $conditions[] = str_replace('action_date', 'changed_at', $dateCondition);
+            $addConditions($query, $conditions);
+            $sqlParts[] = $query;
+        }
+
+        // Vehicle Request Assignment
+        if (in_array('vehicle_request_assignment', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'vehicle_request_assignment')) {
+            $query = "SELECT 
+                        changed_at AS timestamp,
+                        'Vehicle Request Assignment' AS source,
+                        action AS action_type,
+                        staff_name AS affected_item,
+                        description AS details
+                      FROM vehicle_request_assignment_audit";
             $conditions = [];
             if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = str_replace('action_date', 'changed_at', $dateCondition);

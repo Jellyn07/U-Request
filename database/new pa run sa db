@@ -562,3 +562,105 @@ BEGIN
     );
 END$$
 DELIMITER ;
+
+// VEHICLE REQUEST ASSIGNMENT ACTIVITY Logs
+
+CREATE TABLE vehicle_request_assignment_audit (
+    audit_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150) NOT NULL,            -- admin performing the action
+    action ENUM('INSERT','UPDATE') NOT NULL,     -- type of action
+	description TEXT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_request_assignment_insert
+AFTER INSERT ON vehicle_request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE vehicle_name VARCHAR(100);
+    DECLARE driver_name VARCHAR(150);
+
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Get vehicle name
+    SET vehicle_name = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = NEW.vehicle_id);
+
+    -- Get driver full name
+    SET driver_name = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = NEW.driver_id);
+
+    -- Insert readable summary
+    INSERT INTO vehicle_request_assignment_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'INSERT',
+        CONCAT(
+            'Assigned vehicle: ', IFNULL(vehicle_name, 'N/A'),
+            ', driver: ', IFNULL(driver_name, 'N/A'),
+            ', status: ', NEW.req_status
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_request_assignment_update
+AFTER UPDATE ON vehicle_request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE vehicle_old VARCHAR(100);
+    DECLARE vehicle_new VARCHAR(100);
+    DECLARE driver_old VARCHAR(150);
+    DECLARE driver_new VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Get old/new vehicle names
+    SET vehicle_old = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = OLD.vehicle_id);
+    SET vehicle_new = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = NEW.vehicle_id);
+
+    -- Get old/new driver names
+    SET driver_old = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = OLD.driver_id);
+    SET driver_new = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = NEW.driver_id);
+
+    -- Detect changes and create summary
+    IF OLD.vehicle_id != NEW.vehicle_id THEN
+        SET changes = CONCAT(changes, 'Vehicle changed from ', IFNULL(vehicle_old,'N/A'), ' to ', IFNULL(vehicle_new,'N/A'), '; ');
+    END IF;
+
+    IF OLD.driver_id != NEW.driver_id THEN
+        SET changes = CONCAT(changes, 'Driver changed from ', IFNULL(driver_old,'N/A'), ' to ', IFNULL(driver_new,'N/A'), '; ');
+    END IF;
+
+    IF OLD.req_status != NEW.req_status THEN
+        SET changes = CONCAT(changes, 'Status changed from "', OLD.req_status, '" to "', NEW.req_status, '"; ');
+    END IF;
+
+    IF OLD.approved_by != NEW.approved_by THEN
+        SET changes = CONCAT(changes, 'Approved by changed from "', OLD.approved_by, '" to "', NEW.approved_by, '"; ');
+    END IF;
+
+    -- Only insert if there is a change
+    IF changes != '' THEN
+        INSERT INTO vehicle_request_assignment_audit (staff_name, action, description)
+        VALUES (
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
