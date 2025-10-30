@@ -1,11 +1,28 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../config/constants.php';
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+require_once __DIR__ . '/../../../controllers/RequestController.php';
+$con = new RequestController();
+$data = $con->indexVehicle();
+$requests = $data['requests'];
 
+$c = new RequestController();
+$d = $c->index();
+$rrequests = $d['requests'];
+
+$controller = new DashboardController();
+$year = $_GET['year'] ?? date('Y');
+$data = $controller->getDashboardData($year);
 // ✅ Date range display (example)
 $startDate = "Jan 1";
 $endDate = date('M d');
 $dateRange = "$startDate - $endDate";
+$profile = $controller->getProfile($_SESSION['email']);
+if (!isset($_SESSION['email'])) {
+    header("Location: modules/shared/views/admin_login.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,17 +49,23 @@ $dateRange = "$startDate - $endDate";
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5 bg-white p-6 rounded-2xl shadow">
         <div class="border-r-2 border-gray-300">
           <h2 class="font-medium mb-3">Overall Requests</h2>
-          <p class="text-4xl font-bold text-text mt-2">199</p>
+          <p class="text-4xl font-bold text-text mt-2">
+            <?= isset($data['summary']['total_requests']) ? $data['summary']['total_requests'] : 0 ?>
+          </p>
           <p class="text-xs text-gray-500 font-medium mt-2">Overall request this year</p>
         </div>
         <div class="border-r-2 border-gray-300">
           <h2 class="font-medium mb-3">Pending Vehicle Requests</h2>
-          <p class="text-4xl font-bold text-text mt-2">56</p>
+          <p class="text-4xl font-bold text-text mt-2">
+            <?= isset($data['summary']['total_vrequests_p']) ? $data['summary']['total_vrequests_p'] : 0 ?>
+          </p>
           <p class="text-xs text-gray-500 font-medium mt-2">Total pending vehicle requests</p>
         </div>
         <div class="border-r-2 border-gray-300">
           <h2 class="font-medium mb-3">Pending Repair Requests</h2>
-          <p class="text-4xl font-bold text-text mt-2">89</p>
+          <p class="text-4xl font-bold text-text mt-2">
+            <?= isset($data['summary']['total_pending']) ? $data['summary']['total_pending'] : 0 ?>
+          </p>
           <p class="text-xs text-gray-500 font-medium mt-2">Total pending repair requests</p>
         </div>
         <div>
@@ -66,7 +89,7 @@ $dateRange = "$startDate - $endDate";
         <div class="bg-white p-4 rounded-2xl shadow">
           <h3 class="font-semibold text-text text-base text-center mb-2">Request Distribution</h3>
           <div class="w-full h-64 flex justify-center">
-            <canvas id="requestPieChart"></canvas>
+            <canvas id="requestTypeChart"></canvas>
           </div>
         </div>
       </div>
@@ -86,15 +109,20 @@ $dateRange = "$startDate - $endDate";
                   <th class="px-4 py-2">Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <?php for($i=0;$i<10;$i++){
-                  echo '<tr class="border-b hover:bg-gray-100 cursor-pointer text-xs">
-                    <td class="px-4 py-3">Oct 25, 2025</td>
-                    <td class="px-4 py-3">John Dela Cruz</td>
-                    <td class="px-4 py-3">N/A</td>
-                    <td class="px-4 py-3"><span class="font-semibold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">Pending</span></td>
-                  </tr>';
-                 } ?>
+              <tbody id="requestsTable" class="text-sm">
+                <?php if (!empty($requests)): ?>
+                  <?php foreach ($requests as $row): ?>
+                    <tr 
+                      class="border-b hover:bg-gray-100 cursor-pointer text-xs">
+                      <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['requester_name']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['vehicle_type'] ?? 'N/A') ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['req_status']) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr><td colspan="6" class="text-center py-3 text-gray-400">No vehicle requests found</td></tr>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>
@@ -113,110 +141,54 @@ $dateRange = "$startDate - $endDate";
                   <th class="px-4 py-2">Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <?php for($i=0;$i<10;$i++){
-                  echo '<tr class="border-b hover:bg-gray-100 cursor-pointer text-xs">
-                    <td class="px-4 py-3">Oct 25, 2025</td>
-                    <td class="px-4 py-3">Ben Dela Cruz</td>
-                    <td class="px-4 py-3">Admin Office</td>
-                    <td class="px-4 py-3"><span class="font-semibold bg-green-200 text-green-800 px-3 py-1 rounded-full">Completed</span></td>
-                  </tr>';
-                 } ?>
+              <tbody id="requestsTable" class="text-sm">
+                <?php foreach ($rrequests as $row): ?>
+                    <tr 
+                        data-category="<?= htmlspecialchars($row['request_Type']) ?>" 
+                        data-status="<?= htmlspecialchars($row['req_status']) ?>" 
+                        @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; showDetails = true"
+                        class="border-b hover:bg-gray-100 cursor-pointer text-xs">
+                        <td class="px-4 py-3" data-date="<?= htmlspecialchars($row['request_date']) ?>">
+                            <?= htmlspecialchars(date("M d, Y", strtotime($row['request_date']))) ?>
+                        </td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>  
+                        <td class="px-4 py-3">
+                            <?php if ($row['req_status'] === 'Completed'): ?>
+                                <!-- ✅ Show label only when Completed -->
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                    Completed
+                                </span>
+                            <?php elseif ($row['req_status'] === 'To Inspect'): ?>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                    To&nbsp;Inspect
+                                </span>
+                            <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
+                                <!-- ✅ Show dropdown if NOT completed -->
+                                <select 
+                                    class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
+                                    data-request-id="<?= $row['request_id'] ?>"
+                                    data-current-status="<?= $row['req_status'] ?>" >
+                                    <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?> class="bg-gray-100 text-black">In Progress</option>
+                                    <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?> class="bg-green-100 text-green-800 border-none rounded-full hover:bg-green-300">Completed</option>
+                                </select>
+                            <?php else: ?>
+                                <!-- Fallback for any other statuses -->
+                                <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                    <?= htmlspecialchars($row['req_status']) ?>
+                                </span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
   </main>
-
   <script src="/public/assets/js/shared/menus.js"></script>
-
-  <!-- Chart Scripts -->
-  <script>
-    // Monthly Line Chart
-    const lineCtx = document.getElementById('monthlyLineChart').getContext('2d');
-    new Chart(lineCtx, {
-      type: 'line',
-      data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-        datasets: [
-          {
-            label: 'Vehicle Requests',
-            data: [10,15,12,18,20,25,22,19,30,28,35,40],
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37,99,235,0.1)',
-            tension: 0.3,
-            fill: true
-          },
-          {
-            label: 'Repair Requests',
-            data: [8,10,14,16,19,22,20,23,25,29,32,38],
-            borderColor: '#16a34a',
-            backgroundColor: 'rgba(22,163,74,0.1)',
-            tension: 0.3,
-            fill: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('../../../controllers/DashboardController.php?request_status=1')
-        .then(response => response.json())
-        .then(data => {
-          const ctx = document.getElementById('requestPieChart').getContext('2d');
-
-          new Chart(ctx, {
-            type: 'pie',
-            data: {
-              labels: ['Vehicle Requests', 'Repair Requests'],
-              datasets: [{
-                data: [
-                  20,
-                  30
-                ],
-                backgroundColor: [
-                  '#16a34a',
-                  '#2563eb'
-                ],
-                borderWidth: 1
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              layout: {
-                padding: {
-                  top: 10,
-                  bottom: 10,
-                  left: 10,
-                  right: 10
-                }
-              },
-              plugins: {
-                legend: {
-                  position: 'right',
-                  labels: {
-                    boxWidth: 15,
-                    boxHeight: 8,
-                    padding: 10
-                  }
-                }
-              },
-              radius: '100%' // smaller circle to add spacing inside the div
-            }
-          });
-        })
-        .catch(error => console.error('Error loading chart data:', error));
-    });
-
-
-  </script>
   <script src="/public/assets/js/shared/stars.js"></script>
+  <script src="/public/assets/js/s-dashboard.js"></script>
 </body>
 </html>

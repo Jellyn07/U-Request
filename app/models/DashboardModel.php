@@ -43,7 +43,13 @@ class DashboardModel extends BaseModel  {
                     INNER JOIN vehicle_request_assignment vra
                     ON vr.req_id = vra.req_id
                     WHERE vra.req_status = 'Pending'
-                ) AS total_vrequests_p
+                ) AS total_vrequests_p,
+
+                (
+                    (SELECT COUNT(*) FROM request WHERE YEAR(request_date) = ?)
+                    +
+                    (SELECT COUNT(*) FROM vehicle_request WHERE YEAR(date_request) = ?)
+                ) AS total_requests
 
         ";
     
@@ -54,7 +60,7 @@ class DashboardModel extends BaseModel  {
         }
     
         // 2 placeholders only
-        $stmt->bind_param("ii", $year, $year);
+        $stmt->bind_param("iiii", $year, $year, $year, $year);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -238,6 +244,61 @@ class DashboardModel extends BaseModel  {
                 'trips' => isset($counts[$v['vehicle_id']]) ? (int)$counts[$v['vehicle_id']] : 0
             ];
         }
+        return $data;
+    }
+
+    public function getRequestTypeCounts($year){
+        $sql = "
+            SELECT 
+                (SELECT COUNT(*) FROM request WHERE YEAR(request_date) = ?) AS total_rrequests,
+                (SELECT COUNT(*) FROM vehicle_request WHERE YEAR(date_request) = ?) AS total_vrequests
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ii", $year, $year);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+
+        return $result ?: ['total_rrequests' => 0, 'total_vrequests' => 0];
+    }
+
+    public function getMonthlyRequestCounts($year){
+        $sql = "
+            SELECT 
+                'vehicle' AS type,
+                MONTH(date_request) AS month,
+                COUNT(*) AS count
+            FROM vehicle_request
+            WHERE YEAR(date_request) = ?
+            GROUP BY MONTH(date_request)
+
+            UNION ALL
+
+            SELECT 
+                'repair' AS type,
+                MONTH(request_date) AS month,
+                COUNT(*) AS count
+            FROM request
+            WHERE YEAR(request_date) = ?
+            GROUP BY MONTH(request_date)
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ii", $year, $year);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Initialize all months with zero
+        $data = [
+            'vehicle' => array_fill(1, 12, 0),
+            'repair' => array_fill(1, 12, 0)
+        ];
+
+        // Fill in actual counts
+        while ($row = $result->fetch_assoc()) {
+            $data[$row['type']][$row['month']] = (int)$row['count'];
+        }
+
         return $data;
     }
 
