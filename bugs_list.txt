@@ -1,5 +1,8 @@
 BUGS LISTS
 
+Overall
+-admins access level is all wrong
+
 Super Admin
 -
 
@@ -13,4 +16,4 @@ GSU Admin
 - if admin assigned a personel the status will automatically go to in progress (idunno kung tama)
 
 Users
--
+- cant request in vehicle 

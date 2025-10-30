@@ -45,16 +45,16 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
     <div class="flex justify-center gap-4 mb-6">
       <form method="GET" class="items-center" id="filterForm">
         <input type="hidden" name="type" id="typeInput" value="<?= htmlspecialchars($type) ?>">
-        <ul class="flex items-center text-sm bg-red-100 rounded-2xl mb-3 text-primary">
+        <ul class="flex items-center text-sm bg-gray-400 rounded-2xl mb-3">
           <li>
             <button type="button" data-type="repair"
-              class="text-xs font-medium  py-2 px-4 <?= ($_GET['type'] ?? 'repair') === 'repair' ? 'text-white rounded-2xl bg-primary' : 'hover:text-text' ?>">
+              class="text-xs font-medium  py-2 px-4 <?= ($_GET['type'] ?? 'repair') === 'repair' ? 'text-white rounded-2xl bg-primary' : 'hover:text-primary' ?>">
               Repair Request
             </button>
           </li>
           <li>
             <button type="button" data-type="vehicle"
-              class="text-xs font-medium  py-2 px-4 <?= ($_GET['type'] ?? '') === 'vehicle' ? 'text-white rounded-2xl bg-primary' : 'hover:text-text' ?>">
+              class="text-xs font-medium  py-2 px-4 <?= ($_GET['type'] ?? '') === 'vehicle' ? 'text-white rounded-2xl bg-primary' : 'hover:text-primary' ?>">
               Vehicle Request
             </button>
           </li>
@@ -68,14 +68,14 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
               : ['To Inspect', 'In Progress', 'Completed'];
           ?>
 
-          <select name="status" id="statusSelect" class="view-field">
+          <select name="status" id="statusSelect" class="input-field">
             <option value="" <?= empty($_GET['status']) ? 'selected' : '' ?>>All Status</option>
             <?php foreach ($statusOptions as $opt): ?>
               <option value="<?= $opt ?>" <?= ($_GET['status'] ?? '') === $opt ? 'selected' : '' ?>><?= $opt ?></option>
             <?php endforeach; ?>
           </select>
 
-          <select name="sort" class="view-field">
+          <select name="sort" class="input-field">
             <option value="oldest" <?= ($_GET['sort'] ?? '') === 'oldest' ? 'selected' : '' ?>>Oldest</option>
             <option value="newest" <?= ($_GET['sort'] ?? '') === 'newest' ? 'selected' : '' ?>>Newest</option>
           </select>
@@ -92,28 +92,28 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
               <div class="flex justify-start mb-3">
                 <img src="<?php echo PUBLIC_URL; ?>/assets/img/mechanic1.gif" alt="Repair Logo" class="h-16 w-16">
               </div>
-              <h3 class="text-base font-semibold text-gray-800">
-                Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>&nbsp;
-                <span class="mt-2 text-sm">
-                  <?php
-                    $req_status = htmlspecialchars($track['req_status']);
-                    $statusClass = match($req_status) {
-                      "To Inspect" => "bg-yellow-100 text-yellow-700 font-medium text-xs px-3",
-                      "In Progress" => "bg-blue-100 text-blue-700 font-medium text-xs px-3",
-                      "Completed"  => "bg-green-100 text-green-700 font-medium text-xs px-3",
-                      default => "bg-gray-100 text-gray-700",
-                    };
-                  ?>
-                  <span class="px-2 py-1 rounded-full <?= $statusClass ?>">
-                    <?= $req_status ?>
-                  </span>
-                </span>
+              <h3 class="text-lg font-semibold text-gray-800">
+                Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
               </h3>
               <p class="mt-2 text-xs text-gray-700">
                 <span class="font-medium">Description:</span>
                 <?php echo htmlspecialchars($track['request_desc']); ?>
               </p>
-              
+              <p class="mt-2 text-sm">
+                <span class="font-medium text-xs mr-1">Status:</span>
+                <?php
+                  $req_status = htmlspecialchars($track['req_status']);
+                  $statusClass = match($req_status) {
+                    "To Inspect" => "bg-yellow-200 text-yellow-700 font-medium text-xs",
+                    "In Progress" => "bg-blue-200 text-blue-700 font-medium text-xs",
+                    "Completed"  => "bg-green-200 text-green-700 font-medium text-xs",
+                    default => "bg-gray-100 text-gray-700",
+                  };
+                ?>
+                <span class="px-2 py-1 rounded-full <?= $statusClass ?>">
+                  <?= $req_status ?>
+                </span>
+              </p>
             <?php else: ?>
               <div class="flex justify-start mb-3">
                 <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">

@@ -28,7 +28,7 @@ require_once __DIR__ . '/../../../config/auth.php';
   <body class="flex flex-col min-h-screen bg-gray-200 text-text">
     <?php include COMPONENTS_PATH . '/header.php'; ?>
     <main class="flex-1">
-      <div class="text-center mt-8 mb-6">
+      <div class="text-center mt-0 md:mt-8 mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Welcome to U-Request</h1>
         <p class="text-sm text-gray-600 mt-1">How can we help you?</p>
       </div>

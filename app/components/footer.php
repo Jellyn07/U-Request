@@ -8,7 +8,7 @@
         </div>
         <p class="text-sm text-text/70">
           <span class="block sm:inline">All rights reserved.</span>
-          <a class="inline-block text-primary underline transition hover:text-accent" href="#">Terms & Conditions</a>
+          <a class="inline-block text-primary underline transition hover:text-accent mt-2 md:mt-0" href="#">Terms & Conditions</a>
           <span>&middot;</span>
           <a class="inline-block text-primary underline transition hover:text-accent" href="#">Privacy Policy</a>
         </p>
