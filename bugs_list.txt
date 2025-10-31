@@ -1,10 +1,11 @@
 BUGS LISTS
 
 Overall
--admins access level is all wrong
+-should show default picture (for img not found) in profiles & others if no pic found
 
 Super Admin
--
+-admins access level is all wrong when editing admin access ✅
+
 
 Motorpool Admin
 -

@@ -26,7 +26,7 @@ $requesters = $controller->getAllRequesters();
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-200">
   <!-- Superadmin Menu & Header -->
   <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
@@ -57,8 +57,8 @@ $requesters = $controller->getAllRequesters();
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow">
-          <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-b-lg p-2">
+          <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-1 py-2 rounded-tl-lg">&nbsp;</th>
@@ -89,7 +89,11 @@ $requesters = $controller->getAllRequesters();
                 <td class="px-4 py-2">
                   <?= htmlspecialchars($req['firstName'] . ' ' . $req['lastName']) ?>
                 </td>
-                <td class="px-4 py-2 text-green-800">Active</td>
+                <td class="px-4 py-2">
+                  <span class="text-xs px-3 py-1 rounded-full font-semibold bg-green-200 text-green-800">
+                    Active
+                  </span>
+                </td>
                 <td class="px-4 py-2"><?= htmlspecialchars($req['email']) ?></td>
                 <td class="px-4 py-2">
                   <?php if (!empty($req['officeOrDept'])): ?>

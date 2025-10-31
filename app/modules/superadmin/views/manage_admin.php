@@ -28,7 +28,7 @@ $admins = $controller->getAllAdmins();
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-200">
   <!-- Superadmin Menu & Header -->
   <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
@@ -214,8 +214,10 @@ $admins = $controller->getAllAdmins();
                     <td class="px-4 py-2">
                       <?php echo htmlspecialchars($admin['full_name']); ?>
                     </td>
-                    <td class="px-4 py-2 <?php echo strtolower($admin['status']) === 'active' ? 'text-green-800' : 'text-red-800'; ?>">
-                      <?php echo htmlspecialchars($admin['status']); ?>
+                    <td class="px-4 py-2">
+                      <span class="text-xs px-3 py-1 rounded-full font-semibold <?php echo strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'text-red-800'; ?>">
+                        <?php echo htmlspecialchars($admin['status']); ?>
+                      </span>
                     </td>
                     <td class="px-4 py-2">
                       <?php echo htmlspecialchars($admin['email']); ?>
@@ -284,9 +286,9 @@ $admins = $controller->getAllAdmins();
             <div>
               <label class="text-xs text-text mb-1">Access Level</label>
               <select name="accessLevel_id" x-model="selected.accessLevel_id" class="w-full input-field">
-                <option value="1">GSU Administrator</option>
-                <option value="2">Motorpool Administrator</option>
-                <option value="3">Superadmin</option>
+                <option value="1">Superadmin</option>
+                <option value="2">GSU Administrator</option>
+                <option value="3">Motorpool Administrator</option>
               </select>
             </div>
 

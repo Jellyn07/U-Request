@@ -33,7 +33,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     <script src="/public/assets/js/alert.js"></script>
   </head>
 <body class="min-h-screen flex relative overflow-hidden">
-  <div class="w-1/2 flex items-end justify-left relative z-10 text-white">
+  <div class="md:w-1/2 items-start justify-end relative z-10 text-white hidden md:flex flex-col">
     <div class="text-right p-8">
       <p class="text-sm text-white">
         <span class="block sm:inline">&copy; All rights reserved.</span>
@@ -43,12 +43,12 @@ require_once __DIR__ . '/../../../config/constants.php';
       </p>
     </div>
   </div>
-  <div class="w-1/2 flex items-center justify-center relative z-10">
-    <div id="loginForm" class="w-1/2 max-w-md bg-background transition-all duration-1000 opacity-0 translate-y-5">
+  <div class="mx-auto w-1/2 flex items-center justify-center relative z-10">
+    <div id="loginForm" class="w-2/3 md:w-1/2 max-w-md min-w-[350px] bg-white p-5 rounded-2xl transition-all duration-1000 opacity-0 translate-y-5 border border-gray-200 shadow-lg md:border-none md:shadow-none">
       <!-- Logo + Title -->
       <div class="text-center mb-4">
-        <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
-        <p class="text-2xl font-bold">ADMIN PANEL</p>
+        <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-14 w-14 mt-4 md:mt-0 md:h-20 md:w-20">
+        <p class="md:text-2xl text-lg mb-3 font-bold">ADMIN PANEL</p>
       </div>
 
       <!-- Form -->
