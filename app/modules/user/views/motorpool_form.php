@@ -20,6 +20,7 @@ require_once __DIR__ . '/../../../config/constants.php';
       method="POST" 
       class="w-full md:w-3/5 lg:w-1/2 my-10 mx-2 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-lg transition hover:shadow-xl"
     >
+      <input type="hidden" name="form_action" value="submitRequest">
       <!-- HEADER -->
       <div class="flex flex-col items-center justify-center mb-6">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/usep.png" alt="USeP Logo" class="w-20 h-20 mb-2">

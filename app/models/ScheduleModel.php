@@ -5,20 +5,23 @@ class ScheduleModel extends BaseModel {
 
     public function getTrips() {
         $query = "
-            SELECT 
-                vr.req_id,
-                vr.travel_date,
-                vr.return_date,
-                vr.travel_destination,
-                vr.trip_purpose,
-                vr.departure_time, 
-                vr.return_time,
-                vra.req_status,
-                v.vehicle_name
-            FROM vehicle_request vr
-            LEFT JOIN vehicle_request_assignment vra ON vr.req_id = vra.req_id
-            LEFT JOIN vehicle v ON vra.vehicle_id = v.vehicle_id
-            GROUP BY vr.tracking_id
+        SELECT 
+            vr.tracking_id,
+            vr.req_id,
+            vr.travel_date,
+            vr.return_date,
+            vr.travel_destination,
+            vr.trip_purpose,
+            vr.departure_time, 
+            vr.return_time,
+            vra.req_status,
+            v.vehicle_name
+        FROM vehicle_request vr
+        LEFT JOIN vehicle_request_assignment vra 
+            ON vr.control_no = vra.control_no   -- use control_no instead of req_id (more precise)
+        LEFT JOIN vehicle v 
+            ON vra.vehicle_id = v.vehicle_id
+        ORDER BY vr.date_request DESC;
         ";
 
         $result = $this->db->query($query);

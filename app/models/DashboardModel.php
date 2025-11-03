@@ -185,32 +185,14 @@ class DashboardModel extends BaseModel  {
     //Vehicle Request Pie
     public function getVehicleRequestStatusCounts() {
         $sql = "
-            SELECT
-                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
-                    FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra
-                    ON vr.req_id = vra.req_id
-                    WHERE vra.req_status = 'Pending') AS pending,
-                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
-                    FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra
-                    ON vr.req_id = vra.req_id
-                    WHERE vra.req_status = 'Approved') AS approved,
-                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
-                    FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra
-                    ON vr.req_id = vra.req_id
-                    WHERE vra.req_status = 'On Going') AS on_going,
-                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
-                    FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra
-                    ON vr.req_id = vra.req_id
-                    WHERE vra.req_status = 'Completed') AS completed,
-                (SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
-                    FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra
-                    ON vr.req_id = vra.req_id
-                    WHERE vra.req_status IN ('Rejected', 'Cancelled')) AS rejected_cancelled
+            SELECT 
+                SUM(CASE WHEN vra.req_status = 'Pending' THEN 1 ELSE 0 END) AS pending,
+                SUM(CASE WHEN vra.req_status = 'Approved' THEN 1 ELSE 0 END) AS approved,
+                SUM(CASE WHEN vra.req_status = 'On Going' THEN 1 ELSE 0 END) AS on_going,
+                SUM(CASE WHEN vra.req_status = 'Completed' THEN 1 ELSE 0 END) AS completed,
+                SUM(CASE WHEN vra.req_status IN ('Rejected', 'Cancelled') THEN 1 ELSE 0 END) AS rejected_cancelled
+            FROM vehicle_request vr
+            INNER JOIN vehicle_request_assignment vra ON vr.control_no = vra.control_no;
         ";
 
         $result = $this->db->query($sql);
@@ -228,7 +210,7 @@ class DashboardModel extends BaseModel  {
 
         // Fetch trip counts per vehicle from vehicle_request table
         $counts = [];
-        $sql2 = "SELECT vehicle_id, COUNT(request_id) AS trips FROM vehicle_request GROUP BY vehicle_id";
+        $sql2 = "SELECT vehicle_id, COUNT(req_id) AS trips FROM vehicle_request_assignment GROUP BY vehicle_id";
         $res2 = $this->db->query($sql2);
         if ($res2) {
             while ($r = $res2->fetch_assoc()) {

@@ -121,11 +121,11 @@ class TrackingModel extends BaseModel {
     public function getVehicleTrackingByEmail($email) {
         $sqlVehicle = "
             SELECT 
-                v.*,
+                v.*, 
                 vr.req_status
             FROM vehicle_request v
             INNER JOIN requester r ON v.req_id = r.req_id
-            INNER JOIN vehicle_request_assignment vr ON v.req_id = vr.req_id
+            LEFT JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no
             WHERE r.email = ?
         ";
         $stmt = $this->db->prepare($sqlVehicle);
