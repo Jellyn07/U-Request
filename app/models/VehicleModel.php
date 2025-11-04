@@ -166,14 +166,32 @@ class VehicleModel extends BaseModel {
     
     public function getVehicleTravelHistory($vehicle_id) {
         $stmt = $this->db->prepare("
-            SELECT vra.reqAssignment_id, vra.control_no, vra.req_id, vra.vehicle_id, vra.driver_id, vra.req_status, vra.approved_by,
-                   CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
-                   vr.trip_purpose, vr.travel_date
+            SELECT 
+                vra.reqAssignment_id,
+                vra.control_no,
+                vra.req_id,
+                vra.vehicle_id,
+                vra.driver_id,
+                vra.req_status,
+                vra.approved_by,
+                CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
+                vr.trip_purpose,
+                vr.travel_date
             FROM vehicle_request_assignment vra
-            LEFT JOIN vehicle_request vr ON vra.req_id = vr.req_id
-            LEFT JOIN driver d ON vra.driver_id = d.driver_id
+            INNER JOIN (
+                SELECT 
+                    control_no,
+                    MAX(reqAssignment_id) AS latest_assignment
+                FROM vehicle_request_assignment
+                GROUP BY control_no
+            ) AS latest 
+                ON vra.reqAssignment_id = latest.latest_assignment
+            INNER JOIN vehicle_request vr 
+                ON vra.control_no = vr.control_no
+            LEFT JOIN driver d 
+                ON vra.driver_id = d.driver_id
             WHERE vra.vehicle_id = ?
-            ORDER BY vr.travel_date DESC
+            ORDER BY vr.travel_date DESC;
         ");
         $stmt->bind_param("i", $vehicle_id);
         $stmt->execute();

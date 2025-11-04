@@ -142,8 +142,13 @@ class DashboardModel extends BaseModel  {
     // Get number of requests per building (matching by building name)
     public function getBuildingRequestsData() {
         $sql = "
-         SELECT cl.building, COUNT(r.request_id) AS total_requests FROM campus_locations cl
-            LEFT JOIN request r ON r.location LIKE CONCAT('%', cl.building, '%') GROUP BY cl.building ORDER BY total_requests DESC;
+         SELECT 
+            cl.building, 
+            COUNT(DISTINCT r.request_id) AS total_requests
+        FROM campus_locations cl
+        LEFT JOIN request r ON r.location LIKE CONCAT('%', cl.building, '%')
+        GROUP BY cl.building
+        ORDER BY total_requests DESC;
         ";
         $result = $this->db->query($sql);
         $rows = [];

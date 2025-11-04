@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['email'])) {
+    header("Location: /app/modules/shared/views/admin_login.php");
+    exit;
+}
+require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/DriverController.php';
 if (isset($_SESSION['driver_success'])) {
@@ -13,7 +18,7 @@ if (isset($_SESSION['driver_error'])) {
 }
 
 if (!isset($_SESSION['email'])) {
-    header('Location: modules/shared/views/admin_login.php');
+    header('Location: /app/modules/shared/views/admin_login.php');
     exit;
 }
 $controller = new DriverController(); $drivers = $controller->getAllDriver();
