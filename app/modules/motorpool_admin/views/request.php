@@ -34,7 +34,7 @@ $requests = $data['requests'];
         <button class="ml-5 btn"><p>All</p></button>
         <button class="btn"><p>Pending</p></button>
         <button class="btn"><p>Approved</p></button>
-        <button class="btn"><p>In Progress</p></button>
+        <button class="btn"><p>On Going</p></button>
         <button class="btn"><p>Rejected/Cancelled</p></button>
         <button class="btn"><p>Completed</p></button>
       </div>
@@ -173,11 +173,13 @@ $requests = $data['requests'];
 
           <div x-data="vehicleDropdown" x-init="init()">
             <label class="text-xs text-text mb-1">Assign Vehicle</label>
+            
             <select 
               id="vehicleSelect"  
               name="vehicle_id"  
               x-model="selected.vehicle_id"  
               class="w-full input-field"
+              :disabled="selected.req_status === 'Rejected/Cancelled' || selected.req_status === 'Completed'"
             >
               <option value="">Select Vehicle</option>
 
@@ -206,16 +208,42 @@ $requests = $data['requests'];
 
             <div x-data>
               <!-- STATUS -->
-              <div>
+              <div x-data>
                 <label class="text-xs text-text mb-1">Status</label>
-                <select id="status"  name="req_status"  x-model="selected.req_status" class="w-full input-field">
-                  <option value="" disabled>Select Status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Rejected/Cancelled">Rejected/Cancelled</option>
-                  <option value="Completed">Completed</option>
-                </select>
+                
+                <template x-if="selected.req_status === 'Rejected/Cancelled' || selected.req_status === 'Completed'">
+                  <!-- If Rejected or Completed: show static text (no dropdown) -->
+                  <input type="text" class="w-full input-field bg-gray-100 cursor-not-allowed" 
+                        x-model="selected.req_status" readonly>
+                </template>
+
+                <template x-if="selected.req_status === 'Pending'">
+                  <!-- If Pending: show all options -->
+                  <select id="status" name="req_status" x-model="selected.req_status" class="w-full input-field">
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="On Going">On Going</option>
+                    <option value="Rejected/Cancelled">Rejected/Cancelled</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </template>
+
+                <template x-if="selected.req_status === 'Approved'">
+                  <!-- If Approved: can only go from Ongoing to Completed -->
+                  <select id="status" name="req_status" x-model="selected.req_status" class="w-full input-field">
+                    <option value="Approved">Approved</option>
+                    <option value="On Going">On Going</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </template>
+
+                <template x-if="selected.req_status === 'On Going'">
+                  <!-- If On Going: can only be Completed -->
+                  <select id="status" name="req_status" x-model="selected.req_status" class="w-full input-field">
+                    <option value="On Going">On Going</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </template>
               </div>
 
               <!-- APPROVED BY -->
@@ -224,8 +252,7 @@ $requests = $data['requests'];
                 <select id="approvedBy" name="approved_by" x-model="selected.approved_by" class="w-full input-field">
                   <option value="" disabled>Select Approver</option>
                   <option value="Dr. Shirley Villanueva">Dr. Shirley Villanueva</option>
-                  <option value="Engr. John Dela Cruz">Engr. John Dela Cruz</option>
-                  <option value="Ms. Maria Santos">Ms. Maria Santos</option>
+                  <option value="Bonifacio G. Gabales, Jr., Ph.D.">Bonifacio G. Gabales, Jr., Ph.D.</option>
                 </select>
               </div>
             </div>
@@ -242,7 +269,11 @@ $requests = $data['requests'];
                       @click="viewFullDetails(selected)">
                 Full Details
               </button>
-              <button type="button" class="btn btn-primary" id="saveBtn">
+              <button 
+                type="button" 
+                class="btn btn-primary" 
+                id="saveBtn"
+                :disabled="selected.req_status === 'Rejected/Cancelled' || selected.req_status === 'Completed'">
                 Save Changes
               </button>
             </div>
