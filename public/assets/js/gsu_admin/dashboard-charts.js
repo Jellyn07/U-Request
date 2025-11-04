@@ -2,34 +2,60 @@
 fetch('../../../controllers/DashboardController.php?building_requests=1')
   .then(res => res.json())
   .then(data => {
-    const labels = data.map(item => item.building);
+    // Trim long building names safely before chart rendering
+    const labels = data.map(item => {
+      const name = item.building;
+      return name.length > 8 ? name.substring(0, 8) + '...' : name;
+    });
+
     const values = data.map(item => parseInt(item.total_requests));
 
     // Optional: generate colors dynamically if more buildings appear
     const colors = labels.map((_, i) => {
-        const palette = ['#FFC845', '#F29C4C', '#1C7ED6', '#6B9A4F', '#D11100'];
-        return palette[i % palette.length]; 
+      const palette = ['#FFC845', '#F29C4C', '#1C7ED6', '#6B9A4F', '#D11100'];
+      return palette[i % palette.length];
     });
 
     new Chart(document.getElementById('buildingChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Requests',
-                data: values,
-                backgroundColor: colors,
-                borderRadius: 6
-            }]
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Requests',
+          data: values,
+          backgroundColor: colors,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              // Show full name in tooltip instead of truncated one
+              title: function(context) {
+                return data[context[0].dataIndex].building;
+              }
+            }
+          }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
+        scales: {
+          x: {
+            ticks: {
+              font: { size: 12 }
+            }
+          },
+          y: {
+            beginAtZero: true
+          }
         }
+      }
     });
   })
   .catch(err => console.error(err));
+  
 // --- Personnel Workload Chart ---
 const requestTypes = ['Carpentry/Masonry','Welding','Hauling','Plumbing','Landscaping','Electrical','Air-Condition','Others'];
 fetch('../../../controllers/DashboardController.php?workload_data=1')
@@ -63,7 +89,7 @@ fetch('../../../controllers/DashboardController.php?workload_data=1')
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: true },
+                legend: { display: false },
                 tooltip: { enabled: true, mode: 'nearest', intersect: false }
             },
             scales: {

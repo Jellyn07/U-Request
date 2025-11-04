@@ -43,10 +43,10 @@ $admins = $controller->getAllAdmins();
                 <option>Tagum Unit</option>
                 <option>Mabini Unit</option>
             </select>
-            <button title="Print data in the table" class="input-field">
+            <button title="Print data in the table" class="input-field" id="print">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
-            <button class="input-field" title="Export to Excel">
+            <button class="input-field" title="Export to Excel" id="export">
                 <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add New Location Modal Trigger -->
@@ -56,17 +56,18 @@ $admins = $controller->getAllAdmins();
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <div id="table" class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
             <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
+                  <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Added</th>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Building</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Exact Location</th>
                 </tr>
               </thead>
-              <tbody id="table" class="text-sm">
+              <tbody id="body_table" class="text-sm">
                 <?php foreach ($locations as $row): ?>
                   <?php 
                     $rowJson = htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8');
@@ -76,7 +77,7 @@ $admins = $controller->getAllAdmins();
                     class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
                   >
                     <!-- Hidden ID column -->
-                    <td class="hidden" x-text="<?= htmlspecialchars($row['location_id']) ?>"></td>
+                    <td class="pl-8 py-3" x-text="<?= htmlspecialchars($row['location_id']) ?>"></td>
 
                     <td class="pl-8 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_added']))) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($row['unit']) ?></td>
@@ -253,5 +254,6 @@ $admins = $controller->getAllAdmins();
   <script src="/public/assets/js/shared/menus.js"></script>
   <script src="/public/assets/js/shared/search.js"></script>          
   <script src="/public/assets/js/gsu_admin/location.js"></script>  
+  <script src="/public/assets/js/shared/export_print.js"></script>
 </body>
 </html>

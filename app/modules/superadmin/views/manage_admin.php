@@ -147,13 +147,21 @@ $admins = $controller->getAllAdmins();
                     <div class="w-full">
                       <h2 class="text-base font-semibold mt-5">Default Password</h2>
                       <!-- <form class="space-y-4" method="post" action="../../../controllers/ProfileController.php"> -->
-                        <div>
+                        <div class="relative">
                           <label class="text-xs text-text mb-1">Password<span class="text-secondary">*</span></label>
-                          <input type="password" name="password" class="w-full input-field" required />
+                          <input type="password" id="password" name="password" class="w-full input-field" required />
+                          <span class="absolute right-3 cursor-pointer" data-password-toggle="password">
+                            <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+                            <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+                          </span>
                         </div>
-                        <div>
+                        <div class="relative">
                           <label class="text-xs text-text mb-1">Confirm Password<span class="text-secondary">*</span></label>
-                          <input type="password" name="confirm_password" class="w-full input-field" required />
+                          <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" required />
+                          <span class="absolute right-3 cursor-pointer" data-password-toggle="confirm_password">
+                            <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+                            <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+                          </span>
                         </div>
                       <!-- </form> -->
                     </div>
@@ -321,6 +329,7 @@ $admins = $controller->getAllAdmins();
       window.adminSuccess = <?= isset($_SESSION['admin_success']) ? json_encode($_SESSION['admin_success']) : 'null' ?>;
       window.adminError = <?= isset($_SESSION['admin_error']) ? json_encode($_SESSION['admin_error']) : 'null' ?>;
   </script>
+  <script src="/public/assets/js/shared/password-visibility.js"></script>
 </body>
 </html>
 
