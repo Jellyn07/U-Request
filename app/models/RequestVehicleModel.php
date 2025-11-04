@@ -18,68 +18,109 @@ class VehicleRequestModel extends BaseModel {
         $source_of_fuel,
         $source_of_oil,
         $source_of_repair_maintenance,
-        $source_of_driver_assistant_per_diem) {
-        // Step 1: Add Vehicle Request
-    
-    if (isset($_SESSION['req_id'])) {
-            setCurrentRequester($this->db); // Use model's connection
-        }
+        $source_of_driver_assistant_per_diem ) {
 
-    $stmt = $this->db->prepare("CALL spAddVehicleRequest(?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param(
-        "isssssss",
-        $req_id,
-        $tracking_id,
-        $trip_purpose,
-        $travel_destination,
-        $travel_date,
-        $return_date,
-        $departure_time,
-        $return_time
-    );
+        try {
 
-        if (!$stmt->execute()) {
-            $this->lastError = "VehicleRequest Execute Error: " . $stmt->error;
+            if (isset($_SESSION['req_id'])) {
+                setCurrentRequester($this->db); // Use model's connection
+            }
+            // Call the stored procedure
+            $stmt = $this->db->prepare("CALL spAddVehicleRequest(?, ?, ?, ?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $this->db->error);
+            }
+
+            $stmt->bind_param(
+                "isssssss",
+                $req_id,
+                $tracking_id,
+                $trip_purpose,
+                $travel_destination,
+                $travel_date,
+                $return_date,
+                $departure_time,
+                $return_time
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
+
+            // ✅ Fetch control_no from result
+            $result = $stmt->get_result();
+            if (!$result) {
+                throw new Exception("No result returned from spAddVehicleRequest");
+            }
+
+            $row = $result->fetch_assoc();
+            $control_no = $row['control_no'] ?? null;
+
             $stmt->close();
-            return false;
-        }
 
-        // Fetch the control_no
-        $result = $stmt->get_result();
-        $row = $result ? $result->fetch_assoc() : null;
-        $stmt->close();
+            if (!$control_no) {
+                throw new Exception("No control_no returned from procedure");
+            }
 
-        $control_no = $row['control_no'] ?? null;
-        if (!$control_no) {
-            $this->lastError = "Failed to retrieve control_no";
-            return false;
-        }
+            // ✅ Continue with source of fund
+            $stmt2 = $this->db->prepare("CALL spAddSourceOfFund(?, ?, ?, ?, ?)");
+            $stmt2->bind_param(
+                "issss",
+                $control_no,
+                $source_of_fuel,
+                $source_of_oil,
+                $source_of_repair_maintenance,
+                $source_of_driver_assistant_per_diem
+            );
 
-        // Step 2: Add Source of Fund
-        $stmt2 = $this->db->prepare("CALL spAddSourceOfFund(?, ?, ?, ?, ?)");
-        if (!$stmt2) {
-            $this->lastError = "SourceOfFund Prepare Error: " . $this->db->error;
-            return false;
-        }
+            if (!$stmt2->execute()) {
+                throw new Exception("Execute failed for spAddSourceOfFund: " . $stmt2->error);
+            }
 
-        $stmt2->bind_param(
-            "issss",
-            $control_no,
-            $source_of_fuel,
-            $source_of_oil,
-            $source_of_repair_maintenance,
-            $source_of_driver_assistant_per_diem
-        );
-
-        if (!$stmt2->execute()) {
-            $this->lastError = "SourceOfFund Execute Error: " . ($stmt2->error ?: $this->db->error);
             $stmt2->close();
+
+            return $control_no;
+
+        } catch (Exception $e) {
+            $this->lastError = $e->getMessage();
+            error_log("VehicleRequestModel Error: " . $this->lastError);
             return false;
         }
+    }
 
-        $stmt2->close();
+    public function addAssignment($control_no, $req_id, $vehicle_id = null, $driver_id = null, $req_status = 'Pending', $approved_by = null) {
+        try {
+            // 🧹 Clear any previous stored procedure results
+            while ($this->db->more_results() && $this->db->next_result()) {;}
 
-        return $control_no;
+            // 🧠 Debug log
+            error_log("📥 addAssignment() called with: control_no=$control_no, req_id=$req_id, status=$req_status");
+
+            // Prepare stored procedure
+            $stmt = $this->db->prepare("CALL spAddVehicleRequestAssignment(?, ?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $this->db->error);
+            }
+
+            // Bind parameters
+            $stmt->bind_param("iiiiss", $control_no, $req_id, $vehicle_id, $driver_id, $req_status, $approved_by);
+
+            // Execute procedure
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
+
+            // Close and clear
+            $stmt->close();
+            $this->db->next_result();
+
+            error_log("✅ addAssignment() success for control_no=$control_no");
+            return true;
+
+        } catch (Exception $e) {
+            error_log("❌ addAssignment() ERROR: " . $e->getMessage());
+            return false;
+        }
     }
 
     // 2. Add Passenger
@@ -145,31 +186,32 @@ class VehicleRequestModel extends BaseModel {
         return $passenger['passenger_id'] ?? null;
     }
 
-// Fetch all vehicles with their assigned driver_id
-public function getVehicles() {
-    $sql = "SELECT vehicle_id, vehicle_name, driver_id FROM vehicle ORDER BY vehicle_name ASC";
-    $res = $this->db->query($sql);
-    $vehicles = [];
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-            $vehicles[] = $row;
+    // Fetch all vehicles with their assigned driver_id
+    public function getVehicles() {
+        $sql = "SELECT vehicle_id, vehicle_name, driver_id FROM vehicle ORDER BY vehicle_name ASC";
+        $res = $this->db->query($sql);
+        $vehicles = [];
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $vehicles[] = $row;
+            }
         }
+        return $vehicles;
     }
-    return $vehicles;
-}
 
-// Fetch all personnel (drivers)
-public function getDriver() {
-    $sql = "SELECT driver_id, CONCAT(firstName, ' ', lastName) AS full_name FROM driver ORDER BY firstName ASC";
-    $res = $this->db->query($sql);
-    $personnels = [];
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-            $personnels[] = $row;
+    // Fetch all personnel (drivers)
+    public function getDriver() {
+        $sql = "SELECT driver_id, CONCAT(firstName, ' ', lastName) AS full_name FROM driver ORDER BY firstName ASC";
+        $res = $this->db->query($sql);
+        $personnels = [];
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $personnels[] = $row;
+            }
         }
+        return $personnels;
     }
-    return $personnels;
-}
+    
     public function updateRequestStatusByToken($token, $status) {
         $sql = "UPDATE vehicle_request SET req_status = ? WHERE approval_token = ?";
         $stmt = $this->db->prepare($sql);

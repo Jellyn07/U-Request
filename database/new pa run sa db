@@ -664,3 +664,50 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+------------------------------------------------------------------------------------------------------------------------------------
+drop procedure spAddVehicleRequest;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spAddVehicleRequest`(
+    IN p_req_id INT,
+    IN p_tracking_id VARCHAR(50),
+    IN p_trip_purpose VARCHAR(100),
+    IN p_travel_destination VARCHAR(255),
+    IN p_travel_date DATE,
+    IN p_return_date DATE,
+    IN p_departure_time TIME,
+    IN p_return_time TIME
+)
+BEGIN
+    DECLARE new_control_no INT;
+
+    INSERT INTO vehicle_request (
+        req_id,
+        date_request,
+        tracking_id,
+        trip_purpose,
+        travel_destination,
+        travel_date,
+        return_date,
+        departure_time,
+        return_time
+    )
+    VALUES (
+        p_req_id,
+        NOW(),
+        p_tracking_id,
+        p_trip_purpose,
+        p_travel_destination,
+        p_travel_date,
+        p_return_date,
+        p_departure_time,
+        p_return_time
+    );
+
+    SET new_control_no = LAST_INSERT_ID();
+
+    SELECT new_control_no AS control_no;
+END$$
+DELIMITER ;
+
+DROP TRIGGER trg_vehicle_request_assignment_insert;

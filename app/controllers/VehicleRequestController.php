@@ -40,10 +40,17 @@ class VehicleRequestController {
         );
 
         if (!$control_no) {
+            error_log("❌ Vehicle request failed. Reason: " . ($this->model->lastError ?? 'Unknown'));
             throw new Exception("Failed to create vehicle request.");
         }
 
-        // Add passengers
+
+        $addAssign = $this->model->addAssignment($control_no, $this->req_id);
+        if (!$addAssign) {
+            error_log("⚠️ Failed to add default assignment for control_no=$control_no");
+        }
+
+        // ✅ Add passengers
         if (!empty($_POST['first_name']) && is_array($_POST['first_name'])) {
             foreach ($_POST['first_name'] as $i => $fname) {
                 $lname = $_POST['last_name'][$i] ?? '';

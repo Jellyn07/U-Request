@@ -40,8 +40,8 @@ class DashboardModel extends BaseModel  {
                 (
                    SELECT COUNT(DISTINCT vr.tracking_id) AS pending_count
                     FROM vehicle_request vr
-                    INNER JOIN vehicle_request_assignment vra
-                    ON vr.req_id = vra.req_id
+                    LEFT JOIN vehicle_request_assignment vra
+                        ON vr.control_no = vra.control_no
                     WHERE vra.req_status = 'Pending'
                 ) AS total_vrequests_p,
 
