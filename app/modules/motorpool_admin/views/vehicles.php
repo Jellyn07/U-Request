@@ -28,33 +28,33 @@ $vehicles = $vehicleController->getVehicles();
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-4">Vehicles</h1>
-
-      <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div x-data="{showDetails: false,editing: false,selected: {}, openDetails(data) {this.selected = data;this.showDetails = true;this.editing = false;}}"
+        class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
-          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-lg">
-             <input 
-                type="text" 
-                id="searchUser" 
-                placeholder="Search by vehicle name" 
-                class="flex-1 min-w-[200px] input-field"
-              >
-              <select class="input-field" id="sortVehicle">
-                <option value="">All Types</option>
-                <option value="Sedan">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="Van">Van</option>
-                <option value="Truck">Truck</option>
-                <option value="Bus">Bus</option>
-              </select>
+          <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
+            <!-- Search + Filters + Buttons -->
+            <input type="text" id="searchUser" placeholder="Search by vehicle name" class="flex-1 min-w-[200px] input-field">
+            <!-- <select class="input-field" id="statusFilter">
+              <option value="all">All</option>
+              <option value="Available">Available</option>
+              <option value="Fixing">Fixing</option>
+            </select> -->
+
+            <select class="input-field" id="sortUsers">
+                <option value="az">Sort A-Z</option>
+                <option value="za">Sort Z-A</option>
             </select>
-            <button title="Print data" class="input-field">
-              <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
+            <button title="Print data in the table" class="input-field">
+                <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
             <button class="input-field" title="Export to Excel">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
+            <!-- Add Admin Modal -->
+                <div x-data="{ showModal: false }">
 
+            <!-- Modal Background -->
             <!-- Add Vehicle / Add Driver Modal -->
             <div x-data="{ showModal: false }">
               <button @click="showModal = true" title="Add new driver" class="btn btn-secondary">
@@ -174,36 +174,13 @@ $vehicles = $vehicleController->getVehicles();
               </div>
             </div>
           </div>
+          </div>
 
-          <!-- Main container -->
-          <div class="flex gap-4 relative">
-            <!-- Vehicle Cards Grid -->
+          <!-- Table -->
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
           <div 
-            x-data="{
-              showDetails: false,
-              editing: false,
-              selected: {},
-              openDetails(vehicle) {
-                  this.selected = vehicle;
-                  this.selected.driver_id = vehicle.driver_id || 0; // add this line
-                  this.showDetails = true;
-                  this.editing = false;
-              },
-              saveEdit() {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Vehicle updated!',
-                  text: `${this.selected.name} has been updated successfully.`,
-                });
-                this.editing = false;
-              }
-            }"
-            class="flex gap-4 relative"
-          >
-            <!-- ✅ Vehicle Cards Grid -->
-            <div 
               id="vehicleContainer"
-              class="grid gap-4 p-4 h-[578px] overflow-y-auto flex-1"
+              class="grid gap-4 p-4 h-max-[500px] overflow-y-auto flex-1"
               :class="showDetails ? 'grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'"
             >
               <?php if (!empty($vehicles)): ?>
@@ -252,20 +229,17 @@ $vehicles = $vehicleController->getVehicles();
                 <p class="col-span-full text-center text-gray-500">No vehicles found.</p>
               <?php endif; ?>
             </div>
+          </div>
+        </div>
 
-            <!-- ✅ Vehicle Details Panel -->
-            <div 
-              x-show="showDetails"
-              x-transition
-              x-cloak
-              class="w-full md:w-[370px] bg-white shadow rounded-lg p-4 overflow-y-auto h-[578px] transition-all duration-300"
-            >
-              <!-- Close button -->
-              <button @click="showDetails = false; editing = false" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
-                <img src="/public/assets/img/exit.png" class="w-4 h-4" alt="Close">
-              </button>
+        <!-- Right Section (Details) -->
+        <div x-show="showDetails" x-cloak
+            class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-y-auto">
+          <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
+            <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
+          </button>
 
-              <!-- ✅ View Mode -->
+          <!-- ✅ View Mode -->
               <div x-show="!editing" x-transition>
                 <div class="text-center mt-4">
                   <img :src="selected.photo" alt="Vehicle" class="w-1/2 h-32 mx-auto rounded-lg mb-3 object-cover">
@@ -279,17 +253,18 @@ $vehicles = $vehicleController->getVehicles();
                 <div class="mt-5 text-center">
                   <button 
                     @click="editing = true" 
-                    class="w-auto border rounded-lg px-3 py-2 text-sm transition">
+                    class="btn btn-secondary">
                     Edit Vehicle
                   </button>
                 </div>      
                 <!-- Button to show travel history -->
-                <div class="vehicle-card bg-white rounded-lg shadow hover:shadow-lg transition border border-gray-300 p-1">
+                <div class="vehicle-card btn btn-secondary mt-4 text-center">
                     <button 
-                        class="mt-5 text-xm hover:underline"
+                        class=""
                         @click="() => toggleHistory(selected.vehicle_id, $event.target)"
                     >
                         View Travel History
+                        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
                     </button>
                     <div class="travel-history mt-2 hidden border-t pt-2"></div>
                 </div>
@@ -476,26 +451,9 @@ $vehicles = $vehicleController->getVehicles();
                   </div>
                 </form>
               </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   </main>
-  <script src="/public/assets/js/shared/menus.js"></script>
-  <?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
-  <?php if (isset($_SESSION['alert'])): ?>
-  <script>
-  Swal.fire({
-      icon: '<?= $_SESSION['alert']['icon'] ?>',
-      title: '<?= $_SESSION['alert']['title'] ?>',
-      text: '<?= $_SESSION['alert']['text'] ?>',
-      confirmButtonText: 'OK'
-  }).then(() => {
-      // Optional: reload or redirect
-  });
-  </script>
-  <?php unset($_SESSION['alert']); ?>
-  <?php endif; ?>
 </body>
 </html>
