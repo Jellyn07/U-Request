@@ -46,10 +46,19 @@ $vehicles = $vehicleController->getVehicles();
               <option value="Fixing">Fixing</option>
             </select> -->
 
-            <select class="input-field" id="sortUsers">
+            <select class="input-field" id="sortVehicle">
+                <option value="">All Types</option>
+                <option value="Sedan">Sedan</option>
+                <option value="SUV">SUV</option>
+                <option value="Van">Van</option>
+                <option value="Truck">Truck</option>
+                <option value="Bus">Bus</option>
+              </select>
+
+            <!-- <select class="input-field" id="sortUsers">
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
-            </select>
+            </select> -->
             <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button>
