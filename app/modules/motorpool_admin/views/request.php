@@ -213,43 +213,15 @@ $requests = $data['requests'];
 
             <div x-data>
               <!-- STATUS -->
-              <div x-data>
-                <label class="text-xs text-text mb-1">Status</label>
-                
-                <template x-if="selected.req_status === 'Rejected/Cancelled' || selected.req_status === 'Completed'">
-                  <!-- If Rejected or Completed: show static text (no dropdown) -->
-                  <input type="text" class="w-full input-field bg-gray-100 cursor-not-allowed" 
-                        x-model="selected.req_status" readonly>
-                </template>
-
-                <template x-if="selected.req_status === 'Pending'">
-                  <!-- If Pending: show all options -->
-                  <select id="status" name="req_status" x-model="selected.req_status" class="w-full input-field">
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="On Going">On Going</option>
-                    <option value="Rejected/Cancelled">Rejected/Cancelled</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </template>
-
-                <template x-if="selected.req_status === 'Approved'">
-                  <!-- If Approved: can only go from Ongoing to Completed -->
-                  <select id="status" name="req_status" x-model="selected.req_status" class="w-full input-field">
-                    <option value="Approved">Approved</option>
-                    <option value="On Going">On Going</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </template>
-
-                <template x-if="selected.req_status === 'On Going'">
-                  <!-- If On Going: can only be Completed -->
-                  <select id="status" name="req_status" x-model="selected.req_status" class="w-full input-field">
-                    <option value="On Going">On Going</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </template>
-              </div>
+               <div>
+                <select id="status"  name="req_status"  x-model="selected.req_status" class="w-full input-field">
+                  <option value="" disabled>Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="On Going">On Going</option>
+                  <option value="Rejected/Cancelled">Rejected/Cancelled</option>
+                  <option value="Completed">Completed</option>
+                </select>
 
               <!-- APPROVED BY -->
               <div x-show="selected.req_status === 'Approved'" x-cloak>
@@ -277,8 +249,7 @@ $requests = $data['requests'];
               <button 
                 type="button" 
                 class="btn btn-primary" 
-                id="saveBtn"
-                :disabled="selected.req_status === 'Rejected/Cancelled' || selected.req_status === 'Completed'">
+                id="saveBtn">
                 Save Changes
               </button>
             </div>
