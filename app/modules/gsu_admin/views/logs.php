@@ -92,7 +92,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Affected Items</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Performed By</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Details</th>
               </tr>
             </thead>
