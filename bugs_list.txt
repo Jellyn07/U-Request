@@ -2,20 +2,31 @@ BUGS LISTS
 
 Overall
 -should show default picture (for img not found) in profiles & others if no pic found
+-if logout cannot go back to last page open
+
+-Admin Model Store Procedures
+-All email must encrypted(last)
 
 Super Admin
 -admins access level is all wrong when editing admin access ✅
 
 
 Motorpool Admin
--
+- Motorpool Vehicle Request if reject with remarks why it is rejected
+- Motorpool Vehicle Request View Full Details✅ (UI NEED POLISH I THINK)
+- Motorpool Vehicle Request Schedule (by color)
 
 GSU Admin
 - can be completed even if request have no assigned personel
 - request: no dropdown for request in (to inspect) to avoid updating request without personel
-- request: in progress no option to go back to (to inspect)
+- request: in progress no option to go back to (to inspect) ✅
 - if admin assigned a personel the status will automatically go to in progress (idunno kung tama)
 - if i change the name of a building in one of the locations the other same building wont me change
 
+- GSU Request Personnel Assign View Edit
+- Request and Request Assignment Trigger (Update)
+
 Users
-- cant request in vehicle 
+- cant request in vehicle ✅
+- contact update/add
+- track sort (oldest/newest)
