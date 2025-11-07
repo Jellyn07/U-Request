@@ -122,7 +122,7 @@ document.addEventListener("alpine:init", () => {
             <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.date_finished || 'Pending'}" readonly />
           </div>
           
-          <div class="mb-2"><label class="text-xs">Materials Needed</label>
+          <div class="mb-2"><label class="text-xs">Materials Used</label>
             <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.materials_needed || ''}" readonly />
           </div>
         </div>

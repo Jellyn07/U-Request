@@ -13,17 +13,18 @@ Super Admin
 
 Motorpool Admin
 - Motorpool Vehicle Request if reject with remarks why it is rejected
-- Motorpool Vehicle Request View Full Details✅ (UI NEED POLISH I THINK)
 - Motorpool Vehicle Request Schedule (by color)
+- Motorpool Vehicle need add (unusable vehicle status) update status abou vehicle
 
 GSU Admin
 - can be completed even if request have no assigned personel
 - request: no dropdown for request in (to inspect) to avoid updating request without personel
 - request: in progress no option to go back to (to inspect) ✅
-- if admin assigned a personel the status will automatically go to in progress (idunno kung tama)
+- if admin assigned a personel the status will automatically go to in progress (idunno kung tama)// need sya iselect ug to inspect para mugawas ang materials (used/needed) na div 
 - if i change the name of a building in one of the locations the other same building wont me change
 
-- GSU Request Personnel Assign View Edit
+- GSU  Request PersonnelAssign View Edit
+- GSU Request View Full Details✅ (UI NEED POLISH I THINK)
 - Request and Request Assignment Trigger (Update)
 
 Users
