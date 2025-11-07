@@ -111,7 +111,7 @@ document.addEventListener("alpine:init", () => {
           </div>
 
           <div class="mb-2"><label class="text-xs">Assigned Personnel</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.full_name || 'Not Assigned'}" readonly />
+            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.assigned_personnel || ''}" readonly />
           </div>
 
           <div class="mb-2"><label class="text-xs">Status</label>

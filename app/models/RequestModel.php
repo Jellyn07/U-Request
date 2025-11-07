@@ -82,13 +82,23 @@ class RequestModel extends BaseModel {
 
       // Get all requests from vw_requests
       public function getAllRequests() {
-        $sql = "        
-                SELECT 
+        $sql = "SELECT 
                     vw.*,
                     r.*,
                     ra.*,
-                    rap.staff_id,
-                    vwg.full_name
+                    COALESCE(
+                        GROUP_CONCAT(
+                            DISTINCT vwg.full_name SEPARATOR ', '
+                        ),
+                        'No personnel assigned'
+                    ) AS assigned_personnel,
+                    COALESCE(
+                        GROUP_CONCAT(
+                            DISTINCT CONCAT(m.material_desc, ' (Qty: ', rm.quantity_needed, ')')
+                            SEPARATOR ', '
+                        ),
+                        'No materials used'
+                    ) AS materials_needed
                 FROM vw_requests vw
                 INNER JOIN request r 
                     ON vw.request_id = r.request_id
@@ -98,6 +108,10 @@ class RequestModel extends BaseModel {
                     ON r.request_id = rap.request_id
                 LEFT JOIN vw_gsu_personnel vwg
                     ON rap.staff_id = vwg.staff_id
+                LEFT JOIN request_materials_needed rm
+                    ON ra.reqAssignment_id = rm.reqAssignment_id
+                LEFT JOIN materials m
+                    ON rm.material_code = m.material_code
                 GROUP BY r.request_id
                 ORDER BY vw.request_date DESC;
                 ";
@@ -129,148 +143,125 @@ class RequestModel extends BaseModel {
     }
 
    // In RequestModel.php
-   public function addAssignment($request_id, $req_status, $staff_ids, $prio_level, $materials = []) {
-    try {
-        $this->db->begin_transaction();
+   public function addAssignment(
+        $request_id,
+        $req_status,
+        $staff_ids = [],
+        $prio_level = null,
+        $materials_to_add = [],    // array of ['material_code'=>int, 'qty'=>int]
+        $remove_staff_ids = [],    // array of staff_id ints to remove
+        $materials_to_remove = []  // array of material_code ints to remove
+    ) {
+        try {
+            $this->db->begin_transaction();
 
-        // ✅ 1️⃣ Check if personnel already assigned for this request
-        $countStmt = $this->db->prepare("
-            SELECT COUNT(*) AS personnel_count 
-            FROM request_assigned_personnel 
-            WHERE request_id = ?
-        ");
-        if (!$countStmt) {
-            throw new Exception("Prepare failed (count personnel): " . $this->db->error);
-        }
-        $countStmt->bind_param("i", $request_id);
-        $countStmt->execute();
-        $countStmt->bind_result($personnelCount);
-        $countStmt->fetch();
-        $countStmt->close();
-
-        $isNewAssignment = false; // track if new personnel were added
-
-        // ✅ 2️⃣ If no personnel yet, insert new ones
-        if ($personnelCount == 0 && !empty($staff_ids) && is_array($staff_ids)) {
-            $stmt3 = $this->db->prepare("CALL spAssignPersonnel(?, ?)");
-            if (!$stmt3) {
-                throw new Exception("Prepare failed (insert personnel): " . $this->db->error);
+            // Update Priority Level
+            if (!empty($prio_level)) {
+                $stmt = $this->db->prepare("CALL spUpdateRequestPriorityStatus(?, ?)");
+                $stmt->bind_param("is", $request_id, $prio_level);
+                $stmt->execute();
+                $stmt->close();
+                while ($this->db->more_results() && $this->db->next_result()) {;}
             }
 
-            foreach ($staff_ids as $staff_id) {
-                if (!empty($staff_id)) {
-                    $stmt3->bind_param("ii", $request_id, $staff_id);
-                    $stmt3->execute();
-                }
-            }
-            $stmt3->close();
-            $isNewAssignment = true;
-        }
-
-        // ✅ 3️⃣ Retrieve reqAssignment_id from request_assignment using request_id
-        $reqAssignment_id = null;
-        $getAssignStmt = $this->db->prepare("
-            SELECT reqAssignment_id 
-            FROM request_assignment 
-            WHERE request_id = ? 
-            LIMIT 1
-        ");
-        if (!$getAssignStmt) {
-            throw new Exception("Prepare failed (retrieve reqAssignment_id): " . $this->db->error);
-        }
-        $getAssignStmt->bind_param("i", $request_id);
-        $getAssignStmt->execute();
-        $getAssignStmt->bind_result($reqAssignment_id);
-        $getAssignStmt->fetch();
-        $getAssignStmt->close();
-
-        // ✅ 4️⃣ Always update Priority Level (even if personnel already exists)
-        if (!empty($prio_level)) {
-            $stmt2 = $this->db->prepare("CALL spUpdateRequestPriorityStatus(?, ?)");
-            if (!$stmt2) {
-                throw new Exception("Prepare failed (priority update): " . $this->db->error);
-            }
-            $stmt2->bind_param("is", $request_id, $prio_level);
-            $stmt2->execute();
-            $stmt2->close();
+            // Update Request Status
+            $stmt = $this->db->prepare("CALL spUpdateRequestStatus(?, ?)");
+            $stmt->bind_param("is", $request_id, $req_status);
+            $stmt->execute();
+            $stmt->close();
             while ($this->db->more_results() && $this->db->next_result()) {;}
-        }
 
-        // ✅ 5️⃣ Always update Request Status
-        $stmtStatus = $this->db->prepare("CALL spUpdateRequestStatus(?, ?)");
-        if (!$stmtStatus) {
-            throw new Exception("Prepare failed (status update): " . $this->db->error);
-        }
-        $stmtStatus->bind_param("is", $request_id, $req_status);
-        $stmtStatus->execute();
-        $stmtStatus->close();
-        while ($this->db->more_results() && $this->db->next_result()) {;}
-
-        // ✅ 6️⃣ Add Materials Needed (if provided)
-        if (!empty($materials) && is_array($materials) && !empty($reqAssignment_id)) {
-            // Insert materials needed
-            $stmt4 = $this->db->prepare("
-                INSERT INTO request_materials_needed (reqAssignment_id, material_code, quantity_needed, date_added)
-                VALUES (?, ?, ?, NOW())
-            ");
-            if (!$stmt4) {
-                throw new Exception("Prepare failed (materials insert): " . $this->db->error);
+            // Remove personnel
+            if (!empty($remove_staff_ids)) {
+                $delStmt = $this->db->prepare("
+                    DELETE FROM request_assigned_personnel 
+                    WHERE request_id = ? AND staff_id = ?
+                ");
+                foreach ($remove_staff_ids as $sid) {
+                    $delStmt->bind_param("ii", $request_id, $sid);
+                    $delStmt->execute();
+                }
+                $delStmt->close();
             }
 
-            // Prepare the update statement to deduct stock
-            $updateStockStmt = $this->db->prepare("
-                UPDATE materials
-                SET qty = qty - ?
-                WHERE material_code = ? AND qty >= ?
-            ");
-            if (!$updateStockStmt) {
-                throw new Exception("Prepare failed (stock update): " . $this->db->error);
+            // Add personnel
+            if (!empty($staff_ids)) {
+                $stmt = $this->db->prepare("
+                    INSERT IGNORE INTO request_assigned_personnel (request_id, staff_id)
+                    VALUES (?, ?)
+                ");
+                foreach ($staff_ids as $sid) {
+                    $stmt->bind_param("ii", $request_id, $sid);
+                    $stmt->execute();
+                }
+                $stmt->close();
             }
 
-            foreach ($materials as $item) {
-                if (!empty($item['material_code'])) {
-                    $material_code = (int) $item['material_code'];
-                    $quantity_needed = (int) ($item['qty'] ?? 1);
+            // Get reqAssignment_id
+            $reqAssignment_id = null;
+            $assignStmt = $this->db->prepare("SELECT reqAssignment_id FROM request_assignment WHERE request_id = ? LIMIT 1");
+            $assignStmt->bind_param("i", $request_id);
+            $assignStmt->execute();
+            $assignStmt->bind_result($reqAssignment_id);
+            $assignStmt->fetch();
+            $assignStmt->close();
 
-                    // ✅ Insert into request_materials_needed
-                    $stmt4->bind_param("iii", $reqAssignment_id, $material_code, $quantity_needed);
-                    $stmt4->execute();
+            // Remove materials
+            if (!empty($materials_to_remove)) {
+                $delMatStmt = $this->db->prepare("
+                    DELETE FROM request_materials_needed 
+                    WHERE reqAssignment_id = ? AND material_code = ?
+                ");
+                foreach ($materials_to_remove as $code) {
+                    $delMatStmt->bind_param("ii", $reqAssignment_id, $code);
+                    $delMatStmt->execute();
+                }
+                $delMatStmt->close();
+            }
 
-                    // ✅ Deduct from materials table (only if enough stock)
-                    $updateStockStmt->bind_param("iii", $quantity_needed, $material_code, $quantity_needed);
-                    $updateStockStmt->execute();
+            if (!empty($materials_to_add)) {
+                // Prepare INSERT with ON DUPLICATE KEY UPDATE
+                $stmtAdd = $this->db->prepare("
+                    INSERT INTO request_materials_needed (reqAssignment_id, material_code, quantity_needed, date_added)
+                    VALUES (?, ?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE 
+                        quantity_needed = quantity_needed + VALUES(quantity_needed)
+                ");
 
-                    // Optional: Check if deduction was successful
-                    if ($updateStockStmt->affected_rows === 0) {
-                        throw new Exception("Insufficient stock for material code: $material_code");
+                // Prepare stock update
+                $updateStock = $this->db->prepare("
+                    UPDATE materials SET qty = qty - ? WHERE material_code = ? AND qty >= ?
+                ");
+
+                foreach ($materials_to_add as $m) {
+                    $code = (int) $m['material_code'];
+                    $qty  = (int) $m['qty'];
+
+                    // Bind parameters: reqAssignment_id, material_code, quantity_needed
+                    $stmtAdd->bind_param("iii", $reqAssignment_id, $code, $qty);
+                    $stmtAdd->execute();
+
+                    // Deduct stock
+                    $updateStock->bind_param("iii", $qty, $code, $qty);
+                    $updateStock->execute();
+
+                    if ($updateStock->affected_rows === 0) {
+                        throw new Exception("Insufficient stock for material code: $code");
                     }
                 }
-            }
-            $stmt4->close();
-            $updateStockStmt->close();
-        }
-        // ✅ 7️⃣ Commit all changes
-        $this->db->commit();
 
-        // ✅ 8️⃣ Different alerts based on action type
-        if ($isNewAssignment) {
+                $stmtAdd->close();
+                $updateStock->close();
+            }
+            $this->db->commit();
             $_SESSION['alert'] = [
                 "type" => "success",
-                "title" => "Assignment Added",
-                "message" => "New personnel were successfully assigned and request details were updated."
-            ];
-        } else {
-            $_SESSION['alert'] = [
-                "type" => "info",
                 "title" => "Request Updated",
-                "message" => "This request already has assigned personnel. Status, priority, and materials were updated."
+                "message" => "Personnel, materials, and request details successfully updated."
             ];
-        }
-
             return true;
 
         } catch (Exception $e) {
-            // ❌ Rollback on any error
             $this->db->rollback();
             $_SESSION['alert'] = [
                 "type" => "error",
@@ -431,5 +422,17 @@ class RequestModel extends BaseModel {
         }
 
         return $requests;
+    }
+
+    public function getAssignedPersonnel($request_id) {
+        $stmt = $this->db->prepare("SELECT staff_id FROM request_assigned_personnel WHERE request_id = ?");
+        $stmt->bind_param("i", $request_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $staff = [];
+        while ($row = $result->fetch_assoc()) {
+            $staff[] = $row['staff_id'];
+        }
+        return $staff;
     }
 }

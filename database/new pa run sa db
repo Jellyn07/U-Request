@@ -711,3 +711,8 @@ END$$
 DELIMITER ;
 
 DROP TRIGGER trg_vehicle_request_assignment_insert;
+
+-------------------------------------------------------------------------------------
+
+ALTER TABLE request_materials_needed
+ADD UNIQUE KEY uniq_req_material (reqAssignment_id, material_code);

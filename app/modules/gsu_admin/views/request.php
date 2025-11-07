@@ -259,8 +259,8 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
 
            <!-- Personnel Section -->
-            <div
-              x-data="{ 
+          <div
+            x-data="{ 
                 personnel: [{ staff_id: '' }],
                 selectedStaffIds: [],
                 assignedPersonnel: [],
@@ -274,7 +274,6 @@ $profile = $controller->getProfile($_SESSION['email']);
                   try {
                     const res = await fetch(`../../../controllers/RequestController.php?getAssignment=${requestId}`);
                     const data = await res.json();
-
                     if (Array.isArray(data) && data.length > 0) {
                       this.assignedPersonnel = data;
                       // If In Progress or Pending → populate for editing
@@ -285,19 +284,20 @@ $profile = $controller->getProfile($_SESSION['email']);
                       this.assignedPersonnel = [];
                       this.personnel = [{ staff_id: '' }];
                     }
-
                     this.updatePersonnelOptions();
                   } catch (err) {
                     console.error('❌ Failed to load personnel:', err);
-                  }
+                    }
                 }
               }"
               x-init="loadAssignedPersonnel(selected.request_id)"
             >
-            <!-- Editable Section (for Pending + In Progress) -->
+            <!-- Editable Section (Pending + In Progress) -->
             <template x-if="selected.req_status !== 'Completed'">
               <div id="personnel-fields" class="space-y-3 mb-6">
                 <label class="text-xs text-text mb-1">Assign / Edit Personnel</label>
+
+                <!-- Editable Dropdowns -->
                 <template x-for="(p, index) in personnel" :key="index">
                   <div class="flex gap-2 personnel-row items-end">
                     <!-- Dropdown -->
@@ -318,7 +318,8 @@ $profile = $controller->getProfile($_SESSION['email']);
                         <?php endforeach; ?>
                       </select>
                     </div>
-                    <!-- Add / Remove buttons -->
+
+                    <!-- Add / Remove Buttons -->
                     <div class="flex items-center gap-1">
                       <button 
                         type="button"
@@ -338,7 +339,8 @@ $profile = $controller->getProfile($_SESSION['email']);
                     </div>
                   </div>
                 </template>
-                <!-- Show assigned personnel list only if In Progress -->
+
+                <!-- Read-only List (for In Progress view) -->
                 <template x-if="selected.req_status === 'In Progress' && assignedPersonnel.length > 0">
                   <div class="mt-4">
                     <label class="text-sm mb-1 block font-medium">Currently Assigned Personnel</label>
@@ -351,6 +353,8 @@ $profile = $controller->getProfile($_SESSION['email']);
                 </template>
               </div>
             </template>
+
+            <!-- Completed: Hide everything -->
             <template x-if="selected.req_status === 'Completed'">
               <div class="hidden"></div>
             </template>
