@@ -636,6 +636,33 @@ video {
 
 /* Tertiary (link style) */
 
+/*Upper Buttons*/
+
+.btn-upper {
+  border-radius: 0.5rem;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity, 1));
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--text);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.btn-upper:hover {
+  border-color: var(--secondary);
+}
+
 /*text input field */
 
 .input-field {
@@ -769,10 +796,6 @@ video {
   z-index: 50;
 }
 
-.z-20 {
-  z-index: 20;
-}
-
 .order-1 {
   order: 1;
 }
@@ -791,10 +814,6 @@ video {
 
 .col-span-full {
   grid-column: 1 / -1;
-}
-
-.col-span-4 {
-  grid-column: span 4 / span 4;
 }
 
 .float-right {
@@ -1936,20 +1955,12 @@ video {
   height: 640px;
 }
 
-.h-auto {
-  height: auto;
-}
-
 .h-full {
   height: 100%;
 }
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[560px\] {
-  height: 560px;
 }
 
 .max-h-48 {
@@ -1974,10 +1985,6 @@ video {
 
 .max-h-\[607px\] {
   max-height: 607px;
-}
-
-.max-h-\[630px\] {
-  max-height: 630px;
 }
 
 .max-h-\[640px\] {
@@ -2156,10 +2163,6 @@ video {
   width: 100%;
 }
 
-.w-\[380px\] {
-  width: 380px;
-}
-
 .min-w-\[200px\] {
   min-width: 200px;
 }
@@ -2248,10 +2251,6 @@ video {
 
 .grid-cols-7 {
   grid-template-columns: repeat(7, minmax(0, 1fr));
-}
-
-.grid-cols-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .flex-col {

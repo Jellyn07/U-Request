@@ -106,29 +106,99 @@ document.addEventListener("DOMContentLoaded", () => {
     exportBtn.addEventListener("click", () => {
       const table = document.querySelector("table");
       if (!table) {
-        alert("No table found to export!");
+        alert("No table found to print!");
         return;
       }
 
-      let csv = [];
-      const rows = table.querySelectorAll("tr");
-      for (let i = 0; i < rows.length; i++) {
-        const cols = rows[i].querySelectorAll("th, td");
-        let row = [];
-        cols.forEach((col) => {
-          row.push('"' + col.innerText.replace(/"/g, '""') + '"');
-        });
-        csv.push(row.join(","));
+      // ✅ Determine title
+      let pageTitle = document.title || "Export";
+
+      if (pageTitle.includes("|")) {
+        pageTitle = pageTitle.split("|")[1].trim();
       }
 
-      const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-      const downloadLink = document.createElement("a");
-      downloadLink.download = "URequest_Table_Export.csv";
-      downloadLink.href = window.URL.createObjectURL(csvFile);
-      downloadLink.style.display = "none";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      pageTitle = pageTitle.replace(/[\\/:*?"<>|]/g, "").trim();
+
+      // ✅ Generate PDF
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        unit: "pt",
+        format: "a4",
+        orientation: "portrait"
+      });
+
+      // ✅ Title
+      doc.setFontSize(14);
+      doc.text(`University of Southeastern Philippines`, 40, 40);
+      doc.setFontSize(12);
+      doc.text(pageTitle, 40, 60);
+
+      // ✅ Convert table
+      doc.autoTable({
+        html: table,
+        startY: 80,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [255, 204, 204], halign: "center", fontStyle: "bold" },
+        tableLineWidth: 0.2,
+        borderColor: 200,
+        margin: { left: 40, right: 40 }
+      });
+
+      // ✅ Output into new browser tab
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+
+      window.open(pdfUrl, "_blank"); // <-- preview without download dialog
     });
   }
+
+
+
+    // ✅ Helper: Fetch logo
+    function getBase64FromURL(url) {
+      return fetch(url)
+        .then(res => res.blob())
+        .then(
+          blob =>
+            new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result.replace(/^data:image\/(png|jpg);base64,/, ""));
+              reader.readAsDataURL(blob);
+            })
+        );
+  }
+
+
+
+
+  // ✅ EXPORT FUNCTION (CSV)
+  // if (exportBtn) {
+  //   exportBtn.addEventListener("click", () => {
+  //     const table = document.querySelector("table");
+  //     if (!table) {
+  //       alert("No table found to export!");
+  //       return;
+  //     }
+
+  //     let csv = [];
+  //     const rows = table.querySelectorAll("tr");
+  //     for (let i = 0; i < rows.length; i++) {
+  //       const cols = rows[i].querySelectorAll("th, td");
+  //       let row = [];
+  //       cols.forEach((col) => {
+  //         row.push('"' + col.innerText.replace(/"/g, '""') + '"');
+  //       });
+  //       csv.push(row.join(","));
+  //     }
+
+  //     const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+  //     const downloadLink = document.createElement("a");
+  //     downloadLink.download = "URequest_Table_Export.csv";
+  //     downloadLink.href = window.URL.createObjectURL(csvFile);
+  //     downloadLink.style.display = "none";
+  //     document.body.appendChild(downloadLink);
+  //     downloadLink.click();
+  //     document.body.removeChild(downloadLink);
+  //   });
+  // }
 });

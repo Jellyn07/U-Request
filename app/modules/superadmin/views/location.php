@@ -20,13 +20,15 @@ $admins = $controller->getAllAdmins();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U-Request</title>
+  <title>U-Request | Locations</title>
   <link rel="stylesheet" href="/public/assets/css/output.css" />
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-200">
   <!-- Superadmin Menu & Header -->
   <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
@@ -38,15 +40,21 @@ $admins = $controller->getAllAdmins();
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <input type="text" id="searchInput" placeholder="Search Location" class="flex-1 min-w-[200px] input-field">
+            <select class="input-field" id="sortFilter">]
+                <option>By ID</option>
+                <option>A - Z</option>
+                <option>Z - A</option>
+            </select>
             <select class="input-field" id="unitFilter">
                 <option value="all">All Unit</option>
                 <option>Tagum Unit</option>
                 <option>Mabini Unit</option>
             </select>
-            <button title="Print data in the table" id="print" class="input-field">
+            <!-- <button title="Print data in the table" id="print" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button title="Export to Excel" id="export" class="input-field">
+            </button> -->
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
                 <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add New Location Modal Trigger -->
@@ -60,6 +68,7 @@ $admins = $controller->getAllAdmins();
             <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
+                  <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Added</th>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Building</th>
@@ -76,7 +85,7 @@ $admins = $controller->getAllAdmins();
                     class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
                   >
                     <!-- Hidden ID column -->
-                    <td class="hidden" x-text="<?= htmlspecialchars($row['location_id']) ?>"></td>
+                    <td class="pl-8 py-3" x-text="<?= htmlspecialchars($row['location_id']) ?>"></td>
 
                     <td class="pl-8 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_added']))) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($row['unit']) ?></td>
@@ -253,6 +262,6 @@ $admins = $controller->getAllAdmins();
   <script src="/public/assets/js/shared/menus.js"></script>
   <script src="/public/assets/js/shared/search.js"></script>          
   <script src="/public/assets/js/gsu_admin/location.js"></script>  
-  <script src="/public/assets/js/shared/export_print.js"></script>
+  <script src="/public/assets/js/shared/export.js"></script>
 </body>
 </html>

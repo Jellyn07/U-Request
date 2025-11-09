@@ -46,6 +46,8 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body class="bg-gray-100 overflow-hidden">
@@ -73,10 +75,11 @@ $profile = $controller->getProfile($_SESSION['email']);
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
             </select>
-            <button title="Print data in the table" class="input-field">
+            <!-- <button title="Print data in the table" class="input-field">
               <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button class="input-field" title="Export to Excel">
+            </button> -->
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
               <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
@@ -138,8 +141,8 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
-            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
+          <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
+            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-gray-50 sticky top-0">
                 <tr>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
@@ -161,10 +164,10 @@ $profile = $controller->getProfile($_SESSION['email']);
                   ?>
                     <tr
                       @click="selected = <?= $rowJson ?>; showDetails = true"
-                      class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
-                      <td class="pl-8 py-3"><?= htmlspecialchars($row['material_code']) ?></td>
-                      <td class="px-4 py-3"><?= htmlspecialchars($row['material_desc']) ?></td>
-                      <td class="px-4 py-3"><?= htmlspecialchars($row['qty']) ?></td>
+                      class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100 text-sm">
+                      <td class="pl-8 py-2"><?= htmlspecialchars($row['material_code']) ?></td>
+                      <td class="px-4 py-2"><?= htmlspecialchars($row['material_desc']) ?></td>
+                      <td class="px-4 py-2"><?= htmlspecialchars($row['qty']) ?></td>
                       <td>
                         <span class="inline-block px-4 ml-3 py-1 text-xs font-semibold rounded-xl <?= $status === 'Available' ? 'bg-green-200 text-green-800 px-6' : 'bg-red-100 text-red-800' ?>"><?= $status ?></span>
                       </td>
@@ -172,7 +175,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <?php } ?>
                 <?php } else { ?>
                   <tr>
-                    <td colspan="4" class="text-center py-3">No materials found</td>
+                    <td colspan="4" class="text-center py-2">No materials found</td>
                   </tr>
                 <?php } ?>
               </tbody>
@@ -310,6 +313,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
+<script src="/public/assets/js/shared/export.js"></script>
 
 //new alert
 <script>

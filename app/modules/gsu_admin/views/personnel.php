@@ -25,6 +25,8 @@ $controller = new PersonnelController(); $personnels = $controller->getAllPerson
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <?php
   // ✅ Pass PHP session values into JavaScript after scripts are loaded
@@ -69,11 +71,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
             </select>
-            <button title="Print data in the table" class="input-field">
+            <!-- <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button class="input-field" title="Export to Excel">
-                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+            </button> -->
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
+              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
                 <div x-data="{ showModal: false }">
@@ -185,7 +188,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <!-- Table -->
           <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
-          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
+          <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
@@ -382,4 +385,5 @@ $profile = $controller->getProfile($_SESSION['email']);
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
+<script src="/public/assets/js/shared/export.js"></script>
 </html>

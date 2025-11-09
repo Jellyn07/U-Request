@@ -25,6 +25,8 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -49,12 +51,15 @@ $profile = $controller->getProfile($_SESSION['email']);
               <option value="az">Sort A–Z</option>
               <option value="za">Sort Z–A</option>
             </select>
-            <button class="input-field"><img src="/public/assets/img/printer.png" class="size-4"></button>
-            <button class="input-field"><img src="/public/assets/img/export.png" class="size-4"></button>
+            <!-- <button class="input-field"><img src="/public/assets/img/printer.png" class="size-4"></button> -->
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
+              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+            </button>
           </div>
 
           <!-- TABLE -->
-          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
+          <div id="table" class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
             <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
               <thead class="bg-gray-50">
                 <tr>
@@ -158,6 +163,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       </div>
     </div>
   <script src="/public/assets/js/shared/menus.js"></script>
+  <script src="/public/assets/js/shared/export.js"></script>
   </main>
 <script defer src="<?php echo PUBLIC_URL; ?>/assets/js/shared/table-filter.js"></script>
 <script type="module">

@@ -54,6 +54,11 @@
     @apply text-primary underline underline-offset-2 hover:text-secondary;
   }
 
+  /*Upper Buttons*/
+  .btn-upper {
+    @apply px-3 py-2 rounded-lg border border-gray-700 text-text text-sm hover:border-secondary outline-none transition;
+  }
+
   /*text input field */
   .input-field {
     @apply px-3 py-2 rounded-lg border border-gray-700 text-text text-sm focus:border-secondary outline-none transition;
