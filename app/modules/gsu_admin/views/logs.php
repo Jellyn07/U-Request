@@ -32,8 +32,6 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   
 </head>
 <body class="bg-gray-100">
@@ -53,12 +51,12 @@ $profile = $controller->getProfile($_SESSION['email']);
             <form method="GET" id="filterForm">
             <select name="table" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $tableFilter==='all'?'selected':'' ?>>All</option>
+              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
+              <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
               <option value="gsu_personnel" <?= $tableFilter==='gsu_personnel'?'selected':'' ?>>GSU Personnel</option>
               <option value="materials" <?= $tableFilter==='materials'?'selected':'' ?>>Materials</option>
               <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
               <option value="status" <?= $tableFilter==='status'?'selected':'' ?>>Status</option>
-              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
-              <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
             </select>
             <select name="action" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $actionFilter==='all'?'selected':'' ?>>All Activity Type</option>
@@ -75,12 +73,11 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option value="30" <?= $dateFilter==='30'?'selected':'' ?>>Last 30 days</option>
             </select>
             </form>
-            <!-- <button title="Print data in the table" class="input-field">
+            <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button> -->
-            <img id="logo" src="/public/assets/img/usep.png" class="hidden" />
-            <button class="btn-upper" title="Export" id="export">
-                <img src="/public/assets/img/export.png" alt="export" class="size-4 my-0.5">
+            </button>
+            <button class="input-field" title="Export to Excel">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
             <div x-data="{ showModal: false }">
@@ -89,7 +86,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <!-- Table -->
           <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
-          <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
             <thead class="bg-white sticky top-0">
               <tr>
                 <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
@@ -99,7 +96,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Details</th>
               </tr>
             </thead>
-            <tbody class="text-sm">
+            <tbody id="table" class="text-sm">
                  <?= $controller->renderLogs($tableFilter, $actionFilter, $dateFilter) ?>
             </tbody>
           </table>
@@ -167,5 +164,4 @@ $profile = $controller->getProfile($_SESSION['email']);
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
-<script src="/public/assets/js/shared/export.js"></script>
 </html>

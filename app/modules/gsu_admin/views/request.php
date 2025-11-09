@@ -275,9 +275,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <!-- Display current location -->
                 <div class="flex items-center justify-between">
                     <span x-text="selected.location" class="w-full view-field"></span>
-                    <button class="text-blue-600 text-xs underline" @click="editLocation" x-show="!editing">
+                    <!-- <button class="text-blue-600 text-xs underline" @click="editLocation" x-show="!editing">
                         Edit Location
-                    </button>
+                    </button> -->
                 </div>
 
                 <!-- Editable input -->

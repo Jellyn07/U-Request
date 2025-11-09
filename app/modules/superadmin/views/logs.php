@@ -43,13 +43,13 @@ $dateFilter = $_GET['date'] ?? 'all';
             <form method="GET" id="filterForm">
             <select name="table" onchange="document.getElementById('filterForm').submit()" class="input-field">
               <option value="all" <?= $tableFilter==='all'?'selected':'' ?>>All</option>
+              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
+              <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
+              <option value="driver" <?= $tableFilter==='driver'?'selected':'' ?>>Driver</option>
               <option value="gsu_personnel" <?= $tableFilter==='gsu_personnel'?'selected':'' ?>>GSU Personnel</option>
               <option value="materials" <?= $tableFilter==='materials'?'selected':'' ?>>Materials</option>
               <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
               <option value="status" <?= $tableFilter==='status'?'selected':'' ?>>Status</option>
-              <option value="assigned_personnel" <?= $tableFilter==='assigned_personnel'?'selected':'' ?>>Assigned Personnel</option>
-              <option value="campus_locations" <?= $tableFilter==='campus_locations'?'selected':'' ?>>Campus Locations</option>
-              <option value="driver" <?= $tableFilter==='driver'?'selected':'' ?>>Driver</option>
               <option value="vehicle" <?= $tableFilter==='vehicle'?'selected':'' ?>>Vehicle</option>
               <option value="vehicle_request" <?= $tableFilter==='vehicle_request'?'selected':'' ?>>Vehicle Request</option>
               <option value="vehicle_request_assignment" <?= $tableFilter==='vehicle_request_assignment'?'selected':'' ?>>Vehicle Request Assignment</option>

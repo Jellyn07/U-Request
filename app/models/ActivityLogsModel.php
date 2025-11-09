@@ -51,7 +51,7 @@ class ActivityLogsModel extends BaseModel {
         ];
 
         // 🔹 STEP 4: Build date condition
-        $dateCondition = $this->buildDateCondition($dateFilter);
+        $dateCondition = $this->buildDateCondition($dateFilter, 'changed_at');
 
         // 🔹 STEP 5: Helper for conditional SQL appending
         $addConditions = function (&$query, $conditions) {
@@ -73,7 +73,7 @@ class ActivityLogsModel extends BaseModel {
                         description AS details
                       FROM gsu_personnel_audit";
             $conditions = [];
-            if ($actionFilter !== 'all') $conditions[] = "action_type = '$actionFilter'";
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = $dateCondition;
             $addConditions($query, $conditions);
             $sqlParts[] = $query;
@@ -89,7 +89,7 @@ class ActivityLogsModel extends BaseModel {
                         description AS details
                       FROM materials_audit";
             $conditions = [];
-            if ($actionFilter !== 'all') $conditions[] = "action_type = '$actionFilter'";
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = $dateCondition;
             $addConditions($query, $conditions);
             $sqlParts[] = $query;
@@ -105,7 +105,7 @@ class ActivityLogsModel extends BaseModel {
                         description AS details
                       FROM request_audit";
             $conditions = [];
-            if ($actionFilter !== 'all') $conditions[] = "action_type = '$actionFilter'";
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = $dateCondition;
             $addConditions($query, $conditions);
             $sqlParts[] = $query;
@@ -134,7 +134,7 @@ class ActivityLogsModel extends BaseModel {
                         description AS details
                       FROM request_assigned_personnel_audit";
             $conditions = [];
-            if ($actionFilter !== 'all') $conditions[] = "action_type = '$actionFilter'";
+            if ($actionFilter !== 'all') $conditions[] = "action = '$actionFilter'";
             if ($dateCondition) $conditions[] = $dateCondition;
             $addConditions($query, $conditions);
             $sqlParts[] = $query;
@@ -247,16 +247,17 @@ class ActivityLogsModel extends BaseModel {
     }
 
     // 🔹 Helper for date filter
-    private function buildDateCondition($dateFilter) {
+    private function buildDateCondition($dateFilter, $column = 'changed_at') {
         switch ($dateFilter) {
-            case 'today': return "DATE(action_date) = CURDATE()";
-            case 'yesterday': return "DATE(action_date) = CURDATE() - INTERVAL 1 DAY";
-            case '7': return "DATE(action_date) >= CURDATE() - INTERVAL 7 DAY";
-            case '14': return "DATE(action_date) >= CURDATE() - INTERVAL 14 DAY";
-            case '30': return "DATE(action_date) >= CURDATE() - INTERVAL 30 DAY";
+            case 'today': return "DATE($column) = CURDATE()";
+            case 'yesterday': return "DATE($column) = CURDATE() - INTERVAL 1 DAY";
+            case '7': return "$column >= NOW() - INTERVAL 7 DAY";
+            case '14': return "$column >= NOW() - INTERVAL 14 DAY";
+            case '30': return "$column >= NOW() - INTERVAL 30 DAY";
             default: return "";
         }
     }
+
     // Get profile data by email
     public function getProfileByEmail($admin_email)
     {
