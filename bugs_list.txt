@@ -10,7 +10,7 @@ Overall
 
 Super Admin
 -admins access level is all wrong when editing admin access ✅
-
+-no profile
 
 Motorpool Admin
 - Motorpool Vehicle Request if reject with remarks why it is rejected
@@ -19,7 +19,7 @@ Motorpool Admin
 - Add unit in driver table
 
 GSU Admin
-- can be completed even if request have no assigned personel
+- can be completed even if request have no assigned personel✅
 - request: no dropdown for request in (to inspect) to avoid updating request without personel
 - request: in progress no option to go back to (to inspect) ✅
 - if admin assigned a personel the status will automatically go to in progress (idunno kung tama)// need sya iselect ug to inspect para mugawas ang materials (used/needed) na div 

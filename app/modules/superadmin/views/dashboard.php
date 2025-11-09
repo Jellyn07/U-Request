@@ -38,6 +38,7 @@ if (!isset($_SESSION['email'])) {
   <link rel="stylesheet" href="/public/assets/css/output.css" />
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/public/assets/js/backup-scheduler.js"></script>
 </head>
 <body class="bg-gray-100">
   <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>

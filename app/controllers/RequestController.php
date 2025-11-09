@@ -152,15 +152,27 @@ class RequestController {
             $materials_to_add = $_POST['materials'] ?? [];
             $materials_to_remove = $_POST['materials_to_remove'] ?? [];
 
-            // Ensure arrays are properly structured
-            if (!is_array($staff_ids)) $staff_ids = [];
-            if (!is_array($remove_staff_ids)) $remove_staff_ids = [];
-            if (!is_array($materials_to_add)) $materials_to_add = [];
-            if (!is_array($materials_to_remove)) $materials_to_remove = [];
+            // Ensure arrays
+            $staff_ids = is_array($staff_ids) ? $staff_ids : [];
+            $remove_staff_ids = is_array($remove_staff_ids) ? $remove_staff_ids : [];
+            $materials_to_add = is_array($materials_to_add) ? $materials_to_add : [];
+            $materials_to_remove = is_array($materials_to_remove) ? $materials_to_remove : [];
+
+            // Get current assigned personnel
+            $assignedPersonnel = $this->model->getAssignedPersonnel($request_id);
+
+            // ❌ Prevent status update if no personnel assigned and no new staff being added
+            if (($req_status === 'In Progress' || $req_status === 'Completed') && empty($assignedPersonnel) && empty($staff_ids)) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Cannot update status to '{$req_status}' because no personnel are assigned."
+                ]);
+                exit;
+            }
 
             $result = $this->model->addAssignment(
                 $request_id,
-                $req_status,
+                'To Inspect', // Pass null for status so it won't update yet
                 $staff_ids,
                 $prio_level,
                 $materials_to_add,
@@ -168,11 +180,15 @@ class RequestController {
                 $materials_to_remove
             );
 
+            $finalAssignedPersonnel = $this->model->getAssignedPersonnel($request_id);
+            if (!empty($finalAssignedPersonnel) && ($req_status === 'In Progress' || $req_status === 'Completed')) {
+                $this->model->updateRequestStatus($request_id, $req_status);
+            }
+
             header("Location: ../modules/gsu_admin/views/request.php");
             exit;
         }
     }
-
 
     public function updateStatus() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'updateStatus') {

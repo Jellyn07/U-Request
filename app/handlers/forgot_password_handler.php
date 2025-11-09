@@ -3,7 +3,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../config/constants.php';
-require_once __DIR__ . '/../core/BaseModel.php';
+require_once __DIR__ . '/../core/Model.php';
 require_once __DIR__ . '/../config/encryption.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
