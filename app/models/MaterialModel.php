@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
+require_once __DIR__ . '/../config/db_helpers.php';
 
 class MaterialModel extends BaseModel
 {
@@ -62,8 +63,10 @@ class MaterialModel extends BaseModel
     }
 
     // Insert material
-    public function addmaterial($code, $description, $quantity, $status)
-    {
+    public function addmaterial($code, $description, $quantity, $status){
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("
             INSERT INTO " . $this->table . " (material_code, material_desc, qty, material_status) 
             VALUES (?, ?, ?, ?)
@@ -99,8 +102,10 @@ class MaterialModel extends BaseModel
     }
 
     // Update material
-    public function update($code, $desc, $qty, $status)
-    {
+    public function update($code, $desc, $qty, $status){
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $sql = "UPDATE materials 
                 SET material_desc = ?, qty = ?, material_status = ? 
                 WHERE material_code = ?";
@@ -170,8 +175,10 @@ class MaterialModel extends BaseModel
         return false;
     }
 
-    public function addQuantity($material_code, $quantity_to_add)
-    {
+    public function addQuantity($material_code, $quantity_to_add){
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("UPDATE materials SET qty = qty + ? WHERE material_code = ?");
         $stmt->bind_param("ii", $quantity_to_add, $material_code);
         return $stmt->execute();

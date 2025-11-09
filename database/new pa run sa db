@@ -716,3 +716,293 @@ DROP TRIGGER trg_vehicle_request_assignment_insert;
 
 ALTER TABLE request_materials_needed
 ADD UNIQUE KEY uniq_req_material (reqAssignment_id, material_code);
+
+drop table gsu_personnel_audit;
+CREATE TABLE gsu_personnel_audit (
+    audit_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150) NOT NULL,         -- admin performing the action
+    action ENUM('INSERT','UPDATE') NOT NULL,  -- type of action
+    description TEXT,                          -- human-readable summary
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+drop trigger after_gsu_personnel_insert;
+drop trigger after_gsu_personnel_update;
+DELIMITER $$
+CREATE TRIGGER trg_gsu_personnel_insert
+AFTER INSERT ON gsu_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Insert summary into audit table
+    INSERT INTO gsu_personnel_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'INSERT',
+        CONCAT(
+            'Added new GSU Personnel: ', NEW.firstName, ' ', NEW.lastName
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_gsu_personnel_update
+AFTER UPDATE ON gsu_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+    -- Build a human-readable description of changes
+    IF OLD.firstName != NEW.firstName THEN
+        SET changes = CONCAT(changes, 'First name changed from "', OLD.firstName, '" to "', NEW.firstName, '"; ');
+    END IF;
+
+    IF OLD.lastName != NEW.lastName THEN
+        SET changes = CONCAT(changes, 'Last name changed from "', OLD.lastName, '" to "', NEW.lastName, '"; ');
+    END IF;
+
+    IF OLD.department != NEW.department THEN
+        SET changes = CONCAT(changes, 'Department changed from "', OLD.department, '" to "', NEW.department, '"; ');
+    END IF;
+
+    IF OLD.contact != NEW.contact THEN
+        SET changes = CONCAT(changes, 'Contact changed from "', OLD.contact, '" to "', NEW.contact, '"; ');
+    END IF;
+
+    IF OLD.hire_date != NEW.hire_date THEN
+        SET changes = CONCAT(changes, 'Hire date changed from "', OLD.hire_date, '" to "', NEW.hire_date, '"; ');
+    END IF;
+
+    -- Only insert if there are changes
+    IF changes != '' THEN
+        INSERT INTO gsu_personnel_audit (staff_name, action, description)
+        VALUES (
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+drop table materials_audit;
+CREATE TABLE materials_audit (
+    audit_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150) NOT NULL,           -- admin performing the action
+    action ENUM('INSERT','UPDATE','DELETE') NOT NULL,  -- type of action
+    description TEXT,                            -- human-readable summary
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+drop trigger after_materials_insert;
+drop trigger after_materials_update;
+drop trigger after_materials_delete;
+DELIMITER $$
+CREATE TRIGGER trg_materials_insert
+AFTER INSERT ON materials
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    INSERT INTO materials_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'INSERT',
+        CONCAT(
+            'Added new material: ', NEW.material_desc,
+            ', Code: ', NEW.material_code,
+            ', Quantity: ', NEW.qty
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_materials_update
+AFTER UPDATE ON materials
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Detect changes and describe them
+    IF OLD.material_desc != NEW.material_desc THEN
+        SET changes = CONCAT(changes, 'Description changed from "', OLD.material_desc, '" to "', NEW.material_desc, '"; ');
+    END IF;
+
+    IF OLD.qty != NEW.qty THEN
+        SET changes = CONCAT(changes, 'Quantity changed from ', OLD.qty, ' to ', NEW.qty, '; ');
+    END IF;
+
+    IF OLD.material_status != NEW.material_status THEN
+        SET changes = CONCAT(changes, 'Status changed from "', OLD.material_status, '" to "', NEW.material_status, '"; ');
+    END IF;
+
+    -- Insert only if there are changes
+    IF changes != '' THEN
+        INSERT INTO materials_audit (staff_name, action, description)
+        VALUES (
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_materials_delete
+AFTER DELETE ON materials
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    INSERT INTO materials_audit (staff_name, action, description)
+    VALUES (
+        admin_name,
+        'DELETE',
+        CONCAT(
+            'Deleted material: ', OLD.material_desc,
+            ', Code: ', OLD.material_code,
+            ', Quantity: ', OLD.qty
+        )
+    );
+END$$
+DELIMITER ;
+
+drop table status_audit;
+CREATE TABLE status_audit (
+    audit_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150) NOT NULL,       -- requester's full name
+    action ENUM('UPDATE') NOT NULL,         -- type of action
+    description TEXT,                        -- human-readable summary
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+drop trigger after_status_update;
+DELIMITER $$
+CREATE TRIGGER trg_request_assignment_status_update
+AFTER UPDATE ON request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE v_admin_name VARCHAR(150) DEFAULT 'System';
+    DECLARE v_tracking_id VARCHAR(100) DEFAULT 'N/A';
+    DECLARE v_changes TEXT;
+
+    -- ✅ Get current admin name if session variable is set
+    IF @current_staff_id IS NOT NULL THEN
+        SELECT CONCAT(first_name, ' ', last_name)
+        INTO v_admin_name
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+        LIMIT 1;
+    END IF;
+    -- ✅ Get tracking_id from request table
+    SELECT tracking_id
+    INTO v_tracking_id
+    FROM request
+    WHERE request_id = NEW.request_id
+    LIMIT 1;
+    -- ✅ Only log when status *actually* changes and not null or same
+    IF (OLD.req_status IS NULL AND NEW.req_status IS NOT NULL)
+        OR (OLD.req_status IS NOT NULL AND NEW.req_status IS NULL)
+        OR (OLD.req_status <> NEW.req_status) THEN
+
+        -- ✅ Prevent duplicate inserts for the same request and status in a short timeframe
+        IF NOT EXISTS (
+            SELECT 1
+            FROM status_audit
+            WHERE description LIKE CONCAT('%Tracking ID: ', v_tracking_id, '%New Status: "', NEW.req_status, '"%')
+              AND TIMESTAMPDIFF(SECOND, changed_at, NOW()) < 3
+        ) THEN
+            SET v_changes = CONCAT(
+                'Tracking ID: ', COALESCE(v_tracking_id, 'N/A'),
+                ' | Previous Status: "', COALESCE(OLD.req_status, 'None'),
+                '" | New Status: "', COALESCE(NEW.req_status, 'None'), '"'
+            );
+            INSERT INTO status_audit (staff_name, action, description)
+            VALUES (v_admin_name, 'UPDATE', v_changes);
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+drop table request_assigned_personnel_audit;
+CREATE TABLE request_assigned_personnel_audit (
+    audit_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(150) NOT NULL,       -- requester's full name
+    action ENUM('INSERT') NOT NULL,         -- type of action
+    description TEXT,                        -- human-readable summary
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+drop trigger trg_insert_request_assigned_personnel;
+
+DELIMITER $$
+CREATE TRIGGER trg_request_assigned_personnel_insert
+AFTER INSERT ON request_assigned_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE personnel_name VARCHAR(150) DEFAULT 'Unknown Personnel';
+    DECLARE admin_name VARCHAR(150) DEFAULT 'System';
+    DECLARE description_text TEXT;
+
+    -- Get administrator name from session variable if available
+    IF @current_staff_id IS NOT NULL THEN
+        SELECT CONCAT(first_name, ' ', last_name)
+        INTO admin_name
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+        LIMIT 1;
+    END IF;
+
+    -- Get personnel full name
+    SELECT CONCAT(firstName, ' ', lastName)
+    INTO personnel_name
+    FROM gsu_personnel
+    WHERE staff_id = NEW.staff_id
+    LIMIT 1;
+
+    -- Compose the description
+    SET description_text = CONCAT('Assigned ', personnel_name, ' to request ID ', NEW.request_id);
+
+    -- Insert a single audit record
+    INSERT INTO request_assigned_personnel_audit (staff_name, action, description)
+    VALUES (admin_name, 'INSERT', description_text);
+END$$
+DELIMITER ;

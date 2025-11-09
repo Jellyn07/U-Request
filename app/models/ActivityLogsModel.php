@@ -66,11 +66,11 @@ class ActivityLogsModel extends BaseModel {
         // GSU Personnel
         if (in_array('gsu_personnel', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'gsu_personnel')) {
             $query = "SELECT 
-                        action_date AS timestamp,
+                        changed_at AS timestamp,
                         'GSU Personnel' AS source,
-                        action_type,
-                        CONCAT(firstName, ' ', lastName) AS affected_item,
-                        department AS details
+                        action AS action_type,
+                        staff_name AS affected_item,
+                        description AS details
                       FROM gsu_personnel_audit";
             $conditions = [];
             if ($actionFilter !== 'all') $conditions[] = "action_type = '$actionFilter'";
@@ -82,11 +82,11 @@ class ActivityLogsModel extends BaseModel {
         // Materials
         if (in_array('materials', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'materials')) {
             $query = "SELECT 
-                        action_date AS timestamp,
+                        changed_at AS timestamp,
                         'Materials' AS source,
-                        action_type,
-                        material_desc AS affected_item,
-                        CONCAT('Quantity: ', qty) AS details
+                        action AS action_type,
+                        staff_name AS affected_item,
+                        description AS details
                       FROM materials_audit";
             $conditions = [];
             if ($actionFilter !== 'all') $conditions[] = "action_type = '$actionFilter'";
@@ -98,10 +98,10 @@ class ActivityLogsModel extends BaseModel {
         // Requests
         if (in_array('request', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'request')) {
             $query = "SELECT 
-                        action_date AS timestamp,
+                        changed_at AS timestamp,
                         'Request' AS source,
-                        action_type,
-                        request_type AS affected_item,
+                        action AS action_type,
+                        requester_name AS affected_item,
                         description AS details
                       FROM request_audit";
             $conditions = [];
@@ -114,11 +114,11 @@ class ActivityLogsModel extends BaseModel {
         // Request Status
         if (in_array('status', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'status')) {
             $query = "SELECT 
-                        action_date AS timestamp,
+                        changed_at AS timestamp,
                         'Request Status' AS source,
-                        'UPDATE' AS action_type,
-                        CONCAT('Request ID: ', request_id) AS affected_item,
-                        CONCAT('From ', old_status, ' to ', new_status) AS details
+                        action AS action_type,
+                        staff_name AS affected_item,
+                        description AS details
                       FROM status_audit";
             if ($dateCondition) $query .= " WHERE $dateCondition";
             $sqlParts[] = $query;
@@ -127,10 +127,10 @@ class ActivityLogsModel extends BaseModel {
         // Assigned Personnel
         if (in_array('assigned_personnel', $allowedTables) && ($tableFilter === 'all' || $tableFilter === 'assigned_personnel')) {
             $query = "SELECT 
-                        action_date AS timestamp,
-                        'Assigned Personnel' AS source,
-                        action_type,
-                        CONCAT('Request ID: ', request_id) AS affected_item,
+                        changed_at AS timestamp,
+                        'Assign Personnel' AS source,
+                        action AS action_type,
+                        staff_name AS affected_item,
                         description AS details
                       FROM request_assigned_personnel_audit";
             $conditions = [];

@@ -233,14 +233,63 @@ $profile = $controller->getProfile($_SESSION['email']);
               <input type="text" class="w-full view-field" x-model="selected.Name" readonly />
             </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">Category</label>
-              <input type="text" class="w-full view-field" x-model="selected.request_Type" readonly />
-            </div>
+            <div x-data="{
+                    editing: false,
+                    locationValue: selected.location,
+                    editLocation() {
+                        this.editing = true;
+                        this.locationValue = selected.location;
+                    },
+                    saveLocation() {
+                        fetch('/../../../controllers/RequestController.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'updateLocation',
+                                id: selected.request_id,
+                                location: this.locationValue
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                selected.location = this.locationValue; // update the parent field
+                                this.editing = false;
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated!',
+                                    text: 'Location updated successfully.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(() => Swal.fire('Error', 'Unable to connect to server.', 'error'));
+                    }
+                }" class="mb-4">
+                
+                <label class="text-xs text-text mb-1">Location</label>
 
-            <div>
-              <label class="text-xs text-text mb-1">Location</label>
-              <input type="text" class="w-full view-field" x-model="selected.location" />
+                <!-- Display current location -->
+                <div class="flex items-center justify-between">
+                    <span x-text="selected.location" class="w-full view-field"></span>
+                    <button class="text-blue-600 text-xs underline" @click="editLocation" x-show="!editing">
+                        Edit Location
+                    </button>
+                </div>
+
+                <!-- Editable input -->
+                <div x-show="editing" class="flex items-center gap-2 mt-2">
+                    <input type="text" x-model="locationValue" class="w-full input-field border rounded px-2 py-1" />
+                    <button class="bg-green-600 text-white px-2 py-1 rounded text-xs" @click="saveLocation">
+                        Save
+                    </button>
+                    <button class="bg-gray-300 text-black px-2 py-1 rounded text-xs" @click="editing = false">
+                        Cancel
+                    </button>
+                </div>
             </div>
 
             <div>
@@ -531,4 +580,5 @@ $profile = $controller->getProfile($_SESSION['email']);
     });
   });
 </script>
+
 </html>

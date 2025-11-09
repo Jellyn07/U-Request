@@ -1,11 +1,14 @@
 <?php
-
 require_once __DIR__ . '/../core/BaseModel.php'; 
+require_once __DIR__ . '/../config/db_helpers.php';
 
 class RequestModel extends BaseModel {
     public $lastError = null;
 
     public function createRequest($tracking_id, $nature, $req_id, $description, $unit, $location, $dateNoticed, $filePath) {
+        if (isset($_SESSION['req_id'])) {
+                setCurrentRequester($this->db); // Use model's connection
+            }
         // Step 1: Insert into REQUEST using stored procedure
         $stmt = $this->db->prepare("CALL spAddRequest(?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
@@ -143,16 +146,20 @@ class RequestModel extends BaseModel {
     }
 
    // In RequestModel.php
-   public function addAssignment(
+    public function addAssignment(
         $request_id,
         $req_status,
         $staff_ids = [],
         $prio_level = null,
         $materials_to_add = [],    // array of ['material_code'=>int, 'qty'=>int]
         $remove_staff_ids = [],    // array of staff_id ints to remove
-        $materials_to_remove = []  // array of material_code ints to remove
+        $materials_to_remove = [], // array of material_code ints to remove
+        $triggerAlert = true       // <-- NEW FLAG: only show alert if true
     ) {
         try {
+            if (isset($_SESSION['staff_id'])) {
+                    setCurrentStaff($this->db); // Use model's connection
+            }
             $this->db->begin_transaction();
 
             // Update Priority Level
@@ -219,8 +226,8 @@ class RequestModel extends BaseModel {
                 $delMatStmt->close();
             }
 
+            // Add materials
             if (!empty($materials_to_add)) {
-                // Prepare INSERT with ON DUPLICATE KEY UPDATE
                 $stmtAdd = $this->db->prepare("
                     INSERT INTO request_materials_needed (reqAssignment_id, material_code, quantity_needed, date_added)
                     VALUES (?, ?, ?, NOW())
@@ -228,7 +235,6 @@ class RequestModel extends BaseModel {
                         quantity_needed = quantity_needed + VALUES(quantity_needed)
                 ");
 
-                // Prepare stock update
                 $updateStock = $this->db->prepare("
                     UPDATE materials SET qty = qty - ? WHERE material_code = ? AND qty >= ?
                 ");
@@ -237,11 +243,12 @@ class RequestModel extends BaseModel {
                     $code = (int) $m['material_code'];
                     $qty  = (int) $m['qty'];
 
-                    // Bind parameters: reqAssignment_id, material_code, quantity_needed
+                    // Skip invalid entries
+                    if ($code <= 0 || $qty <= 0) continue;
+
                     $stmtAdd->bind_param("iii", $reqAssignment_id, $code, $qty);
                     $stmtAdd->execute();
 
-                    // Deduct stock
                     $updateStock->bind_param("iii", $qty, $code, $qty);
                     $updateStock->execute();
 
@@ -254,26 +261,34 @@ class RequestModel extends BaseModel {
                 $updateStock->close();
             }
             $this->db->commit();
-            $_SESSION['alert'] = [
-                "type" => "success",
-                "title" => "Request Updated",
-                "message" => "Personnel, materials, and request details successfully updated."
-            ];
+            // Only trigger alert if $triggerAlert is true
+            if ($triggerAlert) {
+                $_SESSION['alert'] = [
+                    "type" => "success",
+                    "title" => "Request Updated",
+                    "message" => "Personnel, materials, and request details successfully updated."
+                ];
+            }
             return true;
 
         } catch (Exception $e) {
             $this->db->rollback();
-            $_SESSION['alert'] = [
-                "type" => "error",
-                "title" => "Error",
-                "message" => $e->getMessage()
-            ];
+            if ($triggerAlert) {
+                $_SESSION['alert'] = [
+                    "type" => "error",
+                    "title" => "Error",
+                    "message" => $e->getMessage()
+                ];
+            }
             return false;
         }
     }
 
     public function updateRequestStatus($request_id, $req_status) {
         try {
+            if (isset($_SESSION['staff_id'])) {
+                setCurrentStaff($this->db); // Use model's connection
+            }
             $stmt = $this->db->prepare("CALL spUpdateRequestStatus(?, ?)");
             $stmt->bind_param("is", $request_id, $req_status);
             $stmt->execute();
@@ -434,5 +449,15 @@ class RequestModel extends BaseModel {
             $staff[] = $row['staff_id'];
         }
         return $staff;
+    }
+  public function updateLocationOnly($id, $location) {
+        if (isset($_SESSION['staff_id'])) {
+                setCurrentStaff($this->db); // Use model's connection
+        }
+        $stmt = $this->db->prepare("UPDATE request SET location = ? WHERE request_id = ?");
+        $stmt->bind_param("si", $location, $id);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
     }
 }

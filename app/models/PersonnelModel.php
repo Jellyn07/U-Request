@@ -1,6 +1,7 @@
 <?php
 // filepath: app/models/PersonnelModel.php
 require_once __DIR__ . '/../core/BaseModel.php';
+require_once __DIR__ . '/../config/db_helpers.php';
 
 class PersonnelModel extends BaseModel {
 
@@ -53,6 +54,9 @@ class PersonnelModel extends BaseModel {
 
     // Add new personnel
     public function addPersonnel($data) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         // Check duplicate staff_id
         $checkStaff = $this->db->prepare("SELECT COUNT(*) as cnt FROM gsu_personnel WHERE staff_id = ?");
         $checkStaff->bind_param("i", $data['staff_id']);
@@ -106,6 +110,10 @@ class PersonnelModel extends BaseModel {
     // Update personnel
     public function updatePersonnel($data) {
         // require staff_id (the record to update)
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
+
         if (empty($data['staff_id'])) {
             $_SESSION['personnel_error'] = "Missing staff identifier.";
             return false;

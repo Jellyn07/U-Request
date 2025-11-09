@@ -141,65 +141,69 @@ class RequestController {
 
     // In RequestController.php
     public function saveAssignment() {
-        $request_id   = $_POST['request_id'] ?? null;
-        $req_id       = $_POST['req_id'] ?? null;
-        $req_status   = $_POST['req_status'] ?? 'To Inspect';
-        $prio_level   = $_POST['prio_level'] ?? null;
-        $staff_ids    = $_POST['staff_id'] ?? []; // May be array
-        $materials    = $_POST['materials'] ?? []; // May be array of arrays
-        $date_finished = null; // You can adjust this logic later if needed
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $request_id = $_POST['request_id'];
+            $req_status = $_POST['req_status'];
+            $prio_level = $_POST['prio_level'] ?? null;
 
-        // ✅ Basic validation (only for required ones)
-        if (!$request_id || !$req_id) {
-            $_SESSION['alert'] = [
-                "type" => "warning",
-                "title" => "Missing Fields",
-                "message" => "Request ID and Req ID are required."
-            ];
+            // Arrays for personnel and materials
+            $staff_ids = $_POST['staff_id'] ?? [];
+            $remove_staff_ids = $_POST['remove_staff_ids'] ?? [];
+            $materials_to_add = $_POST['materials'] ?? [];
+            $materials_to_remove = $_POST['materials_to_remove'] ?? [];
+
+            // Ensure arrays are properly structured
+            if (!is_array($staff_ids)) $staff_ids = [];
+            if (!is_array($remove_staff_ids)) $remove_staff_ids = [];
+            if (!is_array($materials_to_add)) $materials_to_add = [];
+            if (!is_array($materials_to_remove)) $materials_to_remove = [];
+
+            $result = $this->model->addAssignment(
+                $request_id,
+                $req_status,
+                $staff_ids,
+                $prio_level,
+                $materials_to_add,
+                $remove_staff_ids,
+                $materials_to_remove
+            );
+
             header("Location: ../modules/gsu_admin/views/request.php");
             exit;
         }
-
-        // ✅ Sanitize and skip empty staff/materials safely
-        $validStaff = array_filter($staff_ids, fn($id) => !empty($id));
-        $validMaterials = array_filter($materials, fn($m) => !empty($m['material_code']));
-
-        if ($req_status === 'Completed') {
-        $date_finished = date('Y-m-d H:i:s');
     }
-        // ✅ Call model (handles all logic and skips nulls)
-        $success = $this->model->addAssignment(
-            $request_id,
-            $req_status,
-            $validStaff,
-            $prio_level,
-            $validMaterials
-        );
 
-        // ✅ Feedback message handled by the model (via $_SESSION['alert'])
-        // But still do redirect for user flow
-        header("Location: ../modules/gsu_admin/views/request.php");
-        exit;
-    }
 
     public function updateStatus() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'updateStatus') {
             $request_id = $_POST['request_id'] ?? null;
             $req_status = $_POST['req_status'] ?? null;
-    
-            if (!$request_id || !$req_status) {
-                echo json_encode([
-                    "success" => false,
-                    "message" => "Request ID or status is missing."
-                ]);
-                exit;
-            }
-    
-            $result = $this->model->updateRequestStatus($request_id, $req_status);
-            echo json_encode($result);
+
+        if (!$request_id || !$req_status) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Request ID or status is missing."
+            ]);
             exit;
         }
+        // ✅ Check assigned personnel
+        $assignedPersonnel = $this->model->getAssignedPersonnel($request_id); 
+        // Returns an array of staff_ids assigned
+        if (($req_status === 'In Progress' || $req_status === 'Completed') && empty($assignedPersonnel)) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Cannot update status to '{$req_status}' because no personnel are assigned."
+            ]);
+            exit;
+        }
+        // ✅ If check passes, update status
+        $result = $this->model->updateRequestStatus($request_id, $req_status);
+
+        echo json_encode($result);
+        exit;
     }
+}
+
 
     public function getLocationsByUnit() {
         header('Content-Type: application/json');
@@ -227,6 +231,11 @@ class RequestController {
     {
         return $this->model->getProfileByEmail($admin_email);
     }
+
+    public function getAvailableStaff() {
+        return $this->model->getAvailableStaff();
+    }
+
 }
 
 // Run controller on form submission
@@ -247,4 +256,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['action']) && $_GET['action'] === 'getLocationsByUnit') {
     $controller = new RequestController();
     $controller->getLocationsByUnit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents("php://input"), true);
+    $action = $input['action'] ?? '';
+
+    $model = new RequestModel();
+
+    if ($action === 'updateLocation') {
+        $id = $input['id'];
+        $location = $input['location'];
+
+        $result = $model->updateLocationOnly($id, $location);
+
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update location.']);
+        }
+    }
 }
