@@ -25,6 +25,8 @@ $vehicles = $vehicleController->getVehicles();
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/public/assets/js/motorpool_admin/vehicle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-gray-100">
 
@@ -59,11 +61,12 @@ $vehicles = $vehicleController->getVehicles();
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
             </select> -->
-            <button title="Print data in the table" class="input-field">
+            <!-- <button title="Print data in the table" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button class="input-field" title="Export to Excel">
-                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+            </button> -->
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
+              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
                 <div x-data="{ showModal: false }">
@@ -245,6 +248,34 @@ $vehicles = $vehicleController->getVehicles();
             </div>
           </div>
         </div>
+
+
+        <!-- ✅ Hidden table for export -->
+        <table id="table" class="hidden">
+          <thead>
+            <tr>
+              <th>Vehicle Name</th>
+              <th>Plate Number</th>
+              <th>Capacity</th>
+              <th>Vehicle Type</th>
+              <th>Driver</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($vehicles as $v): ?>
+              <tr>
+                <td><?= htmlspecialchars($v['vehicle_name']) ?></td>
+                <td><?= htmlspecialchars($v['plate_no']) ?></td>
+                <td><?= htmlspecialchars($v['capacity']) ?></td>
+                <td><?= htmlspecialchars($v['vehicle_type']) ?></td>
+                <td><?= htmlspecialchars($v['driver_name'] ?? 'Unassigned') ?></td>
+                <td><?= htmlspecialchars($v['status'] ?? 'Available') ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
 
         <!-- Right Section (Details) -->
         <div x-show="showDetails" x-cloak
@@ -469,5 +500,6 @@ $vehicles = $vehicleController->getVehicles();
       </div>
     </div>
   </main>
+  <script src="/public/assets/js/shared/export.js"></script>
 </body>
 </html>
