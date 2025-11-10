@@ -46,9 +46,12 @@ $trips = $controller->fetchTrips();
   <!-- Modal -->
   <div id="tripModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6 relative">
-      <button id="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
-      <h3 class="font-bold text-lg mb-4">Trip Details</h3>
-      <div id="modalBody" class="flex flex-col gap-2"></div>
+      <!-- <button id="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button> -->
+      <h3 class="font-bold text-lg text-center">Trip Details</h3>
+      <div id="modalBody" class="flex flex-col gap-1"></div>
+      <div class="flex justify-center gap-2 pt-4">
+        <button id="closeModal" class="btn btn-secondary">Cancel</button>
+      </div>
     </div>
   </div>
 

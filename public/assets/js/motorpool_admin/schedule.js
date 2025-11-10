@@ -52,12 +52,30 @@ document.addEventListener('DOMContentLoaded', () => {
           tripSpan.textContent = `${trip.vehicle} - ${trip.purpose}`;
           tripSpan.addEventListener('click', () => {
             modalBody.innerHTML = `
-              <p><strong>Vehicle:</strong> ${trip.vehicle}</p>
-              <p><strong>Purpose:</strong> ${trip.purpose}</p>
-              <p><strong>Destination:</strong> ${trip.destination}</p>
-              <p><strong>Status:</strong> ${trip.status}</p>
-              <p><strong>Time:</strong> ${trip.time}</p>
-              <p><strong>Return Date:</strong> ${trip.return_date_formatted}</p>
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Vehicle</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.vehicle}</p>
+              </div>
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Purpose</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.purpose}</p>
+              </div>
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Destination</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.destination}</p>
+              </div>
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Status</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.status}</p>
+              </div>
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Time</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.time}</p>
+              </div>
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Return Date</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.return_date_formatted}</p>
+              </div>
             `;
             modal.classList.remove('hidden');
           });
