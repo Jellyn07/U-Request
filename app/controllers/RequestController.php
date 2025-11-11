@@ -185,7 +185,9 @@ class RequestController {
                 $this->model->updateRequestStatus($request_id, $req_status);
             }
 
-            header("Location: ../modules/gsu_admin/views/request.php");
+            $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+            header("Location: $redirect");
             exit;
         }
     }

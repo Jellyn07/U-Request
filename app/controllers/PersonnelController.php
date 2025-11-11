@@ -36,7 +36,9 @@ class PersonnelController {
                 $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
             } else {
                 $_SESSION['personnel_error'] = "Failed to upload profile picture.";
-                header("Location: ../modules/gsu_admin/views/personnel.php");
+                $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                header("Location: $redirect");
                 exit;
             }
         }
@@ -63,7 +65,9 @@ class PersonnelController {
             }
         }
     
-        header("Location: ../modules/gsu_admin/views/personnel.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
     
@@ -88,8 +92,10 @@ class PersonnelController {
                  $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
              } else {
                  $_SESSION['personnel_error'] = "Failed to upload profile picture.";
-                 header("Location: ../modules/gsu_admin/views/personnel.php");
-                 exit;
+                 $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                header("Location: $redirect");
+                exit;
              }
          }
 
@@ -114,7 +120,9 @@ class PersonnelController {
             }
         }
 
-        header("Location: ../modules/gsu_admin/views/personnel.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
 
@@ -129,7 +137,9 @@ class PersonnelController {
             $_SESSION['personnel_error'] = "Failed to delete personnel.";
         }
 
-        header("Location: ../modules/gsu_admin/views/personnel.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
 

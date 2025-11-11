@@ -36,7 +36,9 @@ class DriverController {
                 $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
             } else {
                 $_SESSION['driver_error'] = "Failed to upload profile picture.";
-                header("Location: ../modules/motorpool_admin/views/drivers.php");
+                $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                header("Location: $redirect");
                 exit;
             }
         }
@@ -59,7 +61,9 @@ class DriverController {
             }
         }
     
-        header("Location: ../modules/motorpool_admin/views/drivers.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
     
@@ -84,8 +88,10 @@ class DriverController {
                  $profile_picture_path = "/uploads/profile_pics/" . $filename;
              } else {
                  $_SESSION['driver_error'] = "Failed to upload profile picture.";
-                 header("Location: ../modules/motorpool_admin/views/drivers.php");
-                 exit;
+                 $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                header("Location: $redirect");
+                exit;
              }
          }
 
@@ -108,7 +114,9 @@ class DriverController {
             }
         }
 
-        header("Location: ../modules/motorpool_admin/views/drivers.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
 
@@ -122,7 +130,9 @@ class DriverController {
             $_SESSION['personnel_error'] = "Failed to delete personnel.";
         }
 
-        header("Location: ../modules/gsu_admin/views/personnel.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
 

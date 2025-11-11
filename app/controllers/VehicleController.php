@@ -29,7 +29,9 @@ class VehicleController {
                     'title' => 'Duplicate Plate Number',
                     'text' => 'Plate number already exists! Please use a different one.'
                 ];
-                header("Location: ../modules/motorpool_admin/views/vehicles.php");
+                $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                header("Location: $redirect");
                 exit;
             }
 
@@ -51,7 +53,9 @@ class VehicleController {
                         'title' => 'Invalid File Format',
                         'text' => 'Only JPG, JPEG, PNG, GIF are allowed!'
                     ];
-                    header("Location: ../modules/motorpool_admin/views/vehicles.php");
+                    $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                    header("Location: $redirect");
                     exit;
                 }
 
@@ -65,7 +69,9 @@ class VehicleController {
                         'title' => 'Upload Failed',
                         'text' => 'Failed to upload vehicle photo.'
                     ];
-                    header("Location: ../modules/motorpool_admin/views/vehicles.php");
+                    $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+                    header("Location: $redirect");
                     exit;
                 }
             }
@@ -95,7 +101,9 @@ class VehicleController {
                 ];
             }
 
-            header("Location: ../modules/motorpool_admin/views/vehicles.php");
+            $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+            header("Location: $redirect");
             exit;
         }
     }

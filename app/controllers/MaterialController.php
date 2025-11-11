@@ -157,8 +157,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$material_code || $quantity_to_add <= 0) {
             $_SESSION['material_error'] = "Invalid stock data submitted.";
-            header("Location: ../views/inventory.php");
-            exit();
+            $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+            header("Location: $redirect");
+            exit;
         }
 
         if ($controller->addStock($material_code, $quantity_to_add)) {
@@ -167,7 +169,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['material_error'] = "Failed to update stock.";
         }
 
-        header("Location: /app/modules/gsu_admin/views/inventory.php");
-        exit();
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
+        exit;
     }
 }

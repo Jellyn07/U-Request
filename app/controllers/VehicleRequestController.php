@@ -72,7 +72,9 @@ class VehicleRequestController {
             'message' => 'Your vehicle request has been submitted successfully!'
         ];
 
-        header("Location: ../modules/user/views/request.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+        header("Location: $redirect");
         exit;
     }
 
