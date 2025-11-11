@@ -134,6 +134,12 @@ if (session_status() === PHP_SESSION_NONE) {
           <img src="/public/assets/img/feedback.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
         </a>
+
+        <!-- Backup & Restore -->
+        <a href="backup.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <img src="/public/assets/img/backup.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
+          <span class="hidden md:flex items-center sidebar-text">Backup & Restore</span>
+        </a>
         
       </ul>
     </nav>

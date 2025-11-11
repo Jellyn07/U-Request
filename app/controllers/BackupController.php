@@ -3,72 +3,52 @@ session_start();
 require_once __DIR__ . '/../core/BaseModel.php';
 
 class BackupController {
-
     private $model;
 
     public function __construct() {
         $this->model = new BaseModel();
     }
 
-    // Handle requests
     public function handleRequest() {
+        // Manual actions from form buttons
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['backup_now'])) {
+                $result = $this->model->backupDatabase();
+                $_SESSION['backup_status'] = $result['success'] ? 'backup_success' : 'error';
+                header("Location: /app/modules/superadmin/views/backup.php");
+                exit;
+            }
+            $uploadedFile = null;
+            if (isset($_POST['restore_now']) && isset($_FILES['restore_file'])) {
+                $uploadDir = __DIR__ . '/../../backups/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+                // Store uploaded file in variable
+                $uploadedFile = $uploadDir . basename($_FILES['restore_file']['name']);
+                move_uploaded_file($_FILES['restore_file']['tmp_name'], $uploadedFile);
+
+                // Pass the file path to restoreDatabase
+                $result = $this->model->restoreDatabase($uploadedFile);
+
+                $_SESSION['backup_status'] = $result['success'] ? 'restore_success' : 'error';
+                header("Location: /app/modules/superadmin/views/backup.php");
+                exit;
+            }
+        }
+
+        // Automatic (JS fetch)
         $action = $_GET['action'] ?? null;
-
         if ($action === 'backup') {
-            $this->backup();
+            $result = $this->model->backupDatabase();
+            echo json_encode($result);
         } elseif ($action === 'restore') {
-            $this->restore();
+            $result = $this->model->restoreDatabase($uploadedFile);
+            echo json_encode($result);
         } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Invalid action.'
-            ]);
-        }
-    }
-
-    // Backup database
-    private function backup() {
-        $backupFile = $this->model->backupDatabase();
-        if ($backupFile) {
-            echo json_encode([
-                'success' => true,
-                'file' => $backupFile,
-                'message' => 'Backup completed successfully.'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Backup failed.'
-            ]);
-        }
-    }
-
-    // Restore database
-    private function restore() {
-        $backupFile = $_GET['file'] ?? null;
-        if (!$backupFile) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'No backup file specified.'
-            ]);
-            return;
-        }
-
-        $restore = $this->model->restoreDatabase($backupFile);
-        if ($restore) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Database restored successfully from ' . $backupFile
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Restore failed.'
-            ]);
+            echo json_encode(['success' => false, 'message' => 'Invalid action']);
         }
     }
 }
 
-// Execute
 $controller = new BackupController();
 $controller->handleRequest();

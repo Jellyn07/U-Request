@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -60,7 +62,7 @@ class BaseModel {
 
             // Recipients
             $mail->setFrom('jonagujol@gmail.com', 'Database Backup System');
-            $mail->addAddress('jonagujol@gmail.com', 'Admin'); // recipient email
+            $mail->addAddress('jsgujol00060@usep.edu.ph', 'Admin'); // recipient email
 
             // Content
             $mail->isHTML(true);
@@ -72,49 +74,91 @@ class BaseModel {
 
             $mail->send();
         } catch (Exception $e) {
-            error_log("Backup email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            error_log("PHPMailer Error: " . $e->getMessage());
+            echo "Mailer Error: " . $e->getMessage();
         }
+
     }
 
     // Modified backupDatabase method
-  public function backupDatabase() {
-    if (!is_dir($this->backupFolder)) mkdir($this->backupFolder, 0777, true);
+    public function backupDatabase() {
+        // Ensure backup folder exists
+        if (!is_dir($this->backupFolder)) mkdir($this->backupFolder, 0777, true);
 
-    $filename = $this->backupFolder . "db_backup_" . date('Ymd_His') . ".sql";
-    $mysqldumpPath = "C:\\xampp\\mysql\\bin\\mysqldump.exe"; // 👈 FULL PATH
-    $command = "\"$mysqldumpPath\" --user={$this->user} --password={$this->pass} --host={$this->host} --routines --events --triggers --add-drop-database --databases {$this->name} > \"$filename\"";
+        $filename = $this->backupFolder . "db_backup_" . date('Ymd_His') . ".sql";
+        $mysqldumpPath = "C:\\xampp\\mysql\\bin\\mysqldump.exe";
 
-
-    exec($command, $output, $returnVar);
-
-    if ($returnVar === 0 && filesize($filename) > 0) {
-        $this->sendBackupEmail(true, $filename);
-        return ["success" => true, "file" => $filename];
-    } else {
-        $this->sendBackupEmail(false, null, "Backup command failed or empty file.");
-        return ["success" => false, "message" => "Backup failed"];
-    }
-}
-
-
-
-
-    // 🔹 Restore database from a given file
-    public function restoreDatabase($file = null) {
-        if (!$file) {
-            $files = glob($this->backupFolder . "*.sql");
-            if (empty($files)) return ["success" => false, "message" => "No backup found"];
-            rsort($files); // latest backup first
-            $file = $files[0];
+        // Check if mysqldump exists
+        if (!file_exists($mysqldumpPath)) {
+            return ["success" => false, "message" => "mysqldump not found at $mysqldumpPath"];
         }
 
-        $command = "mysql --user={$this->user} --password={$this->pass} --host={$this->host} {$this->name} < $file";
-        exec($command, $output, $returnVar);
+        // Build command for Windows with proper quotes
+        $command = "\"$mysqldumpPath\" " .
+            "--user={$this->user} " .
+            "--password={$this->pass} " .
+            "--host={$this->host} " .
+            "--routines " .        // stored procedures & functions
+            "--events " .          // events
+            "--triggers " .        // triggers
+            "--add-drop-database " .
+            "--add-drop-table " .
+            "--create-options " .
+            "--single-transaction " .
+            "--databases {$this->name} " .
+            "> \"$filename\"";
+
+        // Execute command and capture output
+        exec($command . " 2>&1", $output, $returnVar);
+
+        // Log output for debugging
+        error_log("Backup command: $command");
+        error_log("Backup output: " . print_r($output, true));
+        error_log("Backup return code: $returnVar");
+
+        // Check if backup succeeded
+        if ($returnVar === 0 && file_exists($filename) && filesize($filename) > 0) {
+            try {
+                $this->sendBackupEmail(true, $filename);
+            } catch (\Exception $e) {
+                error_log("Backup email failed: " . $e->getMessage());
+            }
+            return ["success" => true, "file" => $filename];
+        } else {
+            $errorMessage = implode("\n", $output);
+            try {
+                $this->sendBackupEmail(false, null, $errorMessage);
+            } catch (\Exception $e) {
+                error_log("Backup email failed: " . $e->getMessage());
+            }
+            return ["success" => false, "message" => "Backup failed. Output:\n$errorMessage"];
+        }
+    }
+
+    // 🔹 Restore database from a given file
+    public function restoreDatabase($file) {
+        if (!file_exists($file)) {
+            return ["success" => false, "message" => "Backup file does not exist"];
+        }
+
+        $mysqlPath = "C:\\xampp\\mysql\\bin\\mysql.exe";
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'restore_') . '.sql';
+        $contents = file_get_contents($file);
+        $contents = "SET FOREIGN_KEY_CHECKS=0;\n" . $contents . "\nSET FOREIGN_KEY_CHECKS=1;";
+        file_put_contents($tempFile, $contents);
+
+        $command = "\"$mysqlPath\" --user={$this->user} --password={$this->pass} --host={$this->host} {$this->name} < \"$tempFile\"";
+
+        exec($command . " 2>&1", $output, $returnVar);
+
+        unlink($tempFile);
 
         if ($returnVar === 0) {
             return ["success" => true, "file" => $file];
         } else {
-            return ["success" => false, "message" => "Restore failed"];
+            $errorMessage = implode("\n", $output);
+            return ["success" => false, "message" => "Restore failed. Output:\n$errorMessage"];
         }
     }
 
