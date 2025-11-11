@@ -162,7 +162,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
       <!-- Dropdown -->
       <div id="profileMenu" class="hidden absolute bottom-4 left-20 md:bottom-20 md:left-4 w-48 bg-white text-black rounded-lg border-gray-400 shadow-lg">
-        <a href="#" class="block rounded-lg px-4 py-2 hover:bg-gray-100 text-sm">
+        <a href="../../shared/views/profile.php" class="block rounded-lg px-4 py-2 hover:bg-gray-100 text-sm">
           My Profile
         </a>
         <a href="/app/modules/shared/views/admin_login.php" class="flex rounded-lg px-4 py-2 text-accent hover:bg-gray-100 items-center gap-1 text-sm">
