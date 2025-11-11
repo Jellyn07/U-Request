@@ -40,15 +40,10 @@ $admins = $controller->getAllAdmins();
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <input type="text" id="searchInput" placeholder="Search Location" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field" id="sortFilter">]
-                <option>By ID</option>
-                <option>A - Z</option>
-                <option>Z - A</option>
-            </select>
-            <select class="input-field" id="unitFilter">
-                <option value="all">All Unit</option>
-                <option>Tagum Unit</option>
-                <option>Mabini Unit</option>
+            <select class="input-field" id="sortFilter">
+              <option value="id">By ID</option>
+              <option value="az">A - Z</option>
+              <option value="za">Z - A</option>
             </select>
             <!-- <button title="Print data in the table" id="print" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
@@ -258,7 +253,6 @@ $admins = $controller->getAllAdmins();
       </div>
     </div>
   </main>
-
   <script src="/public/assets/js/shared/menus.js"></script>
   <script src="/public/assets/js/shared/search.js"></script>          
   <script src="/public/assets/js/gsu_admin/location.js"></script>  

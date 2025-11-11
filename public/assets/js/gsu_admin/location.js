@@ -74,31 +74,55 @@ function toggleBuildingOption(option) {
     document.getElementById("newBuilding").classList.toggle("hidden", option !== "new");
 }
 
-const searchInput = document.getElementById("searchInput");
-const unitFilter = document.getElementById("unitFilter");
-const tableBody = document.getElementById("table");
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortFilter");
+  const tableBody = document.getElementById("body_table");
 
-function applyFilters() {
+  if (!searchInput || !sortSelect || !tableBody) return;
+
+  function applyFilters() {
     const searchValue = searchInput.value.toLowerCase().trim();
-    const unitValue = unitFilter.value.toLowerCase().trim();
-
+    const sortValue = sortSelect.value;
     const rows = Array.from(tableBody.querySelectorAll("tr"));
 
+    // 🔍 SEARCH FUNCTION
     rows.forEach(row => {
-        const unitText = row.children[2]?.textContent.toLowerCase().trim() || ""; // Unit column
-        const buildingText = row.children[3]?.textContent.toLowerCase().trim() || ""; // Building column
-        const exactLocationText = row.children[4]?.textContent.toLowerCase().trim() || ""; // Exact Location column
-
-        const searchMatches = unitText.includes(searchValue) || buildingText.includes(searchValue) || exactLocationText.includes(searchValue);
-        const unitMatches = unitValue === "all" || unitText === unitValue;
-
-        row.style.display = (searchMatches && unitMatches) ? "" : "none";
+      const unit = row.children[2]?.textContent.toLowerCase() || "";
+      const building = row.children[3]?.textContent.toLowerCase() || "";
+      const exact = row.children[4]?.textContent.toLowerCase() || "";
+      const match = [unit, building, exact].some(val => val.includes(searchValue));
+      row.style.display = match ? "" : "none";
     });
-}
 
-// Event listeners
-searchInput.addEventListener("input", applyFilters);
-unitFilter.addEventListener("change", applyFilters);
+    // 🧩 SORTING FUNCTION
+    const visibleRows = rows.filter(row => row.style.display !== "none");
 
-// Initial filter on page load
-applyFilters();
+    if (sortValue === "id") {
+      visibleRows.sort((a, b) => {
+        const idA = parseInt(a.children[0]?.textContent.trim()) || 0;
+        const idB = parseInt(b.children[0]?.textContent.trim()) || 0;
+        return idA - idB;
+      });
+    } else if (sortValue === "az" || sortValue === "za") {
+      const colIndex = 3; // Sort by Building column
+      visibleRows.sort((a, b) => {
+        const textA = a.children[colIndex]?.textContent.toLowerCase().trim() || "";
+        const textB = b.children[colIndex]?.textContent.toLowerCase().trim() || "";
+        return sortValue === "az"
+          ? textA.localeCompare(textB)
+          : textB.localeCompare(textA);
+      });
+    }
+
+    // Re-append sorted rows
+    visibleRows.forEach(row => tableBody.appendChild(row));
+  }
+
+  // 🔄 Event bindings
+  searchInput.addEventListener("input", applyFilters);
+  sortSelect.addEventListener("change", applyFilters);
+
+  // Run once initially
+  applyFilters();
+});

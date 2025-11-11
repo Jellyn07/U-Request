@@ -1,10 +1,10 @@
 <?php
 session_start();
-// if (!isset($_SESSION['email'])) {
-//     header("Location: admin_login.php");
-//     exit;
-// }
-// require_once __DIR__ . '/../../../config/auth-admin.php';
+if (!isset($_SESSION['email'])) {
+    header("Location: admin_login.php");
+    exit;
+}
+require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/RequestController.php';
 
@@ -96,12 +96,6 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option>Air-Condition</option>
                 <option>Others</option>
             </select>
-            <!-- <select id="sort" class="input-field">
-                <option value="Newest">Newest</option>
-                <option value="Oldest">Oldest</option>
-                <option value="AZ">A-Z</option>
-                <option value="ZA">Z-A</option>
-            </select> -->
             <select id="sortCategory" class="input-field">
                 <option value="all">All Dates</option>
                 <option value="today">Today</option>
@@ -259,26 +253,49 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
 
            <!-- Personnel Section -->
-          <div>
+          <div
+            x-data="{ 
+                personnel: [{ staff_id: '' }],
+                selectedStaffIds: [],
+                assignedPersonnel: [],
+                
+                updatePersonnelOptions() {
+                  this.selectedStaffIds = this.personnel
+                    .map(p => p.staff_id)
+                    .filter(id => id !== '');
+                },
+                async loadAssignedPersonnel(requestId) {
+                  try {
+                    const res = await fetch(`../../../controllers/RequestController.php?getAssignment=${requestId}`);
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                      this.assignedPersonnel = data;
+                      // If In Progress or Pending → populate for editing
+                      if (selected.req_status !== 'Completed') {
+                        this.personnel = data.map(p => ({ staff_id: p.staff_id }));
+                      }
+                    } else {
+                      this.assignedPersonnel = [];
+                      this.personnel = [{ staff_id: '' }];
+                    }
+                    this.updatePersonnelOptions();
+                  } catch (err) {
+                    console.error('❌ Failed to load personnel:', err);
+                    }
+                }
+              }"
+              x-init="loadAssignedPersonnel(selected.request_id)"
+            >
+            <!-- Editable Section (Pending + In Progress) -->
             <template x-if="selected.req_status !== 'Completed'">
-              <div 
-                id="personnel-fields" 
-                class="space-y-3 mb-6"
-                x-data="{ 
-                  personnel: [{ staff_id: '' }],
-                  selectedStaffIds: [],
-                  updatePersonnelOptions() {
-                    this.selectedStaffIds = this.personnel
-                      .map(p => p.staff_id)
-                      .filter(id => id !== '');
-                  }
-                }"
-              >
+              <div id="personnel-fields" class="space-y-3 mb-6">
+                <label class="text-xs text-text mb-1">Assign / Edit Personnel</label>
+
+                <!-- Editable Dropdowns -->
                 <template x-for="(p, index) in personnel" :key="index">
                   <div class="flex gap-2 personnel-row items-end">
                     <!-- Dropdown -->
                     <div class="w-full">
-                      <label class="text-xs text-text mb-1">Personnel</label>
                       <select 
                         :name="'staff_id[' + index + ']'"
                         x-model="p.staff_id"
@@ -289,22 +306,20 @@ $profile = $controller->getProfile($_SESSION['email']);
                         <?php foreach ($personnels as $person): ?>
                           <option 
                             value="<?= $person['staff_id'] ?>"
-                            x-bind:disabled="selectedStaffIds.includes('<?= $person['staff_id'] ?>') && p.staff_id !== '<?= $person['staff_id'] ?>'"
-                          >
+                            x-bind:disabled="selectedStaffIds.includes('<?= $person['staff_id'] ?>') && p.staff_id !== '<?= $person['staff_id'] ?>'">
                             <?= htmlspecialchars($person['full_name']) ?>
                           </option>
                         <?php endforeach; ?>
                       </select>
                     </div>
 
-                    <!-- Add / Remove buttons -->
+                    <!-- Add / Remove Buttons -->
                     <div class="flex items-center gap-1">
                       <button 
                         type="button"
                         class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
                         @click="personnel.push({ staff_id: '' }); updatePersonnelOptions();"
-                        title="Add Personnel"
-                      >
+                        title="Add Personnel">
                         <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
                       </button>
 
@@ -312,28 +327,33 @@ $profile = $controller->getProfile($_SESSION['email']);
                         type="button"
                         class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex items-center justify-center"
                         @click="personnel.splice(index, 1); updatePersonnelOptions();"
-                        title="Remove Personnel"
-                      >
+                        title="Remove Personnel">
                         <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
                       </button>
                     </div>
                   </div>
                 </template>
-              </div>
-            </template>
 
-            <!-- Read-only view when Completed -->
-            <template x-if="selected.req_status === 'Completed'">
-              <div class="space-y-2">
-                <label class="text-sm mb-1 block font-medium">Assigned Personnel</label>
-                <template x-for="person in selected.assignedPersonnel" :key="person.staff_id">
-                  <div class="w-full input-field bg-gray-100 text-gray-700 cursor-default">
-                    <span x-text="person.full_name"></span>
+                <!-- Read-only List (for In Progress view) -->
+                <template x-if="selected.req_status === 'In Progress' && assignedPersonnel.length > 0">
+                  <div class="mt-4">
+                    <label class="text-sm mb-1 block font-medium">Currently Assigned Personnel</label>
+                    <template x-for="person in assignedPersonnel" :key="person.staff_id">
+                      <div class="w-full input-field bg-gray-100 text-gray-700 cursor-default">
+                        <span x-text="person.full_name"></span>
+                      </div>
+                    </template>
                   </div>
                 </template>
               </div>
             </template>
+
+            <!-- Completed: Hide everything -->
+            <template x-if="selected.req_status === 'Completed'">
+              <div class="hidden"></div>
+            </template>
           </div>
+
           <div>
               <label class="text-xs text-text mb-1">Status</label>
 
@@ -361,20 +381,52 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
 
             <!-- ✅ MATERIALS SECTION -->
-          <div x-show="selected.req_status === 'In Progress' || selected.req_status === 'Completed'" 
-              class="mt-3 border-t border-gray-200 pt-3">
+            <div 
+              x-show="selected.req_status === 'In Progress'" 
+              x-data="{ 
+                materials: [{ material_code: '', qty: 1 }],
+                selectedMaterialCodes: [],
 
-            <h3 class="text-sm font-semibold mb-2">Materials Needed</h3>
+                updateMaterialOptions() {
+                  this.selectedMaterialCodes = this.materials
+                    .map(m => m.material_code)
+                    .filter(code => code !== '');
+                },
 
-            <!-- Editable (In Progress) -->
-            <template x-if="selected.req_status === 'In Progress'">
+                async loadAssignedMaterials(requestId) {
+                  try {
+                    const res = await fetch(`../../../controllers/RequestController.php?getAssignedMaterials=${requestId}`);
+                    const data = await res.json();
+
+                    if (Array.isArray(data) && data.length > 0) {
+                      this.materials = data.map(m => ({
+                        material_code: m.material_code,
+                        material_desc: m.material_desc,
+                        qty: m.quantity_needed
+                      }));
+                    } else {
+                      this.materials = [{ material_desc: 'No materials used', qty: '' }];
+                    }
+
+                    this.updateMaterialOptions();
+                  } catch (err) {
+                    console.error('❌ Failed to load materials:', err);
+                  }
+                }
+              }"
+              x-init="loadAssignedMaterials(selected.request_id)"
+              class="mt-3 border-t border-gray-200 pt-3"
+            >
+              <h3 class="text-xs text-text mb-1">Materials Used / Needed</h3>
+
+              <!-- Editable materials (In Progress only) -->
               <div id="material-fields" class="space-y-3 mb-6">
                 <template x-for="(item, index) in materials" :key="index">
                   <div class="flex gap-2 material-row items-end">
                     
                     <!-- Material Dropdown -->
                     <div class="w-1/2">
-                      <label class="text-sm mb-1 block">Material</label>
+                      <label class="text-xs text-text mb-1 block">Material</label>
                       <select 
                         :name="'materials[' + index + '][material_code]'"
                         class="input-field w-full material-select"
@@ -393,7 +445,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
                     <!-- Quantity -->
                     <div class="w-1/4">
-                      <label class="text-sm mb-1 block">Qty</label>
+                      <label class="text-xs text-text mb-1 block">Qty</label>
                       <input 
                         type="number" 
                         :name="'materials[' + index + '][qty]'"
@@ -423,21 +475,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   </div>
                 </template>
               </div>
-            </template>
-
-            <!-- Read-Only (Completed) -->
-            <template x-if="selected.req_status === 'Completed'">
-              <div class="space-y-2">
-                <template x-for="mat in materials" :key="mat.material_code">
-                  <div class="flex justify-between w-full input-field bg-gray-100 text-gray-700 cursor-default px-3 py-2 rounded">
-                    <span x-text="mat.material_desc"></span>
-                    <span x-text="'Qty: ' + mat.qty"></span>
-                  </div>
-                </template>
-              </div>
-            </template>
             </div>
-
             <div class="flex justify-center pt-2 space-x-2">
                 <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
 
