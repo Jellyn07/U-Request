@@ -39,6 +39,8 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/gsu_admin/request.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   
 </head>
 <body class="bg-gray-100">
@@ -108,10 +110,8 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option value="14">Last 14 days</option>
                 <option value="30">Last 30 days</option>
             </select>
-            <button title="Print data in the table" class="input-field">
-                <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button class="input-field" title="Export to Excel">
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
                 <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
@@ -471,6 +471,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
+<script src="/public/assets/js/shared/export.js"></script>
 <script type="module">
   import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
 

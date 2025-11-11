@@ -18,13 +18,15 @@ $requesters = $controller->getAllRequesters();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U-Request</title>
+  <title>U-Request | Users</title>
   <link rel="stylesheet" href="/public/assets/css/output.css" />
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-gray-200">
   <!-- Superadmin Menu & Header -->
@@ -32,7 +34,7 @@ $requesters = $controller->getAllRequesters();
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-4">Manage User</h1>
+      <h1 class="text-2xl font-bold mb-4">Manage Users</h1>
       <div x-data="{ showDetails: false, selected: {} }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
@@ -48,11 +50,9 @@ $requesters = $controller->getAllRequesters();
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
             </select>
-            <button class="input-field">
-              <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button class="input-field">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
           </div>
 
@@ -242,4 +242,5 @@ $requesters = $controller->getAllRequesters();
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
+<script src="/public/assets/js/shared/export.js"></script>
 </html>
