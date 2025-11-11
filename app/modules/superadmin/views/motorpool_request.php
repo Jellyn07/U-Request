@@ -95,6 +95,9 @@ $requests = $data['requests'];
                           depret_time: "<?= htmlspecialchars(date('h:i A', strtotime($row['departure_time'])) . ' - ' . date('h:i A', strtotime($row['return_time'])), ENT_QUOTES) ?>",
                           trip_purpose: "<?= htmlspecialchars($row['trip_purpose'], ENT_QUOTES) ?>",
                           req_status: "<?= htmlspecialchars($row['req_status'], ENT_QUOTES) ?>",
+                          vehicle_name: "<?= htmlspecialchars($row['vehicle_name'] ?? '', ENT_QUOTES) ?>",
+                          driver_name: "<?= htmlspecialchars($row['driver_name'] ?? '', ENT_QUOTES) ?>",
+                          approved_by: "<?= htmlspecialchars($row['approved_by'] ?? '', ENT_QUOTES) ?>",
                           passenger_count: "<?= count($row['passengers']) ?>",
                           passengers: <?= htmlspecialchars(json_encode($row['passengers'] ?? []), ENT_QUOTES) ?>
                       })'>
@@ -121,7 +124,7 @@ $requests = $data['requests'];
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
 
-          <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/VehicleRequestController.php">
+          <form id="assignmentForm" method="post" action="<?php echo BASE_URL; ?>/controllers/VehicleRequestController.php">
             <input type="hidden" name="action" value="saveAssignment">
             <input type="hidden" name="req_id" x-model="selected.req_id">
 
@@ -168,35 +171,57 @@ $requests = $data['requests'];
               <input type="text" class="w-full view-field" x-model="selected.passenger_count" readonly />
             </div>
 
-            <div>
+            <div x-data="vehicleDropdown" x-init="init()">
               <label class="text-xs text-text mb-1">Assign Vehicle</label>
-              <select id="vehicleSelect"  name="vehicle_id"  class="w-full input-field">
-                <option value="">Loading vehicles...</option>
+              <select 
+                id="vehicleSelect"  
+                name="vehicle_id"  
+                x-model="selected.vehicle_id"  
+                class="w-full input-field"
+                disabled
+              >
+                <option value="">Select Vehicle</option>
+                <!-- show all vehicles dynamically -->
+                <template x-for="v in vehicles" :key="v.vehicle_id">
+                  <option 
+                    :value="v.vehicle_id" 
+                    x-text="v.vehicle_name"
+                  ></option>
+                </template>
               </select>
+              <!-- Display currently assigned vehicle -->
+              <p class="text-xs text-gray-500 mt-1">
+                Current Assigned Vehicle: 
+                <span x-text="selected.vehicle_name"></span>
+              </p>
             </div>
 
             <div x-data>
               <!-- STATUS -->
               <div>
                 <label class="text-xs text-text mb-1">Status</label>
-                <select id="status"  name="req_status"  x-model="selected.req_status" class="w-full input-field">
+                <select 
+                  id="status"  
+                  name="req_status"  
+                  x-model="selected.req_status"  
+                  class="w-full input-field"
+                  disabled
+                >
                   <option value="" disabled>Select Status</option>
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
-                  <option value="In Progress">In Progress</option>
+                  <option value="On Going">On Going</option>
                   <option value="Rejected/Cancelled">Rejected/Cancelled</option>
                   <option value="Completed">Completed</option>
                 </select>
               </div>
-
               <!-- APPROVED BY -->
               <div x-show="selected.req_status === 'Approved'" x-cloak>
                 <label class="text-xs text-text mb-1 mt-2">Approved By</label>
-                <select id="approvedBy" name="approved_by" x-model="selected.approved_by" class="w-full input-field">
+                <select id="approvedBy" name="approved_by" x-model="selected.approved_by" class="w-full input-field" disabled>
                   <option value="" disabled>Select Approver</option>
                   <option value="Dr. Shirley Villanueva">Dr. Shirley Villanueva</option>
-                  <option value="Engr. John Dela Cruz">Engr. John Dela Cruz</option>
-                  <option value="Ms. Maria Santos">Ms. Maria Santos</option>
+                  <option value="Bonifacio G. Gabales, Jr., Ph.D.">Bonifacio G. Gabales, Jr., Ph.D.</option>
                 </select>
               </div>
             </div>
@@ -206,60 +231,14 @@ $requests = $data['requests'];
                       @click="viewFullDetails(selected)">
                 Full Details
               </button>
-              <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment">
+              <!-- <button type="button" class="btn btn-primary" id="saveBtn" name="saveAssignment">
                 Save Changes
-              </button>
+              </button> -->
             </div>
           </form>
         </div>
       </div>
     </div>
-    <script>
-      document.getElementById('saveBtn').addEventListener('click', async () => {
-        const form = document.getElementById('assignmentForm');
-        const formData = new FormData(form);
-
-        console.log("Form action:", form.action);
-        // optional: show formData contents for debug
-        for (const pair of formData.entries()) { console.log(pair[0]+':', pair[1]); }
-
-        const confirm = await Swal.fire({
-          title: 'Confirm Save?',
-          text: 'Do you want to save these changes?',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, Save it!'
-        });
-        if (!confirm.isConfirmed) return;
-
-        Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-        try {
-          const res = await fetch(form.action, { method: 'POST', body: formData });
-          const text = await res.text();
-          let data;
-          try {
-            data = JSON.parse(text);
-          } catch (e) {
-            Swal.close();
-            console.error('Non-JSON response:', text);
-            Swal.fire({ icon: 'error', title: 'Server error', html: `<pre style="white-space:pre-wrap;text-align:left;">${text}</pre>` });
-            return;
-          }
-
-          Swal.close();
-          if (data.success) {
-            Swal.fire({ icon: 'success', title: 'Saved!', text: data.message || 'Saved successfully.' });
-          } else {
-            Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Unknown server error.' });
-          }
-        } catch (err) {
-          Swal.close();
-          console.error('Fetch error:', err);
-          Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to connect to server or invalid response.' });
-        }
-      });
-      </script>
   </main>
 </script>
   <!-- Table Filters -->

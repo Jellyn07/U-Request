@@ -142,42 +142,28 @@ $profile = $controller->getProfile($_SESSION['email']);
                           <?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?>
                       </td>
                       <td class="px-4 py-3">
-                          <?php if ($row['req_status'] === 'Completed'): ?>
-                              <!-- ✅ Show label only when Completed -->
-                              <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                  Completed
-                              </span>
-
-                          <?php elseif ($row['req_status'] === 'To Inspect'): ?>
-                              <!-- ✅ Dropdown for 'To Inspect' -->
-                              <select 
-                                  class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800" 
-                                  data-request-id="<?= $row['request_id'] ?>"
-                                  data-current-status="<?= $row['req_status'] ?>"
-                              >
-                                  <option class="hidden" disabled value="To Inspect" <?= $row['req_status'] === 'To Inspect' ? 'selected' : '' ?>>To Inspect</option>
-                                  <option value="In Progress" class="bg-blue-100 text-blue-800">In Progress</option>
-                                  <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
-                              </select>
-
-                          <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
-                              <!-- ✅ Dropdown for 'In Progress' -->
-                              <select 
-                                  class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
-                                  data-request-id="<?= $row['request_id'] ?>"
-                                  data-current-status="<?= $row['req_status'] ?>"
-                              >
-                                  <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-                                  <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
-                              </select>
-
-                          <?php else: ?>
-                              <!-- Fallback for other statuses -->
-                              <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                                  <?= htmlspecialchars($row['req_status']) ?>
-                              </span>
-                          <?php endif; ?>
-                      </td>
+                        <?php 
+                            $status = $row['req_status'];
+                            $statusClass = '';
+                            $statusText = htmlspecialchars($status);
+                            switch ($status) {
+                                case 'Completed':
+                                    $statusClass = 'bg-green-100 text-green-800';
+                                    break;
+                                case 'In progress':
+                                    $statusClass = 'bg-blue-200 text-blue-800';
+                                    break;
+                                case 'To Inspect':
+                                    $statusClass = 'bg-yellow-100 text-yellow-800';
+                                    break;
+                                default:
+                                    $statusClass = 'bg-gray-100 text-gray-800';
+                            }
+                        ?>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold <?= $statusClass ?>">
+                            <?= $statusText ?>
+                        </span>
+                    </td>
                   </tr>
               <?php endforeach; ?>
           </tbody>
@@ -242,7 +228,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <select name="prio_level" id="prioritySelect" 
                         class="w-full input-field" 
                         x-model="selected.priority_status"
-                        :disabled="selected.req_status === 'Completed'">
+                        disabled>
 
                     <!-- Fallback if no priority -->
                     <!-- <option value="" x-show="!selected.priority_status">No Priority Level</option> -->
@@ -252,246 +238,47 @@ $profile = $controller->getProfile($_SESSION['email']);
                 </select>
             </div>
 
-           <!-- Personnel Section -->
-          <div
-            x-data="{ 
-                personnel: [{ staff_id: '' }],
-                selectedStaffIds: [],
-                assignedPersonnel: [],
-                
-                updatePersonnelOptions() {
-                  this.selectedStaffIds = this.personnel
-                    .map(p => p.staff_id)
-                    .filter(id => id !== '');
-                },
-                async loadAssignedPersonnel(requestId) {
-                  try {
-                    const res = await fetch(`../../../controllers/RequestController.php?getAssignment=${requestId}`);
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                      this.assignedPersonnel = data;
-                      // If In Progress or Pending → populate for editing
-                      if (selected.req_status !== 'Completed') {
-                        this.personnel = data.map(p => ({ staff_id: p.staff_id }));
-                      }
-                    } else {
-                      this.assignedPersonnel = [];
-                      this.personnel = [{ staff_id: '' }];
-                    }
-                    this.updatePersonnelOptions();
-                  } catch (err) {
-                    console.error('❌ Failed to load personnel:', err);
-                    }
-                }
-              }"
-              x-init="loadAssignedPersonnel(selected.request_id)"
-            >
-            <!-- Editable Section (Pending + In Progress) -->
-            <template x-if="selected.req_status !== 'Completed'">
-              <div id="personnel-fields" class="space-y-3 mb-6">
-                <label class="text-xs text-text mb-1">Assign / Edit Personnel</label>
+            <div>
+                <label class="text-xs text-text mb-1">Status</label>
 
-                <!-- Editable Dropdowns -->
-                <template x-for="(p, index) in personnel" :key="index">
-                  <div class="flex gap-2 personnel-row items-end">
-                    <!-- Dropdown -->
-                    <div class="w-full">
-                      <select 
-                        :name="'staff_id[' + index + ']'"
-                        x-model="p.staff_id"
-                        @change="updatePersonnelOptions()"
-                        class="input-field w-full staff-select"
-                      >
-                        <option value="">Select Personnel</option>
-                        <?php foreach ($personnels as $person): ?>
-                          <option 
-                            value="<?= $person['staff_id'] ?>"
-                            x-bind:disabled="selectedStaffIds.includes('<?= $person['staff_id'] ?>') && p.staff_id !== '<?= $person['staff_id'] ?>'">
-                            <?= htmlspecialchars($person['full_name']) ?>
-                          </option>
-                        <?php endforeach; ?>
-                      </select>
-                    </div>
-
-                    <!-- Add / Remove Buttons -->
-                    <div class="flex items-center gap-1">
-                      <button 
-                        type="button"
-                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
-                        @click="personnel.push({ staff_id: '' }); updatePersonnelOptions();"
-                        title="Add Personnel">
-                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
-                      </button>
-
-                      <button 
-                        type="button"
-                        class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex items-center justify-center"
-                        @click="personnel.splice(index, 1); updatePersonnelOptions();"
-                        title="Remove Personnel">
-                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
-                      </button>
-                    </div>
-                  </div>
+                <!-- Completed: show plain label -->
+                <template x-if="selected.req_status === 'Completed'">
+                  <span class="block w-full input-field bg-green-100 text-green-800 cursor-default" x-text="selected.req_status"></span>
                 </template>
 
-                <!-- Read-only List (for In Progress view) -->
-                <template x-if="selected.req_status === 'In Progress' && assignedPersonnel.length > 0">
-                  <div class="mt-4">
-                    <label class="text-sm mb-1 block font-medium">Currently Assigned Personnel</label>
-                    <template x-for="person in assignedPersonnel" :key="person.staff_id">
-                      <div class="w-full input-field bg-gray-100 text-gray-700 cursor-default">
-                        <span x-text="person.full_name"></span>
-                      </div>
-                    </template>
-                  </div>
+                <!-- In Progress: dropdown without "To Inspect" -->
+                <template x-if="selected.req_status === 'In Progress'">
+                  <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field" disabled>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </template>
+
+                <!-- Other (e.g. To Inspect) : full dropdown -->
+                <template x-if="selected.req_status !== 'Completed' && selected.req_status !== 'In Progress'">
+                  <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field  bg-yellow-100 text-yellow-800" disabled>
+                    <option value="To Inspect">To Inspect</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
                 </template>
               </div>
-            </template>
+              <div class="flex justify-center pt-2 space-x-2">
+              <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
 
-            <!-- Completed: Hide everything -->
-            <template x-if="selected.req_status === 'Completed'">
-              <div class="hidden"></div>
-            </template>
+                  <!-- Save button hidden if status is Completed -->
+                  <!-- <button type="submit" class="btn btn-primary" id="saveBtn" name="saveAssignment"
+                          x-show="selected.req_status !== 'Completed'">
+                      Save Changes
+                  </button> -->
+              </div>
+            </form>
           </div>
-
-          <div>
-              <label class="text-xs text-text mb-1">Status</label>
-
-              <!-- Completed: show plain label -->
-              <template x-if="selected.req_status === 'Completed'">
-                <span class="block w-full input-field bg-green-100 text-green-800 cursor-default" x-text="selected.req_status"></span>
-              </template>
-
-              <!-- In Progress: dropdown without "To Inspect" -->
-              <template x-if="selected.req_status === 'In Progress'">
-                <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field">
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </template>
-
-              <!-- Other (e.g. To Inspect) : full dropdown -->
-              <template x-if="selected.req_status !== 'Completed' && selected.req_status !== 'In Progress'">
-                <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field">
-                  <option value="To Inspect">To Inspect</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </template>
-            </div>
-
-            <!-- ✅ MATERIALS SECTION -->
-            <div 
-              x-show="selected.req_status === 'In Progress'" 
-              x-data="{ 
-                materials: [{ material_code: '', qty: 1 }],
-                selectedMaterialCodes: [],
-
-                updateMaterialOptions() {
-                  this.selectedMaterialCodes = this.materials
-                    .map(m => m.material_code)
-                    .filter(code => code !== '');
-                },
-
-                async loadAssignedMaterials(requestId) {
-                  try {
-                    const res = await fetch(`../../../controllers/RequestController.php?getAssignedMaterials=${requestId}`);
-                    const data = await res.json();
-
-                    if (Array.isArray(data) && data.length > 0) {
-                      this.materials = data.map(m => ({
-                        material_code: m.material_code,
-                        material_desc: m.material_desc,
-                        qty: m.quantity_needed
-                      }));
-                    } else {
-                      this.materials = [{ material_desc: 'No materials used', qty: '' }];
-                    }
-
-                    this.updateMaterialOptions();
-                  } catch (err) {
-                    console.error('❌ Failed to load materials:', err);
-                  }
-                }
-              }"
-              x-init="loadAssignedMaterials(selected.request_id)"
-              class="mt-3 border-t border-gray-200 pt-3"
-            >
-              <h3 class="text-xs text-text mb-1">Materials Used / Needed</h3>
-
-              <!-- Editable materials (In Progress only) -->
-              <div id="material-fields" class="space-y-3 mb-6">
-                <template x-for="(item, index) in materials" :key="index">
-                  <div class="flex gap-2 material-row items-end">
-                    
-                    <!-- Material Dropdown -->
-                    <div class="w-1/2">
-                      <label class="text-xs text-text mb-1 block">Material</label>
-                      <select 
-                        :name="'materials[' + index + '][material_code]'"
-                        class="input-field w-full material-select"
-                        x-model="item.material_code"
-                        @change="updateMaterialOptions()">
-                        <option value="">Select Material</option>
-                        <?php foreach ($materials as $mat): ?>
-                          <option 
-                            value="<?= $mat['material_code'] ?>" 
-                            x-show="!selectedMaterialCodes.includes('<?= $mat['material_code'] ?>') || item.material_code === '<?= $mat['material_code'] ?>'">
-                            <?= htmlspecialchars($mat['material_desc']) ?>
-                          </option>
-                        <?php endforeach; ?>
-                      </select>
-                    </div>
-
-                    <!-- Quantity -->
-                    <div class="w-1/4">
-                      <label class="text-xs text-text mb-1 block">Qty</label>
-                      <input 
-                        type="number" 
-                        :name="'materials[' + index + '][qty]'"
-                        x-model="item.qty"
-                        min="1"
-                        class="input-field w-full" />
-                    </div>
-
-                    <!-- Add / Remove Buttons -->
-                    <div class="flex items-center gap-1">
-                      <button 
-                        type="button"
-                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
-                        @click="materials.push({ material_code: '', qty: 1 }); updateMaterialOptions();"
-                        title="Add Material">
-                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
-                      </button>
-
-                      <button 
-                        type="button"
-                        class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex justify-center items-center"
-                        @click="materials.splice(index, 1); updateMaterialOptions();"
-                        title="Remove Material">
-                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Remove" class="w-3 h-3">
-                      </button>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-            <div class="flex justify-center pt-2 space-x-2">
-                <button type="button" class="btn btn-primary" @click="viewDetails(selected)"> Full Details </button>
-
-                <!-- Save button hidden if status is Completed -->
-                <button type="submit" class="btn btn-primary" id="saveBtn" name="saveAssignment"
-                        x-show="selected.req_status !== 'Completed'">
-                    Save Changes
-                </button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
-  </div>
   </main>
-  <script>
+<script>
 <?php if (isset($_SESSION['alert'])): ?>
   Swal.fire({
     icon: '<?= $_SESSION['alert']['type'] ?>',
@@ -506,7 +293,6 @@ $profile = $controller->getProfile($_SESSION['email']);
   <?php unset($_SESSION['alert']); ?>
 <?php endif; ?>
 </script>
-
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/export.js"></script>
