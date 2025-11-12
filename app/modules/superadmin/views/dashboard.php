@@ -121,7 +121,7 @@ if (!isset($_SESSION['email'])) {
                       class="border-b hover:bg-gray-100 cursor-pointer text-xs">
                       <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['requester_name']) ?></td>
-                      <td class="px-4 py-3"><?= htmlspecialchars($row['vehicle_type'] ?? 'N/A') ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['vehicle_name'] ?? 'N/A') ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['req_status']) ?></td>
                     </tr>
                   <?php endforeach; ?>
@@ -169,14 +169,9 @@ if (!isset($_SESSION['email'])) {
                                     To&nbsp;Inspect
                                 </span>
                             <?php elseif (in_array($row['req_status'], ['In Progress', 'In progress'], true)): ?>
-                                <!-- ✅ Show dropdown if NOT completed -->
-                                <select 
-                                    class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
-                                    data-request-id="<?= $row['request_id'] ?>"
-                                    data-current-status="<?= $row['req_status'] ?>" >
-                                    <option class="hidden" disabled value="In Progress" <?= $row['req_status'] === 'In Progress' ? 'selected' : '' ?> class="bg-gray-100 text-black">In Progress</option>
-                                    <option value="Completed" <?= $row['req_status'] === 'Completed' ? 'selected' : '' ?> class="bg-green-100 text-green-800 border-none rounded-full hover:bg-green-300">Completed</option>
-                                </select>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                    To&nbsp;Inspect
+                                </span>
                             <?php else: ?>
                                 <!-- Fallback for any other statuses -->
                                 <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
