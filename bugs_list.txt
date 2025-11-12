@@ -10,7 +10,8 @@ Overall
 
 Super Admin
 -admins access level is all wrong when editing admin access ✅
--no profile
+-no profile ✅
+-user history (no vehicle request)
 
 Motorpool Admin
 - Motorpool Vehicle Request if reject with remarks why it is rejected

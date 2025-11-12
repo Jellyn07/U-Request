@@ -96,6 +96,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     $password_raw   = $_POST['password'] ?? '';
     $confirm_pass   = $_POST['confirm_password'] ?? '';
 
+    $_SESSION['admin_form_data'] = [
+        'staff_id' => $staff_id,
+        'email' => $email,
+        'first_name' => $first_name,
+        'last_name' => $last_name,
+        'contact_no' => $contact_no,
+        'access_level' => $access_level,
+        'password' => $password_raw,
+        'confirm_password' => $confirm_pass
+    ];
+
+    // ✅ Password validation function
+    function isValidPassword($password) {
+        return preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/", $password);
+        // Must contain:
+        // - at least one lowercase letter
+        // - at least one uppercase letter
+        // - at least one number
+        // - at least 8 characters total
+    }
+
+    if (!isValidPassword($password_raw)) {
+        $_SESSION['admin_error'] = "Password must be at least 8 characters long and contain uppercase, lowercase letters,special character and numbers.";
+        header("Location: ../modules/superadmin/views/manage_admin.php");
+        exit;
+    }
+
     if ($password_raw !== $confirm_pass) {
         $_SESSION['admin_error'] = "Passwords do not match.";
         header("Location: ../modules/superadmin/views/manage_admin.php");

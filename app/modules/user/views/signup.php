@@ -1,15 +1,15 @@
 <?php
 session_start();
 
+// Retrieve messages
 $db_error = $_SESSION['db_error'] ?? '';
-unset($_SESSION['db_error']);
-
 $signup_error = $_SESSION['signup_error'] ?? '';
-unset($_SESSION['signup_error']);
-
 $signup_success = $_SESSION['signup_success'] ?? '';
-unset($_SESSION['signup_success']);
 
+// ✅ Retrieve previously entered form data (if validation failed)
+$form_data = $_SESSION['form_data'] ?? [];
+
+// Do NOT clear here — clear after showing alerts
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../models/UserModel.php';
 ?>
@@ -59,7 +59,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
             Student/Staff ID:
             <span class="text-accent">*</span>
           </label>
-          <input type="text" name="ssid" class="w-full input-field" required placeholder="2000-012345">
+          <input type="text" name="ssid" class="w-full input-field" required placeholder="2000-012345"
+                 value="<?= htmlspecialchars($form_data['ssid'] ?? '') ?>">
         </div>
 
         <!-- Email -->
@@ -68,7 +69,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
             USeP Email:
             <span class="text-accent">*</span>
           </label>
-          <input type="text" id="email" name="email" class="w-full input-field" required placeholder="your@usep.edu.ph">
+          <input type="text" id="email" name="email" class="w-full input-field" required placeholder="your@usep.edu.ph"
+                 value="<?= htmlspecialchars($form_data['email'] ?? '') ?>">
         </div>
 
         <!-- First + Last Name side by side -->
@@ -78,14 +80,16 @@ require_once __DIR__ . '/../../../models/UserModel.php';
               First Name:
               <span class="text-accent">*</span>
             </label>
-            <input type="text" id="fname" name="fn" class="w-full input-field" required>
+            <input type="text" id="fname" name="fn" class="w-full input-field" required
+                   value="<?= htmlspecialchars($form_data['fn'] ?? '') ?>">
           </div>
           <div>
             <label for="lname" class="text-sm text-text mb-1">
               Last Name:
               <span class="text-accent">*</span>
             </label>
-            <input type="text" id="lname" name="ln" class="w-full input-field" required>
+            <input type="text" id="lname" name="ln" class="w-full input-field" required
+                   value="<?= htmlspecialchars($form_data['ln'] ?? '') ?>">
           </div>
         </div>
 
@@ -95,7 +99,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
             Password:
             <span class="text-accent">*</span>
           </label>
-          <input type="password" id="password" name="pass" class="w-full input-field" required>
+          <input type="password" id="password" name="pass" class="w-full input-field" required
+                 value="<?= htmlspecialchars($form_data['pass'] ?? '') ?>"> 
           <span class="absolute right-3 cursor-pointer" data-password-toggle="password">
             <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
             <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
@@ -108,7 +113,8 @@ require_once __DIR__ . '/../../../models/UserModel.php';
             Re-enter Password:
             <span class="text-accent">*</span>
           </label>                
-          <input type="password" id="repassword" name="rpass" class="w-full input-field" required>
+          <input type="password" id="repassword" name="rpass" class="w-full input-field" required
+                 value="<?= htmlspecialchars($form_data['rpass'] ?? '') ?>">
           <span class="absolute right-3 cursor-pointer" data-password-toggle="repassword">
             <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
             <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
@@ -141,6 +147,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
 
   </body>
 </html>
+
 <script src="/public/assets/js/shared/password-visibility.js"></script>
 <script>
   let signupError = <?= json_encode($signup_error) ?>;
@@ -153,3 +160,11 @@ require_once __DIR__ . '/../../../models/UserModel.php';
       showSuccessAlert(signupSuccess);
   }
 </script>
+
+<?php
+// ✅ Clear messages and form data AFTER they’re displayed
+unset($_SESSION['signup_error']);
+unset($_SESSION['signup_success']);
+unset($_SESSION['db_error']);
+unset($_SESSION['form_data']);
+?>

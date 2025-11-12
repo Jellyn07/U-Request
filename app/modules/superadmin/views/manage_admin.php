@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
 
 $controller = new AdminController();
 $admins = $controller->getAllAdmins();
-
+$formData = $_SESSION['admin_form_data'] ?? []; 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,22 +99,22 @@ $admins = $controller->getAllAdmins();
                       <!-- <form class="space-y-4" method="post"> -->
                         <div>
                           <label class="text-xs text-text mb-1">Staff ID No.<span class="text-secondary">*</span></label>
-                          <input type="text" name="staff_id" class="w-full input-field" required />
+                          <input type="text" name="staff_id" class="w-full input-field" value="<?= htmlspecialchars($formData['staff_id'] ?? '') ?>"  required />
                         </div>
 
                         <div>
                           <label class="text-xs text-text mb-1">USeP Email<span class="text-secondary">*</span></label>
-                          <input type="email" name="email" class="w-full input-field" required />
+                          <input type="email" name="email" class="w-full input-field" value="<?= htmlspecialchars($formData['email'] ?? '') ?>" required />
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label class="text-xs text-text mb-1">First Name<span class="text-secondary">*</span></label>
-                            <input type="text" name="first_name" class="w-full input-field" required />
+                            <input type="text" name="first_name" class="w-full input-field" value="<?= htmlspecialchars($formData['first_name'] ?? '') ?>" required />
                           </div>
                           <div>
                             <label class="text-xs text-text mb-1">Last Name<span class="text-secondary">*</span></label>
-                            <input type="text" name="last_name" class="w-full input-field" required />
+                            <input type="text" name="last_name" class="w-full input-field" value="<?= htmlspecialchars($formData['last_name'] ?? '') ?>" required />
                           </div>
                         </div>
 
@@ -126,16 +126,17 @@ $admins = $controller->getAllAdmins();
                                 minlength="11" 
                                 maxlength="11" 
                                 pattern="[0-9]{11}" 
-                                title="Please enter a valid 11-digit contact number" />
+                                title="Please enter a valid 11-digit contact number"
+                                value="<?= htmlspecialchars($formData['contact_no'] ?? '') ?>" />
                         </div>
 
                         <div>
                           <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
                           <select name="access_level" class="w-full input-field" required>
-                            <option value="" disabled selected>Select Access</option>
-                            <option value="1">Super Admin</option>
-                            <option value="2">GSU Admin</option>
-                            <option value="3">Motorpool Admin</option>
+                             <option value="" disabled <?= empty($formData['access_level']) ? 'selected' : '' ?>>Select Access</option>
+                             <option value="1" <?= ($formData['access_level'] ?? '') === '1' ? 'selected' : '' ?>>Super Admin</option>
+                             <option value="2" <?= ($formData['access_level'] ?? '') === '2' ? 'selected' : '' ?>>GSU Admin</option>
+                             <option value="3" <?= ($formData['access_level'] ?? '') === '3' ? 'selected' : '' ?>>Motorpool Admin</option>
                           </select>
                         </div>
                       <!-- </form> -->
@@ -149,7 +150,7 @@ $admins = $controller->getAllAdmins();
                       <!-- <form class="space-y-4" method="post" action="../../../controllers/ProfileController.php"> -->
                         <div class="relative">
                           <label class="text-xs text-text mb-1">Password<span class="text-secondary">*</span></label>
-                          <input type="password" id="password" name="password" class="w-full input-field" required />
+                          <input type="password" id="password" name="password" class="w-full input-field" required value="<?= htmlspecialchars($formData['password'] ?? '') ?>" />
                           <span class="absolute right-3 cursor-pointer" data-password-toggle="password">
                             <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
                             <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
@@ -157,7 +158,7 @@ $admins = $controller->getAllAdmins();
                         </div>
                         <div class="relative">
                           <label class="text-xs text-text mb-1">Confirm Password<span class="text-secondary">*</span></label>
-                          <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" required />
+                          <input type="password" id="confirm_password" name="confirm_password" class="w-full input-field" required value="<?= htmlspecialchars($formData['confirm_password'] ?? '') ?>"/>
                           <span class="absolute right-3 cursor-pointer" data-password-toggle="confirm_password">
                             <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
                             <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
