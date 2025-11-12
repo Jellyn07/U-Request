@@ -137,7 +137,7 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
               <!-- Hidden Form to carry tracking_id --> 
                 <form action="feedback.php" method="GET" class="hidden" id="form_<?php echo $track['tracking_id']; ?>"> 
                   <input type="hidden" name="tracking_id" value="<?php echo htmlspecialchars($track['tracking_id']); ?>"> 
-                </form> <div class="mt-4 text-center md:text-right"> 
+                </form> <div class="mt-4 sm:text-center text-right"> 
                   <?php if ($track['req_status'] === 'Completed') { ?> 
                   <?php if ($feedbackModel->hasFeedback($track['tracking_id'])) { ?> 
                     <button class="btn btn-secondary mb-2 md:mb-0  mr-0 md:mr-3" disabled>Feedback Completed</button> <?php } else { ?> 

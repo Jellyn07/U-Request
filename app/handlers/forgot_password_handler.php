@@ -118,8 +118,11 @@ switch ($action) {
         $email = $_POST['email'] ?? '';
         $new_password = $_POST['new_password'] ?? '';
 
-        if (strlen($new_password) < 6) {
-            echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters long.']);
+        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $new_password)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.'
+            ]);
             exit;
         }
 

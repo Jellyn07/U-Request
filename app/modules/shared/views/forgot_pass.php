@@ -49,10 +49,26 @@ require_once __DIR__ . '/../../../config/constants.php';
         <!-- STEP 3: RESET PASSWORD -->
         <div id="step-reset" class="hidden">
           <h1 class="text-center text-sm font-medium mb-2">Reset Your Password</h1>
-          <label class="text-sm text-text mb-1">New Password</label>
-          <input type="password" id="new_password" name="new_password" class="mb-3 w-full input-field" required>
-          <label class="text-sm text-text mb-1">Confirm Password</label>
-          <input type="password" id="confirm_password" name="confirm_password" class="mb-3 w-full input-field" required>
+          <div class="relative mb-2">
+            <label for="password" class="text-sm text-text mb-1">
+              New Password
+            </label>
+            <input type="password" id="new_password" name="password" class="w-full input-field" placeholder="atleast 8 characters"  required>
+            <span class="absolute right-3 cursor-pointer" data-password-toggle="new_password">
+              <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+              <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+            </span>
+          </div>
+          <div class="relative mb-2">
+            <label for="password" class="text-sm text-text mb-1">
+              Confirm Password
+            </label>
+            <input type="password" id="confirm_password" name="password" class="w-full input-field" placeholder="atleast 8 characters"  required>
+            <span class="absolute right-3 cursor-pointer" data-password-toggle="confirm_password">
+              <img src="/public/assets/img/view.png" class="size-4 eye-open my-2.5 transition-opacity duration-200">
+              <img src="/public/assets/img/hide.png" class="size-4 eye-closed hidden my-2.5 transition-opacity duration-200">
+            </span>
+          </div>
           <button type="button" class="w-full btn btn-primary" onclick="resetPassword()">Save New Password</button>
         </div>
 
@@ -251,6 +267,7 @@ function resetPassword() {
   });
 }
 </script>
+<script src="/public/assets/js/shared/password-visibility.js"></script>
 
 </body>
 </html>
