@@ -22,7 +22,8 @@ $show_submit = true; // default show submit
 
 $adminFeedbackPages = [
     '/app/modules/gsu_admin/views/feedback.php',
-    '/app/modules/motorpool_admin/views/feedback.php'
+    '/app/modules/motorpool_admin/views/feedback.php',
+    '/app/modules/superadmin/views/feedback.php'
 ];
 
 foreach ($adminFeedbackPages as $page) {

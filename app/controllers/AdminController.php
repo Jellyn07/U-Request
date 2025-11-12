@@ -326,6 +326,9 @@ class AdminController {
         return $this->model->getAllMotorpoolFeedbacks();
     }
     
+    public function getOverallFeedbacks() {
+        return $this->model->getOverallFeedbacks();
+    }
 }
 
 // Handle POST
