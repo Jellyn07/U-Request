@@ -300,14 +300,19 @@ $vehicles = $vehicleController->getVehicles();
                 </div>      
                 <!-- Button to show travel history -->
                 <div class="vehicle-card btn btn-secondary mt-4 text-center">
-                    <button 
-                        class=""
-                        @click="() => toggleHistory(selected.vehicle_id, $event.target)"
-                    >
-                        View Travel History
-                        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
-                    </button>
-                    <div class="travel-history mt-2 hidden border-t pt-2"></div>
+    <button @click="() => toggleHistory(selected.vehicle_id, $event.target)" class="mb-2">
+        Travel History
+        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
+    </button>
+    <div class="travel-history mt-2 hidden border-t pt-2"></div>
+
+    <button @click="() => toggleSchedule(selected.vehicle_id, $event.target)" class="mt-2">
+        Scheduled Trips
+        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
+    </button>
+    <div class="scheduled-trips mt-2 hidden border-t pt-2"></div>
+</div>
+
                 </div>
               </div>
               

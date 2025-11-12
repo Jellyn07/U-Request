@@ -164,39 +164,50 @@ class VehicleModel extends BaseModel {
         }
     }
     
-    public function getVehicleTravelHistory($vehicle_id) {
-        $stmt = $this->db->prepare("
-            SELECT 
-                vra.reqAssignment_id,
-                vra.control_no,
-                vra.req_id,
-                vra.vehicle_id,
-                vra.driver_id,
-                vra.req_status,
-                vra.approved_by,
-                CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
-                vr.trip_purpose,
-                vr.travel_date
-            FROM vehicle_request_assignment vra
-            INNER JOIN (
-                SELECT 
-                    control_no,
-                    MAX(reqAssignment_id) AS latest_assignment
-                FROM vehicle_request_assignment
-                GROUP BY control_no
-            ) AS latest 
-                ON vra.reqAssignment_id = latest.latest_assignment
-            INNER JOIN vehicle_request vr 
-                ON vra.control_no = vr.control_no
-            LEFT JOIN driver d 
-                ON vra.driver_id = d.driver_id
-            WHERE vra.vehicle_id = ?
-            ORDER BY vr.travel_date DESC;
-        ");
-        $stmt->bind_param("i", $vehicle_id);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-        $stmt->close();
-        return $result;
+public function getVehicleTravelHistory($vehicle_id, $type = 'history') {
+    $today = date('Y-m-d');
+
+    $query = "
+        SELECT 
+            vra.reqAssignment_id,
+            vra.control_no,
+            vra.req_id,
+            vra.vehicle_id,
+            vra.driver_id,
+            vra.req_status,
+            vra.approved_by,
+            CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
+            vr.trip_purpose,
+            vr.travel_date
+        FROM vehicle_request_assignment vra
+        INNER JOIN vehicle_request vr 
+            ON vra.control_no = vr.control_no
+        LEFT JOIN driver d 
+            ON vra.driver_id = d.driver_id
+        WHERE vra.vehicle_id = ?
+    ";
+
+    if ($type === 'history') {
+        $query .= " AND LOWER(vra.req_status) = 'completed' AND vr.travel_date <= ? ORDER BY vr.travel_date DESC";
+    } elseif ($type === 'schedule') {
+        $query .= " AND LOWER(vra.req_status) = 'approved' AND vr.travel_date > ? ORDER BY vr.travel_date ASC";
     }
+
+    $stmt = $this->db->prepare($query);
+    if (!$stmt) die(json_encode(['error' => 'Prepare failed: ' . $this->db->error]));
+
+    $stmt->bind_param("is", $vehicle_id, $today);
+    $stmt->execute();
+
+    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    return $result;
+}
+
+
+
+
+
+
 }

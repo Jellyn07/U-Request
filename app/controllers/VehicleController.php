@@ -143,18 +143,26 @@ class VehicleController {
     }
 
     public function fetchTravelHistory() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['get_travel_history'])) {
-            $vehicle_id = intval($_POST['vehicle_id'] ?? 0);
-
-            $history = [];
-            if ($vehicle_id > 0) {
-                $history = $this->vehicleModel->getVehicleTravelHistory($vehicle_id);
-            }
-
-            header('Content-Type: application/json');
-            echo json_encode($history);
-            exit;
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405); // Method not allowed
+            exit(json_encode(['error' => 'Invalid request method']));
         }
+
+        $vehicle_id = intval($_POST['vehicle_id'] ?? 0);
+        if ($vehicle_id <= 0) {
+            exit(json_encode(['error' => 'Invalid vehicle ID']));
+        }
+
+        // Detect type automatically
+        $type = 'history';
+        if (isset($_POST['get_scheduled_trips'])) $type = 'schedule';
+        if (isset($_POST['get_travel_history'])) $type = 'history';
+
+        $data = $this->vehicleModel->getVehicleTravelHistory($vehicle_id, $type);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
     }
     
     public function updateStatusByToken($token, $status) {
@@ -245,7 +253,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_vehicle'])) {
     $controller->updateVehicle();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['get_travel_history'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && 
+    (isset($_POST['get_travel_history']) || isset($_POST['get_scheduled_trips']))) {
     $controller = new VehicleController();
     $controller->fetchTravelHistory();
 }

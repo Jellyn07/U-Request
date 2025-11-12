@@ -76,8 +76,16 @@ function previewProfile(event) {
     }
 }
 
-  function toggleHistory(vehicle_id, btn) {
-    const container = btn.nextElementSibling; // travel-history div
+function toggleHistory(vehicle_id, btn) {
+    loadVehicleData(vehicle_id, btn, 'get_travel_history', 'No Travel History', 'Failed to load travel history');
+}
+
+function toggleSchedule(vehicle_id, btn) {
+    loadVehicleData(vehicle_id, btn, 'get_scheduled_trips', 'No Scheduled Trips', 'Failed to load scheduled trips');
+}
+
+function loadVehicleData(vehicle_id, btn, action, emptyMsg, errorMsg) {
+    const container = btn.nextElementSibling;
     if (!container) return;
 
     const isVisible = !container.classList.contains('hidden');
@@ -92,42 +100,25 @@ function previewProfile(event) {
     fetch('../../../controllers/VehicleController.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `get_travel_history=1&vehicle_id=${vehicle_id}`
+        body: `${action}=1&vehicle_id=${vehicle_id}`
     })
-    .then(res => res.text()) // temporarily as text
-    .then(text => {
-    let data;
-    try {
-        data = JSON.parse(text);
-    } catch (err) {
-        console.error('Invalid JSON:', text);
-        container.innerHTML = '<p class="text-sm text-red-500">Failed to load travel history</p>';
-        return;
-    }
-    if (!data || data.length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-500">No Travel History</p>';
-    } else {
-        const today = new Date();
+    .then(res => res.json())
+    .then(data => {
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p class="text-sm text-gray-500">${emptyMsg}</p>`;
+            return;
+        }
 
         const listItems = data.map(h => {
             const travelDate = new Date(h.travel_date);
             const dateFormatted = travelDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-            // ✅ Check if the travel date is in the future
-            const isFuture = travelDate > today;
-            const label = isFuture ? '<span class="text-blue-600 font-semibold">Schedule: </span> ' : '';
-
-            return `
-                <li class="text-sm p-1 border-b border-gray-200">
-                    ${label}${dateFormatted} - ${h.trip_purpose} - Driver: ${h.driver_name}
-                </li>
-            `;
+            return `<li class="text-sm p-1 border-b border-gray-200">${dateFormatted} - ${h.trip_purpose} - Driver: ${h.driver_name}</li>`;
         }).join('');
+
         container.innerHTML = `<ul class="space-y-1">${listItems}</ul>`;
-    }
     })
     .catch(err => {
         console.error(err);
-        container.innerHTML = '<p class="text-sm text-red-500">Failed to load travel history</p>';
+        container.innerHTML = `<p class="text-sm text-red-500">${errorMsg}</p>`;
     });
 }

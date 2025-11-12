@@ -36,7 +36,7 @@ $requests = $data['requests'];
         <button class="ml-5 btn"><p>All</p></button>
         <button class="btn"><p>Pending</p></button>
         <button class="btn"><p>Approved</p></button>
-        <button class="btn"><p>In Progress</p></button>
+        <button class="btn"><p>On Going</p></button>
         <button class="btn"><p>Rejected/Cancelled</p></button>
         <button class="btn"><p>Completed</p></button>
       </div>

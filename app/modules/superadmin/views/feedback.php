@@ -77,7 +77,7 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
                     <?= htmlspecialchars($feedback['tracking_id'] ?? 'Anonymous User') ?>
                   </p>
                   <p class="text-xs text-gray-600">
-                    <span class="font-medium text-xs">Total Vehicle Request: </span><?= htmlspecialchars($feedback['total_requests'] ?? 0) ?><br>
+                    <span class="font-medium text-xs">Total Request: </span><?= htmlspecialchars($feedback['total_requests'] ?? 0) ?><br>
                     <span class="font-medium text-xs">Total Feedback:</span> <?= htmlspecialchars($feedback['total_feedback'] ?? 0) ?>
                   </p>
                 </div>
