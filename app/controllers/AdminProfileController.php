@@ -161,6 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $_SESSION['error'] = "No file uploaded or upload error.";
     }
 
-    header("Location: /app/modules/gsu_admin/views/profile.php");
-    exit;
+    $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+            header("Location: $redirect");
+            exit;
 }

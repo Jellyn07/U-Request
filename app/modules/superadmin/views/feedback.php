@@ -54,12 +54,12 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
       </div>
 
       <div class="bg-white p-6 rounded-2xl shadow">
-      <div class="mb-5 flex items-center justify-end gap-2">
+      <!-- <div class="mb-5 flex items-center justify-end gap-2">
         <select id="sortSelect" class="input-field">
           <option value="desc">GSU Feedback</option>
           <option value="asc">Motorpool Feedback</option>
         </select>
-      </div>
+      </div> -->
 
         <!-- <hr class="mb-2 border-b border-gray-300 mx-10"> -->
 

@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     header("Location: /app/modules/user/views/profile.php");
-    exit;
+    exit();
 }
 
 //Update Office
