@@ -190,6 +190,7 @@ $formData = $_SESSION['admin_form_data'] ?? [];
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Access Level</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Add Admin Access</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
@@ -213,32 +214,55 @@ $formData = $_SESSION['admin_form_data'] ?? [];
                       }"
                       class="cursor-pointer hover:bg-gray-100 border-b border-gray-200"
                     >
+
+                    <!-- Profile picture -->
                     <td class="pl-8 py-2">
-                    <img src="<?php echo !empty($admin['profile_picture']) 
-                                ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) 
-                                : '/public/assets/img/user-default.png'; ?>" 
-                                  alt="User" 
-                                  class="size-8 rounded-full object-cover">
+                      <img src="<?php echo !empty($admin['profile_picture']) 
+                                  ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) 
+                                  : '/public/assets/img/user-default.png'; ?>" 
+                                    alt="User" 
+                                    class="size-8 rounded-full object-cover">
                     </td>
+
+                    <!-- Full Name -->
                     <td class="px-4 py-2">
                       <?php echo htmlspecialchars($admin['full_name']); ?>
                     </td>
+
+                    <!-- Status -->
                     <td class="px-4 py-2">
                       <span class="text-xs px-3 py-1 rounded-full font-semibold <?php echo strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'text-red-800'; ?>">
                         <?php echo htmlspecialchars($admin['status']); ?>
                       </span>
                     </td>
+
+                    <!-- Email -->
                     <td class="px-4 py-2">
                       <?php echo htmlspecialchars($admin['email']); ?>
                     </td>
+
+                    <!-- Access Level -->
                     <td class="px-4 py-2">
                       <?php echo htmlspecialchars($admin['accessLevel_desc']); ?>
+                    </td>
+
+                    <!-- Checkbox column -->
+                    <td class="pl-4 py-2 text-center">
+                      <input 
+                        type="checkbox" 
+                        class="admin-checkbox"
+                        <?php if (strtolower($admin['accessLevel_desc']) === 'superadmin'): ?>
+                          checked disabled
+                        <?php endif; ?>
+                        @click.stop
+                        @change.stop="grantAccess($event, '<?php echo htmlspecialchars($admin['full_name']); ?>')"
+                      >
                     </td>
                   </tr>
                 <?php endforeach; ?>
               <?php else: ?>
                 <tr>
-                  <td colspan="4" class="text-center py-4 text-gray-500">No administrators found.</td>
+                  <td colspan="6" class="text-center py-4 text-gray-500">No administrators found.</td>
                 </tr>
               <?php endif; ?>
             </tbody>
@@ -361,3 +385,32 @@ unset($_SESSION['admin_error']);
 </script>
 <?php unset($_SESSION['update_status']); endif; ?>
 
+<script>
+function grantAccess(event, adminName) {
+    const checkbox = event.target;
+    const previousState = !checkbox.checked; // store previous state
+
+    // Determine the action based on new state
+    const action = checkbox.checked ? 'grant' : 'terminate';
+    const confirmText = checkbox.checked
+        ? `Do you really want to grant access to ${adminName}?`
+        : `Do you really want to terminate access for ${adminName}?`;
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: confirmText,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: action === 'grant' ? 'Yes, grant access!' : 'Yes, terminate access!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // User confirmed → perform the action (e.g., AJAX call)
+            console.log(`${adminName} access ${action}ed!`);
+        } else {
+            // User canceled → revert checkbox to previous state
+            checkbox.checked = previousState;
+        }
+    });
+}
+</script>

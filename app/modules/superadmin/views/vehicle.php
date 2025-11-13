@@ -68,7 +68,6 @@ $vehicles = $vehicleController->getVehicles();
             <!-- Add Admin Modal -->
                 <div x-data="{ showModal: false }">
 
-            <!-- Modal Background -->
             <!-- Add Vehicle / Add Driver Modal -->
             <div x-data="{ showModal: false }">
               <button @click="showModal = true" title="Add new driver" class="btn btn-secondary">

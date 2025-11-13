@@ -126,7 +126,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
   const ADMIN_LOGIN = "/app/modules/shared/views/admin_login.php";
   const USER_LOGIN  = "/app/modules/user/views/login.php";
 </script>
-<script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
+<script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script> 
 <script src="/public/assets/js/shared/password-visibility.js"></script>
 <script src="/public/assets/js/shared/login-form-transition.js"></script>
 </html>

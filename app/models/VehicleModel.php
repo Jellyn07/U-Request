@@ -204,10 +204,4 @@ public function getVehicleTravelHistory($vehicle_id, $type = 'history') {
 
     return $result;
 }
-
-
-
-
-
-
 }
