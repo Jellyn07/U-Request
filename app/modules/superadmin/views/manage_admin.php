@@ -324,6 +324,14 @@ $formData = $_SESSION['admin_form_data'] ?? [];
               </select>
             </div>
 
+            <div>
+              <label class="text-xs text-text mb-1">Status</label>
+              <select name="status" x-model="selected.status" class="w-full input-field" required>
+                <option value="Active" <?= (!isset($formData['status']) || $formData['status'] === 'Active') ? 'selected' : '' ?>>Active</option>
+                <option value="Inactive" <?= (isset($formData['status']) && $formData['status'] === 'Inactive') ? 'selected' : '' ?>>Deactivate</option>
+              </select>
+            </div>
+
             <div class="flex justify-center">
               <button type="submit" name="update_admin" class="btn btn-primary mt-2">Save Changes</button>
             </div>

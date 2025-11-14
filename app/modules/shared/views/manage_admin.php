@@ -56,12 +56,12 @@ if ($_SESSION['access_level'] == 2) {
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
-            <select id="roleFilter" class="input-field">
+            <!-- <select id="roleFilter" class="input-field">
               <option value="all">All</option>
               <option value="1">Super Admin</option>
               <option value="2">GSU Admin</option>
               <option value="3">Motorpool Admin</option>
-            </select>
+            </select> -->
             <select id="sortUsers" class="input-field">
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
@@ -144,13 +144,37 @@ if ($_SESSION['access_level'] == 2) {
                         </div>
 
                         <div>
-                          <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
-                          <select name="access_level" class="w-full input-field" required>
-                             <option value="" disabled <?= empty($formData['access_level']) ? 'selected' : '' ?>>Select Access</option>
-                             <option value="1" <?= ($formData['access_level'] ?? '') === '1' ? 'selected' : '' ?>>Super Admin</option>
-                             <option value="2" <?= ($formData['access_level'] ?? '') === '2' ? 'selected' : '' ?>>GSU Admin</option>
-                             <option value="3" <?= ($formData['access_level'] ?? '') === '3' ? 'selected' : '' ?>>Motorpool Admin</option>
-                          </select>
+                            <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
+                            <select name="accessLevel_id" class="w-full input-field" required>
+                                <option value="" disabled <?= !isset($formData['accessLevel_id']) ? 'selected' : '' ?>>Select Access</option>
+                                <?php
+                                // Define all access levels
+                                $accessLevels = [
+                                    1 => 'Super Admin',
+                                    2 => 'GSU Admin',
+                                    3 => 'Motorpool Admin'
+                                ];
+
+                                // Determine which options the user can see
+                                foreach ($accessLevels as $id => $label) {
+                                    if ($_SESSION['access_level'] == 1) {
+                                        // Super Admin sees all
+                                        $show = true;
+                                    } elseif ($_SESSION['access_level'] == 2 && $id == 2) {
+                                        $show = true; // GSU Admin sees only GSU
+                                    } elseif ($_SESSION['access_level'] == 3 && $id == 3) {
+                                        $show = true; // Motorpool Admin sees only Motorpool
+                                    } else {
+                                        $show = false;
+                                    }
+
+                                    if ($show) {
+                                        $selected = (isset($formData['accessLevel_id']) && (int)$formData['accessLevel_id'] === $id) ? 'selected' : '';
+                                        echo "<option value=\"$id\" $selected>$label</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
                         </div>
                       <!-- </form> -->
                     </div>
@@ -203,7 +227,6 @@ if ($_SESSION['access_level'] == 2) {
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Access Level</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Add Admin Access</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
@@ -257,19 +280,6 @@ if ($_SESSION['access_level'] == 2) {
                     <!-- Access Level -->
                     <td class="px-4 py-2">
                       <?php echo htmlspecialchars($admin['accessLevel_desc']); ?>
-                    </td>
-
-                    <!-- Checkbox column -->
-                    <td class="pl-4 py-2 text-center">
-                      <input 
-                        type="checkbox" 
-                        class="admin-checkbox"
-                        <?php if (strtolower($admin['accessLevel_desc']) === 'superadmin'): ?>
-                          checked disabled
-                        <?php endif; ?>
-                        @click.stop
-                        @change.stop="grantAccess($event, '<?php echo htmlspecialchars($admin['full_name']); ?>')"
-                      >
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -331,11 +341,7 @@ if ($_SESSION['access_level'] == 2) {
 
             <div>
               <label class="text-xs text-text mb-1">Access Level</label>
-              <select name="accessLevel_id" x-model="selected.accessLevel_id" class="w-full input-field">
-                <option value="1">Superadmin</option>
-                <option value="2">GSU Administrator</option>
-                <option value="3">Motorpool Administrator</option>
-              </select>
+              <input type="text" id="accessLevel_id" name="contact_no" :value="selected.accessLevel_desc || ''" readonly class="w-full input-field"/>
             </div>
 
             <div class="flex justify-center">

@@ -37,67 +37,75 @@ if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
     header("Location: ../modules/shared/views/admin_login.php");
     exit();
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     $email = trim($_POST['email'] ?? '');
     $input_pass = trim($_POST['password'] ?? '');
 
     $userModel = new UserModel();
-    $admin = $userModel->getAdminUserByEmail($email);
+    $admin = $userModel->getAdminUserByEmail($email); // this calls the stored procedure
 
-    if ($admin && $userModel->verifyPassword($input_pass, $admin['password'])) {
+    // Check if admin record exists and procedure returned success
+    if ($admin && isset($admin['result']) && $admin['result'] === 'success') {
 
-        // ✅ SUCCESS
-        $_SESSION['login_attempts'] = 0;
-        $_SESSION['lock_time'] = null;
+        if ($userModel->verifyPassword($input_pass, $admin['password'])) {
 
-        $staff_id = $admin['staff_id']; // important for the next part
+            // ✅ SUCCESS
+            $_SESSION['login_attempts'] = 0;
+            $_SESSION['lock_time'] = null;
 
-        // 🔹 Store user session info
-        $_SESSION['staff_id'] = $staff_id;
-        $_SESSION['email'] = $admin['email'];
-        $_SESSION['access_level'] = $admin['accessLevel_id'];
-        $_SESSION['full_name'] = $admin['first_name'] . ' ' . $admin['last_name'];
+            $staff_id = $admin['staff_id'];
 
-        $adminModel = new AdministratorModel();
-        
-        $menuAccess = $adminModel->getAdminMenuAccess($staff_id);
-        $_SESSION['canSeeAdminManagement'] = ($menuAccess == 1);
+            // 🔹 Store session info
+            $_SESSION['staff_id'] = $staff_id;
+            $_SESSION['email'] = $admin['email'];
+            $_SESSION['access_level'] = $admin['accessLevel_id'];
+            $_SESSION['full_name'] = $admin['first_name'] . ' ' . $admin['last_name'];
 
-        // 🔹 Redirect based on access level
-        switch ($admin['accessLevel_id']) {
-            case 1:
-                header("Location: ../modules/superadmin/views/dashboard.php");
-                break;
-            case 2:
-                header("Location: ../modules/gsu_admin/views/dashboard.php");
-                break;
-            case 3:
-                header("Location: ../modules/motorpool_admin/views/dashboard.php");
-                break;
-            default:
-                $_SESSION['login_error'] = "Unknown access level.";
-                header("Location: ../modules/shared/views/admin_login.php");
+            $adminModel = new AdministratorModel();
+            $menuAccess = $adminModel->getAdminMenuAccess($staff_id);
+            $_SESSION['canSeeAdminManagement'] = ($menuAccess == 1);
+
+            // 🔹 Redirect based on access level
+            switch ($admin['accessLevel_id']) {
+                case 1:
+                    header("Location: ../modules/superadmin/views/dashboard.php");
+                    break;
+                case 2:
+                    header("Location: ../modules/gsu_admin/views/dashboard.php");
+                    break;
+                case 3:
+                    header("Location: ../modules/motorpool_admin/views/dashboard.php");
+                    break;
+                default:
+                    $_SESSION['login_error'] = "Unknown access level.";
+                    header("Location: ../modules/shared/views/admin_login.php");
+            }
+            exit;
+
+        } else {
+            // ❌ Invalid password
+            $_SESSION['login_attempts']++;
+            $_SESSION['login_error'] = "Invalid password. Attempt {$_SESSION['login_attempts']} of 3.";
         }
-        exit;
-    } else {
-        // ❌ FAILED LOGIN
-        $_SESSION['login_attempts']++;
 
+    } else {
+        // ❌ Admin not found or account inactive
+        $_SESSION['login_error'] = $admin['error_message'] ?? "Invalid email or password.";
+
+        // Optional: count failed attempts
+        $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
         if ($_SESSION['login_attempts'] >= 3) {
             $_SESSION['lock_time'] = time() + 60;
-            $remaining = 60;
-            $_SESSION['login_error'] = "Too many failed attempts. Login locked for {$remaining} seconds.";
-        } else {
-            $_SESSION['login_error'] = "Invalid email or password. Attempt {$_SESSION['login_attempts']} of 3.";
+            $_SESSION['login_error'] .= " Login locked for 60 seconds.";
         }
-
-        $_SESSION['old_email'] = $email;
-        $_SESSION['old_password'] = $input_pass;
-        header("Location: ../modules/shared/views/admin_login.php");
-        exit;
     }
+
+    $_SESSION['old_email'] = $email;
+    $_SESSION['old_password'] = $input_pass;
+    header("Location: ../modules/shared/views/admin_login.php");
+    exit;
 }
+
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
     $adminModel = new AdministratorModel(); // ✅ This must be inside the condition
@@ -203,7 +211,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_admin']) ) {
         'lastName'       => $_POST['lastName'] ?? null,
         'contact_no'     => $_POST['contact_no'] ?? null,
         'accessLevel_id' => $_POST['accessLevel_id'] ?? null,
-        'admin_email'=> $_POST['admin_email'] ?? null,
+        'admin_email'    => $_POST['admin_email'] ?? null,
+        'status'         => $_POST['status'] ?? null,
     ];
 
     $updated = $controller->updateAdmin($data);
@@ -214,7 +223,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_admin']) ) {
         $_SESSION['admin_error'] = ['type' => 'error', 'message' => 'Failed to update administrator details.'];
     }
 
-    header("Location: ../modules/superadmin/views/manage_admin.php");
+    $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+    header("Location: $redirect");
     exit;
 }
 
@@ -226,7 +236,9 @@ class AdminController {
     }
 
     public function getAllAdmins() {
-        return $this->model->getAdministrators();
+        // Get the current user's access level from the session
+        $currentAccessLevel = $_SESSION['access_level'] ?? 1; // default to Superadmin if not set
+        return $this->model->getAdministrators($currentAccessLevel);
     }
 
      // --- UPDATE ADMIN DETAILS ---

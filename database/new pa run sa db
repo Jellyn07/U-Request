@@ -1006,3 +1006,60 @@ BEGIN
     VALUES (admin_name, 'INSERT', description_text);
 END$$
 DELIMITER ;
+
+---------------------------------------------------------------------------------------------------------------------------------
+drop procedure spGetAdminByEmail;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetAdminByEmail`(IN `input_email` VARCHAR(150))
+BEGIN
+    DECLARE account_status VARCHAR(20);
+
+    -- Get the account status
+    SELECT status INTO account_status
+    FROM administrator
+    WHERE email = input_email
+    LIMIT 1;
+
+    IF account_status IS NULL THEN
+        -- Email not found
+        SELECT NULL AS staff_id,
+               NULL AS email,
+               NULL AS password,
+               NULL AS first_name,
+               NULL AS last_name,
+               NULL AS accessLevel_id,
+               NULL AS profile_picture,
+               'Email not found.' AS error_message,
+               'error' AS result,
+               NULL AS status;
+    ELSEIF account_status = 'Inactive' THEN
+        -- Account is inactive
+        SELECT NULL AS staff_id,
+               NULL AS email,
+               NULL AS password,
+               NULL AS first_name,
+               NULL AS last_name,
+               NULL AS accessLevel_id,
+               NULL AS profile_picture,
+               'This account is deactivated and cannot log in.' AS error_message,
+               'error' AS result,
+               account_status AS status;
+    ELSE
+        -- Account is active, return admin info
+        SELECT 
+            staff_id,
+            email,
+            password,
+            first_name,
+            last_name,
+            accessLevel_id,
+            profile_picture,
+            status,
+            NULL AS error_message,
+            'success' AS result
+        FROM administrator
+        WHERE email = input_email;
+    END IF;
+END$$
+DELIMITER ;
+

@@ -70,18 +70,54 @@ class AdministratorModel extends BaseModel {
         return $input_pass === decrypt($stored_encrypted_pass);
     }
 
-    public function getAdministrators() {
-        $stmt = $this->db->prepare("SELECT * FROM vw_administrator");
+    // public function getAdministrators() {
+    //     $stmt = $this->db->prepare("SELECT * FROM vw_administrator");
+        
+    //     if (!$stmt) {
+    //         $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
+    //         return [];
+    //     }
+    
+    //     $stmt->execute();
+    //     $result = $stmt->get_result();
+    //     $admins = $result->fetch_all(MYSQLI_ASSOC);
+    
+    //     $stmt->close();
+    //     return $admins;
+    // }
+
+    public function getAdministrators($currentAccessLevel = 1) {
+        // Base query
+        $query = "SELECT * FROM vw_administrator";
+        $params = [];
+        
+        // Apply filter for non-superadmins
+        if ($currentAccessLevel == 2) {
+            // GSU Admin sees only GSU admins
+            $query .= " WHERE accessLevel_id = ?";
+            $params[] = 2;
+        } elseif ($currentAccessLevel == 3) {
+            // Motorpool Admin sees only Motorpool admins
+            $query .= " WHERE accessLevel_id = ?";
+            $params[] = 3;
+        }
+
+        $stmt = $this->db->prepare($query);
         
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
             return [];
         }
-    
+
+        // Bind parameters if needed
+        if (!empty($params)) {
+            $stmt->bind_param(str_repeat('i', count($params)), ...$params);
+        }
+
         $stmt->execute();
         $result = $stmt->get_result();
         $admins = $result->fetch_all(MYSQLI_ASSOC);
-    
+
         $stmt->close();
         return $admins;
     }
@@ -98,6 +134,7 @@ class AdministratorModel extends BaseModel {
             'lastName' => ['col' => 'last_name', 'type' => 's'],
             'contact_no' => ['col' => 'contact_no', 'type' => 's'],
             'accessLevel_id' => ['col' => 'accessLevel_id', 'type' => 'i'],
+            'status' => ['col' => 'status', 'type' => 's'],
         ];
 
         $setParts = [];
@@ -493,22 +530,20 @@ class AdministratorModel extends BaseModel {
         $stmt->bind_param("si", $staff_id, $enabled);
         return $stmt->execute();
     }
+
     public function getAdminMenuAccess($staff_id){
-    $sql = "SELECT is_enabled FROM add_admin_access WHERE staff_id = ?";
-    $stmt = $this->db->prepare($sql);
-    if(!$stmt) return 0;
-    $stmt->bind_param("s", $staff_id);
-    $stmt->execute();
-    $is_enabled = null;
-    $stmt->bind_result($is_enabled);
-    $fetched = $stmt->fetch(); // returns true if a row exists
-    $stmt->close();
+        $sql = "SELECT is_enabled FROM add_admin_access WHERE staff_id = ?";
+        $stmt = $this->db->prepare($sql);
+        if(!$stmt) return 0;
+        $stmt->bind_param("s", $staff_id);
+        $stmt->execute();
+        $is_enabled = null;
+        $stmt->bind_result($is_enabled);
+        $fetched = $stmt->fetch(); // returns true if a row exists
+        $stmt->close();
 
-    return ($fetched && $is_enabled !== null) ? (int)$is_enabled : 0;
-}
-
-
-
+        return ($fetched && $is_enabled !== null) ? (int)$is_enabled : 0;
+    }
 }
 
 
