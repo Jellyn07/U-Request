@@ -1068,3 +1068,22 @@ CREATE TABLE add_admin_access (
     staff_id varchar(100) PRIMARY KEY,
     is_enabled TINYINT(1) DEFAULT 0
 );
+
+------------------------------------------------------------------------------
+
+CREATE OR REPLACE VIEW vw_rqtrack AS
+SELECT 
+    r.tracking_id,
+    r.request_Type,
+    r.request_desc,
+    r.location,
+    ra.req_status,
+    ra.date_finished,
+    r.req_id,
+    r.request_date
+FROM request r
+INNER JOIN request_assignment ra 
+    ON r.request_id = ra.request_id
+INNER JOIN requester rq 
+    ON r.req_id = rq.req_id
+GROUP BY r.req_id, r.tracking_id;

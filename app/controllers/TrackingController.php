@@ -33,7 +33,7 @@ class TrackingController {
         return $this->model->getTrackingDetails($trackingId, $email);
     }
 
-     public function getFilteredTracking($email, $type = 'repair', $statusFilter = '', $sort = 'newest') {
+    public function getFilteredTracking($email, $type = 'repair', $statusFilter = '', $sort = 'newest') {
         // Fetch appropriate list
         $repairList = $this->model->getRepairTrackingByEmail($email);
         $vehicleList = $this->model->getVehicleTrackingByEmail($email);
@@ -47,35 +47,16 @@ class TrackingController {
             });
         }
 
-        // --- Sort by status order then by date ---
-        $statusOrderRepair = [
-            'To Inspect'   => 1,
-            'In Progress'  => 2,
-            'Completed'    => 3
-        ];
+        // --- Sort ONLY by date_request ---
+        usort($list, function ($a, $b) use ($sort) {
+        $dateA = strtotime($a['date_request'] ?? $a['request_date'] ?? 0);
+        $dateB = strtotime($b['date_request'] ?? $b['request_date'] ?? 0);
 
-        $statusOrderVehicle = [
-            'Pending'      => 1,
-            'Approved'     => 2,
-            'Disapproved'  => 3,
-            'On Going'     => 4,
-            'Completed'    => 5
-        ];
-
-        $statusOrder = ($type === 'vehicle') ? $statusOrderVehicle : $statusOrderRepair;
-
-        usort($list, function ($a, $b) use ($statusOrder, $sort) {
-            $statusA = $statusOrder[$a['req_status']] ?? 999;
-            $statusB = $statusOrder[$b['req_status']] ?? 999;
-
-            if ($statusA !== $statusB) return $statusA - $statusB;
-
-            $dateA = !empty($a['date_request']) ? strtotime($a['date_request']) : 0;
-            $dateB = !empty($b['date_request']) ? strtotime($b['date_request']) : 0;
-
-            return ($sort === 'oldest') ? $dateA - $dateB : $dateB - $dateA;
-        });
-
+        return ($sort === 'oldest') 
+            ? ($dateA - $dateB)
+            : ($dateB - $dateA);
+    });
         return $list;
     }
+
 }

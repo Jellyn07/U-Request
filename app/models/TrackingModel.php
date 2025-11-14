@@ -87,6 +87,7 @@ class TrackingModel extends BaseModel {
                 t.date_finished,
                 t.req_id,
                 t.request_desc,
+                t.request_date,
                 NULL AS trip_purpose,
                 NULL AS travel_destination,
                 NULL AS travel_date,
