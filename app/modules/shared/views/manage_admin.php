@@ -226,7 +226,7 @@ if ($_SESSION['access_level'] == 2) {
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Access Level</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Contact No</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
@@ -279,7 +279,7 @@ if ($_SESSION['access_level'] == 2) {
 
                     <!-- Access Level -->
                     <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['accessLevel_desc']); ?>
+                      <?php echo htmlspecialchars($admin['contact_no']); ?>
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -375,6 +375,7 @@ if ($_SESSION['access_level'] == 2) {
   </script>
   <script src="/public/assets/js/shared/password-visibility.js"></script>
   <script src="/public/assets/js/shared/export.js"></script>
+  <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>
 
@@ -403,33 +404,3 @@ unset($_SESSION['admin_error']);
   
 </script>
 <?php unset($_SESSION['update_status']); endif; ?>
-
-<script>
-function grantAccess(event, adminName) {
-    const checkbox = event.target;
-    const previousState = !checkbox.checked; // store previous state
-
-    // Determine the action based on new state
-    const action = checkbox.checked ? 'grant' : 'terminate';
-    const confirmText = checkbox.checked
-        ? `Do you really want to grant access to ${adminName}?`
-        : `Do you really want to terminate access for ${adminName}?`;
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: confirmText,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: action === 'grant' ? 'Yes, grant access!' : 'Yes, terminate access!',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // User confirmed → perform the action (e.g., AJAX call)
-            console.log(`${adminName} access ${action}ed!`);
-        } else {
-            // User canceled → revert checkbox to previous state
-            checkbox.checked = previousState;
-        }
-    });
-}
-</script>

@@ -52,5 +52,6 @@ $trips = $controller->fetchTrips();
     const trips = <?php echo json_encode($trips); ?>;
   </script>
   <script src="/public/assets/js/motorpool_admin/schedule.js"></script>
+  <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>

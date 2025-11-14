@@ -507,5 +507,6 @@ $vehicles = $vehicleController->getVehicles();
     </div>
   </main>
   <script src="/public/assets/js/shared/export.js"></script>
+  <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>

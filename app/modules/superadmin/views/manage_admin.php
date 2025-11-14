@@ -248,15 +248,19 @@ $formData = $_SESSION['admin_form_data'] ?? [];
 
                           <!-- Checkbox column -->
                           <td class="pl-4 py-2 text-center">
-                              <input 
-                                  type="checkbox" 
-                                  class="admin-checkbox"
-                                  <?= $checked ? 'checked' : '' ?>
-                                  <?= $isSuperAdmin ? 'disabled' : '' ?>
-                                  @click.stop
-                                  @change.stop="toggleAdminMenuAccess($event, '<?= $admin['staff_id'] ?>')"
-                              >
-                          </td>
+                            <input 
+                                type="checkbox" 
+                                class="admin-checkbox"
+                                id="access-<?= $admin['staff_id'] ?>"
+                                <?= $checked ? 'checked' : '' ?>
+                                <?= $isSuperAdmin ? 'disabled' : '' ?>
+                                @click.stop
+                                @change.stop="toggleAdminMenuAccess($event, '<?= $admin['staff_id'] ?>'); updateStatusText(this)"
+                            >
+                            <p id="status-text-<?= $admin['staff_id'] ?>" class="text-xs mt-1 text-gray-600 hidden" >
+                                <?= $checked ? 'Enabled' : 'Disabled' ?>
+                            </p>
+                        </td>
                       </tr>
                   <?php endforeach; ?>
               <?php else: ?>
@@ -363,6 +367,8 @@ $formData = $_SESSION['admin_form_data'] ?? [];
   </script>
   <script src="/public/assets/js/shared/password-visibility.js"></script>
   <script src="/public/assets/js/shared/export.js"></script>
+  <script src="/public/assets/js/shared/manage-admin.js"></script>
+  <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>
 
@@ -391,46 +397,3 @@ unset($_SESSION['admin_error']);
   
 </script>
 <?php unset($_SESSION['update_status']); endif; ?>
-
-<script>
-function toggleAdminMenuAccess(event, staffId) {
-    const checked = event.target.checked;
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: checked 
-            ? 'Enable Admin Management for this account?' 
-            : 'Disable Admin Management for this account?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'Cancel'
-    }).then(result => {
-        if (!result.isConfirmed) {
-            event.target.checked = !checked;
-            return;
-        }
-
-        fetch("/app/controllers/AdminController.php?action=toggleAdminMenu", {
-            method: "POST",
-            body: new URLSearchParams({
-                staff_id: staffId,
-                enabled: checked ? 1 : 0
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                Swal.fire('Success!', `Admin Management ${checked ? 'enabled' : 'disabled'} for this account.`, 'success');
-            } else {
-                Swal.fire('Error!', data.message || 'Failed to update menu access.', 'error');
-                event.target.checked = !checked;
-            }
-        })
-        .catch(() => {
-            Swal.fire('Error!', 'Network error. Try again.', 'error');
-            event.target.checked = !checked;
-        });
-    });
-}
-</script>

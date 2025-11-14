@@ -105,6 +105,7 @@ require_once __DIR__ . '/../../../config/constants.php';
   </main>
 
   <script src="/public/assets/js/backup-scheduler.js"></script>
+  <script src="/public/assets/js/shared/menus.js"></script>
 
 <script>
   // Session-based alerts for manual backup/restore

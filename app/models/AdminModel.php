@@ -97,22 +97,6 @@ class AdministratorModel extends BaseModel {
         return $input_pass === decrypt($stored_encrypted_pass);
     }
 
-    // public function getAdministrators() {
-    //     $stmt = $this->db->prepare("SELECT * FROM vw_administrator");
-        
-    //     if (!$stmt) {
-    //         $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
-    //         return [];
-    //     }
-    
-    //     $stmt->execute();
-    //     $result = $stmt->get_result();
-    //     $admins = $result->fetch_all(MYSQLI_ASSOC);
-    
-    //     $stmt->close();
-    //     return $admins;
-    // }
-
     public function getAdministrators($currentAccessLevel = 1) {
         // Base query
         $query = "SELECT * FROM vw_administrator";

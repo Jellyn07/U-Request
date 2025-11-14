@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 }
 
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
     $adminModel = new AdministratorModel(); // ✅ This must be inside the condition
 
     $staff_id       = $_POST['staff_id'] ?? '';
@@ -130,6 +130,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         'confirm_password' => $confirm_pass
     ];
 
+    // ✅ Check if staff id already exists
+    if ($adminModel->isAdminIdExistsOnAdd($staff_id)) {
+        $_SESSION['admin_error'] = "Staff id already exists.";
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+        header("Location: $redirect");
+        exit;
+    }
+
+    // ✅ Check if email already exists
+    if ($adminModel->isAdminEmailExistsOnAdd($email)) {
+        $_SESSION['admin_error'] = "Email already exists.";
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+        header("Location: $redirect");
+        exit;
+    }
+
+    // ✅ Check if contact number already exists
+    if ($adminModel->isAdminContactExistsOnAdd($contact_no)) {
+        $_SESSION['admin_error'] = "Contact number already exists.";
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+        header("Location: $redirect");
+        exit;
+    }
+
     // ✅ Password validation function
     function isValidPassword($password) {
         return preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/", $password);
@@ -142,13 +166,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
     if (!isValidPassword($password_raw)) {
         $_SESSION['admin_error'] = "Password must be at least 8 characters long and contain uppercase, lowercase letters,special character and numbers.";
-        header("Location: ../modules/superadmin/views/manage_admin.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+        header("Location: $redirect");
         exit;
     }
 
     if ($password_raw !== $confirm_pass) {
         $_SESSION['admin_error'] = "Passwords do not match.";
-        header("Location: ../modules/superadmin/views/manage_admin.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+        header("Location: $redirect");
         exit;
     }
 
@@ -172,11 +198,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
         } else {
             $_SESSION['admin_error'] = "Failed to upload profile picture.";
-            header("Location: ../modules/superadmin/views/manage_admin.php");
+            $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+            header("Location: $redirect");
             exit;
         }
     }
-    
+
     $validAccessLevels = [1,2,3];
     if (!in_array((int)$_POST['access_level'], $validAccessLevels)) {
         $redirect = $_SERVER['HTTP_REFERER'] ?? '/';

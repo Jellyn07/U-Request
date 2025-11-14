@@ -502,4 +502,5 @@ $vehicles = $vehicleController->getVehicles();
   </main>
 </body>
 <script src="/public/assets/js/shared/export.js"></script>
+<script src="/public/assets/js/shared/menus.js"></script>
 </html>

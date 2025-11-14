@@ -208,5 +208,5 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
 
   </script>
 </body>
-
+<script src="/public/assets/js/shared/menus.js"></script>
 </html>
