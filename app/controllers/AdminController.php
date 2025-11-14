@@ -176,7 +176,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             exit;
         }
     }
-
+    
+    $validAccessLevels = [1,2,3];
+    if (!in_array((int)$_POST['access_level'], $validAccessLevels)) {
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+            header("Location: $redirect");
+        exit;
+    }
 
     // ✅ Now use the model
     $result = $adminModel->addAdministrator(
@@ -192,11 +198,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
     if ($result) {
         $_SESSION['admin_success'] = "Administrator successfully added.";
-        header("Location: ../modules/superadmin/views/manage_admin.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
+        header("Location: $redirect");
         exit;
     } else {
         $_SESSION['admin_error'] = $_SESSION['db_error'] ?? "Unknown error occurred.";
-        header("Location: ../modules/superadmin/views/manage_admin.php");
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; 
+        header("Location: $redirect");
         exit;
     }
 }

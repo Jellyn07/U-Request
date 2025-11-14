@@ -1063,3 +1063,8 @@ BEGIN
 END$$
 DELIMITER ;
 
+-----------------------------------------------------------------------------
+CREATE TABLE add_admin_access (
+    staff_id varchar(100) PRIMARY KEY,
+    is_enabled TINYINT(1) DEFAULT 0
+);

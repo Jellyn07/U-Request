@@ -9,26 +9,53 @@ class AdministratorModel extends BaseModel {
     // ADD ADMINISTRATOR
     public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
         $encrypted_pass = encrypt($password);
+
+        // Optional: record who added this admin
         if (isset($_SESSION['staff_id'])) {
             setCurrentStaff($this->db); // Use model's connection
         }
-        $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?, ?)");
-        if (!$stmt) {
-            $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
-            return false;
-        }
 
-        $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
-        $result = $stmt->execute();
+        // Begin transaction to ensure both inserts succeed
+        $this->db->begin_transaction();
 
-        if (!$result) {
-            $_SESSION['db_error'] = "Execute failed: " . $stmt->error;
+        try {
+            // 1️⃣ Insert into administrator table
+            $stmt = $this->db->prepare("CALL spAddAdministrator(?, ?, ?, ?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $this->db->error);
+            }
+
+            $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
             $stmt->close();
+
+            // 2️⃣ Insert into add_admin_access table
+            // Super Admin (access_level=1) gets is_enabled=1, others get 0
+            $is_enabled = ($access_level == 1) ? 1 : 0;
+
+            $stmt2 = $this->db->prepare("INSERT INTO add_admin_access (staff_id, is_enabled) VALUES (?, ?)");
+            if (!$stmt2) {
+                throw new Exception("Prepare failed for add_admin_access: " . $this->db->error);
+            }
+
+            $stmt2->bind_param("si", $staff_id, $is_enabled);
+            if (!$stmt2->execute()) {
+                throw new Exception("Execute failed for add_admin_access: " . $stmt2->error);
+            }
+            $stmt2->close();
+
+            // ✅ Commit transaction
+            $this->db->commit();
+            return true;
+
+        } catch (Exception $e) {
+            // ❌ Rollback if anything fails
+            $this->db->rollback();
+            $_SESSION['db_error'] = $e->getMessage();
             return false;
         }
-
-        $stmt->close();
-        return $result;
     }
 
     // GET ADMIN BY EMAIL (FOR LOGIN OR DUPLICATE CHECKING)

@@ -145,8 +145,8 @@ if ($_SESSION['access_level'] == 2) {
 
                         <div>
                             <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
-                            <select name="accessLevel_id" class="w-full input-field" required>
-                                <option value="" disabled <?= !isset($formData['accessLevel_id']) ? 'selected' : '' ?>>Select Access</option>
+                            <select name="access_level" class="w-full input-field" required>
+                                <option value="" disabled <?= !isset($formData['access_level']) ? 'selected' : '' ?>>Select Access</option>
                                 <?php
                                 // Define all access levels
                                 $accessLevels = [
@@ -169,7 +169,7 @@ if ($_SESSION['access_level'] == 2) {
                                     }
 
                                     if ($show) {
-                                        $selected = (isset($formData['accessLevel_id']) && (int)$formData['accessLevel_id'] === $id) ? 'selected' : '';
+                                        $selected = (isset($formData['access_level']) && (int)$formData['access_level'] === $id) ? 'selected' : '';
                                         echo "<option value=\"$id\" $selected>$label</option>";
                                     }
                                 }
