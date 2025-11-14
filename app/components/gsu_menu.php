@@ -18,19 +18,19 @@
     <nav class="flex-1 overflow-y-auto text-sm text-white mt-2">
       <ul class="space-y-2 p-2">
         <!-- Dashboard -->
-        <a href="dashboard.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../gsu_admin/views/dashboard.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
         </a>
-        <a href="request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../gsu_admin/views/request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/repair-request.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Request</span>
         </a>
-        <a href="inventory.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../gsu_admin/views/inventory.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/inventory.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Inventory</span>
         </a>
-        <a href="personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../gsu_admin/views/personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/personnel.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Personnels</span>
         </a>
@@ -38,23 +38,28 @@
             <img src="/public/assets/img/documents.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Documents</span>
           </a> -->
-          <a href="users.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="../../gsu_admin/views/users.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Users</span>
           </a>
-          <a href="location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="../../gsu_admin/views/location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/campus-locations.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Campus Locations</span>
           </a>
-          <a href="logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="../../gsu_admin/views/logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
           </a>
-          <a href="feedback.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+          <a href="../../gsu_admin/views/feedback.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
             <img src="/public/assets/img/feedback.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
             <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
           </a>
-
+          <?php if (!empty($_SESSION['canSeeAdminManagement'])): ?>
+          <a href="../../shared/views/manage_admin.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <img src="/public/assets/img/admin-management.png" class="size-8 p-1.5 md:p-0 md:size-4" />
+              <span class="hidden md:flex sidebar-text">Admin Management</span>
+          </a>
+          <?php endif; ?>
       </ul>
     </nav>
 

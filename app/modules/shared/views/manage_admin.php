@@ -32,7 +32,20 @@ $formData = $_SESSION['admin_form_data'] ?? [];
 </head>
 <body class="bg-gray-200">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/superadmin_menu.php'; ?>
+  <?php
+// Determine which dashboard menu to include based on access level
+if ($_SESSION['access_level'] == 2) {
+    // Gsu Admin
+    include COMPONENTS_PATH . '/gsu_menu.php';
+} elseif ($_SESSION['access_level'] == 3) {
+    // Motorpool Admin
+    include COMPONENTS_PATH . '/motorpool_menu.php';
+} else {
+    // Fallback: no menu or default
+    echo "<p>No menu available for your access level.</p>";
+}
+?>
+
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -195,76 +208,77 @@ $formData = $_SESSION['admin_form_data'] ?? [];
             </thead>
             <tbody id="usersTable" class="text-sm">
               <?php if (!empty($admins)): ?>
-                  <?php foreach ($admins as $admin): ?>
-                      <?php 
-                          // Check if menu access is enabled
-                          $adminModel = new AdministratorModel();
-                          $menuAccess = $adminModel->getAdminMenuAccess($admin['staff_id']);
+                <?php foreach ($admins as $admin): ?>
+                  <tr 
+                      data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
+                      data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
+                      data-role="<?= htmlspecialchars($admin['accessLevel_id']) ?>"
+                      @click="showDetails = true; selected = {
+                        staff_id: '<?php echo $admin['staff_id']; ?>',
+                        email: '<?php echo $admin['email']; ?>',
+                        first_name: '<?php echo $admin['first_name']; ?>',
+                        last_name: '<?php echo $admin['last_name']; ?>',
+                        full_name: '<?php echo $admin['full_name']; ?>',
+                        contact_no: '<?php echo $admin['contact_no']; ?>',
+                        profile_picture: '<?php echo $admin['profile_picture']; ?>',
+                        accessLevel_id: '<?php echo $admin['accessLevel_id']; ?>',
+                        accessLevel_desc: '<?php echo $admin['accessLevel_desc']; ?>',
+                        status: '<?php echo $admin['status']; ?>'
+                      }"
+                      class="cursor-pointer hover:bg-gray-100 border-b border-gray-200"
+                    >
 
-                          // Superadmin cannot be unchecked
-                          $isSuperAdmin = strtolower($admin['accessLevel_desc']) === 'superadmin';
-                          $checked = $isSuperAdmin || $menuAccess == 1;
-                      ?>
-                      <tr 
-                          data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
-                          data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
-                          data-role="<?= htmlspecialchars($admin['accessLevel_id']) ?>"
-                          @click="showDetails = true; selected = {
-                              staff_id: '<?= $admin['staff_id'] ?>',
-                              email: '<?= $admin['email'] ?>',
-                              first_name: '<?= $admin['first_name'] ?>',
-                              last_name: '<?= $admin['last_name'] ?>',
-                              full_name: '<?= $admin['full_name'] ?>',
-                              contact_no: '<?= $admin['contact_no'] ?>',
-                              profile_picture: '<?= $admin['profile_picture'] ?>',
-                              accessLevel_id: '<?= $admin['accessLevel_id'] ?>',
-                              accessLevel_desc: '<?= $admin['accessLevel_desc'] ?>',
-                              status: '<?= $admin['status'] ?>'
-                          }"
-                          class="cursor-pointer hover:bg-gray-100 border-b border-gray-200"
+                    <!-- Profile picture -->
+                    <td class="pl-8 py-2">
+                      <img src="<?php echo !empty($admin['profile_picture']) 
+                                  ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) 
+                                  : '/public/assets/img/user-default.png'; ?>" 
+                                    alt="User" 
+                                    class="size-8 rounded-full object-cover">
+                    </td>
+
+                    <!-- Full Name -->
+                    <td class="px-4 py-2">
+                      <?php echo htmlspecialchars($admin['full_name']); ?>
+                    </td>
+
+                    <!-- Status -->
+                    <td class="px-4 py-2">
+                      <span class="text-xs px-3 py-1 rounded-full font-semibold <?php echo strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'text-red-800'; ?>">
+                        <?php echo htmlspecialchars($admin['status']); ?>
+                      </span>
+                    </td>
+
+                    <!-- Email -->
+                    <td class="px-4 py-2">
+                      <?php echo htmlspecialchars($admin['email']); ?>
+                    </td>
+
+                    <!-- Access Level -->
+                    <td class="px-4 py-2">
+                      <?php echo htmlspecialchars($admin['accessLevel_desc']); ?>
+                    </td>
+
+                    <!-- Checkbox column -->
+                    <td class="pl-4 py-2 text-center">
+                      <input 
+                        type="checkbox" 
+                        class="admin-checkbox"
+                        <?php if (strtolower($admin['accessLevel_desc']) === 'superadmin'): ?>
+                          checked disabled
+                        <?php endif; ?>
+                        @click.stop
+                        @change.stop="grantAccess($event, '<?php echo htmlspecialchars($admin['full_name']); ?>')"
                       >
-                          <!-- Profile picture -->
-                          <td class="pl-8 py-2">
-                              <img src="<?= !empty($admin['profile_picture']) ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) : '/public/assets/img/user-default.png'; ?>" 
-                                  alt="User" 
-                                  class="size-8 rounded-full object-cover">
-                          </td>
-
-                          <!-- Full Name -->
-                          <td class="px-4 py-2"><?= htmlspecialchars($admin['full_name']); ?></td>
-
-                          <!-- Status -->
-                          <td class="px-4 py-2">
-                              <span class="text-xs px-3 py-1 rounded-full font-semibold <?= strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'text-red-800'; ?>">
-                                  <?= htmlspecialchars($admin['status']); ?>
-                              </span>
-                          </td>
-
-                          <!-- Email -->
-                          <td class="px-4 py-2"><?= htmlspecialchars($admin['email']); ?></td>
-
-                          <!-- Access Level -->
-                          <td class="px-4 py-2"><?= htmlspecialchars($admin['accessLevel_desc']); ?></td>
-
-                          <!-- Checkbox column -->
-                          <td class="pl-4 py-2 text-center">
-                              <input 
-                                  type="checkbox" 
-                                  class="admin-checkbox"
-                                  <?= $checked ? 'checked' : '' ?>
-                                  <?= $isSuperAdmin ? 'disabled' : '' ?>
-                                  @click.stop
-                                  @change.stop="toggleAdminMenuAccess($event, '<?= $admin['staff_id'] ?>')"
-                              >
-                          </td>
-                      </tr>
-                  <?php endforeach; ?>
-              <?php else: ?>
-                  <tr>
-                      <td colspan="6" class="text-center py-4 text-gray-500">No administrators found.</td>
+                    </td>
                   </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-gray-500">No administrators found.</td>
+                </tr>
               <?php endif; ?>
-          </tbody>
+            </tbody>
           </table>
           </div>
         </div>
@@ -385,44 +399,31 @@ unset($_SESSION['admin_error']);
 <?php unset($_SESSION['update_status']); endif; ?>
 
 <script>
-function toggleAdminMenuAccess(event, staffId) {
-    const checked = event.target.checked;
+function grantAccess(event, adminName) {
+    const checkbox = event.target;
+    const previousState = !checkbox.checked; // store previous state
+
+    // Determine the action based on new state
+    const action = checkbox.checked ? 'grant' : 'terminate';
+    const confirmText = checkbox.checked
+        ? `Do you really want to grant access to ${adminName}?`
+        : `Do you really want to terminate access for ${adminName}?`;
 
     Swal.fire({
         title: 'Are you sure?',
-        text: checked 
-            ? 'Enable Admin Management for this account?' 
-            : 'Disable Admin Management for this account?',
+        text: confirmText,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes',
+        confirmButtonText: action === 'grant' ? 'Yes, grant access!' : 'Yes, terminate access!',
         cancelButtonText: 'Cancel'
-    }).then(result => {
-        if (!result.isConfirmed) {
-            event.target.checked = !checked;
-            return;
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // User confirmed → perform the action (e.g., AJAX call)
+            console.log(`${adminName} access ${action}ed!`);
+        } else {
+            // User canceled → revert checkbox to previous state
+            checkbox.checked = previousState;
         }
-
-        fetch("/app/controllers/AdminController.php?action=toggleAdminMenu", {
-            method: "POST",
-            body: new URLSearchParams({
-                staff_id: staffId,
-                enabled: checked ? 1 : 0
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                Swal.fire('Success!', `Admin Management ${checked ? 'enabled' : 'disabled'} for this account.`, 'success');
-            } else {
-                Swal.fire('Error!', data.message || 'Failed to update menu access.', 'error');
-                event.target.checked = !checked;
-            }
-        })
-        .catch(() => {
-            Swal.fire('Error!', 'Network error. Try again.', 'error');
-            event.target.checked = !checked;
-        });
     });
 }
 </script>

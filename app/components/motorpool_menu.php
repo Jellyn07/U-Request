@@ -18,38 +18,44 @@
     <nav class="flex-1 overflow-y-auto text-sm text-white mt-2">
       <ul class="space-y-2 p-2">
         <!-- Dashboard -->
-        <a href="dashboard.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/dashboard.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
         </a>
-        <a href="request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/request-for-proposal.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Request</span>
         </a>
-        <a href="schedules.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/schedules.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/calendar.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Schedule</span>
         </a>
-        <a href="vehicles.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/vehicles.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/car-admin.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Vehicle</span>
         </a>
-        <a href="drivers.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/drivers.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/driver.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Drivers</span>
         </a>
-        <a href="users.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/users.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
         <img src="/public/assets/img/user.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
         <span class="hidden md:flex items-center sidebar-text">Users</span>
         </a>
-        <a href="feedback.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/feedback.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
         <img src="/public/assets/img/feedback.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
         <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
         </a>
-        <a href="logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../motorpool_admin/views/logs.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
         <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
         <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
         </a>
+        <?php if (!empty($_SESSION['canSeeAdminManagement'])): ?>
+          <a href="../../shared/views/manage_admin.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <img src="/public/assets/img/admin-management.png" class="size-8 p-1.5 md:p-0 md:size-4" />
+              <span class="hidden md:flex sidebar-text">Admin Management</span>
+          </a>
+        <?php endif; ?>
       </ul>
     </nav>
 

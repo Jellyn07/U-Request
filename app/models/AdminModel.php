@@ -486,6 +486,29 @@ class AdministratorModel extends BaseModel {
         $stmt->close();
         return $feedbacks;
     }
+
+    public function toggleAdminMenuAccess($staff_id, $enabled){
+        $sql = "REPLACE INTO add_admin_access (staff_id, is_enabled) VALUES (?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("si", $staff_id, $enabled);
+        return $stmt->execute();
+    }
+    public function getAdminMenuAccess($staff_id){
+    $sql = "SELECT is_enabled FROM add_admin_access WHERE staff_id = ?";
+    $stmt = $this->db->prepare($sql);
+    if(!$stmt) return 0;
+    $stmt->bind_param("s", $staff_id);
+    $stmt->execute();
+    $is_enabled = null;
+    $stmt->bind_result($is_enabled);
+    $fetched = $stmt->fetch(); // returns true if a row exists
+    $stmt->close();
+
+    return ($fetched && $is_enabled !== null) ? (int)$is_enabled : 0;
+}
+
+
+
 }
 
 

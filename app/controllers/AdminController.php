@@ -9,6 +9,14 @@ require_once __DIR__ . '/../models/AdminModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../config/helpers.php';
 
+$action = $_GET['action'] ?? '';
+
+if ($action === 'toggleAdminMenu') {
+    $controller = new AdminController();
+    $controller->toggleAdminMenu(); // call the toggle function
+    exit; // stop further execution
+}
+
 $login_error = "";
 
 // ✅ Initialize login attempts if not set
@@ -37,18 +45,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     $userModel = new UserModel();
     $admin = $userModel->getAdminUserByEmail($email);
 
-    //if ($admin && ($input_pass == $admin['password'])) {   ////temporary ni sya by jonalyn
     if ($admin && $userModel->verifyPassword($input_pass, $admin['password'])) {
+
         // ✅ SUCCESS
         $_SESSION['login_attempts'] = 0;
         $_SESSION['lock_time'] = null;
 
-        $_SESSION['staff_id'] = $admin['staff_id'];
+        $staff_id = $admin['staff_id']; // important for the next part
+
+        // 🔹 Store user session info
+        $_SESSION['staff_id'] = $staff_id;
         $_SESSION['email'] = $admin['email'];
         $_SESSION['access_level'] = $admin['accessLevel_id'];
         $_SESSION['full_name'] = $admin['first_name'] . ' ' . $admin['last_name'];
 
-        // Redirect based on access level
+        $adminModel = new AdministratorModel();
+        
+        $menuAccess = $adminModel->getAdminMenuAccess($staff_id);
+        $_SESSION['canSeeAdminManagement'] = ($menuAccess == 1);
+
+        // 🔹 Redirect based on access level
         switch ($admin['accessLevel_id']) {
             case 1:
                 header("Location: ../modules/superadmin/views/dashboard.php");
@@ -65,11 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         }
         exit;
     } else {
-        // ❌ FAILED ATTEMPT
+        // ❌ FAILED LOGIN
         $_SESSION['login_attempts']++;
 
         if ($_SESSION['login_attempts'] >= 3) {
-            $_SESSION['lock_time'] = time() + 60; // lock for 60s
+            $_SESSION['lock_time'] = time() + 60;
             $remaining = 60;
             $_SESSION['login_error'] = "Too many failed attempts. Login locked for {$remaining} seconds.";
         } else {
@@ -82,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         exit;
     }
 }
-
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
     $adminModel = new AdministratorModel(); // ✅ This must be inside the condition
@@ -329,6 +344,28 @@ class AdminController {
     public function getOverallFeedbacks() {
         return $this->model->getOverallFeedbacks();
     }
+
+    public function toggleAdminMenu(){
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $staff_id = $_POST['staff_id'] ?? null;
+        $enabled  = $_POST['enabled'] ?? null;
+
+        if (!$staff_id || $enabled === null) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing parameters']);
+            exit();
+        }
+
+        $result = $this->model->toggleAdminMenuAccess($staff_id, $enabled);
+
+        echo json_encode([
+            'status' => $result ? 'success' : 'error',
+            'enabled' => $enabled
+        ]);
+        exit();
+    }
+}
+
+
 }
 
 // Handle POST
