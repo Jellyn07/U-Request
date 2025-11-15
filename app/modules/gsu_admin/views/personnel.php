@@ -305,7 +305,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
             <div>
               <label class="text-xs text-text mb-1">Staff ID No.</label>
-              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field" readonly/>
+              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full view-field" disabled readonly/>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -345,7 +345,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
             <div>
               <label class="text-xs text-text mb-1">Hire Date</label>
-              <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
+              <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full view-field" disabled/>
             </div>
 
 

@@ -125,7 +125,7 @@ $admins = $controller->getAllAdmins();
 
             <div>
               <label class="text-xs text-text mb-1">Unit</label>
-              <input type="text" name="unit" :value="selected.unit || ''" class="w-full input-field" readonly />
+              <input type="text" name="unit" :value="selected.unit || ''" class="w-full view-field" readonly />
             </div>
 
             <div>

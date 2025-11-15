@@ -95,7 +95,7 @@ $dateFilter = $_GET['date'] ?? 'all';
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Details</th>
               </tr>
             </thead>
-            <tbody id="table" class="text-sm">
+            <tbody id="table" class="text-xs">
                  <?= $controller->renderLogs($tableFilter, $actionFilter, $dateFilter) ?>
             </tbody>
           </table>

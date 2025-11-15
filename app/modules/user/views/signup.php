@@ -26,7 +26,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
     <script src="/public/assets/js/alert.js"></script>
   </head>
 <body class="min-h-screen flex relative overflow-hidden">
-  <div class="w-1/2 flex items-end justify-left relative z-10 text-white">
+  <div class="md:w-1/2 items-start justify-end relative z-10 text-white hidden md:flex flex-col">
     <div class="text-right p-8">
       <p class="text-sm text-white">
           <span class="block sm:inline">&copy; 
@@ -42,12 +42,12 @@ require_once __DIR__ . '/../../../models/UserModel.php';
         </p>
     </div>
   </div>
-  <div class="w-1/2 flex items-center justify-center relative z-10">
-    <div class="w-1/2 max-w-md bg-background">
+  <div class="w-full md:w-1/2 flex items-center justify-center relative z-10">
+    <div class="w-4/5 m-3 md:w-2/3 max-w-md bg-white p-5 rounded-2xl transition-all duration-1000 translate-y-5 border border-gray-200 shadow-lg md:border-none md:shadow-none mb-10">
       <!-- Logo + Title -->
       <div class="text-center">
-        <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
-        <p class="text-2xl font-bold">
+        <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-16 w-16">
+        <p class="text-xl font-bold">
           U<span class="text-accent">-</span>REQUEST
         </p>
       </div>

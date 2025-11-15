@@ -69,10 +69,8 @@ $dateFilter = $_GET['date'] ?? 'all';
                 <option value="30" <?= $dateFilter==='30'?'selected':'' ?>>Last 30 days</option>
             </select>
             </form>
-            <button title="Print data in the table" class="input-field">
-                <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button>
-            <button class="input-field" title="Export to Excel">
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
+            <button title="Export" id="export" class="btn-upper">
                 <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
@@ -160,4 +158,5 @@ $dateFilter = $_GET['date'] ?? 'all';
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
+<script src="/public/assets/js/shared/export.js"></script>
 </html>

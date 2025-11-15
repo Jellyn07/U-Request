@@ -15,8 +15,8 @@ require_once __DIR__ . '/../../../config/constants.php';
 <body class="bg-background min-h-screen flex relative overflow-hidden">
 
   <!-- LEFT SECTION -->
-  <div class="w-1/2 flex items-center justify-center relative z-10">
-    <div class="w-1/2 max-w-md bg-background">
+  <div class="w-full md:w-1/2 flex items-center justify-center relative z-10">
+    <div class="md:w-1/2 w-4/5 m-3 max-w-md bg-white p-5 rounded-2xl transition-all duration-1000 translate-y-5 border border-gray-200 shadow-lg md:border-none md:shadow-none">
       <div class="text-center mb-4">
         <img src="<?php echo PUBLIC_URL; ?>/assets/img/logo_light.png" alt="U-Request Logo" class="mx-auto h-20 w-20">
         <p class="text-2xl font-bold">U<span class="text-accent">-</span>REQUEST</p>
@@ -77,7 +77,7 @@ require_once __DIR__ . '/../../../config/constants.php';
   </div>
 
   <!-- RIGHT SECTION -->
-  <div class="w-1/2 flex items-end justify-end relative z-10 text-white">
+  <div class="md:w-1/2 items-end justify-end relative z-10 text-white hidden md:flex flex-col">
     <div class="text-right p-8">
       <p class="text-sm text-text/70">
         &copy; All rights reserved.

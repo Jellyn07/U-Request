@@ -102,7 +102,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                           <h2 class="text-base font-medium mb-3">Add Materials</h2>
                           <div>
                             <label class="text-xs text-text mb-1">Material Code No.<span class="text-secondary"></span></label>
-                            <input type="text" name="material_code" value="<?= htmlspecialchars($nextCode) ?>" class="w-full input-field" required readonly />
+                            <input type="text" name="material_code" value="<?= htmlspecialchars($nextCode) ?>" class="w-full view-field" required readonly />
                           </div>
 
                           <div>
@@ -201,7 +201,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
             <div>
               <label class="text-xs text-text mb-1">Material Code No.</label>
-              <input type="text" name="material_code" :value="selected.material_code || ''" class="w-full input-field" required readonly />
+              <input type="text" name="material_code" :value="selected.material_code || ''" class="w-full view-field" required readonly />
             </div>
 
             <div>

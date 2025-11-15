@@ -1,40 +1,192 @@
 BUGS LISTS
 
-Overall
--should show default picture (for img not found) in profiles & others if no pic found
--if logout cannot go back to last page open
+Too Add functionality
+    - Can print the request with the same format of their physical request in GSU
+    - super admin can see admin activity logs in account Management
 
--Admin Model Store Procedures
--All email must encrypted(last)
--Password(8 characters with uppercase lowercase and special characters)
+Overall
+    - should show default picture (for img not found) in profiles & others if no pic found
+    - if logout cannot go back to last page open
+    - export should be the same in the table ex. if i filter only the available then it should be the same when exporting
+    - should display/refresh by year in dashboard and should have an all year option too in all admin
+    - when adding contact 09 should be given and cannot be change like what if user input 06?
+    - should not allow use to have name with number
+    - profiles in admin wont change after i change it ex. i change profile it does change but when i go back the sidemenu profile not change
+
+    feedback
+    - chart not working
+
+    logs
+    - more details
+    - activity type not working properly
+
+    -Admin Model Store Procedures
+    -All email must encrypted(last)
+    -Password(8 characters with uppercase lowercase and special characters)
 
 Super Admin
--admins access level is all wrong when editing admin access ✅
--no profile ✅
--user history (no vehicle request)
+    - admins access level is all wrong when editing admin access ✅
+    - no profile ✅
+    - user history (no vehicle request)
+    - Menu logout/profile
+
+    account mgt.
+    - can edit staff ID?
+    - super admins should be anable in access and cannot be change
+    - cannot add new admin (Prepare failed for add_admin_access: Table 'u_request.add_admin_access' doesn't exist)
+    - filter in user mgt.
+
+    GSU oversight
+    - no material history
+
+    logs
+    - export not working
+    - right details not working
+
 
 Motorpool Admin
-- Motorpool Vehicle Request if reject with remarks why it is rejected
-- Motorpool Vehicle Request Schedule (by color)
-- Motorpool Vehicle need add (unusable vehicle status) update status abou vehicle
-- Add unit in driver table
+    - Motorpool Vehicle Request if reject with remarks why it is rejected
+    - Motorpool Vehicle Request Schedule (by color)
+    - Motorpool Vehicle need add (unusable vehicle status) update status abou vehicle
+    - Add unit in driver table
+    - Menu logout/profile
+
+    request
+    - should print on what is in the table ex. is the table is all completed in export it should display only completed
+    - what if theirs new chancellor or president?
+    - should not be assigned any vehicle is request is not been approved
+    - assigning a vehicle in request not working
+    - should assign a vehicle only if its approved and will only show vehicles that will fit the passanger if passengers are too many should allow to book 2 vehicle too fit them all
+    - wont update any change in request except status
+    - completed and on going status should be automatically updated
+    - pending, approved, and rejected/cancelled are the only status that the motorpool admin can update
+
+    vehicle
+    - vehicle filter should be dynamic
+    - vehicle type should be dynamic. what if usep wants to buy sports car? theirs no option in that
+    - right side details dont change if i click to other vehicles ex. i show the Schedule and that Schedule wont change even if i click to other vehicle but the pprimary details do change
+    
+    driver
+    - filters and search dont work
+    - contact should only allow numbers start 09 not 08 etc.
+    - driver profile dont work
+    - changing unit in driver dont work
+    - hire date should not be change
+
 
 GSU Admin
-- can be completed even if request have no assigned personel✅
-- request: no dropdown for request in (to inspect) to avoid updating request without personel
-- request: in progress no option to go back to (to inspect) ✅
-- if admin assigned a personel the status will automatically go to in progress (idunno kung tama)// need sya iselect ug to inspect para mugawas ang materials (used/needed) na div 
-- if i change the name of a building in one of the locations the other same building wont me change  ✅ //mugana sa ako
+    - can be completed even if request have no assigned personel✅
+    - request: no dropdown for request in (to inspect) to avoid updating request without personel
+    - request: in progress no option to go back to (to inspect) ✅
+    - if admin assigned a personel the status will automatically go to in progress (idunno kung tama)// need sya iselect ug to inspect para mugawas ang materials (used/needed) na div 
+    - if i change the name of a building in one of the locations the other same building wont me change  ✅ //mugana sa ako
+    - Menu logout/profile
 
-- Personnel work history (unable)
+    dashboard
+    - workload chart should just be bar no more by personel
 
-- GSU Request PersonnelAssign Add  ✅
-- GSU Request Materials Add  ✅
-- GSU Request View Full Details✅ (UI NEED POLISH I THINK)
-- GSU Request Location Update
-- Request and Request Assignment Trigger (Update)
+    request
+    - bugs in changing request status
+    - it display all status in export functionality ex. to inspectinprogresscompleted
+    - should print on what is in the table ex. is the table is all completed in export it should display only completed
+    - should not allow to delete all the personnel input field
+    - cant change the status in side details
+
+    inventory
+    - no material history
+
+    personnel
+    - no work history
+    - cant edit
+    - filter need fixing
+    Locations
+
+    - filters
+    - adding building should be base on unit ex. mabini unit all building from mabini should display
+
+    logs
+    - export not working
+    
+
+    - Personnel work history (unable)
+    - GSU Request PersonnelAssign Add  ✅
+    - GSU Request Materials Add  ✅
+    - GSU Request View Full Details✅ (UI NEED POLISH I THINK)
+    - GSU Request Location Update
+    - Request and Request Assignment Trigger (Update)
 
 Users
-- cant request in vehicle ✅
-- contact update/add
-- track sort (oldest/newest)
+    - cant request in vehicle ✅
+    - contact update/add
+    - track sort (oldest/newest)
+    - names not automatically correct the case ex. jellyn it should be Jellyn
+    - should prevent user from entering the wrong time and date in Motorpool form
+    - dont allow user to travel and return the same date/day
+    - it should not allow duplicate request
+    - no pop up if my request is done/submitted
+    - give a submitted popup if i cancel
+    - save profile picture button need to be gone
+    - Contact cannot be updated in profile
+    - contact should be required before the user can request in motorpool
+    - should have popup when i update something in the user profile
+
+
+
+UI
+    All
+    - All input fields that cant be change should be view-field
+    - admin update password
+    - buttons in profile admin
+    - loading ui
+    - make the feedback card type
+    - actions in logs should be color coded
+
+    Users
+    - finalize tracking cards
+    - view Details should be same2 with the request layout
+    - should have transitions
+    - should have ui when loading any page
+
+    GSU
+    - Full Details in Request
+    - Request Management needs to make sense in UI
+    - to inspect will will be 2 line shorld be always one even if fight details show
+
+    Motorpool
+    - bar chart name should not be diagonal
+    - status in dashboard
+    - Full Details in Request
+    - colors in Schedule should be same in dashboard
+    - status ui in request
+    - Schedule and travel history ui
+
+    driver
+    - status   
+
+    user
+    - status should be in the last column like others
+    - user history ui
+
+    Superadmin
+        dashboard
+        - status in vehicle recent request
+        
+        account mgt.
+        - status should be last like others
+        - admin right info ui
+        - inactive statys ui in admin
+        - history in user
+
+        gsu oversight
+        - request full details ui
+        - to inspect will will be 2 line shorld be always one even if fight details show
+
+        motorpool oversight
+        - request full details ui
+        - Schedule details not same in motorpool
+        - edit vehicle go to the bottom
+        - driver status
+        - driver change profile not working
+
+        backup
+        - ui should be top and bottom not side by side
