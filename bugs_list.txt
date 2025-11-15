@@ -4,6 +4,7 @@ Too Add functionality
     - Can print the request with the same format of their physical request in GSU
     - super admin can see admin activity logs in account Management
 
++++++++++++++++++++++++++++++++++BFELL+++++++++++++++++++++++++++++++++
 Overall
     - should show default picture (for img not found) in profiles & others if no pic found
     - if logout cannot go back to last page open
@@ -43,7 +44,7 @@ Super Admin
     - export not working
     - right details not working
 
-
++++++++++++++++++++++++++++++++++JUNA+++++++++++++++++++++++++++++++++
 Motorpool Admin
     - Motorpool Vehicle Request if reject with remarks why it is rejected
     - Motorpool Vehicle Request Schedule (by color)
@@ -115,6 +116,7 @@ GSU Admin
     - GSU Request Location Update
     - Request and Request Assignment Trigger (Update)
 
++++++++++++++++++++++++++++++++++JELLYN+++++++++++++++++++++++++++++++++
 Users
     - cant request in vehicle ✅
     - contact update/add
@@ -129,8 +131,6 @@ Users
     - Contact cannot be updated in profile
     - contact should be required before the user can request in motorpool
     - should have popup when i update something in the user profile
-
-
 
 UI
     All
