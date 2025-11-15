@@ -37,7 +37,7 @@ class LocationModel extends BaseModel{
         if (isset($_SESSION['staff_id'])) {
             setCurrentStaff($this->db); // Use model's connection
         }
-    // Check if the location already exists
+        // Check if the location already exists
         $checkStmt = $this->db->prepare("
             SELECT COUNT(*) as count 
             FROM campus_locations 
@@ -45,10 +45,10 @@ class LocationModel extends BaseModel{
         ");
         $checkStmt->bind_param("sss", $unit, $building, $exact_location);
         $checkStmt->execute();
+        $count = 0;
         $checkStmt->bind_result($count);
         $checkStmt->fetch();
         $checkStmt->close();
-
         if ($count > 0) {
             // Location already exists
             return 'exists';
@@ -66,17 +66,39 @@ class LocationModel extends BaseModel{
 
 
     // 🟡 Update location
-    public function updateLocation($id, $building, $exact_location) {
+    public function updateLocation($id, $unit, $building, $exact_location) {
         if (isset($_SESSION['staff_id'])) {
-            setCurrentStaff($this->db); // Use model's connection
+            setCurrentStaff($this->db); // optional: track staff
         }
+
+        // 1️⃣ Check for duplicate (same unit + building + exact_location, excluding current record)
+        $checkStmt = $this->db->prepare("
+            SELECT COUNT(*) AS count
+            FROM campus_locations
+            WHERE unit = ? AND building = ? AND exact_location = ? AND location_id != ?
+        ");
+        $checkStmt->bind_param("sssi", $unit, $building, $exact_location, $id);
+        $checkStmt->execute();
+        $result = $checkStmt->get_result()->fetch_assoc();
+
+        if ($result['count'] > 0) {
+            // Duplicate exists
+            return ['status' => false, 'message' => 'This exact location already exists for the same unit and building.'];
+        }
+
+        // 2️⃣ Proceed with update
         $stmt = $this->db->prepare("
             UPDATE campus_locations
             SET building = ?, exact_location = ?
             WHERE location_id = ?
         ");
         $stmt->bind_param("ssi", $building, $exact_location, $id);
-        return $stmt->execute();
+
+        if ($stmt->execute()) {
+            return ['status' => true, 'message' => 'Location updated successfully.'];
+        } else {
+            return ['status' => false, 'message' => 'Failed to update location.'];
+        }
     }
 
     // 🔴 Delete location

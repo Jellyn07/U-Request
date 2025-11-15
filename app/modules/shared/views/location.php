@@ -57,6 +57,11 @@ if ($_SESSION['access_level'] == 1) {
               <option value="az">A - Z</option>
               <option value="za">Z - A</option>
             </select>
+            <select class="input-field" id="sortUnit">
+              <option value="All">All Unit</option>
+              <option value="Tagum Unit">Tagum Unit</option>
+              <option value="Mabini Unit">Mabini Unit</option>
+            </select>
 
             <!-- <button title="Print data in the table" id="print" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">

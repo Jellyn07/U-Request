@@ -52,9 +52,9 @@ class LocationController {
         }
     }
 
-
     public function updateLocation($data) {
         $id = $data['location_id'] ?? 0;
+        $unit = $data['unit'] ?? '';
         $building = $data['building'] ?? '';
         $exact_location = $data['exact_location'] ?? '';
 
@@ -62,10 +62,13 @@ class LocationController {
             return ['status' => 'error', 'message' => 'Invalid location ID.'];
         }
 
-        $success = $this->model->updateLocation($id, $building, $exact_location);
-        return $success 
-            ? ['status' => 'success', 'message' => 'Location updated successfully.']
-            : ['status' => 'error', 'message' => 'Failed to update location.'];
+        // Call model to handle update + duplicate check
+        $result = $this->model->updateLocation($id, $unit, $building, $exact_location);
+
+        // Return result from model
+        return $result['status']
+            ? ['status' => 'success', 'message' => $result['message']]
+            : ['status' => 'error', 'message' => $result['message']];
     }
 
     public function deleteLocation($id) {
