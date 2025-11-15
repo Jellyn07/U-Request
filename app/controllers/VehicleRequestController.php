@@ -86,18 +86,19 @@ class VehicleRequestController {
             $vehicle_id = $data['vehicle_id'] ?? null;
             $req_status = $data['req_status'] ?? null;
             $approved_by = $data['approved_by'] ?? null;
+            $reason = $data['reason'] ?? null;
 
             if (!$control_no) {
                 throw new Exception('Missing Control No.');
             }
 
-            $result = $this->model->updateAssignment($control_no, $vehicle_id, $req_status, $approved_by);
+            $result = $this->model->updateAssignment($control_no, $vehicle_id, $req_status, $approved_by, $reason);
 
-            if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Assignment updated successfully.']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'No changes made or failed to update.']);
-            }
+            echo json_encode([
+                'success' => $result,
+                'message' => $result ? 'Assignment updated successfully.' : 'No changes made or failed to update.'
+            ]);
+
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }

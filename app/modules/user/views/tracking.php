@@ -64,7 +64,7 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
           <?php 
             $type = $_GET['type'] ?? 'repair'; 
             $statusOptions = ($type === 'vehicle') 
-              ? ['Pending', 'Approved', 'Disapproved', 'On Going' ,'Completed']
+              ? ['Pending', 'Approved', 'On Going' ,'Completed', 'Rejected/Cancelled']
               : ['To Inspect', 'In Progress', 'Completed'];
           ?>
 
@@ -125,12 +125,29 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
                 <span class="font-medium">Trip Purpose:</span> <?= htmlspecialchars($track['trip_purpose']); ?><br>
                 <span class="font-medium">Destination:</span> <?= htmlspecialchars($track['travel_destination']); ?>
               </p>
+             <?php
+              $status = $track['req_status'] ?? 'Pending';
+              $badgeClass = match ($status) {
+                  'Rejected/Cancelled' => 'bg-red-100 text-red-700',
+                  'Completed'          => 'bg-green-100 text-green-700',
+                  'Approved'           => 'bg-blue-100 text-blue-700',
+                  'On Going'           => 'bg-orange-100 text-orange-700',
+                  'Pending'            => 'bg-yellow-100 text-yellow-700',
+                  default              => 'bg-gray-100 text-gray-700'
+              };
+              ?>
               <p class="mt-2 text-sm">
                 <span class="font-medium">Status:</span>
-                <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700">
-                  <?= htmlspecialchars($track['req_status'] ?? 'Pending'); ?>
+                <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium <?= $badgeClass ?>">
+                    <?= htmlspecialchars($status); ?>
                 </span>
               </p>
+              <?php if ($status === 'Rejected/Cancelled' && !empty($track['reason'])): ?>
+                <p class="mt-2 text-sm text-red-700">
+                    <span class="font-medium">Reason:</span>
+                    <?= htmlspecialchars($track['reason']); ?>
+                </p>
+              <?php endif; ?>
             <?php endif; ?>
 
             <div class="mt-4 text-right">

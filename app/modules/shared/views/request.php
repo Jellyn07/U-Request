@@ -29,9 +29,16 @@ $requests = $data['requests'];
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-gray-100">
-  <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
-
+  <!-- Menu & Header -->
+  <?php
+  if ($_SESSION['access_level'] == 1) {
+      include COMPONENTS_PATH . '/superadmin_menu.php';
+  } elseif ($_SESSION['access_level'] == 3) {
+      include COMPONENTS_PATH . '/motorpool_menu.php';
+  } else {
+      echo "<p>No menu available for your access level.</p>";
+  }
+  ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-4">Request</h1>
@@ -103,6 +110,7 @@ $requests = $data['requests'];
                           depret_time: "<?= htmlspecialchars(date('h:i A', strtotime($row['departure_time'])) . ' - ' . date('h:i A', strtotime($row['return_time'])), ENT_QUOTES) ?>",
                           trip_purpose: "<?= htmlspecialchars($row['trip_purpose'], ENT_QUOTES) ?>",
                           req_status: "<?= htmlspecialchars($row['req_status'], ENT_QUOTES) ?>",
+                          reason: "<?= htmlspecialchars($row['reason'] ?? '', ENT_QUOTES) ?>",
                           vehicle_name: "<?= htmlspecialchars($row['vehicle_name'] ?? '', ENT_QUOTES) ?>",
                           driver_name: "<?= htmlspecialchars($row['driver_name'] ?? '', ENT_QUOTES) ?>",
                           approved_by: "<?= htmlspecialchars($row['approved_by'] ?? '', ENT_QUOTES) ?>",
@@ -132,92 +140,97 @@ $requests = $data['requests'];
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
 
-          <form id="assignmentForm" class="space-y-1" method="post" action="../../../controllers/VehicleRequestController.php">
-            <input type="hidden" name="form_action" value="saveAssignment">
-            <input type="hidden" name="control_no" x-model="selected.control_no">
+          <form id="assignmentForm" class="space-y-1" method="post" 
+            action="../../../controllers/VehicleRequestController.php"
+            x-data="{ 
+                isSuperadmin: <?= ($_SESSION['access_level'] == 1 ? 'true' : 'false') ?>,
 
-            <h2 class="text-lg font-bold mb-2">Vehicle Request Information</h2>
+                isLocked() { 
+                    return this.isSuperadmin ||
+                        this.selected.req_status === 'Rejected/Cancelled' ||
+                        this.selected.req_status === 'Completed';
+                }
+            }">
+              <input type="hidden" name="form_action" value="saveAssignment">
+              <input type="hidden" name="control_no" x-model="selected.control_no">
 
-            <div>
-              <label class="text-xs text-text mb-1">Tracking No.</label>
-              <input type="text" class="w-full view-field"  x-model="selected.tracking_id" readonly />
-            </div>
+              <h2 class="text-lg font-bold mb-2">Vehicle Request Information</h2>
 
-            <div>
-              <label class="text-xs text-text mb-1">Request Date</label>
-              <input type="text" class="w-full view-field"  
-              :value="new Date(selected.date_request).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: '2-digit' 
-              })" 
-              readonly />
-            </div>
+              <div>
+                <label class="text-xs text-text mb-1">Tracking No.</label>
+                <input type="text" class="w-full view-field" x-model="selected.tracking_id" readonly />
+              </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">Requester</label>
-              <input type="text" class="w-full view-field" x-model="selected.requester_name" readonly />
-            </div>
+              <div>
+                <label class="text-xs text-text mb-1">Request Date</label>
+                <input type="text" class="w-full view-field"
+                :value="new Date(selected.date_request).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: '2-digit' 
+                })" 
+                readonly />
+              </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">Travel Date</label>
-              <input type="text" class="w-full view-field" x-model="selected.travel_date" readonly />
-            </div>
+              <div>
+                <label class="text-xs text-text mb-1">Requester</label>
+                <input type="text" class="w-full view-field" x-model="selected.requester_name" readonly />
+              </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">Destination</label>
-              <input type="text" class="w-full view-field" x-model="selected.travel_destination" readonly />
-            </div>
+              <div>
+                <label class="text-xs text-text mb-1">Travel Date</label>
+                <input type="text" class="w-full view-field" x-model="selected.travel_date" readonly />
+              </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">Trip Purpose</label>
-              <input type="text" class="w-full view-field" x-model="selected.trip_purpose" readonly />
-            </div>
+              <div>
+                <label class="text-xs text-text mb-1">Destination</label>
+                <input type="text" class="w-full view-field" x-model="selected.travel_destination" readonly />
+              </div>
 
-            <div>
-              <label class="text-xs text-text mb-1">No of Passengers</label>
-              <input type="text" class="w-full view-field" x-model="selected.passenger_count" readonly />
-            </div>
+              <div>
+                <label class="text-xs text-text mb-1">Trip Purpose</label>
+                <input type="text" class="w-full view-field" x-model="selected.trip_purpose" readonly />
+              </div>
 
-          <div x-data="vehicleDropdown" x-init="init()">
-            <label class="text-xs text-text mb-1">Assign Vehicle</label>
-            
-            <select 
-              id="vehicleSelect"  
-              name="vehicle_id"  
-              x-model="selected.vehicle_id"  
-              class="w-full input-field"
-              :disabled="selected.req_status === 'Rejected/Cancelled' || selected.req_status === 'Completed'"
-            >
-              <option value="">Select Vehicle</option>
+              <div>
+                <label class="text-xs text-text mb-1">No of Passengers</label>
+                <input type="text" class="w-full view-field" x-model="selected.passenger_count" readonly />
+              </div>
 
-              <!-- show all vehicles dynamically -->
-              <template x-for="v in vehicles" :key="v.vehicle_id">
-                <option 
-                  :value="v.vehicle_id" 
-                  x-text="v.vehicle_name"
-                ></option>
-              </template>
-            </select>
+              <!-- VEHICLE DROPDOWN -->
+              <div x-data="vehicleDropdown" x-init="init()">
+                <label class="text-xs text-text mb-1">Assign Vehicle</label>
 
-            <!-- Display currently assigned vehicle -->
-            <p class="text-xs text-gray-500 mt-1">
-              Current Assigned Vehicle: 
-              <span x-text="selected.vehicle_name"></span>
-            </p>
-          </div>
+                <select 
+                  id="vehicleSelect"
+                  name="vehicle_id"
+                  x-model="selected.vehicle_id"
+                  class="w-full input-field"
+                  :disabled="isLocked()"
+                >
+                  <option value="">Select Vehicle</option>
 
-            <!-- <div x-show="selected.req_status === 'Approved'" x-cloak>
-              <label class="text-xs text-text mb-1">Assign Vehicle</label>
-              <select id="vehicleSelect" name="vehicle_id" class="w-full input-field">
-                <option value="">Select a vehicle</option>
-              </select>
-            </div> -->
+                  <template x-for="v in vehicles" :key="v.vehicle_id">
+                    <option :value="v.vehicle_id" x-text="v.vehicle_name"></option>
+                  </template>
+                </select>
 
-            <div x-data>
-              <!-- STATUS -->
-               <div>
-                <select id="status"  name="req_status"  x-model="selected.req_status" class="w-full input-field">
+                <p class="text-xs text-gray-500 mt-1">
+                  Current Assigned Vehicle:
+                  <span x-text="selected.vehicle_name"></span>
+                </p>
+              </div>
+
+              <!-- STATUS + APPROVED BY + REASON -->
+              <div>
+                <!-- STATUS SELECT -->
+                <select 
+                  id="status"  
+                  name="req_status"  
+                  x-model="selected.req_status" 
+                  class="w-full input-field"
+                  :disabled="isLocked()"
+                >
                   <option value="" disabled>Select Status</option>
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
@@ -226,36 +239,50 @@ $requests = $data['requests'];
                   <option value="Completed">Completed</option>
                 </select>
 
-              <!-- APPROVED BY -->
-              <div x-show="selected.req_status === 'Approved'" x-cloak>
-                <label class="text-xs text-text mb-1 mt-2">Approved By</label>
-                <select id="approvedBy" name="approved_by" x-model="selected.approved_by" class="w-full input-field">
-                  <option value="" disabled>Select Approver</option>
-                  <option value="Dr. Shirley Villanueva">Dr. Shirley Villanueva</option>
-                  <option value="Bonifacio G. Gabales, Jr., Ph.D.">Bonifacio G. Gabales, Jr., Ph.D.</option>
-                </select>
-              </div>
-            </div>
-             
-            <!-- <button 
-              type="button" type="hidden"
-              class="btn btn-primary sendEmailBtn"
-              data-control-no="<?= htmlspecialchars($row['control_no'], ENT_QUOTES) ?>">
-              Send Email to Top Management
-            </button> -->
+                <!-- APPROVED BY -->
+                <div x-show="selected.req_status === 'Approved'" x-cloak>
+                  <label class="text-xs text-text mb-1 mt-2">Approved By</label>
+                  <input 
+                    type="text"
+                    id="approvedBy"
+                    name="approved_by"
+                    x-model="selected.approved_by"
+                    class="w-full input-field"
+                    placeholder="e.g., Dr. Shirley Villanueva"
+                    :readonly="isLocked()"
+                  />
+                </div>
 
-            <div class="flex justify-center pt-2 space-x-2">
-              <button type="button" class="btn btn-primary"
-                      @click="viewFullDetails(selected)">
-                Full Details
-              </button>
-              <button 
-                type="button" 
-                class="btn btn-primary" 
-                id="saveBtn">
-                Save Changes
-              </button>
-            </div>
+                <!-- REASON TEXTAREA -->
+                <div x-show="selected.req_status === 'Rejected/Cancelled'" x-cloak>
+                  <label class="text-xs text-text mb-1 mt-2">Reason</label>
+                  <textarea 
+                    name="reason" 
+                    x-model="selected.reason"
+                    class="w-full input-field resize-none" 
+                    rows="2"
+                    placeholder="Enter reason for cancellation or rejection..."
+                    :readonly="isLocked()"
+                    required
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="flex justify-center pt-2 space-x-2">
+                <button type="button" class="btn btn-primary"
+                        @click="viewFullDetails(selected)">
+                  Full Details
+                </button>
+
+                <button 
+                  type="button" 
+                  class="btn btn-primary" 
+                  id="saveBtn"
+                  :disabled="isLocked()"
+                >
+                  Save Changes
+                </button>
+              </div>
           </form>
         </div>
       </div>

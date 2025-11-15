@@ -398,6 +398,7 @@ class RequestModel extends BaseModel {
             CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
             vr.req_status,
             vr.approved_by,
+            vr.reason,
             vl.vehicle_name
         FROM vehicle_request v
         INNER JOIN requester r ON v.req_id = r.req_id

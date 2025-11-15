@@ -246,95 +246,79 @@ public function getVehicleRequestByControlNo($controlNo) {
     return $stmt->get_result()->fetch_assoc();
 }
 
-public function updateApprovalToken($controlNo, $token) {
-    $sql = "
-        UPDATE vehicle_request_assignment vra
-        JOIN vehicle_request vr ON vra.control_no = vr.control_no
-        SET vra.approval_token = ?
-        WHERE vr.control_no = ?
-    ";
-    $stmt = $this->db->prepare($sql);
-    $stmt->bind_param("ss", $token, $controlNo);
-    $stmt->execute();
-}
-public function updateVehicleRequestStatusByToken($token, $status) {
-    $sql = "
-        UPDATE vehicle_request_assignment
-        SET req_status = ?, approval_token = NULL
-        WHERE approval_token = ?
-    ";
-    $stmt = $this->db->prepare($sql);
-    $stmt->bind_param("ss", $status, $token);
-    $stmt->execute();
-    return $stmt->affected_rows > 0;
-}
-
-public function updateAssignment($control_no, $vehicle_id = null, $req_status = null, $approved_by = null) {
-    if (isset($_SESSION['staff_id'])) {
+    public function updateAssignment($control_no, $vehicle_id = null, $req_status = null, $approved_by = null, $reason = null) {
+        if (isset($_SESSION['staff_id'])) {
             setCurrentStaff($this->db);
         }
-    try {
-        // Optional: retrieve driver_id if vehicle_id is provided
-        $driver_id = null;
-        if (!empty($vehicle_id)) {
-            $driverQuery = "SELECT driver_id FROM vehicle WHERE vehicle_id = ?";
-            $stmtDriver = $this->db->prepare($driverQuery);
-            $stmtDriver->bind_param("i", $vehicle_id);
-            $stmtDriver->execute();
-            $driverResult = $stmtDriver->get_result();
-            if ($driverRow = $driverResult->fetch_assoc()) {
-                $driver_id = $driverRow['driver_id'];
+
+        try {
+            $driver_id = null;
+
+            if (!empty($vehicle_id)) {
+                $driverQuery = "SELECT driver_id FROM vehicle WHERE vehicle_id = ?";
+                $stmtDriver = $this->db->prepare($driverQuery);
+                $stmtDriver->bind_param("i", $vehicle_id);
+                $stmtDriver->execute();
+                $driverResult = $stmtDriver->get_result();
+
+                if ($driverRow = $driverResult->fetch_assoc()) {
+                    $driver_id = $driverRow['driver_id'];
+                }
+                $stmtDriver->close();
             }
-            $stmtDriver->close();
-        }
 
-        // Dynamically build query — update only provided fields
-        $fields = [];
-        $params = [];
-        $types = "";
+            $fields = [];
+            $params = [];
+            $types = "";
 
-        if (!empty($vehicle_id)) {
-            $fields[] = "vehicle_id = ?";
-            $params[] = $vehicle_id;
-            $types .= "i";
-        }
-        if (!is_null($driver_id)) {
-            $fields[] = "driver_id = ?";
-            $params[] = $driver_id;
-            $types .= "i";
-        }
-        if (!empty($req_status)) {
-            $fields[] = "req_status = ?";
-            $params[] = $req_status;
+            if (!empty($vehicle_id)) {
+                $fields[] = "vehicle_id = ?";
+                $params[] = $vehicle_id;
+                $types .= "i";
+            }
+
+            if (!is_null($driver_id)) {
+                $fields[] = "driver_id = ?";
+                $params[] = $driver_id;
+                $types .= "i";
+            }
+
+            if (!empty($req_status)) {
+                $fields[] = "req_status = ?";
+                $params[] = $req_status;
+                $types .= "s";
+            }
+
+            if (!empty($approved_by)) {
+                $fields[] = "approved_by = ?";
+                $params[] = $approved_by;
+                $types .= "s";
+            }
+
+            // NEW: Add Reason
+            if (!empty($reason)) {
+                $fields[] = "reason = ?";
+                $params[] = $reason;
+                $types .= "s";
+            }
+
+            if (empty($fields)) {
+                throw new Exception("No fields to update.");
+            }
+
+            $query = "UPDATE vehicle_request_assignment SET " . implode(", ", $fields) . " WHERE control_no = ?";
+            $params[] = $control_no;
             $types .= "s";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+
+            return $stmt->affected_rows > 0;
+
+        } catch (Exception $e) {
+            error_log("Update Error: " . $e->getMessage());
+            return false;
         }
-        if (!empty($approved_by)) {
-            $fields[] = "approved_by = ?";
-            $params[] = $approved_by;
-            $types .= "s";
-        }
-
-        if (empty($fields)) {
-            throw new Exception("No fields to update.");
-        }
-
-        // Add WHERE condition
-        $query = "UPDATE vehicle_request_assignment SET " . implode(", ", $fields) . " WHERE control_no = ?";
-        $params[] = $control_no;
-        $types .= "s";
-
-        // Prepare and bind
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param($types, ...$params);
-        $stmt->execute();
-
-        return $stmt->affected_rows > 0;
-    } catch (Exception $e) {
-        error_log('Error updating assignment: ' . $e->getMessage());
-        return false;
     }
-}
-
-
-
 }

@@ -123,7 +123,8 @@ class TrackingModel extends BaseModel {
         $sqlVehicle = "
             SELECT 
                 v.*, 
-                vr.req_status
+                vr.req_status,
+                vr.reason
             FROM vehicle_request v
             INNER JOIN requester r ON v.req_id = r.req_id
             LEFT JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no

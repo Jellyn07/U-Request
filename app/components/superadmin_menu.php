@@ -97,7 +97,7 @@ if (session_status() === PHP_SESSION_NONE) {
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
-              <a href="../../superadmin/views/motorpool_request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../shared/views/request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/request-for-proposal.png" alt="request" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Request</span>
               </a>

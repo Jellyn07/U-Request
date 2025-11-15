@@ -31,21 +31,20 @@ $formData = $_SESSION['admin_form_data'] ?? [];
   
 </head>
 <body class="bg-gray-200">
-  <!-- Superadmin Menu & Header -->
+  <!-- Menu & Header -->
   <?php
-// Determine which dashboard menu to include based on access level
-if ($_SESSION['access_level'] == 2) {
-    // Gsu Admin
-    include COMPONENTS_PATH . '/gsu_menu.php';
-} elseif ($_SESSION['access_level'] == 3) {
-    // Motorpool Admin
-    include COMPONENTS_PATH . '/motorpool_menu.php';
-} else {
-    // Fallback: no menu or default
-    echo "<p>No menu available for your access level.</p>";
-}
-?>
-
+  // Determine which dashboard menu to include based on access level
+  if ($_SESSION['access_level'] == 2) {
+      // Gsu Admin
+      include COMPONENTS_PATH . '/gsu_menu.php';
+  } elseif ($_SESSION['access_level'] == 3) {
+      // Motorpool Admin
+      include COMPONENTS_PATH . '/motorpool_menu.php';
+  } else {
+      // Fallback: no menu or default
+      echo "<p>No menu available for your access level.</p>";
+  }
+  ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->

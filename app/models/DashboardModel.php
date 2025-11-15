@@ -185,8 +185,7 @@ class DashboardModel extends BaseModel  {
         }
         return $rows;
     }
-
-
+    
     //Vehicle Request Pie
     public function getVehicleRequestStatusCounts() {
         $sql = "
@@ -195,7 +194,7 @@ class DashboardModel extends BaseModel  {
                 SUM(CASE WHEN vra.req_status = 'Approved' THEN 1 ELSE 0 END) AS approved,
                 SUM(CASE WHEN vra.req_status = 'On Going' THEN 1 ELSE 0 END) AS on_going,
                 SUM(CASE WHEN vra.req_status = 'Completed' THEN 1 ELSE 0 END) AS completed,
-                SUM(CASE WHEN vra.req_status IN ('Rejected', 'Cancelled') THEN 1 ELSE 0 END) AS rejected_cancelled
+                SUM(CASE WHEN vra.req_status IN ('Rejected/Cancelled') THEN 1 ELSE 0 END) AS rejected_cancelled
             FROM vehicle_request vr
             INNER JOIN vehicle_request_assignment vra ON vr.control_no = vra.control_no;
         ";
