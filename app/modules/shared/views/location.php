@@ -29,13 +29,25 @@ $admins = $controller->getAllAdmins();
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-gray-200">
-  <!-- GSU Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+<?php
+// Determine which dashboard menu to include based on access level
+if ($_SESSION['access_level'] == 1) {
+    // Gsu Admin
+    include COMPONENTS_PATH . '/superadmin_menu.php';
+} elseif ($_SESSION['access_level'] == 2) {
+    // Motorpool Admin
+    include COMPONENTS_PATH . '/gsu_menu.php';
+} else {
+    // Fallback: no menu or default
+    echo "<p>No menu available for your access level.</p>";
+}
+?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-4">Campus Locations</h1>
 
-      <div x-data="{ showDetails: false, selected: {}, addLocation: false }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div x-data="locationModal()" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
         <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
@@ -45,11 +57,7 @@ $admins = $controller->getAllAdmins();
               <option value="az">A - Z</option>
               <option value="za">Z - A</option>
             </select>
-            <select class="input-field" id="unitFilter">
-                <option value="all">All Unit</option>
-                <option>Tagum Unit</option>
-                <option>Mabini Unit</option>
-            </select>
+
             <!-- <button title="Print data in the table" id="print" class="input-field">
                 <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
             </button> -->
@@ -125,7 +133,7 @@ $admins = $controller->getAllAdmins();
 
             <div>
               <label class="text-xs text-text mb-1">Unit</label>
-              <input type="text" name="unit" :value="selected.unit || ''" class="w-full view-field" readonly />
+              <input type="text" name="unit" :value="selected.unit || ''" class="w-full input-field" readonly />
             </div>
 
             <div>
@@ -166,7 +174,7 @@ $admins = $controller->getAllAdmins();
                 <!-- UNIT -->
                 <div>
                   <label class="text-xs text-text mb-1">Unit</label>
-                  <select name="unit" class="w-full input-field" required>
+                  <select name="unit" class="w-full input-field" required x-on:change="fetchBuildings($event.target.value)">
                     <option value="">Select Unit</option>
                     <option value="Tagum Unit">Tagum Unit</option>
                     <option value="Mabini Unit">Mabini Unit</option>
@@ -184,7 +192,7 @@ $admins = $controller->getAllAdmins();
                         name="buildingOption" 
                         value="existing" 
                         checked 
-                        onclick="toggleBuildingOption('existing')"
+                        x-on:click="buildingOption = 'existing'"
                       >
                       <span class="text-xs">Choose Existing</span>
                     </label>
@@ -193,27 +201,23 @@ $admins = $controller->getAllAdmins();
                         type="radio" 
                         name="buildingOption" 
                         value="new" 
-                        onclick="toggleBuildingOption('new')"
+                        x-on:click="buildingOption = 'new'"
                       >
                       <span class="text-xs">Add New</span>
                     </label>
                   </div>
 
                   <!-- EXISTING BUILDING DROPDOWN -->
-                  <div id="existingBuilding">
+                  <div x-show="buildingOption === 'existing'">
                     <label class="text-xs text-text mb-1">Existing Building</label>
-                    <select name="existing_building" class="w-full input-field">
+                    <select name="existing_building" class="w-full input-field" x-ref="existingBuilding">
                       <option value="">Select Building</option>
-                      <?php foreach ($building as $b): ?>
-                        <option value="<?= htmlspecialchars($b['building']) ?>">
-                          <?= htmlspecialchars($b['building']) ?>
-                        </option>
-                      <?php endforeach; ?>
+                      <!-- Options will be populated dynamically -->
                     </select>
                   </div>
 
                   <!-- NEW BUILDING INPUT -->
-                  <div id="newBuilding" class="hidden">
+                  <div x-show="buildingOption === 'new'">
                     <label class="text-xs text-text mb-1">New Building Name</label>
                     <input 
                       type="text" 
@@ -260,7 +264,8 @@ $admins = $controller->getAllAdmins();
   </main>
   <script src="/public/assets/js/shared/menus.js"></script>
   <script src="/public/assets/js/shared/search.js"></script>          
-  <script src="/public/assets/js/gsu_admin/location.js"></script> 
+  <script src="/public/assets/js/gsu_admin/location.js"></script>  
   <script src="/public/assets/js/shared/export.js"></script>
 </body>
 </html>
+

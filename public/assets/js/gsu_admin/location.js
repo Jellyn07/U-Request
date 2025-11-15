@@ -126,3 +126,42 @@ document.addEventListener("DOMContentLoaded", function () {
   // Run once initially
   applyFilters();
 });
+
+function locationModal() {
+    return {
+        showDetails: false,
+        addLocation: false,
+        selected: {},
+        buildingOption: 'existing',
+
+        async fetchBuildings(unit) {
+            if (!unit) {
+                this.$refs.existingBuilding.innerHTML = '<option value="">Select Building</option>';
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_buildings');
+                formData.append('unit', unit);
+
+                const res = await fetch("../../../controllers/LocationController.php", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+
+                // Clear and populate the building dropdown
+                this.$refs.existingBuilding.innerHTML = '<option value="">Select Building</option>';
+                data.forEach(b => {
+                    const option = document.createElement('option');
+                    option.value = b.building;
+                    option.textContent = b.building;
+                    this.$refs.existingBuilding.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Failed to fetch buildings:", err);
+            }
+        }
+    }
+}

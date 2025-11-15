@@ -18,6 +18,19 @@ class LocationModel extends BaseModel{
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
+    // Get buildings by unit
+    public function getBuildingsByUnit($unit) {
+        $stmt = $this->db->prepare("
+            SELECT DISTINCT building 
+            FROM campus_locations 
+            WHERE unit = ? AND building IS NOT NULL
+            ORDER BY building ASC
+        ");
+        $stmt->bind_param("s", $unit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 
     // 🟢 Add new location
     public function addLocation($unit, $building, $exact_location) {

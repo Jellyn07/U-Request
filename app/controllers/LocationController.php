@@ -16,6 +16,14 @@ class LocationController {
         return $this->model->getAllBuildings();
     }
 
+    public function getBuildingsByUnit($unit) {
+    $buildings = $this->model->getBuildingsByUnit($unit);
+    header('Content-Type: application/json');
+    echo json_encode($buildings);
+    exit;
+}
+
+
     public function addLocation($data) {
         $unit = $data['unit'] ?? '';
         $buildingOption = $data['buildingOption'] ?? '';
@@ -89,6 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['location_id'] ?? 0;
             $response = $controller->deleteLocation($id);
             break;
+        case 'get_buildings':
+    $unit = $_POST['unit'] ?? '';
+    $controller->getBuildingsByUnit($unit);
+    break;
+
         default:
             $response = ['status' => 'error', 'message' => 'Invalid action'];
     }

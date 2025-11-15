@@ -102,14 +102,14 @@ GSU Admin
     - filter need fixing✅
     Locations
 
-    - filters
-    - adding building should be base on unit ex. mabini unit all building from mabini should display
+    - filters ✅
+    - adding building should be base on unit ex. mabini unit all building from mabini should display ✅
 
     logs
     - export not working
     
 
-    - Personnel work history (unable)
+    - Personnel work history (unable) ✅
     - GSU Request PersonnelAssign Add  ✅
     - GSU Request Materials Add  ✅
     - GSU Request View Full Details✅ (UI NEED POLISH I THINK)
