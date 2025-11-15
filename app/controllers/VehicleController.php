@@ -16,6 +16,14 @@ class VehicleController {
         return $this->vehicleModel->getVehicles();
     }
 
+    public function getVehiclesWithLastMaintenance() {
+        $vehicles = $this->vehicleModel->getVehicles();
+        foreach ($vehicles as &$vehicle) {
+            $vehicle['last_maintenance'] = $this->vehicleModel->getLastMaintenance($vehicle['vehicle_name']);
+        }
+        return $vehicles;
+    }
+
     public function addVehicle() {
         if (isset($_POST['add_vehicle'])) {
             session_start();

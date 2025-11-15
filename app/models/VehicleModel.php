@@ -164,44 +164,66 @@ class VehicleModel extends BaseModel {
         }
     }
     
-public function getVehicleTravelHistory($vehicle_id, $type = 'history') {
-    $today = date('Y-m-d');
+    public function getVehicleTravelHistory($vehicle_id, $type = 'history') {
+        $today = date('Y-m-d');
 
-    $query = "
-        SELECT 
-            vra.reqAssignment_id,
-            vra.control_no,
-            vra.req_id,
-            vra.vehicle_id,
-            vra.driver_id,
-            vra.req_status,
-            vra.approved_by,
-            CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
-            vr.trip_purpose,
-            vr.travel_date
-        FROM vehicle_request_assignment vra
-        INNER JOIN vehicle_request vr 
-            ON vra.control_no = vr.control_no
-        LEFT JOIN driver d 
-            ON vra.driver_id = d.driver_id
-        WHERE vra.vehicle_id = ?
-    ";
+        $query = "
+            SELECT 
+                vra.reqAssignment_id,
+                vra.control_no,
+                vra.req_id,
+                vra.vehicle_id,
+                vra.driver_id,
+                vra.req_status,
+                vra.approved_by,
+                CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
+                vr.trip_purpose,
+                vr.travel_date
+            FROM vehicle_request_assignment vra
+            INNER JOIN vehicle_request vr 
+                ON vra.control_no = vr.control_no
+            LEFT JOIN driver d 
+                ON vra.driver_id = d.driver_id
+            WHERE vra.vehicle_id = ?
+        ";
 
-    if ($type === 'history') {
-        $query .= " AND LOWER(vra.req_status) = 'completed' AND vr.travel_date <= ? ORDER BY vr.travel_date DESC";
-    } elseif ($type === 'schedule') {
-        $query .= " AND LOWER(vra.req_status) = 'approved' AND vr.travel_date > ? ORDER BY vr.travel_date ASC";
+        if ($type === 'history') {
+            $query .= " AND LOWER(vra.req_status) = 'completed' AND vr.travel_date <= ? ORDER BY vr.travel_date DESC";
+        } elseif ($type === 'schedule') {
+            $query .= " AND LOWER(vra.req_status) = 'approved' AND vr.travel_date > ? ORDER BY vr.travel_date ASC";
+        }
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) die(json_encode(['error' => 'Prepare failed: ' . $this->db->error]));
+
+        $stmt->bind_param("is", $vehicle_id, $today);
+        $stmt->execute();
+
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        return $result;
     }
 
-    $stmt = $this->db->prepare($query);
-    if (!$stmt) die(json_encode(['error' => 'Prepare failed: ' . $this->db->error]));
+    public function getLastMaintenance($vehicleName) {
+        $targetStatus = 'Under Maintenance';
+        $pattern = "%" . $vehicleName . "%$targetStatus%";
 
-    $stmt->bind_param("is", $vehicle_id, $today);
-    $stmt->execute();
+        $query = "SELECT changed_at 
+                FROM activity_logs 
+                WHERE description LIKE ?
+                ORDER BY changed_at DESC
+                LIMIT 1";
 
-    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("s", $pattern);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    return $result;
-}
-}
+        if ($row = $result->fetch_assoc()) {
+            return $row['changed_at'];
+        }
+
+        return null;
+    }
+    }
