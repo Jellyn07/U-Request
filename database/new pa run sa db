@@ -1087,3 +1087,725 @@ INNER JOIN request_assignment ra
 INNER JOIN requester rq 
     ON r.req_id = rq.req_id
 GROUP BY r.req_id, r.tracking_id;
+
+--------------------------------------------------------------------------------------
+CREATE TABLE activity_logs (
+    logs_id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    source VARCHAR(150) NOT NULL,
+    name VARCHAR(150) NOT NULL,       
+    action ENUM('INSERT','UPDATE','DELETE') NOT NULL,        
+    description TEXT,                        
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Activity Logs (All)
+drop trigger trg_admin_insert;
+drop trigger trg_admin_update;
+drop trigger trg_admin_delete;
+
+DELIMITER $$
+CREATE TRIGGER trg_administrator_insert
+AFTER INSERT ON administrator
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES('Administrator', admin_name, 'INSERT', CONCAT(admin_name, ' added administrator: ', NEW.first_name,' ',NEW.last_name));
+END$$
+DELIMITER ;
+
+-- UPDATE Trigger
+DELIMITER $$
+CREATE TRIGGER trg_administrator_update
+AFTER UPDATE ON administrator
+FOR EACH ROW
+BEGIN
+    DECLARE changes TEXT DEFAULT '';
+
+	DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    IF OLD.first_name != NEW.first_name OR OLD.last_name != NEW.last_name THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.first_name,' ',OLD.last_name,'" to "', NEW.first_name,' ',NEW.last_name,'"; ');
+    END IF;
+    IF OLD.email != NEW.email THEN
+        SET changes = CONCAT(changes, 'Email from "', OLD.email,'" to "', NEW.email,'"; ');
+    END IF;
+    IF OLD.contact_no != NEW.contact_no THEN
+        SET changes = CONCAT(changes, 'Contact from "', OLD.contact_no,'" to "', NEW.contact_no,'"; ');
+    END IF;
+    IF OLD.accessLevel_id != NEW.accessLevel_id THEN
+        SET changes = CONCAT(changes, 'Access Level changed; ');
+    END IF;
+    IF OLD.status != NEW.status THEN
+        SET changes = CONCAT(changes, 'Status from "', OLD.status,'" to "', NEW.status,'"; ');
+    END IF;
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+        'Administrator',
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated administrator: ', changes)
+    );
+END$$
+DELIMITER ;
+
+drop trigger trg_campus_insert;
+drop trigger trg_campus_update;
+drop trigger trg_campus_delete;
+
+DELIMITER $$
+CREATE TRIGGER trg_campus_location_insert
+AFTER INSERT ON campus_locations
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+		'Campus Location',
+        admin_name,
+        'INSERT',
+        CONCAT(admin_name, ' added campus location: ', NEW.unit, ', ', NEW.building, ', ', NEW.exact_location)
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_campus_location_update
+AFTER UPDATE ON campus_locations
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    IF OLD.unit != NEW.unit THEN
+        SET changes = CONCAT(changes, 'Unit from "', OLD.unit,'" to "', NEW.unit,'"; ');
+    END IF;
+    IF OLD.building != NEW.building THEN
+        SET changes = CONCAT(changes, 'Building from "', OLD.building,'" to "', NEW.building,'"; ');
+    END IF;
+    IF OLD.exact_location != NEW.exact_location THEN
+        SET changes = CONCAT(changes, 'Exact Location from "', OLD.exact_location,'" to "', NEW.exact_location,'"; ');
+    END IF;
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+		'Campus Location',
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated campus location: ', changes)
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_campus_location_delete
+AFTER DELETE ON campus_locations
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+		'Campus Location',
+        admin_name,
+        'DELETE',
+        CONCAT(admin_name, ' deleted campus location: ', OLD.unit, ', ', OLD.building, ', ', OLD.exact_location)
+    );
+END$$
+DELIMITER ;
+
+drop trigger trg_driver_insert;
+drop trigger trg_driver_update;
+DELIMITER $$
+CREATE TRIGGER trg_driver_insert
+AFTER INSERT ON driver
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    -- Get the name of the staff performing the insert
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Insert an audit record, including the new driver_id
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Driver',
+        admin_name,
+        'INSERT',
+        CONCAT(admin_name, ' added driver: ', NEW.firstName, ' ', NEW.lastName)
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_driver_update
+AFTER UPDATE ON driver
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    IF OLD.firstName != NEW.firstName OR OLD.lastName != NEW.lastName THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.firstName,' ',OLD.lastName,'" to "', NEW.firstName,' ',NEW.lastName,'"; ');
+    END IF;
+    IF OLD.contact != NEW.contact THEN
+        SET changes = CONCAT(changes, 'Contact from "', OLD.contact,'" to "', NEW.contact,'"; ');
+    END IF;
+    IF OLD.hire_date != NEW.hire_date THEN
+        SET changes = CONCAT(changes, 'Hire Date changed; ');
+    END IF;
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+		'Driver',
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated driver: ', changes)
+    );
+END$$
+DELIMITER ;
+
+drop trigger trg_vehicle_insert;
+drop trigger trg_vehicle_update;
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_insert
+AFTER INSERT ON vehicle
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Vehicle',
+        admin_name,
+        'INSERT',
+        CONCAT(admin_name, ' added vehicle: ', NEW.vehicle_name, 
+               ' (Plate: ', NEW.plate_no, ', Type: ', NEW.vehicle_type, ')')
+    );
+END$$
+DELIMITER ;
+
+-- Update
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_update
+AFTER UPDATE ON vehicle
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Detect changes
+    IF OLD.vehicle_name != NEW.vehicle_name THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.vehicle_name, '" to "', NEW.vehicle_name, '"; ');
+    END IF;
+
+    IF OLD.plate_no != NEW.plate_no THEN
+        SET changes = CONCAT(changes, 'Plate No from "', OLD.plate_no, '" to "', NEW.plate_no, '"; ');
+    END IF;
+
+    IF OLD.capacity != NEW.capacity THEN
+        SET changes = CONCAT(changes, 'Capacity from "', OLD.capacity, '" to "', NEW.capacity, '"; ');
+    END IF;
+
+    IF OLD.vehicle_type != NEW.vehicle_type THEN
+        SET changes = CONCAT(changes, 'Type from "', OLD.vehicle_type, '" to "', NEW.vehicle_type, '"; ');
+    END IF;
+
+    IF OLD.driver_id != NEW.driver_id THEN
+        SET changes = CONCAT(changes, 'Driver changed; ');
+    END IF;
+
+    IF OLD.photo != NEW.photo THEN
+        SET changes = CONCAT(changes, 'Photo updated; ');
+    END IF;
+
+    IF OLD.status != NEW.status THEN
+        SET changes = CONCAT(changes, 'Status from "', OLD.status, '" to "', NEW.status, '"; ');
+    END IF;
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Vehicle',
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated vehicle: ', NEW.vehicle_name, '. Changes: ', changes)
+    );
+END$$
+DELIMITER ;
+
+drop trigger trg_vehicle_request_insert;
+-- Vehicle Request Trigger
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_request_insert
+AFTER INSERT ON vehicle_request
+FOR EACH ROW
+BEGIN
+    DECLARE requester_name VARCHAR(150);
+
+    -- Get requester's name using req_id
+    SET requester_name = (
+        SELECT CONCAT(firstName, ' ', lastName)
+        FROM requester
+        WHERE req_id = @current_req_id
+    );
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Vehicle Request',
+        requester_name,
+        'INSERT',
+        CONCAT(requester_name, ' created a new vehicle request with tracking ID ', NEW.tracking_id)
+    );
+END$$
+DELIMITER ;
+
+drop trigger trg_vehicle_request_assignment_insert;
+drop trigger trg_vehicle_request_assignment_update;
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_request_assignment_insert
+AFTER INSERT ON vehicle_request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE vehicle_name VARCHAR(100);
+    DECLARE driver_name VARCHAR(150);
+
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Get vehicle name
+    SET vehicle_name = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = NEW.vehicle_id);
+
+    -- Get driver full name
+    SET driver_name = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = NEW.driver_id);
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Vehicle Request Assignment',
+        admin_name,
+        'INSERT',
+        CONCAT(
+            'Assigned vehicle: ', IFNULL(vehicle_name, 'N/A'),
+            ', driver: ', IFNULL(driver_name, 'N/A'),
+            ', status: ', NEW.req_status
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_request_assignment_update
+AFTER UPDATE ON vehicle_request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE vehicle_old VARCHAR(100);
+    DECLARE vehicle_new VARCHAR(100);
+    DECLARE driver_old VARCHAR(150);
+    DECLARE driver_new VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Get old/new vehicle names
+    SET vehicle_old = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = OLD.vehicle_id);
+    SET vehicle_new = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = NEW.vehicle_id);
+
+    -- Get old/new driver names
+    SET driver_old = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = OLD.driver_id);
+    SET driver_new = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = NEW.driver_id);
+
+    -- Detect changes and create summary
+    IF OLD.vehicle_id != NEW.vehicle_id THEN
+        SET changes = CONCAT(changes, 'Vehicle changed from ', IFNULL(vehicle_old,'N/A'), ' to ', IFNULL(vehicle_new,'N/A'), '; ');
+    END IF;
+
+    IF OLD.driver_id != NEW.driver_id THEN
+        SET changes = CONCAT(changes, 'Driver changed from ', IFNULL(driver_old,'N/A'), ' to ', IFNULL(driver_new,'N/A'), '; ');
+    END IF;
+
+    IF OLD.req_status != NEW.req_status THEN
+        SET changes = CONCAT(changes, 'Status changed from "', OLD.req_status, '" to "', NEW.req_status, '"; ');
+    END IF;
+
+    IF OLD.approved_by != NEW.approved_by THEN
+        SET changes = CONCAT(changes, 'Approved by changed from "', OLD.approved_by, '" to "', NEW.approved_by, '"; ');
+    END IF;
+
+    -- Only insert if there is a change
+    IF changes != '' THEN
+        INSERT INTO activity_logs(source, name, action, description)
+        VALUES (
+			'Vehicle Request Assignment',
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+drop trigger trg_gsu_personnel_insert;
+drop trigger trg_gsu_personnel_update;
+DELIMITER $$
+CREATE TRIGGER trg_gsu_personnel_insert
+AFTER INSERT ON gsu_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Insert summary into audit table
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'GSU Personnel',
+        admin_name,
+        'INSERT',
+        CONCAT(
+            'Added new GSU Personnel: ', NEW.firstName, ' ', NEW.lastName
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_gsu_personnel_update
+AFTER UPDATE ON gsu_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+    -- Build a human-readable description of changes
+    IF OLD.firstName != NEW.firstName THEN
+        SET changes = CONCAT(changes, 'First name changed from "', OLD.firstName, '" to "', NEW.firstName, '"; ');
+    END IF;
+
+    IF OLD.lastName != NEW.lastName THEN
+        SET changes = CONCAT(changes, 'Last name changed from "', OLD.lastName, '" to "', NEW.lastName, '"; ');
+    END IF;
+
+    IF OLD.department != NEW.department THEN
+        SET changes = CONCAT(changes, 'Department changed from "', OLD.department, '" to "', NEW.department, '"; ');
+    END IF;
+
+    IF OLD.contact != NEW.contact THEN
+        SET changes = CONCAT(changes, 'Contact changed from "', OLD.contact, '" to "', NEW.contact, '"; ');
+    END IF;
+
+    IF OLD.hire_date != NEW.hire_date THEN
+        SET changes = CONCAT(changes, 'Hire date changed from "', OLD.hire_date, '" to "', NEW.hire_date, '"; ');
+    END IF;
+
+    -- Only insert if there are changes
+    IF changes != '' THEN
+        INSERT INTO activity_logs(source, name, action, description)
+        VALUES (
+			'GSU Personnel',
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+drop trigger trg_materials_insert;
+drop trigger trg_materials_update;
+drop trigger trg_materials_delete;
+DELIMITER $$
+CREATE TRIGGER trg_materials_insert
+AFTER INSERT ON materials
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    -- Get current admin name from session variable
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Materials',
+        admin_name,
+        'INSERT',
+        CONCAT(
+            'Added new material: ', NEW.material_desc,
+            ', Code: ', NEW.material_code,
+            ', Quantity: ', NEW.qty
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_materials_update
+AFTER UPDATE ON materials
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Detect changes and describe them
+    IF OLD.material_desc != NEW.material_desc THEN
+        SET changes = CONCAT(changes, 'Description changed from "', OLD.material_desc, '" to "', NEW.material_desc, '"; ');
+    END IF;
+
+    IF OLD.qty != NEW.qty THEN
+        SET changes = CONCAT(changes, 'Quantity changed from ', OLD.qty, ' to ', NEW.qty, '; ');
+    END IF;
+
+    IF OLD.material_status != NEW.material_status THEN
+        SET changes = CONCAT(changes, 'Status changed from "', OLD.material_status, '" to "', NEW.material_status, '"; ');
+    END IF;
+
+    -- Insert only if there are changes
+    IF changes != '' THEN
+        INSERT INTO activity_logs(source, name, action, description)
+        VALUES (
+			'Materials',
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_materials_delete
+AFTER DELETE ON materials
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Materials',
+        admin_name,
+        'DELETE',
+        CONCAT(
+            'Deleted material: ', OLD.material_desc,
+            ', Code: ', OLD.material_code,
+            ', Quantity: ', OLD.qty
+        )
+    );
+END$$
+DELIMITER ;
+
+drop trigger trg_request_insert;
+drop trigger trg_request_update;
+
+DELIMITER $$
+CREATE TRIGGER trg_request_insert
+AFTER INSERT ON request
+FOR EACH ROW
+BEGIN
+    DECLARE req_name VARCHAR(150);
+    -- Get requester full name
+    SET req_name = (
+        SELECT CONCAT(firstName, ' ', lastName)
+        FROM requester           -- change this to your requester table
+        WHERE req_id = @current_req_id
+    );
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES (
+		'Request',
+        req_name,
+        'INSERT',
+        CONCAT(
+            'New request created. Type: ', NEW.request_Type,
+            ', Location: ', NEW.location
+        )
+    );
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_request_update
+AFTER UPDATE ON request
+FOR EACH ROW
+BEGIN
+    DECLARE staff_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Get requester full name
+    SET staff_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+
+    -- Detect changes in location only
+    IF OLD.location != NEW.location THEN
+        SET changes = CONCAT('Location changed from "', OLD.location, '" to "', NEW.location, '"');
+    END IF;
+
+    -- Insert only if there are changes
+    IF changes != '' THEN
+        INSERT INTO activity_logs(source, name, action, description)
+        VALUES (
+			'Request',
+            staff_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+drop trigger trg_request_assignment_status_update;
+DELIMITER $$
+CREATE TRIGGER trg_request_assignment_status_update
+AFTER UPDATE ON request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE v_admin_name VARCHAR(150) DEFAULT 'System';
+    DECLARE v_tracking_id VARCHAR(100) DEFAULT 'N/A';
+    DECLARE v_changes TEXT;
+
+    -- ✅ Get current admin name if session variable is set
+    IF @current_staff_id IS NOT NULL THEN
+        SELECT CONCAT(first_name, ' ', last_name)
+        INTO v_admin_name
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+        LIMIT 1;
+    END IF;
+    -- ✅ Get tracking_id from request table
+    SELECT tracking_id
+    INTO v_tracking_id
+    FROM request
+    WHERE request_id = NEW.request_id
+    LIMIT 1;
+    -- ✅ Only log when status *actually* changes and not null or same
+    IF (OLD.req_status IS NULL AND NEW.req_status IS NOT NULL)
+        OR (OLD.req_status IS NOT NULL AND NEW.req_status IS NULL)
+        OR (OLD.req_status <> NEW.req_status) THEN
+
+        -- ✅ Prevent duplicate inserts for the same request and status in a short timeframe
+        IF NOT EXISTS (
+            SELECT 1
+            FROM status_audit
+            WHERE description LIKE CONCAT('%Tracking ID: ', v_tracking_id, '%New Status: "', NEW.req_status, '"%')
+              AND TIMESTAMPDIFF(SECOND, changed_at, NOW()) < 3
+        ) THEN
+            SET v_changes = CONCAT(
+                'Tracking ID: ', COALESCE(v_tracking_id, 'N/A'),
+                ' | Previous Status: "', COALESCE(OLD.req_status, 'None'),
+                '" | New Status: "', COALESCE(NEW.req_status, 'None'), '"'
+            );
+            INSERT INTO activity_logs(source, name, action, description)
+            VALUES ('Request Status', v_admin_name, 'UPDATE', v_changes);
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+drop trigger trg_request_assigned_personnel_insert;
+DELIMITER $$
+CREATE TRIGGER trg_request_assigned_personnel_insert
+AFTER INSERT ON request_assigned_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE personnel_name VARCHAR(150) DEFAULT 'Unknown Personnel';
+    DECLARE admin_name VARCHAR(150) DEFAULT 'System';
+    DECLARE description_text TEXT;
+
+    -- Get administrator name from session variable if available
+    IF @current_staff_id IS NOT NULL THEN
+        SELECT CONCAT(first_name, ' ', last_name)
+        INTO admin_name
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+        LIMIT 1;
+    END IF;
+
+    -- Get personnel full name
+    SELECT CONCAT(firstName, ' ', lastName)
+    INTO personnel_name
+    FROM gsu_personnel
+    WHERE staff_id = NEW.staff_id
+    LIMIT 1;
+
+    -- Compose the description
+    SET description_text = CONCAT('Assigned ', personnel_name, ' to request ID ', NEW.request_id);
+
+    -- Insert a single audit record
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES ('Request Assigned Personnel', admin_name, 'INSERT', description_text);
+END$$
+DELIMITER ;
+
+drop table vehicle_request_assignment_audit;
+drop table vehicle_request_audit;
+drop table status_audit;
+drop table request_audit;
+drop table request_assigned_personnel_audit;
+drop table materials_audit;
+drop table gsu_personnel_audit;
+drop table driver_audit;
+drop table campus_locations_audit;
+drop table administrator_audit;
+drop table vehicle_audit;
