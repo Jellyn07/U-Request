@@ -15,6 +15,7 @@ class ScheduleModel extends BaseModel {
             vr.departure_time, 
             vr.return_time,
             vra.req_status,
+            vra.reason,
             v.vehicle_name
         FROM vehicle_request vr
         LEFT JOIN vehicle_request_assignment vra 
@@ -53,6 +54,7 @@ class ScheduleModel extends BaseModel {
                         'purpose' => $row['trip_purpose'],
                         'destination' => $row['travel_destination'],
                         'status' => $row['req_status'] ?? 'Pending',
+                        'reason' => $row['reason'] ?? '',
                         'req_id' => $row['req_id'],
                         'time' => $time,
                         'return_date_formatted' => $formattedReturnDate

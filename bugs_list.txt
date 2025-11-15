@@ -47,7 +47,7 @@ Super Admin
 +++++++++++++++++++++++++++++++++JUNA+++++++++++++++++++++++++++++++++
 Motorpool Admin
     - Motorpool Vehicle Request if reject with remarks why it is rejected ✅
-    - Motorpool Vehicle Request Schedule (by color)
+    - Motorpool Vehicle Request Schedule (by color)✅
     - Motorpool Vehicle need add (unusable vehicle status) update status abou vehicle✅
     - Add unit in driver table
     - Menu logout/profile✅

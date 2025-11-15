@@ -19,8 +19,16 @@ $trips = $controller->fetchTrips();
   <link rel="icon" href="/public/assets/img/upper_logo.png"/>
 </head>
 <body class="bg-gray-100">
-  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
-
+    <!-- Menu & Header -->
+  <?php
+  if ($_SESSION['access_level'] == 1) {
+      include COMPONENTS_PATH . '/superadmin_menu.php';
+  } elseif ($_SESSION['access_level'] == 3) {
+      include COMPONENTS_PATH . '/motorpool_menu.php';
+  } else {
+      echo "<p>No menu available for your access level.</p>";
+  }
+  ?>
   <main class="ml-16 md:ml-64 p-6 flex flex-col min-h-screen">
     <h1 class="text-2xl font-bold mb-4">Schedules</h1>
 
