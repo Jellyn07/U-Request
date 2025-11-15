@@ -318,3 +318,85 @@ async function viewVehicleRequestHistory(requester_id) {
     });
   }
 }
+
+document.addEventListener("click", function (e) {
+    if (e.target.closest(".historyBtn")) {
+
+        const btn = e.target.closest(".historyBtn");
+        const material_code = btn.getAttribute("data-code");
+
+        if (!material_code) {
+            return Swal.fire("Error", "Material code not found.", "error");
+        }
+
+        fetch('../../../controllers/MaterialController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                fetch_material_history: true,
+                material_code: material_code
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+
+            if (response.status !== "success" || response.data.length === 0) {
+                return Swal.fire(
+                    'No Records Found',
+                    'No usage history found for this material.',
+                    'info'
+                );
+            }
+
+            let rows = response.data.map(item => `
+                <tr>
+                    <td class="border px-2 py-1 text-center">${item.tracking_id}</td>
+                    <td class="border px-2 py-1">${item.location}</td>
+                    <td class="border px-2 py-1">${item.material_desc}</td>
+                    <td class="border px-2 py-1 text-center">${item.quantity_needed}</td>
+                    <td class="border px-2 py-1 text-center">
+                        ${new Date(item.material_requested_date).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                        })}
+                    </td>
+                </tr>
+            `).join('');
+
+            Swal.fire({
+                title: 'Material Used History',
+                width: 900,
+                confirmButtonText: 'Close',
+                confirmButtonColor: '#800000',
+                background: '#fff',
+                customClass: {
+                    popup: 'border-t-4 border-red-500 shadow-lg rounded-lg'
+                },
+                html: `
+                    <div class="overflow-auto max-h-60">
+                        <table class="min-w-full text-xs text-center border border-gray-300">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="border px-2 py-1">Tracking ID</th>
+                                    <th class="border px-2 py-1">Location</th>
+                                    <th class="border px-2 py-1">Description</th>
+                                    <th class="border px-2 py-1">Qty Used</th>
+                                    <th class="border px-2 py-1">Date Requested</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            });
+
+        })
+        .catch(err => {
+            console.error('Error fetching material history:', err);
+            Swal.fire('Error', 'Unable to fetch material history.', 'error');
+        });
+    }
+});

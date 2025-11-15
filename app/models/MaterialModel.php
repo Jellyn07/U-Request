@@ -183,4 +183,33 @@ class MaterialModel extends BaseModel
         $stmt->bind_param("ii", $quantity_to_add, $material_code);
         return $stmt->execute();
     }
+
+    public function getMaterialHistory($material_code) {
+        $material_code = intval($material_code); // basic sanitization
+
+        $sql = "SELECT 
+                    r.tracking_id,
+                    r.location,
+                    m.material_desc,
+                    rmn.quantity_needed,
+                    rmn.date_added AS material_requested_date
+                FROM request_materials_needed rmn
+                JOIN request_assignment ra ON rmn.reqAssignment_id = ra.reqAssignment_id
+                JOIN request r ON ra.request_id = r.request_id
+                JOIN materials m ON rmn.material_code = m.material_code
+                WHERE rmn.material_code = $material_code
+                ORDER BY rmn.date_added DESC";
+
+        $result = $this->db->query($sql);
+
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+
+        return $data;
+    }
+
 }

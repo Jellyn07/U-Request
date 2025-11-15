@@ -10,49 +10,41 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-class MaterialController extends BaseModel
-{
+class MaterialController extends BaseModel{
     private $model;
 
-    public function __construct()
-    {
+    public function __construct(){
         parent::__construct(); // ✅ Base model constructor
         $this->model = new MaterialModel();
     }
 
     // Get filtered materials
-    public function getFiltered($search = '', $status = 'all', $order = 'az')
-    {
+    public function getFiltered($search = '', $status = 'all', $order = 'az'){
         return $this->model->getFilteredMaterials($search, $status, $order);
     }
 
     // Get all materials
-    public function index()
-    {
+    public function index(){
         return $this->model->getAll();
     }
 
     // Search
-    public function search($keyword)
-    {
+    public function search($keyword){
         return $this->model->search($keyword);
     }
 
     // Filter
-    public function filter($status)
-    {
+    public function filter($status){
         return $this->model->filterByStatus($status);
     }
 
     // Sort
-    public function sort($order = 'az')
-    {
+    public function sort($order = 'az'){
         return $this->model->sortByName($order);
     }
 
     // Update
-    public function update($data)
-    {
+    public function update($data){
         $duplicate = $this->model->existsForUpdate($data['material_code'], $data['material_desc'], $data['material_code']);
         if ($duplicate) return $duplicate;
 
@@ -65,8 +57,7 @@ class MaterialController extends BaseModel
     }
 
     // Store new material
-    public function store($data)
-    {
+    public function store($data){
         $duplicate = $this->model->exists($data['material_code'], $data['material_desc']);
         if ($duplicate) return $duplicate;
 
@@ -81,14 +72,12 @@ class MaterialController extends BaseModel
     }
 
     // Show single material
-    public function show($id)
-    {
+    public function show($id){
         return $this->model->find($id);
     }
 
     // Get next material code
-    public function getNextMaterialCode()
-    {
+    public function getNextMaterialCode(){
         $stmt = $this->db->prepare("SELECT MAX(material_code) AS max_code FROM materials");
 
         if (!$stmt) return 1;
@@ -102,9 +91,21 @@ class MaterialController extends BaseModel
     }
 
     // Add stock
-    public function addStock($material_code, $quantity)
-    {
+    public function addStock($material_code, $quantity){
         return $this->model->addQuantity($material_code, $quantity);
+    }
+
+    public function fetchMaterialHistory() {
+        $material_code = $_POST['material_code'] ?? 0;
+
+        if (!$material_code) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid material code']);
+            return;
+        }
+
+        $history = $this->model->getMaterialHistory($material_code);
+
+        echo json_encode(['status' => 'success', 'data' => $history]);
     }
 }
 
@@ -174,4 +175,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: $redirect");
         exit;
     }
+}
+
+$materialModel = new MaterialModel();  
+
+if (isset($_POST['fetch_material_history'])) {
+
+    $material_code = $_POST['material_code'] ?? 0;
+
+    if (!$material_code) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Invalid material code'
+        ]);
+        exit;
+    }
+
+    $history = $materialModel->getMaterialHistory($material_code);
+
+    echo json_encode([
+        'status' => 'success',
+        'data' => $history
+    ]);
+    exit;
 }

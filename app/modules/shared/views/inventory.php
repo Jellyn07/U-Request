@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['email'])) {
-    header("Location: /app/modules/shared/views/admin_login.php");
+    header("Location: admin_login.php");
     exit;
 }
 require_once __DIR__ . '/../../../config/auth-admin.php';
@@ -46,13 +46,26 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
+    <script src="<?php echo PUBLIC_URL; ?>/assets/js/shared/popup.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body class="bg-gray-100 overflow-hidden">
-  <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+  <!-- Menu & Header -->
+  <?php
+  // Determine which dashboard menu to include based on access level
+  if ($_SESSION['access_level'] == 1) {
+      // Gsu Admin
+      include COMPONENTS_PATH . '/superadmin_menu.php';
+  } elseif ($_SESSION['access_level'] == 2) {
+      // Motorpool Admin
+      include COMPONENTS_PATH . '/gsu_menu.php';
+  } else {
+      // Fallback: no menu or default
+      echo "<p>No menu available for your access level.</p>";
+  }
+  ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -75,12 +88,9 @@ $profile = $controller->getProfile($_SESSION['email']);
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
             </select>
-            <!-- <button title="Print data in the table" class="input-field">
-              <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button> -->
             <img id="logo" src="/public/assets/img/usep.png" class="hidden">
             <button title="Export" id="export" class="btn-upper">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
             <div x-data="{ showModal: false }">
@@ -141,8 +151,8 @@ $profile = $controller->getProfile($_SESSION['email']);
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
-            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+          <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
+            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
               <thead class="bg-gray-50 sticky top-0">
                 <tr>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
@@ -164,10 +174,11 @@ $profile = $controller->getProfile($_SESSION['email']);
                   ?>
                     <tr
                       @click="selected = <?= $rowJson ?>; showDetails = true"
-                      class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100 text-sm">
-                      <td class="pl-8 py-2"><?= htmlspecialchars($row['material_code']) ?></td>
-                      <td class="px-4 py-2"><?= htmlspecialchars($row['material_desc']) ?></td>
-                      <td class="px-4 py-2"><?= htmlspecialchars($row['qty']) ?></td>
+                      data-code="<?= $row['material_code']; ?>"
+                      class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100">
+                      <td class="pl-8 py-3"><?= htmlspecialchars($row['material_code']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['material_desc']) ?></td>
+                      <td class="px-4 py-3"><?= htmlspecialchars($row['qty']) ?></td>
                       <td>
                         <span class="inline-block px-4 ml-3 py-1 text-xs font-semibold rounded-xl <?= $status === 'Available' ? 'bg-green-200 text-green-800 px-6' : 'bg-red-100 text-red-800' ?>"><?= $status ?></span>
                       </td>
@@ -175,7 +186,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <?php } ?>
                 <?php } else { ?>
                   <tr>
-                    <td colspan="4" class="text-center py-2">No materials found</td>
+                    <td colspan="4" class="text-center py-3">No materials found</td>
                   </tr>
                 <?php } ?>
               </tbody>
@@ -219,28 +230,19 @@ $profile = $controller->getProfile($_SESSION['email']);
               </div>
             </div>
 
-            <!-- <div>
-              <label class="text-xs text-text mb-1">Status</label>
-                  <div>
-                    <select name="material_status" class="input-field">
-                      <option value="Available" :selected="selected.material_status === 'available'">Available</option>
-                      <option value="Unavailable" :selected="selected.material_status === 'unavailable'">Unavailable</option>
-                    </select>
-                  </div>
-            </div> -->
-
             <div class="flex justify-center gap-2 pt-2">
-              <!-- <button type="button" title="Material Used History" class="btn btn-secondary"> -->
-              <button type="button" title="Material Used History" class="btn btn-secondary">
-                <img src="/public/assets/img/work-history.png" class="size-4" alt="Material Used History">
-              </button>
+              <button 
+                  type="button"
+                  class="btn btn-secondary historyBtn"
+                  :data-code="selected.material_code"
+                  title="Material Used History">
+                  <img src="/public/assets/img/work-history.png" class="size-4">
               </button>
               <button type="submit" name="update_material" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
 
         </div>
-
 
         <!-- Stock Management Modal -->
         <div x-show="addmaterial" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center  z-50 overflow-auto">
@@ -262,8 +264,6 @@ $profile = $controller->getProfile($_SESSION['email']);
             </form>
           </div>
         </div>
-
-
       </div>
     </div>
     </div>
@@ -314,8 +314,6 @@ $profile = $controller->getProfile($_SESSION['email']);
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/search.js"></script>
 <script src="/public/assets/js/shared/export.js"></script>
-
-//new alert
 <script>
   function validateAndSubmit() {
     const form = document.getElementById('addStockForm');
@@ -333,8 +331,6 @@ $profile = $controller->getProfile($_SESSION['email']);
     }
   }
 </script>
-
-
 </html>
 
 <?php
@@ -342,3 +338,4 @@ $profile = $controller->getProfile($_SESSION['email']);
 unset($_SESSION['admin_success']);
 unset($_SESSION['admin_error']);
 ?>
+

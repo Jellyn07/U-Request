@@ -38,7 +38,7 @@ Super Admin
     - filter in user mgt.
 
     GSU oversight
-    - no material history
+    - no material history ✅
 
     logs
     - export not working
@@ -94,7 +94,7 @@ GSU Admin
     - cant change the status in side details
 
     inventory
-    - no material history
+    - no material history ✅
 
     personnel
     - no work history ✅

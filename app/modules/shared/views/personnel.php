@@ -49,8 +49,8 @@ $profile = $controller->getProfile($_SESSION['email']);
   ?>
 </head>
 <body class="bg-gray-100">
-  <!-- Superadmin Menu & Header -->
-    <?php
+  <!-- Menu & Header -->
+<?php
 // Determine which dashboard menu to include based on access level
 if ($_SESSION['access_level'] == 1) {
     // Gsu Admin
