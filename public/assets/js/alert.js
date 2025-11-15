@@ -120,110 +120,75 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminForm = document.getElementById("adminForm");
   const personnelForm = document.getElementById("personnelForm");
   const driverForm = document.getElementById("driverForm");
-
-  // ADMIN UPDATE CONFIRMATION
-  if (adminForm) {
-    adminForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to update this administrator's details?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, update it",
-        cancelButtonText: "Cancel"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          adminForm.submit();
-        }
-      });
-    });
-  }
-
-  // PERSONNEL UPDATE CONFIRMATION
-  if (personnelForm) {
-    personnelForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to update this personnel's details?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, update it",
-        cancelButtonText: "Cancel"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          if (!personnelForm.querySelector('input[name="update_personnel"]')) {
-            const hidden = document.createElement("input");
-            hidden.type = "hidden";
-            hidden.name = "update_personnel";
-            hidden.value = "1";
-            personnelForm.appendChild(hidden);
-          }
-          personnelForm.submit();
-        }
-      });
-    });
-  }
-
-  // DRIVER UPDATE CONFIRMATION
-  if (driverForm) {
-    driverForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to update this driver's details?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, update it",
-        cancelButtonText: "Cancel"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          if (!driverForm.querySelector('input[name="update_driver"]')) {
-            const hidden = document.createElement("input");
-            hidden.type = "hidden";
-            hidden.name = "update_driver";
-            hidden.value = "1";
-            driverForm.appendChild(hidden);
-          }
-          driverForm.submit();
-        }
-      });
-    });
-  }
-
-  // GENERIC USER FORM CONFIRMATION
   const userForm = document.getElementById("userForm");
-  if (userForm) {
-    userForm.addEventListener("submit", function (e) {
+  const updateBtn = document.getElementById("updateBtn");
+
+  // Helper: Validate contact number
+  function validateContact(input) {
+    const value = input.value.trim();
+    let errorEl = input.parentElement.querySelector('.contact-error');
+    if (!errorEl) {
+      errorEl = document.createElement('p');
+      errorEl.classList.add('contact-error', 'text-red-600', 'text-xs', 'mt-1');
+      input.parentElement.appendChild(errorEl);
+    }
+    errorEl.textContent = "";
+
+    const pattern = /^09\d{9}$/;
+    if (!pattern.test(value)) {
+      errorEl.textContent = "Contact number must start with 09 and be 11 digits long.";
+      input.focus();
+      return false;
+    }
+    return true;
+  }
+
+  // Helper: Attach confirmation + optional contact validation
+  function attachFormConfirmation(form, message, actionInputName = null) {
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
 
+      // Validate contact if exists
+      const contactInput = form.querySelector('input[name="contact_no"]');
+      if (contactInput && !validateContact(contactInput)) return;
+
+      // Show confirmation
       Swal.fire({
         title: "Are you sure?",
-        text: "Do you want to save these changes?",
+        text: message,
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, save it!"
+        confirmButtonText: "Yes, update it",
+        cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          e.target.submit();
+          // Add hidden action input if needed
+          if (actionInputName && !form.querySelector(`input[name="${actionInputName}"]`)) {
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = actionInputName;
+            hidden.value = "1";
+            form.appendChild(hidden);
+          }
+          form.submit();
         }
       });
     });
   }
 
-  // UPDATE BUTTON CONFIRMATION
-  const updateBtn = document.getElementById("updateBtn");
-  if (updateBtn) {
-    updateBtn.addEventListener("click", function (e) {
+  // Attach confirmations
+  attachFormConfirmation(adminForm, "Do you want to update this administrator's details?");
+  attachFormConfirmation(personnelForm, "Do you want to update this personnel's details?", "update_personnel");
+  attachFormConfirmation(driverForm, "Do you want to update this driver's details?", "update_driver");
+  attachFormConfirmation(userForm, "Do you want to save these changes?");
+
+  // Update button (outside form)
+  if (updateBtn && userForm) {
+    updateBtn.addEventListener("click", function () {
       Swal.fire({
         title: "Update User Details?",
         text: "Are you sure you want to save these changes?",
@@ -233,24 +198,22 @@ document.addEventListener("DOMContentLoaded", function () {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, update!"
       }).then((result) => {
-        if (result.isConfirmed) {
-          document.getElementById("userForm").submit();
-        }
+        if (result.isConfirmed) userForm.submit();
       });
     });
   }
 
-  // ✅ SUCCESS OR ERROR ALERT AFTER REDIRECT
+  // ✅ Show success/error alerts based on URL params
   const urlParams = new URLSearchParams(window.location.search);
-
-  if (urlParams.get("updated") === "1") {
+  const updated = urlParams.get("updated");
+  if (updated === "1") {
     Swal.fire({
       title: "Updated!",
-      text: "Administrator details have been updated successfully.",
+      text: "Details have been updated successfully.",
       icon: "success",
       confirmButtonColor: "#3085d6"
     });
-  } else if (urlParams.get("updated") === "0") {
+  } else if (updated === "0") {
     Swal.fire({
       title: "Error!",
       text: "Something went wrong while updating.",

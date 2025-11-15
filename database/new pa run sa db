@@ -1809,3 +1809,16 @@ drop table driver_audit;
 drop table campus_locations_audit;
 drop table administrator_audit;
 drop table vehicle_audit;
+
+------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE VIEW vw_work_history AS
+SELECT 
+    rap.staff_id,
+    r.request_id,
+    r.request_Type,
+    ra.date_finished,
+    ra.req_status
+FROM request_assigned_personnel rap
+JOIN request_assignment ra ON rap.request_id = ra.request_id
+JOIN request r ON ra.request_id = r.request_id;

@@ -34,7 +34,7 @@ Super Admin
     account mgt.
     - can edit staff ID?
     - super admins should be anable in access and cannot be change
-    - cannot add new admin (Prepare failed for add_admin_access: Table 'u_request.add_admin_access' doesn't exist)
+    - cannot add new admin (Prepare failed for add_admin_access: Table 'u_request.add_admin_access' doesn't exist)✅ naa kay need ih add sa db boss (naas pa run)
     - filter in user mgt.
 
     GSU oversight
@@ -50,7 +50,7 @@ Motorpool Admin
     - Motorpool Vehicle Request Schedule (by color)
     - Motorpool Vehicle need add (unusable vehicle status) update status abou vehicle
     - Add unit in driver table
-    - Menu logout/profile
+    - Menu logout/profile✅
 
     request
     - should print on what is in the table ex. is the table is all completed in export it should display only completed
@@ -68,11 +68,11 @@ Motorpool Admin
     - right side details dont change if i click to other vehicles ex. i show the Schedule and that Schedule wont change even if i click to other vehicle but the pprimary details do change
     
     driver
-    - filters and search dont work
-    - contact should only allow numbers start 09 not 08 etc.
+    - filters and search dont work ✅
+    - contact should only allow numbers start 09 not 08 etc. ✅
     - driver profile dont work
     - changing unit in driver dont work
-    - hire date should not be change
+    - hire date should not be change ✅
 
 
 GSU Admin
@@ -97,9 +97,9 @@ GSU Admin
     - no material history
 
     personnel
-    - no work history
-    - cant edit
-    - filter need fixing
+    - no work history ✅
+    - cant edit ✅
+    - filter need fixing✅
     Locations
 
     - filters

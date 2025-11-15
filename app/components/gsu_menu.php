@@ -30,7 +30,7 @@
           <img src="/public/assets/img/inventory.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Inventory</span>
         </a>
-        <a href="../../gsu_admin/views/personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../shared/views/personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/personnel.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Personnels</span>
         </a>

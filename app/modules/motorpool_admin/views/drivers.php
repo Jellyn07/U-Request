@@ -53,12 +53,6 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
-            <!-- <select class="input-field" id="statusFilter">
-              <option value="all">All</option>
-              <option value="Available">Available</option>
-              <option value="Fixing">Fixing</option>
-            </select> -->
-
             <select class="input-field" id="sortUsers">
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
@@ -175,6 +169,7 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Driver ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
               </tr>
             </thead>
             <tbody id="table" class="text-sm">
@@ -305,7 +300,16 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
 
             <div>
               <label class="text-xs text-text mb-1">Hire Date</label>
-              <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full input-field"/>
+              <input 
+                  type="text"
+                  :value="selected.hire_date ? new Date(selected.hire_date).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                  }) : ''"
+                  class="w-full view-field cursor-not-allowed"
+                  disabled
+              />
             </div>
 
 
@@ -330,12 +334,11 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
     import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
 
     initTableFilters({
-      tableId: "usersTable",
+      tableId: "table", 
       searchId: "searchUser",
-      filterId: "statusFilter",  
-      sortId: "sortUsers",          
-      searchColumns: [2, 4],         
-      filterColumn: 3             
+      sortId: "sortUsers",
+      searchColumns: [2, 1], 
+      filterColumn: 3 
     });
 
       function previewProfile(event) {

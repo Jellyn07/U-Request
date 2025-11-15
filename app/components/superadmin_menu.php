@@ -25,7 +25,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <nav class="flex-1 overflow-y-auto text-sm text-white mt-2">
       <ul class="space-y-2 p-2">
         <!-- Dashboard -->
-        <a href="dashboard.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../superadmin/views/dashboard.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/dashboard.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Dashboard</span>
         </a>
@@ -39,13 +39,13 @@ if (session_status() === PHP_SESSION_NONE) {
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
-              <a href="manage_user.php" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">
+              <a href="../../superadmin/views/manage_user.php" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">
                 <img src="/public/assets/img/accout-management.png" alt="Manage Users" class="size-5 object-cover overflow-hidden mr-2" />
                 Users
               </a>
             </li>
             <li>
-              <a href="manage_admin.php" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">
+              <a href="../../superadmin/views/manage_admin.php" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">
                 <img src="/public/assets/img/admin-management.png" alt="Manage Admins" class="size-5 object-cover overflow-hidden mr-2" />
                 Admins
               </a>
@@ -62,25 +62,25 @@ if (session_status() === PHP_SESSION_NONE) {
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
-              <a href="gsu_request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/gsu_request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/repair-request.png" alt="request" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Request</span>
               </a>
             </li>
             <li>
-              <a href="inventory.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/inventory.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/inventory.png" alt="inventory" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Inventory</span>
               </a>  
             </li>
             <li>
-              <a href="personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../shared/views/personnel.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/personnel.png" alt="personnel" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Personnels</span>
               </a>
             </li>
             <li>
-              <a href="location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/location.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/campus-locations.png" alt="location" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Campus Locations</span>
               </a>
@@ -97,25 +97,25 @@ if (session_status() === PHP_SESSION_NONE) {
           </button>
           <ul class="submenu hidden pl-5 space-y-2 mt-1">
             <li>
-              <a href="motorpool_request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/motorpool_request.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/request-for-proposal.png" alt="request" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Request</span>
               </a>
             </li>
             <li>
-              <a href="schedule.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/schedule.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/calendar.png" alt="schedule" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Schedule</span>
               </a>
             </li>
             <li>
-              <a href="vehicle.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/vehicle.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/car-admin.png" alt="vehicle" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Vehicle</span>
               </a>
             </li>
             <li>
-              <a href="driver.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+              <a href="../../superadmin/views/driver.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
                 <img src="/public/assets/img/driver.png" alt="drivers" class="size-8 p-1.5 md:p-0 md:size-4" />
                 <span class="hidden md:flex items-center sidebar-text">Drivers</span>
               </a>
@@ -124,19 +124,19 @@ if (session_status() === PHP_SESSION_NONE) {
         </li>
 
         <!-- Activity Logs -->
-        <a href="logs.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../superadmin/views/logs.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/activity-logs.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Activity Logs</span>
         </a>
 
         <!-- Feedbacks -->
-        <a href="feedback.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../superadmin/views/feedback.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/feedback.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Feedbacks</span>
         </a>
 
         <!-- Backup & Restore -->
-        <a href="backup.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../superadmin/views/backup.php" class="accordion flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/backup.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Backup & Restore</span>
         </a>

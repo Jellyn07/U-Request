@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['email'])) {
-    header("Location: /app/modules/shared/views/admin_login.php");
+    header("Location: admin_login.php");
     exit;
 }
 require_once __DIR__ . '/../../../config/auth-admin.php';
@@ -50,7 +50,19 @@ $profile = $controller->getProfile($_SESSION['email']);
 </head>
 <body class="bg-gray-100">
   <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/gsu_menu.php'; ?>
+    <?php
+// Determine which dashboard menu to include based on access level
+if ($_SESSION['access_level'] == 1) {
+    // Gsu Admin
+    include COMPONENTS_PATH . '/superadmin_menu.php';
+} elseif ($_SESSION['access_level'] == 2) {
+    // Motorpool Admin
+    include COMPONENTS_PATH . '/gsu_menu.php';
+} else {
+    // Fallback: no menu or default
+    echo "<p>No menu available for your access level.</p>";
+}
+?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -71,12 +83,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
             </select>
-            <!-- <button title="Print data in the table" class="input-field">
-                <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button> -->
             <img id="logo" src="/public/assets/img/usep.png" class="hidden">
             <button title="Export" id="export" class="btn-upper">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
                 <div x-data="{ showModal: false }">
@@ -188,7 +197,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <!-- Table -->
           <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
-          <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
+          <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg p-2">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
@@ -207,6 +216,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
                   data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
                   data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
+                  data-status="<?= htmlspecialchars($person['status']) ?>"
                   @click="selected = {
                       staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
                       firstName: '<?= htmlspecialchars($person['firstName']) ?>',
@@ -305,7 +315,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
             <div>
               <label class="text-xs text-text mb-1">Staff ID No.</label>
-              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full view-field" disabled readonly/>
+              <input type="text" id="staff_id" name="staff_id" :value="selected.staff_id || ''" class="w-full input-field" readonly/>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -345,9 +355,12 @@ $profile = $controller->getProfile($_SESSION['email']);
 
             <div>
               <label class="text-xs text-text mb-1">Hire Date</label>
-              <input type="date" name="hire_date" :value="selected.hire_date || ''" max="<?= date('Y-m-d') ?>" class="w-full view-field" disabled/>
+              <input type="date" name="hire_date" 
+                :value="selected.hire_date || ''" 
+                max="<?= date('Y-m-d') ?>" 
+                class="w-full input-field"
+                <?= $_SESSION['access_level'] == 2 ? 'readonly' : '' ?> />
             </div>
-
 
             <div class="flex justify-center gap-2 pt-2">
               <button type="button" 
@@ -375,7 +388,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       filterId: "statusFilter",  
       sortId: "sortUsers",          
       searchColumns: [2, 4],         
-      filterColumn: 3             
+      filterColumn: 4            
     });
 
       function previewProfile(event) {
