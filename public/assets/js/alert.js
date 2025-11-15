@@ -368,7 +368,7 @@ async function viewRequestHistory(requester_id) {
     if (!Array.isArray(history) || !history.length) {
       Swal.fire({
         icon: "info",
-        title: "No Work History Found",
+        title: "No Request History Found",
         text: "This requester has no recorded requests yet."
       });
       return;

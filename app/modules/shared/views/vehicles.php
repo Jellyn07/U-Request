@@ -30,14 +30,52 @@ $vehicles = $vehicleController->getVehicles();
 </head>
 <body class="bg-gray-100">
 
-  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
+    <!-- Menu & Header -->
+  <?php
+  // Determine which dashboard menu to include based on access level
+  if ($_SESSION['access_level'] == 1) {
+      // Gsu Admin
+      include COMPONENTS_PATH . '/superadmin_menu.php';
+  } elseif ($_SESSION['access_level'] == 3) {
+      // Motorpool Admin
+      include COMPONENTS_PATH . '/motorpool_menu.php';
+  } else {
+      // Fallback: no menu or default
+      echo "<p>No menu available for your access level.</p>";
+  }
+  ?>
 
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-4">Vehicles</h1>
-      <div x-data="{showDetails: false,editing: false,selected: {}, openDetails(data) {this.selected = data;this.showDetails = true;this.editing = false;}}"
-        class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Left Section -->
+     <div x-data="{
+        showDetails: false,
+        editing: false,
+        selected: {},
+        
+        openDetails(data) {
+            this.selected = data;
+            this.showDetails = true;
+            this.editing = false;
+
+            // Reset Travel History
+            document.querySelectorAll('.travel-history').forEach(e => {
+                e.innerHTML = '';
+                e.classList.add('hidden'); // hide section
+            });
+
+            // Reset Scheduled Trips
+            document.querySelectorAll('.scheduled-trips').forEach(e => {
+                e.innerHTML = '';
+                e.classList.add('hidden'); // hide section
+            });
+
+            // Reset toggle classes
+            document.querySelectorAll('.history-open').forEach(btn => btn.classList.remove('history-open'));
+            document.querySelectorAll('.schedule-open').forEach(btn => btn.classList.remove('schedule-open'));
+          }
+        }" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Left Section -->
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
@@ -304,21 +342,19 @@ $vehicles = $vehicleController->getVehicles();
                 </div>      
                 
                 <!-- Button to show travel history -->
-<div class="vehicle-card btn btn-secondary mt-4 text-center">
-    <button @click="() => toggleHistory(selected.vehicle_id, $event.target)" class="mb-2">
-        Travel History
-        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
-    </button>
-    <div class="travel-history mt-2 hidden border-t pt-2"></div>
+                <div class="vehicle-card btn btn-secondary mt-4 text-center">
+                    <button @click="() => toggleHistory(selected.vehicle_id, $event.target)" class="mb-2">
+                        Travel History
+                        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
+                    </button>
+                    <div class="travel-history mt-2 hidden border-t pt-2"></div>
 
-    <button @click="() => toggleSchedule(selected.vehicle_id, $event.target)" class="mt-2">
-        Scheduled Trips
-        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
-    </button>
-    <div class="scheduled-trips mt-2 hidden border-t pt-2"></div>
-</div>
-
-
+                    <button @click="() => toggleSchedule(selected.vehicle_id, $event.target)" class="mt-2">
+                        Scheduled Trips
+                        <img src="/public/assets/img/arrow.png" class="inline size-4 ml-1" alt="Arrow Down">
+                    </button>
+                    <div class="scheduled-trips mt-2 hidden border-t pt-2"></div>
+                </div>
               </div>
               
               <!-- ✅ Edit Mode -->

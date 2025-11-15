@@ -65,7 +65,7 @@ Motorpool Admin
     vehicle
     - vehicle filter should be dynamic
     - vehicle type should be dynamic. what if usep wants to buy sports car? theirs no option in that
-    - right side details dont change if i click to other vehicles ex. i show the Schedule and that Schedule wont change even if i click to other vehicle but the pprimary details do change
+    - right side details dont change if i click to other vehicles ex. i show the Schedule and that Schedule wont change even if i click to other vehicle but the pprimary details do change ✅
     
     driver
     - filters and search dont work ✅
