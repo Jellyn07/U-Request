@@ -143,7 +143,7 @@ class RequestController {
     public function saveAssignment() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request_id = $_POST['request_id'];
-            $req_status = $_POST['req_status'];
+            $req_status = $_POST['req_status'] ?? null;
             $prio_level = $_POST['prio_level'] ?? null;
 
             // Arrays for personnel and materials
@@ -172,7 +172,7 @@ class RequestController {
 
             $result = $this->model->addAssignment(
                 $request_id,
-                'To Inspect', // Pass null for status so it won't update yet
+                $req_status, // Pass null for status so it won't update yet
                 $staff_ids,
                 $prio_level,
                 $materials_to_add,

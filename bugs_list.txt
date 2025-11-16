@@ -54,7 +54,7 @@ Motorpool Admin
 
     request
     - should print on what is in the table ex. is the table is all completed in export it should display only completed
-    - what if theirs new chancellor or president?
+    - what if theirs new chancellor or president? ✅ input nlng
     - should not be assigned any vehicle is request is not been approved
     - assigning a vehicle in request not working
     - should assign a vehicle only if its approved and will only show vehicles that will fit the passanger if passengers are too many should allow to book 2 vehicle too fit them all

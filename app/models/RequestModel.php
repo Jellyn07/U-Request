@@ -160,7 +160,12 @@ class RequestModel extends BaseModel {
             if (isset($_SESSION['staff_id'])) {
                     setCurrentStaff($this->db); // Use model's connection
             }
-            $this->db->begin_transaction();
+            // ✅ Check if at least one personnel assigned
+        if (empty($staff_ids)) {
+            throw new Exception("Cannot update request: At least one personnel must be assigned.");
+        }
+
+        $this->db->begin_transaction();
 
             // Update Priority Level
             if (!empty($prio_level)) {
