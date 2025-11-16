@@ -78,14 +78,13 @@ $profile = $controller->getProfile($_SESSION['email']);
           materials: [{ material_code: '', qty: 1 }],
           selectedMaterialCodes: [],
           isLocked() {
-  // Lock only if superadmin OR original status was completed
-  return <?= $_SESSION['access_level'] == 1 ? 'true' : 'false' ?> || this.selected.original_status === 'Completed';
-},
-canSave() {
-  // Show save button if status changed OR not locked
-  return !this.isLocked() || this.selected.req_status !== this.selected.original_status;
-},
-
+            // Lock only if superadmin OR original status was completed
+            return <?= $_SESSION['access_level'] == 1 ? 'true' : 'false' ?> || this.selected.original_status === 'Completed';
+          },
+          canSave() {
+            // Show save button if status changed OR not locked
+            return !this.isLocked() || this.selected.req_status !== this.selected.original_status;
+          },
           updateMaterialOptions() {
             this.selectedMaterialCodes = this.materials
               .map(m => m.material_code)
@@ -203,6 +202,86 @@ canSave() {
               <input type="text" class="w-full view-field" x-model="selected.Name" readonly />
             </div>
 
+<!-- Location Field with Edit/Save -->
+<div x-data="{ editingLocation: false }" class="flex items-center gap-2 mt-2">
+  
+  <!-- Input Field -->
+  <div class="flex-1">
+    <label class="text-xs text-text mb-1">Location</label>
+    <input type="text" class="w-full view-field"  
+           x-model="selected.location"
+           :readonly="!editingLocation" />
+  </div>
+  
+  <!-- Edit / Save Buttons -->
+  <div class="flex gap-1">
+    <!-- Edit Button -->
+    <button 
+      type="button" 
+      class="btn btn-secondary text-xs"
+      x-show="!editingLocation"
+      @click="editingLocation = true">
+      Edit
+    </button>
+
+    <!-- Save Button -->
+    <button 
+      type="button" 
+      class="btn btn-primary text-xs"
+      x-show="editingLocation"
+      @click="
+        if(selected.location.trim() === '') {
+          Swal.fire('Error', 'Location cannot be empty.', 'error');
+          return;
+        }
+        $dispatch('update-location', selected.location); 
+        editingLocation = false;
+      ">
+      Save
+    </button>
+  </div>
+
+  <!-- AlpineJS Listener (hidden, just for event handling) -->
+<div x-data 
+     @update-location.window="async (e) => {
+       const newLocation = e.detail;
+       try {
+         console.log('Updating location for', selected.request_id, '->', newLocation);
+         const formData = new FormData();
+         formData.append('request_id', selected.request_id);
+         formData.append('location', newLocation);
+         formData.append('action', 'updateLocation');
+
+         const res = await fetch('../../../controllers/RequestController.php', {
+           method: 'POST',
+           body: formData
+         });
+
+         // optional: log raw text for debugging if JSON parse fails
+         const text = await res.text();
+         try {
+           const data = JSON.parse(text);
+           if (data.success) {
+             Swal.fire('Updated!', 'Location updated successfully.', 'success');
+             selected.location = newLocation;
+           } else {
+             Swal.fire('Error', data.message || 'Failed to update location.', 'error');
+           }
+         } catch (parseErr) {
+           console.error('Invalid JSON response:', text, parseErr);
+           Swal.fire('Error', 'Invalid server response.', 'error');
+         }
+       } catch (err) {
+         console.error(err);
+         Swal.fire('Error', 'An unexpected error occurred.', 'error');
+       }
+     }">
+</div>
+
+</div>
+
+
+
             <div>
                 <label class="text-xs text-text mb-1">Priority Level</label>
                 <select name="prio_level" id="prioritySelect" 
@@ -216,136 +295,126 @@ canSave() {
                 </select>
             </div>
 
-           <!-- Personnel Section -->
-          <div
-            x-data="{ 
+         <!-- PERSONNEL & STATUS SECTION -->
+            <div x-data="{
                 personnel: [{ staff_id: '' }],
-                selectedStaffIds: [],
                 assignedPersonnel: [],
-                
+                selectedStaffIds: [],
+                status: selected.req_status, // local status for binding
+                // Check if there is at least one assigned personnel
+                get hasAssignedPersonnel() {
+                    return this.personnel.filter(p => p.staff_id !== '').length > 0 || this.assignedPersonnel.length > 0;
+                },
                 updatePersonnelOptions() {
-                  this.selectedStaffIds = this.personnel
-                    .map(p => p.staff_id)
-                    .filter(id => id !== '');
+                    this.selectedStaffIds = this.personnel.map(p => p.staff_id).filter(id => id !== '');
+                    // Auto-set status to 'To Inspect' if personnel assigned and status is not already finalized
+                    if (this.hasAssignedPersonnel && !['In Progress','Completed','To Inspect'].includes(this.status)) {
+                        this.status = 'To Inspect';
+                        selected.req_status = this.status; // sync with main selected object
+                    }
                 },
                 async loadAssignedPersonnel(requestId) {
-                  try {
-                    const res = await fetch(`../../../controllers/RequestController.php?getAssignment=${requestId}`);
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                      this.assignedPersonnel = data;
-                      // If In Progress or Pending → populate for editing
-                      if (selected.req_status !== 'Completed') {
-                        this.personnel = data.map(p => ({ staff_id: p.staff_id }));
-                      }
-                    } else {
-                      this.assignedPersonnel = [];
-                      this.personnel = [{ staff_id: '' }];
-                    }
-                    this.updatePersonnelOptions();
-                  } catch (err) {
-                    console.error('❌ Failed to load personnel:', err);
+                    try {
+                        const res = await fetch(`../../../controllers/RequestController.php?getAssignment=${requestId}`);
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            this.assignedPersonnel = data;
+                            this.personnel = data.map(p => ({ staff_id: p.staff_id }));
+                        } else {
+                            this.assignedPersonnel = [];
+                            this.personnel = [{ staff_id: '' }];
+                        }
+                        this.updatePersonnelOptions();
+                    } catch (err) {
+                        console.error('❌ Failed to load personnel:', err);
                     }
                 }
-              }"
-              x-init="loadAssignedPersonnel(selected.request_id)"
+            }" 
+            x-init="loadAssignedPersonnel(selected.request_id)"
             >
-            <!-- Editable Section (Pending + In Progress) -->
-            <template x-if="selected.req_status !== 'Completed'">
-              <div id="personnel-fields" class="space-y-3 mb-6">
-                <label class="text-xs text-text mb-1" :hidden="isLocked()">Assign / Edit Personnel</label>
+                <!-- Editable Section (Pending + In Progress) -->
+                <template x-if="selected.req_status !== 'Completed'">
+                    <div id="personnel-fields" class="space-y-3 mb-6">
+                        <label class="text-xs text-text mb-1" :hidden="isLocked()">Assign / Edit Personnel</label>
 
-                <!-- Editable Dropdowns -->
-                <template x-for="(p, index) in personnel" :key="index">
-                  <div class="flex gap-2 personnel-row items-end">
-                    <!-- Dropdown -->
-                    <div class="w-full">
-                      <select 
-                        :name="'staff_id[' + index + ']'"
-                        x-model="p.staff_id"
-                        @change="updatePersonnelOptions()"
-                        class="input-field w-full staff-select"
-                        :hidden="isLocked()"
-                      >
-                        <option value="">Select Personnel</option>
-                        <?php foreach ($personnels as $person): ?>
-                          <option 
-                            value="<?= $person['staff_id'] ?>"
-                            x-bind:disabled="selectedStaffIds.includes('<?= $person['staff_id'] ?>') && p.staff_id !== '<?= $person['staff_id'] ?>'">
-                            <?= htmlspecialchars($person['full_name']) ?>
-                          </option>
-                        <?php endforeach; ?>
-                      </select>
-                    </div>
+                        <!-- Editable Dropdowns -->
+                        <template x-for="(p, index) in personnel" :key="index">
+                            <div class="flex gap-2 personnel-row items-end">
+                                <!-- Dropdown -->
+                                <div class="w-full">
+                                    <select 
+                                        :name="'staff_id[' + index + ']'"
+                                        x-model="p.staff_id"
+                                        @change="updatePersonnelOptions()"
+                                        class="input-field w-full staff-select"
+                                        :hidden="isLocked()"
+                                    >
+                                        <option value="">Select Personnel</option>
+                                        <?php foreach ($personnels as $person): ?>
+                                            <option 
+                                                value="<?= $person['staff_id'] ?>"
+                                                x-bind:disabled="selectedStaffIds.includes('<?= $person['staff_id'] ?>') && p.staff_id !== '<?= $person['staff_id'] ?>'">
+                                                <?= htmlspecialchars($person['full_name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
 
-                    <!-- Add / Remove Buttons -->
-                   <div class="flex items-center gap-1">
-                      <button 
-                        x-show="!isLocked()"  
-                        type="button"
-                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
-                        @click="personnel.push({ staff_id: '' }); updatePersonnelOptions();"
-                        title="Add Personnel">
-                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
-                      </button>
-                      <button 
-                        x-show="!isLocked() && personnel.length > 1"  
-                        type="button"
-                        class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex items-center justify-center"
-                        @click="personnel.splice(index, 1); updatePersonnelOptions();"
-                        title="Remove Personnel">
-                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
-                      </button>
+                                <!-- Add / Remove Buttons -->
+                                <div class="flex items-center gap-1">
+                                    <button 
+                                        x-show="!isLocked()"  
+                                        type="button"
+                                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
+                                        @click="personnel.push({ staff_id: '' }); updatePersonnelOptions();"
+                                        title="Add Personnel">
+                                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
+                                    </button>
+                                    <button 
+                                        x-show="!isLocked() && personnel.length > 1"  
+                                        type="button"
+                                        class="bg-gray-700 hover:bg-gray-600 text-white rounded-full w-9 h-9 flex items-center justify-center"
+                                        @click="personnel.splice(index, 1); updatePersonnelOptions();"
+                                        title="Remove Personnel">
+                                        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Read-only List (for In Progress view) -->
+                        <template x-if="selected.req_status === 'In Progress' && assignedPersonnel.length > 0">
+                            <div class="mt-4">
+                                <label class="text-sm mb-1 block font-medium">Currently Assigned Personnel</label>
+                                <template x-for="person in assignedPersonnel" :key="person.staff_id">
+                                    <div class="w-full input-field bg-gray-100 text-gray-700 cursor-default">
+                                        <span x-text="person.full_name"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
                     </div>
-                  </div>
                 </template>
 
-                <!-- Read-only List (for In Progress view) -->
-                <template x-if="selected.req_status === 'In Progress' && assignedPersonnel.length > 0">
-                  <div class="mt-4">
-                    <label class="text-sm mb-1 block font-medium">Currently Assigned Personnel</label>
-                    <template x-for="person in assignedPersonnel" :key="person.staff_id">
-                      <div class="w-full input-field bg-gray-100 text-gray-700 cursor-default">
-                        <span x-text="person.full_name"></span>
-                      </div>
+                <!-- Status Dropdown -->
+                <div>
+                    <label class="text-xs text-text mb-1">Status</label>
+
+                    <!-- Completed: show plain label -->
+                    <template x-if="selected.req_status === 'Completed'">
+                        <span class="block w-full input-field bg-green-100 text-green-800 cursor-default" x-text="selected.req_status"></span>
                     </template>
-                  </div>
-                </template>
-              </div>
-            </template>
 
-            <!-- Completed: Hide everything -->
-            <template x-if="selected.req_status === 'Completed'" >
-              <div class="hidden"></div>
-            </template>
-          </div>
-
-          <div>
-              <label class="text-xs text-text mb-1">Status</label>
-
-              <!-- Completed: show plain label -->
-              <template x-if="selected.req_status === 'Completed'">
-                <span class="block w-full input-field bg-green-100 text-green-800 cursor-default" x-text="selected.req_status"></span>
-              </template>
-
-              <!-- In Progress: dropdown without "To Inspect" -->
-              <template x-if="selected.req_status === 'In Progress'">
-                <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field" :disabled="isLocked()">
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </template>
-
-              <!-- Other (e.g. To Inspect) : full dropdown -->
-              <template x-if="selected.req_status !== 'Completed' && selected.req_status !== 'In Progress'">
-                <select name="req_status" id="status" x-model="selected.req_status" class="w-full input-field" :disabled="isLocked()">
-                  <option value="To Inspect">To Inspect</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </template>
+                    <!-- Editable dropdown if not Completed -->
+                    <template x-if="selected.req_status !== 'Completed'">
+                        <select name="req_status" x-model="selected.req_status" class="w-full input-field" 
+                                :disabled="!hasAssignedPersonnel || isLocked()">
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </template>
+                </div>
             </div>
-
             <!-- ✅ MATERIALS SECTION -->
             <div 
               x-show="selected.req_status === 'In Progress'" 
@@ -448,7 +517,7 @@ canSave() {
             </div>
             <div class="flex justify-center pt-2 space-x-2">
               <button type="button" class="btn btn-primary" @click="viewDetails(selected)">Full Details</button>
-              <button type="submit" class="btn btn-primary" id="saveBtn" name="saveAssignment"  x-show="canSave()">Save Changes</button>
+              <button type="submit" class="btn btn-primary" id="saveBtn" name="saveAssignment"  x-show="canSave()" :disabled="isLocked()">Save Changes</button>
             </div>
           </form>
         </div>

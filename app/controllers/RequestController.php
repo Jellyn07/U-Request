@@ -276,22 +276,28 @@ if (isset($_GET['action']) && $_GET['action'] === 'getLocationsByUnit') {
     $controller->getLocationsByUnit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents("php://input"), true);
-    $action = $input['action'] ?? '';
+require_once __DIR__ . '/../models/RequestModel.php';
 
-    $model = new RequestModel();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
 
     if ($action === 'updateLocation') {
-        $id = $input['id'];
-        $location = $input['location'];
+        $request_id = $_POST['request_id'] ?? null;
+        $location = $_POST['location'] ?? null;
 
-        $result = $model->updateLocationOnly($id, $location);
+        if (!$request_id || !$location) {
+            echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+            exit;
+        }
 
-        if ($result) {
+        $model = new RequestModel();
+        $updated = $model->updateLocation($request_id, $location);
+
+        if ($updated) {
             echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update location.']);
+            echo json_encode(['success' => false, 'message' => 'Failed to update location']);
         }
+        exit;
     }
 }

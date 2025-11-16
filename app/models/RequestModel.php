@@ -456,14 +456,27 @@ class RequestModel extends BaseModel {
         }
         return $staff;
     }
-  public function updateLocationOnly($id, $location) {
-        if (isset($_SESSION['staff_id'])) {
+//   public function updateLocationOnly($id, $location) {
+//         if (isset($_SESSION['staff_id'])) {
+//                 setCurrentStaff($this->db); // Use model's connection
+//         }
+//         $stmt = $this->db->prepare("UPDATE request SET location = ? WHERE request_id = ?");
+//         $stmt->bind_param("si", $location, $id);
+//         $success = $stmt->execute();
+//         $stmt->close();
+//         return $success;
+//     }
+
+public function updateLocation($request_id, $location) {
+   if (isset($_SESSION['staff_id'])) {
                 setCurrentStaff($this->db); // Use model's connection
         }
         $stmt = $this->db->prepare("UPDATE request SET location = ? WHERE request_id = ?");
-        $stmt->bind_param("si", $location, $id);
+        $stmt->bind_param("si", $location, $request_id);
         $success = $stmt->execute();
         $stmt->close();
         return $success;
-    }
+}
+
+
 }

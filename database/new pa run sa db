@@ -1822,3 +1822,53 @@ SELECT
 FROM request_assigned_personnel rap
 JOIN request_assignment ra ON rap.request_id = ra.request_id
 JOIN request r ON ra.request_id = r.request_id;
+
+------------------------------------------------------------------------------------------------
+
+drop trigger trg_request_assignment_status_update;
+DELIMITER $$
+CREATE TRIGGER trg_request_assignment_status_update
+AFTER UPDATE ON request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE v_admin_name VARCHAR(150) DEFAULT 'System';
+    DECLARE v_tracking_id VARCHAR(100) DEFAULT 'N/A';
+    DECLARE v_changes TEXT;
+
+    -- ✅ Get current admin name if session variable is set
+    IF @current_staff_id IS NOT NULL THEN
+        SELECT CONCAT(first_name, ' ', last_name)
+        INTO v_admin_name
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+        LIMIT 1;
+    END IF;
+    -- ✅ Get tracking_id from request table
+    SELECT tracking_id
+    INTO v_tracking_id
+    FROM request
+    WHERE request_id = NEW.request_id
+    LIMIT 1;
+    -- ✅ Only log when status *actually* changes and not null or same
+    IF (OLD.req_status IS NULL AND NEW.req_status IS NOT NULL)
+        OR (OLD.req_status IS NOT NULL AND NEW.req_status IS NULL)
+        OR (OLD.req_status <> NEW.req_status) THEN
+
+        -- ✅ Prevent duplicate inserts for the same request and status in a short timeframe
+        IF NOT EXISTS (
+            SELECT 1
+            FROM activity_logs
+            WHERE description LIKE CONCAT('%Tracking ID: ', v_tracking_id, '%New Status: "', NEW.req_status, '"%')
+              AND TIMESTAMPDIFF(SECOND, changed_at, NOW()) < 3
+        ) THEN
+            SET v_changes = CONCAT(
+                'Tracking ID: ', COALESCE(v_tracking_id, 'N/A'),
+                ' | Previous Status: "', COALESCE(OLD.req_status, 'None'),
+                '" | New Status: "', COALESCE(NEW.req_status, 'None'), '"'
+            );
+            INSERT INTO activity_logs(source, name, action, description)
+            VALUES ('Request Status', v_admin_name, 'UPDATE', v_changes);
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
