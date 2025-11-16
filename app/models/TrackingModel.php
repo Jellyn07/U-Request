@@ -232,4 +232,36 @@ class TrackingModel extends BaseModel {
         return $vehicle;
     }
 
+    // Get source of fund details by tracking_id and email
+    public function getSourceOfFund($tracking_id) {
+        $sql = "
+            SELECT 
+                source_of_fuel,
+                source_of_oil,
+                source_of_repair_maintenance,
+                source_of_driver_assistant_per_diem
+            FROM source_of_fund
+            WHERE tracking_id = ?
+            LIMIT 1
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            error_log("getSourceOfFund prepare failed: " . $this->db->error);
+            return null;
+        }
+
+        $stmt->bind_param("s", $tracking_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $fund = $res->fetch_assoc();
+        $stmt->close();
+
+        return $fund;
+    }
+
+
+
+
+
 }

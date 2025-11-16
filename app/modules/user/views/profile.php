@@ -38,38 +38,41 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
       }
       </script>
       <div class="max-w-4xl mx-auto space-y-8 m-2">
-        <!-- Profile Picture -->
-        <form method="post" action="../../../controllers/ProfileController.php" enctype="multipart/form-data">
-          <div class="flex flex-col items-center">
+        <!-- Profile Picture Form -->
+        <form id="pictureForm" method="post" action="../../../controllers/ProfileController.php" enctype="multipart/form-data">
+          <div class="rounded-xl flex flex-col items-center">
             <div class="relative">
-              <img id="profile-preview"  
-                  src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
-                  alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
-                  class="w-36 h-36 rounded-full object-cover border border-secondary shadow-sm"
+              <img id="profile-preview"
+                src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
+                alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>" 
+                class="w-36 h-36 rounded-full object-cover border border-secondary shadow-sm"
               />
+              <!-- <img 
+                src="<?php echo htmlspecialchars(!empty($profile['profile_picture']) ? $profile['profile_picture'] : '/public/assets/img/user-default.png'); ?>"
+                alt="<?php echo htmlspecialchars($profile['first_name'] ?? 'User Profile'); ?>"
+                class="w-36 h-36 rounded-full object-cover border border-secondary shadow-sm" /> -->
 
               <?php
               $defaultPic = '/public/assets/img/user-default.png';
-              $profilePic = (!empty($profile['profile_pic']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $profile['profile_pic']))
-              ? $profile['profile_pic']
-              : $defaultPic;
+              $profilePic = (!empty($profile['profile_picture']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $profile['profile_picture']))
+                ? $profile['profile_picture']
+                : $defaultPic;
               ?>
+
               <!-- Edit button -->
-              <label for="profile_picture" title="Change Profile Picture" 
+              <label for="profile_picture" title="Change Profile Picture"
                 class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M15.232 5.232l3.536 3.536m-2.036-5.036
-                          a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036
+                      a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </label>
-              <input type="file" id="profile_picture" value="upload_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
+
+              <!-- File input -->
+              <input type="hidden" name="action" value="upload_picture">
+              <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" />
             </div>
-          </div>
-          <div class="flex justify-center my-2">
-            <button type="submit" name="action" value="upload_picture" class="btn btn-primary ">
-              Save Profile Picture
-            </button>
           </div>
         </form>
       </div>
@@ -233,14 +236,43 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
 
     <script>
-      // Preview profile picture before upload
-      function previewProfile(event) {
+      document.getElementById("profile_picture").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const previewImg = document.getElementById("profile-preview");
+        const oldSrc = previewImg.src;
         const reader = new FileReader();
-        reader.onload = function(){
-          document.getElementById("profile-preview").src = reader.result;
-        }
-        reader.readAsDataURL(event.target.files[0]);
-      }
+
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        Swal.fire({
+          title: "Change Profile Picture?",
+          text: "Do you want to save this new profile picture?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, save it",
+          cancelButtonText: "Cancel"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              icon: "success",
+              title: "Profile Picture Updated",
+              text: "Your new profile picture will be saved.",
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              document.getElementById("pictureForm").submit();
+            });
+          } else {
+            previewImg.src = oldSrc;
+            event.target.value = "";
+          }
+        });
+      });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

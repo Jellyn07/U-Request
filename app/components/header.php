@@ -69,7 +69,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
 
         <!-- Mobile Menu Button -->
         <button id="mobile-menu-btn"
-                class="flex md:hidden rounded-md p-2 bg-gray-200 hover:bg-gray-300 ml-auto transition duration-200">
+                class="flex md:hidden rounded-md p-2 text-white bg-primary hover:bg-gray-300 ml-auto transition duration-200">
           <svg class="w-6 h-6" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -82,7 +82,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
 
         <!-- Mobile Menu -->
         <nav id="mobile-menu"
-            class="fixed top-0 right-0 w-1/2 max-w-xs rounded-l-xl h-full bg-white shadow-lg z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden flex flex-col">
+            class="fixed top-0 right-0 w-2/3 max-w-xs rounded-l-xl h-full bg-white shadow-lg z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden flex flex-col">
           <div class="flex items-center p-4 border-b border-gray-200">
             <div class="flex items-center flex-shrink-0">
               <img id="logo-img" src="/public/assets/img/logo_light.png" alt="Logo" class="h-10 w-10">

@@ -59,4 +59,9 @@ class TrackingController {
         return $list;
     }
 
+    public function getSourceOfFundDetails($tracking_id) {
+        return $this->model->getSourceOfFund($tracking_id);
+    }
+
+
 }
