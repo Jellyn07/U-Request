@@ -117,7 +117,7 @@ GSU Admin
     - Request and Request Assignment Trigger (Update)✅
 
     - Atleast 3 Store Procedures ✅
-             - functions - 1 kulang
+             - functions - 1 kulang✅
              - views ✅
              - index
              - triggers ✅
@@ -135,9 +135,9 @@ Users
     - give a submitted popup if i cancel
     - save profile picture button need to be gone ✅
     - Contact cannot be updated in profile ✅
-    - contact should be required before the user can request in motorpool
+    - contact should be required before the user can request in motorpool✅
     - should have popup when i update something in the user profile
-    - no source of fund in more details
+    - no source of fund in more details✅
 
 UI
     All

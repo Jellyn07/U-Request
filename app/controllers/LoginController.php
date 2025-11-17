@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         if ($req && isset($req['req_id'])) {
             $_SESSION['req_id'] = $req['req_id'];
             $_SESSION['email'] = $email;
+            $_SESSION['contact_no'] = $userModel->fnGetRequesterContact($req['req_id']);
 
             header("Location: ../modules/user/views/request.php");
             exit;

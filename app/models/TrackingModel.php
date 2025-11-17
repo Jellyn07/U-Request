@@ -193,7 +193,7 @@ class TrackingModel extends BaseModel {
         }
 
         // 2) try vehicle_request
-            $sqlVehicle = "
+        $sqlVehicle = "
             SELECT 
                 v.*
             FROM vehicle_request v

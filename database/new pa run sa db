@@ -1872,3 +1872,21 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+--------------------------------------------------------------------------------------------------------------------
+
+DELIMITER $$
+CREATE FUNCTION fnGetRequesterContact(p_req_id INT)
+RETURNS VARCHAR(11)
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE v_contact VARCHAR(11);
+    SELECT contact
+    INTO v_contact
+    FROM requester
+    WHERE req_id = p_req_id
+    LIMIT 1;
+    RETURN v_contact;
+END$$
+DELIMITER ;

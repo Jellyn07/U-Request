@@ -225,20 +225,44 @@ $requests = $data['requests'];
 
               <!-- STATUS + APPROVED BY + REASON -->
               <div>
-                <!-- STATUS SELECT -->
+                  <!-- STATUS SELECT -->
                 <select 
-                  id="status"  
-                  name="req_status"  
-                  x-model="selected.req_status" 
-                  class="w-full input-field"
-                  :disabled="isLocked()"
+                    id="status"  
+                    name="req_status"  
+                    x-model="selected.req_status" 
+                    class="w-full input-field"
+                    :disabled="isLocked()"
                 >
-                  <option value="" disabled>Select Status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="On Going">On Going</option>
-                  <option value="Rejected/Cancelled">Rejected/Cancelled</option>
-                  <option value="Completed">Completed</option>
+                    <option value="" disabled>Select Status</option>
+
+                    <option value="Pending" 
+                        x-show="selected.original_status !== 'Approved'" 
+                        x-bind:selected="selected.req_status === 'Pending'">
+                        Pending
+                    </option>
+
+                    <option value="Approved" 
+                        x-show="selected.original_status !== 'Approved'" 
+                        x-bind:selected="selected.req_status === 'Approved'">
+                        Approved
+                    </option>
+
+                    <option value="On Going" 
+                        x-show="selected.original_status !== 'Approved'" 
+                        x-bind:selected="selected.req_status === 'On Going'">
+                        On Going
+                    </option>
+
+                    <option value="Rejected/Cancelled" 
+                        x-show="selected.original_status !== 'Approved'" 
+                        x-bind:selected="selected.req_status === 'Rejected/Cancelled'">
+                        Rejected/Cancelled
+                    </option>
+
+                    <!-- Completed is always visible if original_status is Approved or already Completed -->
+                    <option value="Completed" x-bind:selected="selected.req_status === 'Completed'">
+                        Completed
+                    </option>
                 </select>
 
                 <!-- APPROVED BY -->

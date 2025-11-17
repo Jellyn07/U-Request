@@ -43,6 +43,23 @@ class UserModel extends BaseModel  {
         return $result;
     }
 
+    public function fnGetRequesterContact($req_id) {
+        $sql = "SELECT fnGetRequesterContact(?) AS contact";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            error_log("fnGetRequesterContact prepare failed: " . $this->db->error);
+            return null;
+        }
+
+        $stmt->bind_param("i", $req_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res->fetch_assoc();
+        $stmt->close();
+
+        return $row['contact'] ?? null;
+    }
+
     // LOGIN - Get Requester ID
     public function getRequesterId($email) {
         $stmt = $this->db->prepare("SELECT fnGetRequesterIdByEmail(?) AS req_id");
