@@ -1,13 +1,22 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit;
 }
+
 if (isset($_SESSION['alert'])) {
-  $alert = $_SESSION['alert'];
-  unset($_SESSION['alert']); // prevent repeat alerts
+    $alert = $_SESSION['alert'];
+    unset($_SESSION['alert']); // prevent repeat alerts
 }
+
+// Check if req_id exists, otherwise redirect
+if (!isset($_SESSION['req_id'])) {
+    header("Location: http://localhost:3000/app/modules/user/views/login.php");
+    exit;
+}
+
 $req_id = $_SESSION['req_id'];
 // Prevent browser from caching protected pages
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");

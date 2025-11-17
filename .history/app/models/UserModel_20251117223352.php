@@ -105,7 +105,7 @@ class UserModel extends BaseModel  {
             vr.trip_purpose AS request_desc,
             vr.travel_destination AS location,
             vra.req_status AS req_status,
-            '--' AS date_finished,
+            CONCAT(vr.travel_date, ' - ', vr.return_date) AS date_finished,
             vr.travel_date AS sort_date  -- temporary for sorting
         FROM vehicle_request vr
         INNER JOIN vehicle_request_assignment vra 
@@ -130,7 +130,7 @@ class UserModel extends BaseModel  {
         SELECT
             v.tracking_id AS tracking_id,
             'Repair Request' AS request_Type,
-            v.request_Type AS request_desc,
+            v.request_desc AS request_desc,
             v.req_status AS req_status,
             v.location AS location,
             v.date_finished AS date_finished,

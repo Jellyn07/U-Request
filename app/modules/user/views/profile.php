@@ -3,11 +3,24 @@ session_start();
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/ProfileController.php';
 
+
 if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit;
 }
 
+if (isset($_SESSION['alert'])) {
+    $alert = $_SESSION['alert'];
+    unset($_SESSION['alert']); // prevent repeat alerts
+}
+
+// Check if req_id exists, otherwise redirect
+if (!isset($_SESSION['req_id'])) {
+    header("Location: http://localhost:3000/app/modules/user/views/login.php");
+    exit;
+}
+
+$req_id = $_SESSION['req_id'];
 $controller = new ProfileController();
 
 // Get user ID from session
