@@ -114,39 +114,47 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
                 <?php echo htmlspecialchars($track['request_desc']); ?>
               </p>
               
-            <?php else: ?>
-              <div class="flex justify-start mb-3">
-                <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
-              </div>
-              <h3 class="text-base font-semibold text-gray-800">
-                Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
-                <?php
-                  $status = $track['req_status'] ?? 'Pending';
-                  $badgeClass = match ($status) {
-                      'Rejected/Cancelled' => 'bg-red-100 text-red-700',
-                      'Completed'          => 'bg-green-100 text-green-700',
-                      'Approved'           => 'bg-blue-100 text-blue-700',
-                      'On Going'           => 'bg-orange-100 text-orange-700',
-                      'Pending'            => 'bg-yellow-100 text-yellow-700',
-                      default              => 'bg-gray-100 text-gray-700'
-                  };
-                ?>
-                <span class="inline-block rounded-full ml-1 px-2 py-0.5 text-xs font-medium <?= $badgeClass ?>">
-                    <?= htmlspecialchars($status); ?>
-                </span>
-              </h3>
-              <p class="mt-2 mb-2 text-xs text-gray-700">
-                <span class="font-medium">Trip Purpose:</span> <?= htmlspecialchars($track['trip_purpose']); ?><br>
-                <span class="font-medium">Destination:</span> <?= htmlspecialchars($track['travel_destination']); ?>
-              </p>
+<?php else: ?>
+    <div class="flex justify-start mb-3">
+        <img src="<?php echo PUBLIC_URL; ?>/assets/img/minicar1.gif" alt="Vehicle Logo" class="h-16 w-16">
+    </div>
+    <h3 class="text-base font-semibold text-gray-800">
+        Tracking No. <?php echo htmlspecialchars($track['tracking_id']); ?>
+        <?php
+          $status = $track['req_status'] ?? 'Pending';
+          $badgeClass = match ($status) {
+              'Rejected/Cancelled' => 'bg-red-100 text-red-700',
+              'Completed'          => 'bg-green-100 text-green-700',
+              'Approved'           => 'bg-blue-100 text-blue-700',
+              'On Going'           => 'bg-orange-100 text-orange-700',
+              'Pending'            => 'bg-yellow-100 text-yellow-700',
+              default              => 'bg-gray-100 text-gray-700'
+          };
+        ?>
+        <span class="inline-block rounded-full ml-1 px-2 py-0.5 text-xs font-medium <?= $badgeClass ?>">
+            <?= htmlspecialchars($status); ?>
+        </span>
+    </h3>
+        <p class="mt-2 mb-2 text-xs text-gray-700">
+            <span class="font-medium">Trip Purpose:</span> <?= htmlspecialchars($track['trip_purpose']); ?><br>
+            <span class="font-medium">Destination:</span> <?= htmlspecialchars($track['travel_destination']); ?>
+        </p>
 
-              <?php if ($status === 'Rejected/Cancelled' && !empty($track['reason'])): ?>
-                <p class="mt-2 text-sm text-red-700">
-                    <span class="font-medium">Reason:</span>
-                    <?= htmlspecialchars($track['reason']); ?>
-                </p>
-              <?php endif; ?>
+        <?php if ($status === 'Rejected/Cancelled' && !empty($track['reason'])): ?>
+            <p class="mt-2 text-sm text-red-700">
+                <span class="font-medium">Reason:</span>
+                <?= htmlspecialchars($track['reason']); ?>
+            </p>
+        <?php endif; ?>
+
+        <?php if ($status === 'Approved'): ?>
+            <hr class="my-2 border-gray-300">
+            <p class="mt-2 text-sm text-gray-800">
+                <span class="font-medium">Assigned Vehicle:</span> <?= htmlspecialchars($track['vehicle_info'] ?? 'N/A'); ?><br>
+                <span class="font-medium">Assigned Driver:</span> <?= htmlspecialchars($track['driver_name'] ?? 'N/A'); ?>
+            </p>
             <?php endif; ?>
+        <?php endif; ?>
 
             <div class="mt-4 text-right">
               <!-- Hidden Form to carry tracking_id --> 

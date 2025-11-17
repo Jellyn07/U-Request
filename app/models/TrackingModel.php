@@ -121,14 +121,20 @@ class TrackingModel extends BaseModel {
     // Get vehicle tracking requests by email
     public function getVehicleTrackingByEmail($email) {
         $sqlVehicle = "
-            SELECT 
-                v.*, 
-                vr.req_status,
-                vr.reason
-            FROM vehicle_request v
-            INNER JOIN requester r ON v.req_id = r.req_id
-            LEFT JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no
-            WHERE r.email = ?
+        SELECT 
+            vrq.*,  -- vehicle_request columns
+            vra.req_status,
+            vra.reason,
+            v.vehicle_name,
+            v.plate_no,
+            CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
+            CONCAT(v.vehicle_name, ' - ', v.plate_no) AS vehicle_info
+        FROM vehicle_request vrq
+        INNER JOIN requester r ON vrq.req_id = r.req_id
+        LEFT JOIN vehicle_request_assignment vra ON vrq.control_no = vra.control_no
+        LEFT JOIN vehicle v ON vra.vehicle_id = v.vehicle_id
+        LEFT JOIN driver d ON vra.driver_id = d.driver_id
+        WHERE r.email = ?
         ";
         $stmt = $this->db->prepare($sqlVehicle);
         if ($stmt === false) {
