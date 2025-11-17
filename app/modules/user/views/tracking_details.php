@@ -10,9 +10,6 @@ if (!isset($_GET['id'])) {
 $trackingId = $_GET['id'];
 $trackingController = new TrackingController();
 $details = $trackingController->getTrackingDetails($trackingId);
-$fund = $trackingController->getSourceOfFundDetails($trackingId);
-// var_dump($fund); // check what’s actually returned
-
 
 if (!$details) {
     echo "<p class='text-gray-500 text-center'>No details found.</p>";
@@ -227,19 +224,19 @@ if (!$details) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
           <label class="text-xs mb-1 block font-medium">Fuel </label>
-          <p class="view-field w-full"><?= htmlspecialchars($fund['source_of_fuel'] ?? 'N/A') ?></p>
+          <p class="view-field w-full"><?= htmlspecialchars($details['source_of_fuel'] ?? 'N/A') ?></p>
         </div>
         <div>
           <label class="text-xs mb-1 block font-medium">Oil </label>
-          <p class="view-field w-full"><?= htmlspecialchars($fund['source_of_oil'] ?? 'N/A') ?></p>
+          <p class="view-field w-full"><?= htmlspecialchars($details['source_of_oil'] ?? 'N/A') ?></p>
         </div>
         <div>
           <label class="text-xs mb-1 block font-medium">Repair/Maintenance </label>
-          <p class="view-field w-full"><?= htmlspecialchars($fund['source_of_repair_maintenance'] ?? 'N/A') ?></p>
+          <p class="view-field w-full"><?= htmlspecialchars($details['source_of_repair_maintenance'] ?? 'N/A') ?></p>
         </div>
         <div>
           <label class="text-xs mb-1 block font-medium">Driver/Assistant Per Diem </label>
-          <p class="view-field w-full"><?= htmlspecialchars($fund['source_of_driver_assistant_per_diem'] ?? 'N/A') ?></p>
+          <p class="view-field w-full"><?= htmlspecialchars($details['source_of_driver_assistant_per_diem'] ?? 'N/A') ?></p>
         </div>
       </div>
       <!-- FOOTER -->
