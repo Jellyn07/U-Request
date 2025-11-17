@@ -101,9 +101,10 @@ class UserModel extends BaseModel  {
     $queryVR = "
         SELECT
             vr.tracking_id AS tracking_id,
-            vr.trip_purpose AS type,
+            vr.trip_purpose AS request_Type,
+            vr.trip_purpose AS request_desc,
             vr.travel_destination AS location,
-            vra.req_status AS status,
+            vra.req_status AS req_status,
             CONCAT(vr.travel_date, ' - ', vr.return_date) AS date_finished,
             vr.travel_date AS sort_date  -- temporary for sorting
         FROM vehicle_request vr
@@ -128,9 +129,10 @@ class UserModel extends BaseModel  {
     $queryNonVR = "
         SELECT
             v.tracking_id AS tracking_id,
-            v.request_Type AS type,
-            v.request_desc AS location,
-            v.req_status AS status,
+            v.request_Type AS request_Type,
+            v.request_desc AS request_desc,
+            v.req_status AS req_status,
+            v.location AS location,
             v.date_finished AS date_finished,
             v.date_finished AS sort_date  -- temporary for sorting
         FROM vw_rqtrack v

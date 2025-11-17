@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Swal.fire({
         title: 'Request History',
         html: historyHtml,
-        width: 900,
+        width: 1200,
         confirmButtonText: 'Close',
         didOpen: () => {
           const btn = Swal.getConfirmButton();
