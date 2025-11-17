@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusColors = {
     "Pending": "bg-yellow-200 text-yellow-800 hover:bg-yellow-300",
     "Approved": "bg-blue-200 text-blue-800 hover:bg-blue-300",
-    "In Progress": "bg-orange-200 text-orange-800 hover:bg-orange-300",
+    "On Going": "bg-orange-100 text-orange-700 hover:bg-orange-300",
     "Rejected/Cancelled": "bg-red-200 text-red-800 hover:bg-red-300",
     "Completed": "bg-green-200 text-green-800 hover:bg-green-300"
   };
@@ -68,6 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label class="text-xs text-gray-600 font-semibold">Status</label>
                 <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.status}</p>
               </div>
+              ${trip.status === 'Rejected/Cancelled' && trip.reason ? `
+              <div>
+                <label class="text-xs text-gray-600 font-semibold">Reason</label>
+                <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.reason}</p>
+              </div>
+              ` : ''}
               <div>
                 <label class="text-xs text-gray-600 font-semibold">Time</label>
                 <p type="text" disabled class="w-full view-field cursor-not-allowed mt-0">${trip.time}</p>
