@@ -54,7 +54,7 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
       </div>
 
       <!-- Feedback Cards Section -->
-      <div class="bg-white p-6 rounded-2xl shadow">
+      <div class="bg-white rounded-2xl shadow">
         <div class="mb-5 flex items-center justify-end gap-2">
           <!-- <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
           <select id="sortSelect" class="input-field">
@@ -66,14 +66,15 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
         <!-- <hr class="mb-2 border-b border-gray-300 mx-10"> -->
 
         <!-- Feedback Cards -->
-        <div id="feedbackCards" class="grid grid-cols-1 mx-10">
+        <div id="feedbackCards" class="flex grid-cols-3 gap-4 p-3 h-max-[500px] overflow-y-auto">
+          <!-- <div> -->
           <?php foreach ($feedbackData as $feedback): ?>
-            <div class="feedback-card border-b border-gray-400 p-6" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
+            <div class="feedback-card border border-gray-800 p-6" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
               <div class="flex items-start gap-4">
                 <!-- Profile -->
-                <img src="<?= !empty($feedback['profile_pic']) ? htmlspecialchars($feedback['profile_pic']) : '/public/assets/img/user-default.png' ?>"
+                <!-- <img src="<?= !empty($feedback['profile_pic']) ? htmlspecialchars($feedback['profile_pic']) : '/public/assets/img/user-default.png' ?>"
                   alt="User photo"
-                  class="w-14 h-14 rounded-full object-cover">
+                  class="w-14 h-14 rounded-full object-cover"> -->
                 <div class="flex flex-col">
                   <p class="font-semibold text-sm mb-1">
                     <?= htmlspecialchars($feedback['tracking_id'] ?? 'Anonymous User') ?>
@@ -119,6 +120,8 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
               </div>
             </div>
           <?php endforeach; ?>
+          <!-- </div> -->
+          
         </div>
       </div>
     </div>

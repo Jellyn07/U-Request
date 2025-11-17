@@ -134,7 +134,7 @@ Users
     - no pop up if my request is done/submitted
     - give a submitted popup if i cancel
     - save profile picture button need to be gone ✅
-    - Contact cannot be updated in profile
+    - Contact cannot be updated in profile ✅
     - contact should be required before the user can request in motorpool
     - should have popup when i update something in the user profile
     - no source of fund in more details
