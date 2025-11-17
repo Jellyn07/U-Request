@@ -130,7 +130,7 @@ class UserModel extends BaseModel  {
         SELECT
             v.tracking_id AS tracking_id,
             'Repair Request' AS request_Type,
-            v.request_desc AS request_desc,
+            v.request_Type AS request_desc,
             v.req_status AS req_status,
             v.location AS location,
             v.date_finished AS date_finished,
