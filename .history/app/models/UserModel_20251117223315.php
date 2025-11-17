@@ -101,7 +101,7 @@ class UserModel extends BaseModel  {
     $queryVR = "
         SELECT
             vr.tracking_id AS tracking_id,
-            'Vehicle Request' AS request_Type,
+            'Vehicle Request' AS request_type,
             vr.trip_purpose AS request_desc,
             vr.travel_destination AS location,
             vra.req_status AS req_status,
@@ -129,7 +129,7 @@ class UserModel extends BaseModel  {
     $queryNonVR = "
         SELECT
             v.tracking_id AS tracking_id,
-            'Repair Request' AS request_Type,
+            'Repair Request' AS request_type,
             v.request_desc AS request_desc,
             v.req_status AS req_status,
             v.location AS location,
