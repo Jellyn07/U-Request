@@ -94,38 +94,74 @@ class UserModel extends BaseModel  {
     }
 
     public function getRequestHistory($requester_id) {
-        $records = [];
-        $requester_id = strval($requester_id);
+    $records = [];
+    $requester_id = strval($requester_id);
 
-        $query = "
-            SELECT 
-                v.tracking_id,
-                v.request_Type,
-                v.request_desc,
-                v.location,
-                v.req_status,
-                v.date_finished
-            FROM vw_rqtrack v
-            WHERE v.req_id IN (
-                SELECT req_id FROM requester WHERE requester_id = ?
-            )
-            ORDER BY v.date_finished DESC
-        ";
+    // --- Query 1: Vehicle Requests (VR) ---
+    $queryVR = "
+        SELECT
+            vr.tracking_id AS tracking_id,
+            vr.trip_purpose AS type,
+            vr.travel_destination AS location,
+            vra.req_status AS status,
+            CONCAT(vr.travel_date, ' - ', vr.return_date) AS date_finished,
+            vr.travel_date AS sort_date  -- temporary for sorting
+        FROM vehicle_request vr
+        INNER JOIN vehicle_request_assignment vra 
+            ON vr.control_no = vra.control_no
+        INNER JOIN requester r 
+            ON vr.req_id = r.req_id
+        WHERE r.requester_id = ?
+    ";
 
-        if ($stmt = $this->db->prepare($query)) {
-            $stmt->bind_param("s", $requester_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            while ($row = $result->fetch_assoc()) {
-                $records[] = $row;
-            }
-
-            $stmt->close();
+    if ($stmt = $this->db->prepare($queryVR)) {
+        $stmt->bind_param("s", $requester_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $records[] = $row;
         }
-
-        return $records;
+        $stmt->close();
     }
+
+    // --- Query 2: Non-VR Requests ---
+    $queryNonVR = "
+        SELECT
+            v.tracking_id AS tracking_id,
+            v.request_Type AS type,
+            v.request_desc AS location,
+            v.req_status AS status,
+            v.date_finished AS date_finished,
+            v.date_finished AS sort_date  -- temporary for sorting
+        FROM vw_rqtrack v
+        INNER JOIN requester r 
+            ON v.req_id = r.req_id
+        WHERE r.requester_id = ?
+    ";
+
+    if ($stmt = $this->db->prepare($queryNonVR)) {
+        $stmt->bind_param("s", $requester_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $records[] = $row;
+        }
+        $stmt->close();
+    }
+
+    // --- Sort all records by date_finished / travel_date descending ---
+    usort($records, function($a, $b) {
+        return strtotime($b['sort_date']) - strtotime($a['sort_date']);
+    });
+
+    // Remove temporary sort_date field
+    foreach ($records as &$row) {
+        unset($row['sort_date']);
+    }
+
+    return $records;
+}
+
 
     public function getVehicleRequestHistory($requester_id) {
         $stmt = $this->db->prepare("
@@ -155,3 +191,76 @@ class UserModel extends BaseModel  {
         }
     }
 }
+
+
+
+
+// public function getRequestHistory($requester_id) {
+//     $records = [];
+//     $requester_id = strval($requester_id);
+
+//     // --- Query 1: Vehicle Requests (VR) ---
+//     $queryVR = "
+//         SELECT
+//             vr.tracking_id AS tracking_id,
+//             vr.trip_purpose AS type,
+//             vr.travel_destination AS location,
+//             vra.req_status AS status,
+//             CONCAT(vr.travel_date, ' - ', vr.return_date) AS date_finished,
+//             vr.travel_date AS sort_date  -- temporary for sorting
+//         FROM vehicle_request vr
+//         INNER JOIN vehicle_request_assignment vra 
+//             ON vr.control_no = vra.control_no
+//         INNER JOIN requester r 
+//             ON vr.req_id = r.req_id
+//         WHERE r.requester_id = ?
+//     ";
+
+//     if ($stmt = $this->db->prepare($queryVR)) {
+//         $stmt->bind_param("s", $requester_id);
+//         $stmt->execute();
+//         $result = $stmt->get_result();
+//         while ($row = $result->fetch_assoc()) {
+//             $records[] = $row;
+//         }
+//         $stmt->close();
+//     }
+
+//     // --- Query 2: Non-VR Requests ---
+//     $queryNonVR = "
+//         SELECT
+//             v.tracking_id AS tracking_id,
+//             v.request_type AS type,
+//             v.request_desc AS location,
+//             v.req_status AS status,
+//             v.date_finished AS date_finished,
+//             v.date_finished AS sort_date  -- temporary for sorting
+//         FROM vw_rqtrack v
+//         INNER JOIN requester r 
+//             ON v.req_id = r.req_id
+//         WHERE r.requester_id = ?
+//     ";
+
+//     if ($stmt = $this->db->prepare($queryNonVR)) {
+//         $stmt->bind_param("s", $requester_id);
+//         $stmt->execute();
+//         $result = $stmt->get_result();
+//         while ($row = $result->fetch_assoc()) {
+//             $records[] = $row;
+//         }
+//         $stmt->close();
+//     }
+
+//     // --- Sort all records by date_finished / travel_date descending ---
+//     usort($records, function($a, $b) {
+//         return strtotime($b['sort_date']) - strtotime($a['sort_date']);
+//     });
+
+//     // Remove temporary sort_date field
+//     foreach ($records as &$row) {
+//         unset($row['sort_date']);
+//     }
+
+//     return $records;
+// }
+

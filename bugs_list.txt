@@ -32,7 +32,7 @@ Super Admin
     - Menu logout/profile
 
     account mgt.
-    - can edit staff ID?
+    - can edit staff ID? ✅
     - super admins should be anable in access and cannot be change
     - cannot add new admin (Prepare failed for add_admin_access: Table 'u_request.add_admin_access' doesn't exist)✅ naa kay need ih add sa db boss (naas pa run)
     - filter in user mgt.
@@ -189,11 +189,11 @@ UI
         - to inspect will will be 2 line shorld be always one even if fight details show
 
         motorpool oversight
-        - request full details ui
+        - request full details ui ✅
         - Schedule details not same in motorpool
-        - edit vehicle go to the bottom
-        - driver status
-        - driver change profile not working
+        - edit vehicle go to the bottom ✅
+        - driver status ✅
+        - driver change profile not for Superadmin ✅
 
         backup
-        - ui should be top and bottom not side by side
+        - ui should be top and bottom not side by side ✅

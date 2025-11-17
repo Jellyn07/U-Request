@@ -51,7 +51,7 @@
 
   /* Tertiary (link style) */
   .btn-tertiary {
-    @apply text-primary underline underline-offset-2 hover:text-secondary;
+    @apply text-primary hover:underline hover:underline-offset-2 hover:text-secondary;
   }
 
   /*Upper Buttons*/
