@@ -201,8 +201,10 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
                   </td>
-                  <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
+                  <td class="px-4 py-2">
+                    <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full <?= strtolower($person['status']) === 'Available' ? 'bg-gray-200 text-gray-600' : 'bg-green-200 text-green-800 ' ?>">
                       <?= htmlspecialchars($person['status']) ?>
+                    </span>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -247,14 +249,14 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                   class="w-24 h-24 rounded-full object-cover shadow-sm"
                 />
                 <!-- Edit Button -->
-                <label for="profile_picture" title="Change Profile Picture"
+                <!-- <label for="profile_picture" title="Change Profile Picture"
                   class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036
                         a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
-                </label>
+                </label> -->
 
                 <!-- Hidden File Input -->
                 <input 

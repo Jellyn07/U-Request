@@ -26,23 +26,45 @@ require_once __DIR__ . '/../../../config/constants.php';
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-6">Backup & Restore Database</h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6">
+        <!-- 🔹 RESTORE SECTION -->
+        <div class="bg-white p-6 rounded-xl shadow">
+          <h2 class="text-lg font-semibold mb-2">Restore Database</h2>
+          <p class="text-sm text-gray-600 mb-3">
+            Restore the database from a .sql backup file. Make sure you’re restoring the correct version.
+          </p>
+
+          <form method="POST" action="../../../controllers/BackupController.php" enctype="multipart/form-data">
+            <div class="space-y-4">
+              <input type="file" name="restore_file" accept=".sql" class="w-full input-field file:bg-primary file:text-white file:px-2 file:py-1 file:rounded-md file:text-xs file:border-0 file:mr-3 file:cursor-pointer hover:file:bg-secondary text-gray-700" required>
+
+              <button type="submit" name="restore_now" class="btn btn-primary w-auto py-2">
+                <!-- <img src="/public/assets/img/import.png" alt="Restore" class="size-4 inline mr-2"> -->
+                Restore Database
+              </button>
+            </div>
+          </form>
+
+          <p class="text-xs text-red-500 mt-3">
+            ⚠️ Warning: Restoring will overwrite the current database.
+          </p>
+        </div>
 
         <!-- 🔹 BACKUP SECTION -->
-        <div class="bg-white p-6 rounded-lg shadow">
-          <h2 class="text-lg font-semibold mb-4">Backup Database</h2>
-          <p class="text-sm text-gray-600 mb-6">
+        <div class="bg-white p-6 rounded-xl shadow">
+          <h2 class="text-lg font-semibold mb-2">Backup Database</h2>
+          <p class="text-sm text-gray-600 mb-3">
             Create a secure backup of the U-Request database. You can also enable automatic backup every 6 hours.
           </p>
 
           <form method="POST" action="../../../controllers/BackupController.php">
-            <div class="space-y-3">
-              <button type="submit" name="backup_now" class="btn btn-primary w-full py-2">
+            <div class="flex gap-2">
+              <button type="submit" name="backup_now" class="btn btn-primary w-auto py-2">
                 <img src="/public/assets/img/backup.png" alt="Backup" class="size-4 inline mr-2">
                 Backup Now
               </button>
 
-              <button type="button" id="enableAutoBackup" class="btn btn-secondary w-full py-2">
+              <button type="button" id="enableAutoBackup" class="btn btn-secondary w-auto py-2">
                 <!-- <img src="/public/assets/img/refresh.png" alt="Auto" class="size-4 inline mr-2"> -->
                 Enable Auto Backup (6 hrs)
               </button>
@@ -50,9 +72,9 @@ require_once __DIR__ . '/../../../config/constants.php';
           </form>
 
           <!-- Available backups -->
-          <div class="mt-6">
-            <h3 class="text-sm font-semibold text-gray-700 mb-2">Recent Backups</h3>
-            <ul class="max-h-40 overflow-y-auto text-sm text-gray-600 border rounded p-2">
+          <div class="mt-3">
+            <h3 class="text-sm font-semibold text-gray-700 mb-">Recent Backups</h3>
+            <ul class="text-sm rounded-lg p-2">
             <?php
               $backupDir = __DIR__ . '/../../../../backups/';
               $webPath = '/../../backups/'; // URL for browser
@@ -60,9 +82,9 @@ require_once __DIR__ . '/../../../config/constants.php';
                   $files = array_diff(scandir($backupDir), ['.', '..']);
                   if (count($files) > 0) {
                       foreach (array_reverse($files) as $file) {
-                          echo "<li class='flex justify-between border-b py-1'>
-                                  <span>" . htmlspecialchars($file) . "</span>
-                                  <a href='/app/handlers/download_backup.php?file=" . urlencode($file) . "' download class='text-primary hover:underline'>Download</a>
+                          echo "<li class='flex justify-between bg-red-50 rounded-lg py-2 pl-2 mb-2'>
+                                  <span class='ml-3'>" . htmlspecialchars($file) . "</span>
+                                  <a href='/app/handlers/download_backup.php?file=" . urlencode($file) . "' download class='btn-tertiary mr-3'>Download</a>
                                 </li>";
                                         // <img src='/public/assets/img/export.png' alt='User' class='size-4 my-0.5'>
                       }
@@ -75,29 +97,6 @@ require_once __DIR__ . '/../../../config/constants.php';
             ?>
             </ul>
           </div>
-        </div>
-
-        <!-- 🔹 RESTORE SECTION -->
-        <div class="bg-white p-6 rounded-lg shadow">
-          <h2 class="text-lg font-semibold mb-4">Restore Database</h2>
-          <p class="text-sm text-gray-600 mb-6">
-            Restore the database from a .sql backup file. Make sure you’re restoring the correct version.
-          </p>
-
-          <form method="POST" action="../../../controllers/BackupController.php" enctype="multipart/form-data">
-            <div class="space-y-4">
-              <input type="file" name="restore_file" accept=".sql" class="w-full input-field" required>
-
-              <button type="submit" name="restore_now" class="btn btn-primary w-full py-2">
-                <!-- <img src="/public/assets/img/import.png" alt="Restore" class="size-4 inline mr-2"> -->
-                Restore Database
-              </button>
-            </div>
-          </form>
-
-          <p class="text-xs text-red-500 mt-3">
-            ⚠️ Warning: Restoring will overwrite the current database.
-          </p>
         </div>
 
       </div>

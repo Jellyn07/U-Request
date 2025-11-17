@@ -14,68 +14,98 @@ document.addEventListener('alpine:init', () => {
     viewFullDetails(selected) {
       Swal.fire({
         html: `
-          <div class="text-left text-sm max-w-full overflow-x-auto">
-            <h2 class="text-base font-bold mb-2">Vehicle Request Details</h2>
+          <div class="text-black text-sm max-w-full overflow-x-auto">
 
-            <div class="mb-2"><label class="text-xs">Tracking No.</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.tracking_id}" readonly />
+            <!-- HEADER -->
+            <div class="flex flex-col items-center justify-center mb-4">
+              <img src="/public/assets/img/usep.png" class="w-20 h-20 mb-2 mt-4" alt="USeP Logo">
+              <h2 class="text-lg font-semibold text-center">VEHICLE REQUEST DETAILS</h2>
             </div>
 
-            <div class="mb-2"><label class="text-xs">Request Date</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.date_request}" readonly />
+            <!-- TRIP INFORMATION -->
+            <h4 class="text-base font-semibold mb-2">Trip Information</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Tracking No.</label>
+                <p class="view-field font-normal">${selected.tracking_id}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Request Date</label>
+                <p class="view-field font-normal">${selected.date_request}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Requester</label>
+                <p class="view-field font-normal">${selected.requester_name}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Contact No</label>
+                <p class="view-field font-normal">${selected.contact || 'N/A'}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Travel Date</label>
+                <p class="view-field font-normal">${selected.travel_date}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Return Travel Date</label>
+                <p class="view-field font-normal">${selected.return_date}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Destination</label>
+                <p class="view-field font-normal">${selected.travel_destination}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Departure & Return Time</label>
+                <p class="view-field font-normal">${selected.depret_time || 'N/A'}</p>
+              </div>
+            </div>
+              <div class="w-full">
+                <label class="text-xs mb-1 block font-medium">Trip Purpose</label>
+                <p class="view-field font-normal">${selected.trip_purpose}</p>
+              </div>
+
+            <hr class="my-6 border-gray-300">
+
+            <!-- PASSENGERS -->
+            <h4 class="text-base font-semibold mb-2">Passenger Information</h4>
+            <div class="space-y-2 mb-6">
+              ${selected.passengers?.length > 0
+                ? selected.passengers.map(p => `
+                  <p class="view-field font-normal">${p.name || p}</p>
+                `).join('')
+                : `<p class="text-xs text-gray-500">No Passengers</p>`}
             </div>
 
-            <div class="mb-2"><label class="text-xs">Requester</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.requester_name}" readonly />
-            </div>
+            <hr class="my-6 border-gray-300">
 
-            <div class="mb-2"><label class="text-xs">Requester Contact No</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.contact}" readonly />
+            <!-- VEHICLE & DRIVER -->
+            <h4 class="text-base font-semibold mb-2">Assignment Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Assigned Vehicle</label>
+                <p class="view-field font-normal">${selected.vehicle_name || 'Not Assigned'}</p>
+              </div>
+              <div>
+                <label class="text-xs mb-1 flex font-medium">Assigned Driver</label>
+                <p class="view-field font-normal">${selected.driver_name || 'Not Assigned'}</p>
+              </div>
             </div>
+            <div class="w-full">
+                <label class="text-xs mb-1 block font-medium">Status</label>
+                <p class="view-field font-normal">${selected.req_status}</p>
+              </div>
 
-            <div class="mb-2"><label class="text-xs">Travel Date</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.travel_date}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Return Travel Date</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.return_date}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Destination</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.travel_destination}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Trip Purpose</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.trip_purpose}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Departure and Return Time</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.depret_time || 'N/A'}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Passengers</label>
-              <ul class="border px-2 py-1 rounded text-sm max-h-40 overflow-y-auto">
-                ${selected.passengers && selected.passengers.length > 0 
-                  ? selected.passengers.map(p => `<li>${p.name || p}</li>`).join('') 
-                  : '<li>No Passengers</li>'}
-              </ul>
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Assigned Vehicle</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.vehicle_name || 'Not Assigned'}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Assigned Driver</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.driver_name || 'Not Assigned'}" readonly />
-            </div>
-
-            <div class="mb-2"><label class="text-xs">Status</label>
-              <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.req_status}" readonly />
-            </div>
+            <p class="text-xs text-gray-500 text-center mt-6">
+              © 2025 University of Southeastern Philippines — U-Request System
+            </p>
 
           </div>
         `,
         width: 600,
+        customClass: {
+          popup: 'swal-custom-popup text-black m-10',
+          confirmButton: 'btn btn-primary font-normal',
+          textColor: 'text-sm'
+        },
         confirmButtonText: 'Close',
         confirmButtonColor: '#800000'
       });
