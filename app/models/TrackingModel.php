@@ -229,11 +229,22 @@ class TrackingModel extends BaseModel {
         $stmt3->close();
 
         $vehicle['passengers'] = $passengers;
+
+        $fund = $this->getSourceOfFundByControlNo($vehicle['control_no']);
+
+        if ($fund) {
+            $vehicle = array_merge($vehicle, $fund);
+        } else {
+            $vehicle['source_of_fuel'] = 'N/A';
+            $vehicle['source_of_oil'] = 'N/A';
+            $vehicle['source_of_repair_maintenance'] = 'N/A';
+            $vehicle['source_of_driver_assistant_per_diem'] = 'N/A';
+        }
+
         return $vehicle;
     }
 
-    // Get source of fund details by tracking_id and email
-    public function getSourceOfFund($tracking_id) {
+    public function getSourceOfFundByControlNo($control_no) {
         $sql = "
             SELECT 
                 source_of_fuel,
@@ -241,17 +252,17 @@ class TrackingModel extends BaseModel {
                 source_of_repair_maintenance,
                 source_of_driver_assistant_per_diem
             FROM source_of_fund
-            WHERE tracking_id = ?
+            WHERE control_no = ?
             LIMIT 1
         ";
 
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
-            error_log("getSourceOfFund prepare failed: " . $this->db->error);
+            error_log("getSourceOfFundByControlNo prepare failed: " . $this->db->error);
             return null;
         }
 
-        $stmt->bind_param("s", $tracking_id);
+        $stmt->bind_param("i", $control_no);
         $stmt->execute();
         $res = $stmt->get_result();
         $fund = $res->fetch_assoc();
@@ -259,9 +270,4 @@ class TrackingModel extends BaseModel {
 
         return $fund;
     }
-
-
-
-
-
 }
