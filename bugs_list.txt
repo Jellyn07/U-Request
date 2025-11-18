@@ -143,6 +143,7 @@ Users
     - contact should be required before the user can request in motorpool✅
     - should have popup when i update something in the user profile
     - no source of fund in more details✅
+    - if change department it pop up the contact no
 
 UI
     All
