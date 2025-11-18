@@ -61,7 +61,8 @@ Motorpool Admin
     - wont update any change in request except status
     - completed and on going status should be automatically updated
     - pending, approved, and rejected/cancelled are the only status that the motorpool admin can update
-
+    - sa status na part ky for example if ever mamali and admin og click sa status ba like maclick nya ang completed accidentally. Dli na sya makabalik atong last status ang mogawas 
+    nlng sa status ky completed nlng tong unsa ang naclick.
     vehicle
     - vehicle filter should be dynamic ✅
     - vehicle type should be dynamic. what if usep wants to buy sports car? theirs no option in that ✅
@@ -92,10 +93,13 @@ GSU Admin
     - should print on what is in the table ex. is the table is all completed in export it should display only completed
     - should not allow to delete all the personnel input field
     - cant change the status in side details
-
+    - pag iset ang status pag nakaclick nka og completed ky dli na sya makachoose og balik./same sa priority level if nakapili na sya dli na makapilig balik.
+    -assigning sa personnel dli sya maka assign biskan og nag assign nka.
+    - export dli mag work
     inventory
     - no material history ✅
 
+  
     personnel
     - no work history ✅
     - cant edit ✅
