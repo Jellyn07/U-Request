@@ -1,10 +1,5 @@
 <?php
 session_start();
-if (!isset($_SESSION['email'])) {
-    header("Location: /app/modules/shared/views/admin_login.php");
-    exit;
-}
-require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../config/constants.php';
 require_once __DIR__ . '/../../../controllers/DriverController.php';
 if (isset($_SESSION['driver_success'])) {
@@ -18,7 +13,7 @@ if (isset($_SESSION['driver_error'])) {
 }
 
 if (!isset($_SESSION['email'])) {
-    header('Location: /app/modules/shared/views/admin_login.php');
+    header('Location: modules/shared/views/admin_login.php');
     exit;
 }
 $controller = new DriverController(); $drivers = $controller->getAllDriver();
@@ -41,8 +36,16 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-gray-100">
-  <!-- Superadmin Menu & Header -->
-  <?php include COMPONENTS_PATH . '/motorpool_menu.php'; ?>
+    <!-- Menu & Header -->
+  <?php
+  if ($_SESSION['access_level'] == 1) {
+      include COMPONENTS_PATH . '/superadmin_menu.php';
+  } elseif ($_SESSION['access_level'] == 3) {
+      include COMPONENTS_PATH . '/motorpool_menu.php';
+  } else {
+      echo "<p>No menu available for your access level.</p>";
+  }
+  ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
     <div class="p-6">
       <!-- Header -->
@@ -53,16 +56,19 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
+            <!-- <select class="input-field" id="statusFilter">
+              <option value="all">All</option>
+              <option value="Available">Available</option>
+              <option value="Fixing">Fixing</option>
+            </select> -->
+
             <select class="input-field" id="sortUsers">
                 <option value="az">Sort A-Z</option>
                 <option value="za">Sort Z-A</option>
             </select>
-            <!-- <button title="Print data in the table" class="input-field">
-                <img src="/public/assets/img/printer.png" alt="User" class="size-4 my-0.5">
-            </button> -->
             <img id="logo" src="/public/assets/img/usep.png" class="hidden">
             <button title="Export" id="export" class="btn-upper">
-              <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
+                <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
             <!-- Add Admin Modal -->
                 <div x-data="{ showModal: false }">
@@ -169,10 +175,9 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Driver ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
               </tr>
             </thead>
-            <tbody id="table" class="text-sm">
+            <tbody id="usersTable" class="text-sm">
               
             <?php if (!empty($drivers)): ?>
               <?php foreach ($drivers as $person): ?>
@@ -204,8 +209,10 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                   <td class="px-4 py-2">
                     <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
                   </td>
-                  <td class="px-4 py-2 <?= strtolower($person['status']) === 'fixing' ? 'text-red-600' : 'text-green-600' ?>">
+                  <td class="px-4 py-2">
+                    <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full <?= strtolower($person['status']) === 'Available' ? 'bg-gray-200 text-gray-600' : 'bg-green-200 text-green-800 ' ?>">
                       <?= htmlspecialchars($person['status']) ?>
+                    </span>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -250,14 +257,14 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                   class="w-24 h-24 rounded-full object-cover shadow-sm"
                 />
                 <!-- Edit Button -->
-                <label for="profile_picture" title="Change Profile Picture"
+                <!-- <label for="profile_picture" title="Change Profile Picture"
                   class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036
                         a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
-                </label>
+                </label> -->
 
                 <!-- Hidden File Input -->
                 <input 
@@ -289,29 +296,18 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
                 <label class="text-xs text-text mb-1">Contact No.</label>
                 <input type="text" id="contact_no" name="contact_no" :value="selected.contact || ''" class="w-full input-field"/>
             </div>
-
+            
             <div>
-                <label class="text-xs text-text mb-1">Unit</label>
-                <select name="unit" class="w-full input-field">
-                  <option value="Tagum Unit" :selected="selected.unit === 'Tagum Unit'">Tagum Unit</option>
-                  <option value="Mabini Unit" :selected="selected.unit === 'Mabini Unit'">Mabini Unit</option>
-                </select>
+                <label class="text-xs text-text mb-1">Hire Date</label>
+                <input 
+                    type="date" 
+                    name="hire_date" 
+                    :value="selected.hire_date || ''" 
+                    max="<?= date('Y-m-d') ?>" 
+                    class="w-full input-field"
+                    :disabled="access_level == 3"
+                />
             </div>
-
-            <div>
-              <label class="text-xs text-text mb-1">Hire Date</label>
-              <input 
-                  type="text"
-                  :value="selected.hire_date ? new Date(selected.hire_date).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                  }) : ''"
-                  class="w-full view-field cursor-not-allowed"
-                  disabled
-              />
-            </div>
-
 
             <div class="flex justify-center gap-2 pt-2">
               <!-- <button type="button" 
@@ -334,11 +330,12 @@ $controller = new DriverController(); $drivers = $controller->getAllDriver();
     import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
 
     initTableFilters({
-      tableId: "table", 
+      tableId: "usersTable",
       searchId: "searchUser",
-      sortId: "sortUsers",
-      searchColumns: [2, 1], 
-      filterColumn: 3 
+      filterId: "statusFilter",  
+      sortId: "sortUsers",          
+      searchColumns: [2, 4],         
+      filterColumn: 3             
     });
 
       function previewProfile(event) {

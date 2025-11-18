@@ -34,7 +34,7 @@
           <img src="/public/assets/img/car-admin.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Vehicle</span>
         </a>
-        <a href="../../motorpool_admin/views/drivers.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
+        <a href="../../shared/views/driver.php" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition gap-2">
           <img src="/public/assets/img/driver.png" alt="dashboard" class="size-8 p-1.5 md:p-0 md:size-4" />
           <span class="hidden md:flex items-center sidebar-text">Drivers</span>
         </a>
