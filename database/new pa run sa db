@@ -1890,3 +1890,17 @@ BEGIN
     RETURN v_contact;
 END$$
 DELIMITER ;
+
+---------------------------------------------------------------------------------
+
+ALTER TABLE request_assigned_personnel
+ADD INDEX idx_staff_id (staff_id);
+
+ALTER TABLE requester
+ADD INDEX idx_requester_id (requester_id);
+
+ALTER TABLE requester
+ADD INDEX idx_email (email);
+
+ALTER TABLE vehicle_request ADD INDEX idx_tracking_id (tracking_id); 
+ALTER TABLE request ADD INDEX idx_tracking_id (tracking_id);
