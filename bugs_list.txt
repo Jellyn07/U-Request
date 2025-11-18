@@ -166,26 +166,26 @@ UI
     - should have ui when loading any page
 
     GSU
-    - Full Details in Request
-    - Request Management needs to make sense in UI
-    - to inspect will will be 2 line shorld be always one even if fight details show
+    - Full Details in Request ✅
+    - Request Management needs to make sense in UI. ✅
+    - to inspect will will be 2 line shorld be always one even if fight details show. ✅
 
     Motorpool
-    - bar chart name should not be diagonal
-    - status in dashboard
+    - bar chart name should not be diagonal ✅
+    - status in dashboard ✅
     - Full Details in Request ✅
     - colors in Schedule should be same in dashboard
     - status ui in request
     - Schedule and travel history ui
     - dili manggawas ang source of fund sa full details nga gi input sa user
     - calendar schedule - 2 requests same nag book ug same date of departure and arrival , same vehicle gamit 
-    - request 7 days before the travel date not realized.
+    - request 7 days before the travel date not realized
 
         driver
         - status   
 
         user
-        - status should be in the last column like others
+        - status should be in the last column like others ✅
         - user history ui
 
     Superadmin
@@ -199,8 +199,8 @@ UI
         - history in user
 
         gsu oversight
-        - request full details ui
-        - to inspect will will be 2 line shorld be always one even if fight details show
+        - request full details ui ✅
+        - to inspect will be 2 line shorld be always one even if fight details show. ✅
 
         motorpool oversight
         - request full details ui ✅

@@ -71,65 +71,101 @@ document.addEventListener("alpine:init", () => {
     Swal.fire({
       html: `
         <div class="text-left text-sm max-w-full overflow-x-auto">
-          <h2 class="text-base font-bold mb-2">Repair Information</h2>
-          <img src="${selected.image_path 
+          <!-- HEADER -->
+            <div class="flex flex-col items-center justify-center mb-2">
+              <img src="/public/assets/img/usep.png" class="w-20 h-20 mb-2 mt-4" alt="USeP Logo">
+              <h2 class="text-lg font-semibold text-center">REPAIR REQUEST DETAILS</h2>
+            </div>
+
+          <div class="text-sm mb-1 font-medium mt-3">
+            <label class="text-base">Requester</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.Name}" readonly />
+          </div>
+
+          <div class="text-sm mb-1 font-medium">
+            <label class="text-base">Tracking No.</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.tracking_id}" readonly />
+          </div>     
+          
+          <div class="font-medium text-left">
+            <label class="text-base mb-2">Photo Evidence</label>
+            <img src="${selected.image_path 
                       ? '/public/uploads/' + selected.image_path 
                       : '/public/assets/img/default-img.png'}"
                onerror="this.src='/public/assets/img/default-img.png'"
-               class="w-6/12 shadow-lg mx-auto rounded-lg mb-3"/>
+               class="mt-1 rounded-md border border-gray-200 max-h-48"/>
+          </div>  
 
-          <div class="mb-2"><label class="text-xs">Date Request</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.request_date}" readonly />
+          <hr class="my-6 border-gray-400">
+          <h4 class="text-base font-semibold mb-2">Request Information</h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="text-xs mb-1 font-medium">
+              <label class="text-xs">Date the Issue was Noticed</label>
+              <input type="text" class="view-field w-full font-normal" value="${selected.request_date}" readonly />
+            </div>
+            <div class="text-xs mb-1 font-medium">
+              <label class="text-xs">Date Finished</label>
+              <input type="text" class="view-field w-full font-normal" value="${selected.date_finished || 'Not Applicable'}" readonly />
+            </div>          
           </div>
 
-          <div class="mb-2"><label class="text-xs">Tracking No.</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.tracking_id}" readonly />
+
+          <div class="text-xs mb-1 font-medium mt-2">
+            <label class="text-xs">Location</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.location}" readonly />
           </div>
 
-          <div class="mb-2"><label class="text-xs">Requester</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.Name}" readonly />
+          <div class="text-xs mb-1 font-medium mt-3">
+            <label class="text-xs">Nature of Request</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.request_Type}" readonly />
           </div>
 
-          <div class="mb-2"><label class="text-xs">Category</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.request_Type}" readonly />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="text-xs mb-1 font-medium mt-3">
+              <label class="text-xs">Unit</label>
+              <input type="text" class="view-field w-full font-normal" value="${selected.unit}" readonly />
+            </div>
+            <div class="text-xs mb-1 font-medium mt-3">
+              <label class="text-xs">Priority Level</label>
+              <input type="text" class="view-field w-full font-normal" value="${selected.priority_status || 'No Priority Level'}" readonly />
+            </div>
+
           </div>
 
-          <div class="mb-2"><label class="text-xs">Description</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.request_desc}" readonly />
+          <div class="text-xs mb-1 font-medium mt-3">
+            <label class="text-xs">Detailed Description of the Issue</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.request_desc}" readonly />
           </div>
 
-          <div class="mb-2"><label class="text-xs">Unit</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.unit}" readonly />
-          </div>
+          <hr class="my-6 border-gray-400">
+          <!-- SECTION: Repair Info -->
+          <h4 class="text-base font-semibold mb-2">Repair Information</h4>
 
-          <div class="mb-2"><label class="text-xs">Location</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.location}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Priority Level</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.priority_status || 'No Priority Level'}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Assigned Personnel</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.assigned_personnel || ''}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Status</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.req_status}" readonly />
-          </div>
-
-          <div class="mb-2"><label class="text-xs">Date Finished</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.date_finished || 'Pending'}" readonly />
+          <div class="text-xs mb-1 font-medium mt-3"><label class="text-xs">Assigned Personnel</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.assigned_personnel || ''}" readonly />
           </div>
           
-          <div class="mb-2"><label class="text-xs">Materials Used</label>
-            <input type="text" class="w-full border px-2 py-1 rounded text-sm" value="${selected.materials_needed || ''}" readonly />
+          <div class="text-xs mb-1 font-medium mt-3"><label class="text-xs">Materials Used</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.materials_needed || ''}" readonly />
           </div>
+
+          <div class="text-xs mb-1 font-medium mt-3"><label class="text-xs">Status</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.req_status}" readonly />
+          </div>
+
+          <p class="text-xs text-gray-500 text-center mt-6">
+            © 2025 University of Southeastern Philippines — U-Request System
+          </p>
         </div>
       `,
       width: 600,
-      confirmButtonText: 'Close',
-      confirmButtonColor: '#800000' // 🔴 maroon color
+      customClass: {
+          popup: 'swal-custom-popup text-black m-10 rounded-lg',
+          confirmButton: 'btn btn-primary font-normal',
+          textColor: 'text-sm'
+        },
+      confirmButtonText: 'Close'
     });
   };
 });

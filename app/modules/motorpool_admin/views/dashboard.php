@@ -85,7 +85,7 @@ $dateRange = "$startDate - $endDate";
 
       <!-- Charts -->
       <div class="grid md:grid-cols-2 gap-6 mb-5">
-       <div class="bg-white p-4 rounded-2xl shadow mb-6">
+       <div class="bg-white p-4 rounded-2xl shadow">
           <h3 class="font-semibold text-text text-base text-center mb-2">Request Status</h3>
           <div class="w-full h-80 flex justify-center">
             <canvas id="requestStatusChart"></canvas>
@@ -138,7 +138,39 @@ $dateRange = "$startDate - $endDate";
                       <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['travel_date']))) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars($row['travel_destination']) ?></td>
                       <td class="px-4 py-3"><?= htmlspecialchars(date('M d, Y', strtotime($row['date_request']))) ?></td>
-                      <td class="px-4 py-3"><?= htmlspecialchars($row['req_status']) ?></td>
+                      <td class="px-4 py-3">
+                        <?php if ($row['req_status'] === 'Completed'): ?>
+                            <!-- ✅ Show label only when Completed -->
+                            <span class="px-8 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                Completed
+                            </span>
+                        <?php elseif ($row['req_status'] === 'Pending'): ?>
+                            <!-- ✅ Show label only when Pending -->
+                            <span class="px-10 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                Pending
+                            </span>
+                        <?php elseif ($row['req_status'] === 'Approved'): ?>
+                            <!-- ✅ Show label only when Approved -->
+                            <span class="px-9 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                Approved
+                            </span>     
+                        <?php elseif ($row['req_status'] === 'On Going'): ?>
+                            <!-- ✅ Show label only when On Going -->
+                            <span class="px-9 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
+                                On Going
+                            </span>   
+                        <?php elseif ($row['req_status'] === 'Rejected/Cancelled'): ?>
+                            <!-- ✅ Show label only when Rejected/Cancelled -->
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                Rejected/Cancelled
+                            </span>         
+                        <?php else: ?>
+                            <!-- Fallback for any other statuses -->
+                            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                <?= htmlspecialchars($row['req_status']) ?>
+                            </span>
+                        <?php endif; ?>
+                      </td>
                     </tr>
                   <?php endforeach; ?>
                 <?php else: ?>
