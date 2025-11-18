@@ -31,6 +31,7 @@ Super Admin
     - user history (no vehicle request) ✅ 
     - if completed vehicle request the date finished is the return date
     - Menu logout/profile
+    - change location button gsu request
 
     account mgt.
     - can edit staff ID? ✅
@@ -147,6 +148,7 @@ Users
     - should have popup when i update something in the user profile
     - no source of fund in more details✅
     - if change department it pop up the contact no
+    - if dili mag upload ug pic dili ka submit pero walay warning nga naay kulang nga fillupan
 
 UI
     All
@@ -175,6 +177,9 @@ UI
     - colors in Schedule should be same in dashboard
     - status ui in request
     - Schedule and travel history ui
+    - dili manggawas ang source of fund sa full details nga gi input sa user
+    - calendar schedule - 2 requests same nag book ug same date of departure and arrival , same vehicle gamit 
+    - request 7 days before the travel date not realized.
 
         driver
         - status   
