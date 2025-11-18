@@ -71,7 +71,7 @@ require_once __DIR__ . '/../../../config/auth.php';
                   <button type="button" 
                       class="btn btn-primary mt-2"
                       <?php 
-                      if (empty($contact_no)) {
+                      if ($contact_no === null || trim($contact_no) === '') {
                           echo 'onclick="contactAlert()"';
                       } else {
                           echo "onclick=\"location.href='motorpool_form.php'\"";

@@ -187,9 +187,9 @@ $formData = $_SESSION['admin_form_data'] ?? [];
               <tr>
                 <th class="px-1 py-2 rounded-tl-lg">&nbsp;</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Access Level</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Admin Mgmt</th>
               </tr>
             </thead>
@@ -233,18 +233,19 @@ $formData = $_SESSION['admin_form_data'] ?? [];
                           <!-- Full Name -->
                           <td class="px-4 py-2"><?= htmlspecialchars($admin['full_name']); ?></td>
 
-                          <!-- Status -->
-                          <td class="px-4 py-2">
-                              <span class="text-xs px-3 py-1 rounded-full font-semibold <?= strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'text-red-800'; ?>">
-                                  <?= htmlspecialchars($admin['status']); ?>
-                              </span>
-                          </td>
 
                           <!-- Email -->
                           <td class="px-4 py-2"><?= htmlspecialchars($admin['email']); ?></td>
 
                           <!-- Access Level -->
                           <td class="px-4 py-2"><?= htmlspecialchars($admin['accessLevel_desc']); ?></td>
+
+                          <!-- Status -->
+                          <td class="px-4 py-2">
+                              <span class="text-xs px-3 py-1 rounded-full font-semibold <?= strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800 px-4' : 'bg-red-200 text-red-800'; ?>">
+                                  <?= htmlspecialchars($admin['status']); ?>
+                              </span>
+                          </td>
 
                           <!-- Checkbox column -->
                           <td class="pl-4 py-2 text-center">
@@ -274,7 +275,7 @@ $formData = $_SESSION['admin_form_data'] ?? [];
         </div>
 
         <!-- Right Section (Details) -->
-        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px]">
+        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>

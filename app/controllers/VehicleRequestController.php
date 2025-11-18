@@ -105,6 +105,42 @@ class VehicleRequestController {
     }
 
     // ==============================
+    // ❌ USER: Cancel Request (called by user)
+    // ==============================
+public function cancelRequest() {
+    header('Content-Type: application/json');
+
+    $control_no = $_POST['control_no'] ?? null;
+    $reason = $_POST['reason'] ?? null;
+
+    if (!$control_no || !$reason) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Control number and reason are required.'
+        ]);
+        return;
+    }
+
+    $result = $this->model->cancelRequest($control_no, $reason);
+
+    if ($result) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Request cancelled successfully.'
+        ]);
+    } else {
+        // Add debug info
+        echo json_encode([
+            'success' => false,
+            'message' => 'Failed to cancel request. It may not be pending or already cancelled.'
+        ]);
+    }
+}
+
+
+    
+
+    // ==============================
     // 🔵 Fetchers
     // ==============================
     public function fetchVehicles() {
@@ -135,6 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'saveAssignment':
             $controller->updateAssignment($_POST);
+            break;
+
+        case 'cancelRequest':
+            $controller->cancelRequest();
             break;
 
         default:

@@ -129,24 +129,25 @@ GSU Admin
 +++++++++++++++++++++++++++++++++JELLYN+++++++++++++++++++++++++++++++++
 Users
     - cant request in vehicle ✅
-    - contact update/add
+    - contact update/add ✅
     - track sort (oldest/newest) ✅
-    - names not automatically correct the case ex. jellyn it should be Jellyn
-    - should prevent user from entering the wrong time and date in Motorpool form
-    - dont allow user to travel and return the same date/day
-    - it should not allow duplicate request
-    - no pop up if my request is done/submitted
-    - give a submitted popup if i cancel
+    - names not automatically correct the case ex. jellyn it should be Jellyn ✅
+    - should prevent user from entering the wrong time and date in Motorpool form ✅
+    - allow user to travel and return the same date/day ✅
+    - it should not allow duplicate request in vehicle 
+    - no pop up if my request is submitted ✅
+    - should not give a submitted popup if i cancel ✅
     - save profile picture button need to be gone ✅
     - Contact cannot be updated in profile ✅
     - contact should be required before the user can request in motorpool✅
-    - should have popup when i update something in the user profile
-    - no source of fund in more details✅
+    - should have popup when i update something in the user profile ✅
+    - no source of fund in more details ✅
+    - add cancel button in vehicle tracking 
 
 UI
     All
     - All input fields that cant be change should be view-field
-    - admin update password
+    - admin update password ✅
     - buttons in profile admin
     - loading ui
     - make the feedback card type
@@ -166,26 +167,26 @@ UI
     Motorpool
     - bar chart name should not be diagonal
     - status in dashboard
-    - Full Details in Request
+    - Full Details in Request ✅
     - colors in Schedule should be same in dashboard
     - status ui in request
     - Schedule and travel history ui
 
-    driver
-    - status   
+        driver
+        - status   
 
-    user
-    - status should be in the last column like others
-    - user history ui
+        user
+        - status should be in the last column like others
+        - user history ui
 
     Superadmin
         dashboard
-        - status in vehicle recent request
+        - status in vehicle recent request ✅
         
         account mgt.
-        - status should be last like others
-        - admin right info ui
-        - inactive statys ui in admin
+        - status should be last like others ✅
+        - admin right info ui ✅
+        - inactive statys ui in admin ✅
         - history in user
 
         gsu oversight

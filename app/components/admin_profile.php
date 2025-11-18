@@ -71,7 +71,7 @@
       <input type="hidden" name="action" value="change_password">
 
       <!-- Old Password -->
-      <div class="relative w-1/2">
+      <div class="relative w-full">
         <label for="old_password" class="text-sm text-text mb-1">Old Password</label>
         <input type="password" id="old_password" name="old_password"
                class="w-full input-field pr-10" placeholder="Enter old password" required />
@@ -82,7 +82,7 @@
       </div>
 
       <!-- New Password -->
-      <div class="relative w-1/2">
+      <div class="relative w-full">
         <label for="new_password" class="text-sm text-text mb-1">New Password</label>
         <input type="password" id="new_password" name="new_password"
                class="w-full input-field pr-10" placeholder="Enter new password" required />
@@ -93,7 +93,7 @@
       </div>
 
       <!-- Confirm Password -->
-      <div class="relative w-1/2">
+      <div class="relative w-full">
         <label for="confirm_password" class="text-sm text-text mb-1">Confirm Password</label>
         <input type="password" id="confirm_password" name="confirm_password"
                class="w-full input-field pr-10" placeholder="Re-enter new password" required />

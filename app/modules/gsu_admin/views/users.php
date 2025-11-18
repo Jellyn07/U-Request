@@ -65,9 +65,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <tr>
                   <th class="px-1 py-2">&nbsp;</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Office / Department</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 </tr>
               </thead>
               <tbody class="text-sm" id="usersTable">
@@ -89,20 +89,20 @@ $profile = $controller->getProfile($_SESSION['email']);
                            class="size-8 rounded-full object-cover mx-auto" alt="User">
                     </td>
                     <td class="px-4 py-2"><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?></td>
+                    <td class="px-4 py-2"><?= htmlspecialchars($user['email']) ?></td>
+                     <td class="px-4 py-2">
+                      <?php if (!empty($user['officeOrDept'])): ?>
+                        <?= htmlspecialchars($user['officeOrDept']) ?>
+                      <?php else: ?>
+                        <span class="text-red-500">Undefined</span>
+                      <?php endif; ?>
+                    </td>
                     <td class="px-4 py-2">
                       <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                        <?= $user['account_status'] === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600' ?>">
+                        <?= $user['account_status'] === 'Active' ? 'bg-green-200 text-green-800 px-3' : 'bg-red-200 text-red-600' ?>">
                         <?= htmlspecialchars($user['account_status']) ?>
                       </span>
                     </td>
-                    <td class="px-4 py-2"><?= htmlspecialchars($user['email']) ?></td>
-                     <td class="px-4 py-2">
-                  <?php if (!empty($user['officeOrDept'])): ?>
-                    <?= htmlspecialchars($user['officeOrDept']) ?>
-                  <?php else: ?>
-                    <span class="text-red-500">Undefined</span>
-                  <?php endif; ?>
-                </td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>

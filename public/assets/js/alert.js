@@ -41,7 +41,7 @@ function openDetails(trackingId) {
           showConfirmButton: false,
           background: '#fff',
           customClass: {
-            popup: 'rounded-lg shadow-lg',
+            popup: 'rounded-lg shadow-lg m-10',
             title: 'mb-2',
             htmlContainer: 'text-sm text-black'
           }

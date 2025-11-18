@@ -31,7 +31,18 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
     <script src="/public/assets/js/user/tracking-filter.js"></script>
   </head>
   <body class="flex flex-col min-h-screen bg-gray-200 text-text">
+
     <?php include COMPONENTS_PATH . '/header.php'; ?>
+
+        <?php
+foreach ($list as $track) {
+    error_log('Tracking item control_no=' . ($track['control_no'] ?? 'NULL'));
+}
+
+$control_no = $track['control_no'] ?? 'UNKNOWN';
+echo "Last control_no processed: $control_no";
+?>
+
     <main class="flex-1 px-4 sm:px-8 lg:px-20">
       <!-- Page Heading -->
       <div class="text-center mt-0 md:mt-8 mb-3">
@@ -167,6 +178,17 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
                     <button type="button" class="btn btn-secondary mb-2 md:mb-0 mr-0 md:mr-3" onclick="document.getElementById('form_<?php echo $track['tracking_id']; ?>').submit();"> Give Feedback </button> 
                     <?php } ?> 
                   <?php } ?>
+
+                  <?php if ($status === 'Pending'): ?>
+                    <button 
+                      class="btn btn-danger mt-2"
+                       onclick="openCancelModal('<?php echo $track['control_no']; ?>')"
+                    >
+                      Cancel Request
+                    </button>
+                  <?php endif; ?>
+
+
               <button class="btn btn-primary" onclick="openDetails('<?php echo $track['tracking_id']; ?>')">
                 View Details
               </button>
@@ -182,4 +204,52 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
     </main>
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
   </body>
+<script>
+function openCancelModal(control_no) {
+    Swal.fire({
+        title: "Cancel This Request?",
+        text: "Please provide your reason for cancellation:",
+        icon: "warning",
+        input: "textarea",
+        inputPlaceholder: "Enter your reason...",
+        showCancelButton: true,
+        confirmButtonText: "Submit",
+        cancelButtonText: "Close",
+        preConfirm: (reason) => {
+            if (!reason) {
+                Swal.showValidationMessage("Reason is required.");
+                return false;
+            }
+
+            // Send POST request
+            return fetch("../../../controllers/VehicleRequestController.php", {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: new URLSearchParams({
+                    form_action: "cancelRequest",
+                    control_no: control_no,
+                    reason: reason
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.showValidationMessage(data.message || "Request failed");
+                    return false;
+                }
+                return data;
+            })
+            .catch(() => Swal.showValidationMessage("Request failed."));
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                icon: "success",
+                title: "Cancelled",
+                text: "Your request has been cancelled.",
+            }).then(() => location.reload());
+        }
+    });
+}
+</script>
 </html>

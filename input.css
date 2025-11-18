@@ -49,6 +49,10 @@
     @apply bg-background text-primary rounded-md text-sm border border-primary;
   }
 
+  .btn-danger {
+    @apply bg-yellow-100 text-yellow-900 rounded-md text-sm border border-yellow-900;
+  }
+
   /* Tertiary (link style) */
   .btn-tertiary {
     @apply text-primary hover:underline hover:underline-offset-2 hover:text-secondary;

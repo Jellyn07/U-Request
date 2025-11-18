@@ -234,17 +234,18 @@ class VehicleRequestModel extends BaseModel {
     }
     public function getLastError() {
     return $this->lastError;
-}
-public function getVehicleRequestByControlNo($controlNo) {
-    $sql = "SELECT vr.*, CONCAT(r.firstName, ' ', r.lastName) AS requester_name
-            FROM vehicle_request vr
-            JOIN requester r ON vr.req_id = r.req_id
-            WHERE vr.control_no = ?";
-    $stmt = $this->db->prepare($sql);
-    $stmt->bind_param("s", $controlNo);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
-}
+    }
+
+    public function getVehicleRequestByControlNo($controlNo) {
+        $sql = "SELECT vr.*, CONCAT(r.firstName, ' ', r.lastName) AS requester_name
+                FROM vehicle_request vr
+                JOIN requester r ON vr.req_id = r.req_id
+                WHERE vr.control_no = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("s", $controlNo);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
 
     public function updateAssignment($control_no, $vehicle_id = null, $req_status = null, $approved_by = null, $reason = null) {
         if (isset($_SESSION['staff_id'])) {
@@ -321,4 +322,47 @@ public function getVehicleRequestByControlNo($controlNo) {
             return false;
         }
     }
+
+    // ==========================
+    // ❌ USER Cancel Request
+    // ==========================
+    // public function cancelRequest($control_no, $reason)
+    // {
+    //     try {
+    //         // Update request status + reason
+    //         $sql = "UPDATE vehicle_request_assignment 
+    //                 SET req_status = 'Rejected/Cancelled', reason = ?
+    //                 WHERE control_no = ?";
+
+    //         $stmt = $this->db->prepare($sql);
+    //         $stmt->bind_param("ss", $reason, $control_no);
+    //         $stmt->execute();
+
+    //         return $stmt->affected_rows > 0;
+
+    //     } catch (Exception $e) {
+    //         error_log("CancelRequest Error: " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
+
+    public function cancelRequest($control_no, $reason) {
+    try {
+        $sql = "UPDATE vehicle_request_assignment
+                SET req_status = 'Rejected/Cancelled', reason = ?
+                WHERE control_no = ?";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ss", $reason, $control_no);
+        $stmt->execute();
+
+        return $stmt->affected_rows > 0;
+
+    } catch (Exception $e) {
+        error_log("CancelRequest Error: " . $e->getMessage());
+        return false;
+    }
+}
+
+
 }

@@ -63,9 +63,9 @@ $requesters = $controller->getAllRequesters();
               <tr>
                 <th class="px-1 py-2 rounded-tl-lg">&nbsp;</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Office / Department</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
@@ -89,11 +89,6 @@ $requesters = $controller->getAllRequesters();
                 <td class="px-4 py-2">
                   <?= htmlspecialchars($req['firstName'] . ' ' . $req['lastName']) ?>
                 </td>
-                <td class="px-4 py-2">
-                  <span class="text-xs px-3 py-1 rounded-full font-semibold bg-green-200 text-green-800">
-                    Active
-                  </span>
-                </td>
                 <td class="px-4 py-2"><?= htmlspecialchars($req['email']) ?></td>
                 <td class="px-4 py-2">
                   <?php if (!empty($req['officeOrDept'])): ?>
@@ -102,6 +97,16 @@ $requesters = $controller->getAllRequesters();
                     <span class="text-red-500">Undefined</span>
                   <?php endif; ?>
                 </td>
+                <td class="px-4 py-2">
+                  <span class="text-xs px-3 py-1 rounded-full font-semibold bg-green-200 text-green-800">
+                    Active
+                  </span>
+                </td> 
+                <!-- <td class="px-4 py-2">
+                  <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full <?= $req['account_status'] === 'Active' ? 'bg-green-100 text-green-800 px-3' : 'bg-red-200 text-red-600' ?>">
+                    <?= htmlspecialchars($req['account_status']) ?>
+                  </span>
+                </td> -->
               </tr>
             <?php endforeach; ?>
           </tbody>

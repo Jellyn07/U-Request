@@ -183,5 +183,58 @@ require_once __DIR__ . '/../../../config/constants.php';
         });
       });
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+      const travelDate = document.getElementById('date_of_travel');
+      const returnDate = document.getElementById('date_of_return');
+      const timeDeparture = document.querySelector('input[name="time_of_departure"]');
+      const timeReturn = document.querySelector('input[name="time_of_return"]');
+
+      function validateTime() {
+        if (!travelDate.value || !returnDate.value || !timeDeparture.value) return;
+
+        // Convert times to minutes for comparison
+        const [depHour, depMin] = timeDeparture.value.split(':').map(Number);
+        const departureMinutes = depHour * 60 + depMin;
+
+        const [retHour, retMin] = (timeReturn.value || "00:00").split(':').map(Number);
+        const returnMinutes = retHour * 60 + retMin;
+
+        // If travel and return date are same, enforce rule
+        if (travelDate.value === returnDate.value) {
+
+          // MINIMUM hours required (change 5 if you want)
+          const minHours = 5;
+          const minReturn = departureMinutes + minHours * 60;
+
+          // Set min time allowed for return
+          const minHour = Math.floor(minReturn / 60).toString().padStart(2, '0');
+          const minMinute = (minReturn % 60).toString().padStart(2, '0');
+          const minTimeString = `${minHour}:${minMinute}`;
+
+          timeReturn.min = minTimeString;
+
+          // If selected time is invalid, reset it
+          if (returnMinutes < minReturn) {
+            timeReturn.value = "";
+            Swal.fire({
+              icon: "warning",
+              title: "Invalid Time",
+              text: `If you return the SAME DAY, the return time must be at least ${minHours} hours after departure (${minTimeString}).`,
+            });
+          }
+        } 
+        else {
+          // If dates are different, clear restrictions
+          timeReturn.min = "";
+        }
+      }
+
+      travelDate.addEventListener('change', validateTime);
+      returnDate.addEventListener('change', validateTime);
+      timeDeparture.addEventListener('change', validateTime);
+      timeReturn.addEventListener('change', validateTime);
+    });
+    </script>
   </body>
 </html>

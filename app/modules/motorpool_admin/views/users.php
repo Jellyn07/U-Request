@@ -75,9 +75,9 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <tr>
                   <th class="px-4 py-2">&nbsp;</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Office / Department</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 </tr>
               </thead>
               <tbody id="usersTable" class="text-sm">
@@ -99,15 +99,15 @@ $profile = $controller->getProfile($_SESSION['email']);
                         <img src="<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>" class="size-8 rounded-full object-cover mx-auto">
                       </td>
                       <td class="px-4 py-2"><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?></td>
-                      <td class="px-4 py-2">
-                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                          <?= $user['account_status'] === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600' ?>">
-                          <?= htmlspecialchars($user['account_status']) ?>
-                        </span>
-                      </td>
                       <td class="px-4 py-2"><?= htmlspecialchars($user['email']) ?></td>
                       <td class="px-4 py-2">
                         <?= !empty($user['officeOrDept']) ? htmlspecialchars($user['officeOrDept']) : '<span class="text-red-500">Undefined</span>' ?>
+                      </td>
+                      <td class="px-4 py-2">
+                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                          <?= $user['account_status'] === 'Active' ? 'bg-green-200 text-green-800 px-3' : 'px-1 bg-red-200 text-red-600' ?>">
+                          <?= htmlspecialchars($user['account_status']) ?>
+                        </span>
                       </td>
                     </tr>
                   <?php endforeach; ?>
