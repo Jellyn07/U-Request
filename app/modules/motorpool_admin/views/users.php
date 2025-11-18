@@ -89,6 +89,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                         firstName: '<?= htmlspecialchars($user['firstName']) ?>',
                         lastName: '<?= htmlspecialchars($user['lastName']) ?>',
                         requester_id: '<?= htmlspecialchars($user['requester_id']) ?>',
+                        req_id: '<?= htmlspecialchars($user['req_id']) ?>',
                         officeOrDept: '<?= htmlspecialchars($user['officeOrDept']) ?>',
                         profile_pic: '<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>',
                         account_status: '<?= htmlspecialchars($user['account_status']) ?>'
@@ -132,6 +133,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <form id="userForm" method="post" action="../../../controllers/UserAdminController.php" class="space-y-4">
             <input type="hidden" name="requester_email" :value="selected.email || ''">
+            <input type="hidden" name="requester_id" :value="selected.requester_id || ''">
             <input type="hidden" name="update_user" value="1">
 
             <div>
