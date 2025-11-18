@@ -28,7 +28,8 @@ Overall
 Super Admin
     - admins access level is all wrong when editing admin access ✅
     - no profile ✅
-    - user history (no vehicle request) ✅
+    - user history (no vehicle request) ✅ 
+    - if completed vehicle request the date finished is the return date
     - Menu logout/profile
 
     account mgt.
@@ -143,6 +144,9 @@ Users
     - should have popup when i update something in the user profile ✅
     - no source of fund in more details ✅
     - add cancel button in vehicle tracking 
+    - should have popup when i update something in the user profile
+    - no source of fund in more details✅
+    - if change department it pop up the contact no
 
 UI
     All
