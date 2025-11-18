@@ -152,15 +152,15 @@ echo "Last control_no processed: $control_no";
         </p>
 
         <?php if ($status === 'Rejected/Cancelled' && !empty($track['reason'])): ?>
-            <p class="mt-2 text-sm text-red-700">
+            <p class="mt-2 mb-2 text-xs text-red-700">
                 <span class="font-medium">Reason:</span>
                 <?= htmlspecialchars($track['reason']); ?>
             </p>
         <?php endif; ?>
 
         <?php if ($status === 'Approved'): ?>
-            <hr class="my-2 border-gray-300">
-            <p class="mt-2 text-sm text-gray-800">
+            <!-- <hr class="my-2 border-gray-300"> -->
+            <p class="mt-2 mb-2 text-xs text-gray-700">
                 <span class="font-medium">Assigned Vehicle:</span> <?= htmlspecialchars($track['vehicle_info'] ?? 'N/A'); ?><br>
                 <span class="font-medium">Assigned Driver:</span> <?= htmlspecialchars($track['driver_name'] ?? 'N/A'); ?>
             </p>

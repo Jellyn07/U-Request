@@ -60,7 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
 fetch('../../../controllers/DashboardController.php?vehicle_usage=1')
   .then(res => res.json())
   .then(data => {
-    const labels = data.map(d => d.vehicle_name);
+    // Trim long vehicle_name names safely before chart rendering
+    const labels = data.map(item => {
+      const name = item.vehicle_name;
+      return name.length > 8 ? name.substring(0, 8) + '...' : name;
+    });
+
     const values = data.map(d => d.trips);
 
     const colors = ['#FFC845', '#F29C4C', '#1C7ED6', '#6B9A4F', '#D11100'];

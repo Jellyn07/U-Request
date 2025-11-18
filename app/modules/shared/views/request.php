@@ -206,19 +206,15 @@ $profile = $controller->getProfile($_SESSION['email']);
 <div x-data="{ editingLocation: false }" class="flex items-center gap-2 mt-2">
   
   <!-- Input Field -->
-  <div class="flex-1">
+  <div class="w-full">
     <label class="text-xs text-text mb-1">Location</label>
-    <input type="text" class="w-full view-field"  
-           x-model="selected.location"
-           :readonly="!editingLocation" />
-  </div>
-  
-  <!-- Edit / Save Buttons -->
-  <div class="flex gap-1">
-    <!-- Edit Button -->
+    <div class="flex gap-2">
+    <input type="text" class="w-full view-field"   x-model="selected.location" :readonly="!editingLocation" />
+<!-- Edit / Save Buttons -->
+<!-- Edit Button -->
     <button 
       type="button" 
-      class="btn btn-secondary text-xs"
+      class="btn btn-secondary text-xs mt-1"
       x-show="!editingLocation"
       @click="editingLocation = true">
       Edit
@@ -227,7 +223,7 @@ $profile = $controller->getProfile($_SESSION['email']);
     <!-- Save Button -->
     <button 
       type="button" 
-      class="btn btn-primary text-xs"
+      class="btn btn-primary text-xs mt-1"
       x-show="editingLocation"
       @click="
         if(selected.location.trim() === '') {
@@ -239,6 +235,13 @@ $profile = $controller->getProfile($_SESSION['email']);
       ">
       Save
     </button>
+    </div>
+
+  </div>
+  
+  <!-- Edit / Save Buttons -->
+  <div class="flex gap-1">
+    
   </div>
 
   <!-- AlpineJS Listener (hidden, just for event handling) -->
@@ -334,7 +337,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             >
                 <!-- Editable Section (Pending + In Progress) -->
                 <template x-if="selected.req_status !== 'Completed'">
-                    <div id="personnel-fields" class="space-y-3 mb-6">
+                    <div id="personnel-fields" class="">
                         <label class="text-xs text-text mb-1" :hidden="isLocked()">Assign / Edit Personnel</label>
 
                         <!-- Editable Dropdowns -->
@@ -365,7 +368,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                                     <button 
                                         x-show="!isLocked()"  
                                         type="button"
-                                        class="bg-primary hover:bg-secondary text-white rounded-full w-9 h-9 flex justify-center shadow-md items-center"
+                                        class="bg-primary hover:bg-secondary text-white rounded-lg w-10 h-10 flex justify-center shadow-md items-center"
                                         @click="personnel.push({ staff_id: '' }); updatePersonnelOptions();"
                                         title="Add Personnel">
                                         <img src="<?php echo PUBLIC_URL; ?>/assets/img/add_white.png" alt="Add" class="w-3 h-3">
