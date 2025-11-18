@@ -112,37 +112,39 @@ document.addEventListener('alpine:init', () => {
     }
   }));
 });
-fetch('../../../controllers/VehicleRequestController.php?vehicles=1')
-  .then(res => res.json())
-  .then(data => {
-    const vehicleSelect = document.getElementById('vehicleSelect');
-    vehicleSelect.innerHTML = '<option value="">Vehicle Assigned</option>';
+document.addEventListener("alpine:init", () => {
+    Alpine.data("vehicleDropdown", () => ({
+        vehicles: [],
 
-    data.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v.vehicle_id;
-      opt.textContent = v.vehicle_name;
-      opt.dataset.driverId = v.driver_id; // store assigned driver
-      vehicleSelect.appendChild(opt);
-    });
+        async init() {
+            const control_no  = this.$root.getAttribute("data-controlno");
+            const travel_date = this.$root.getAttribute("data-traveldate");
+            const return_date = this.$root.getAttribute("data-returndate");
 
-    // Listen for vehicle selection
-    vehicleSelect.addEventListener('change', function() {
-      const driverSelect = document.getElementById('staffSelect');
-      driverSelect.innerHTML = '<option value="">No Assigned Driver</option>'; // reset
+            console.log("INIT PARAMS:", control_no, travel_date, return_date);
 
-      const selectedOption = vehicleSelect.selectedOptions[0];
-      const driverId = selectedOption ? selectedOption.dataset.driverId : '';
+            await this.loadAvailableVehicles(control_no, travel_date, return_date);
+        },
 
-      if (driverId) {
-        // Filter the drivers array to find the assigned driver
-        const assignedDriver = drivers.find(d => d.driver_id == driverId);
-        if (assignedDriver) {
-          const opt = document.createElement('option');
-          opt.value = assignedDriver.driver_id;
-          opt.textContent = assignedDriver.full_name;
-          driverSelect.appendChild(opt);
+        async loadAvailableVehicles(control_no, travel_date, return_date) {
+
+            const params = new URLSearchParams({
+                control_no,
+                travel_date,
+                return_date
+            });
+
+            try {
+                const res = await fetch(`../../../controllers/VehicleController.php?getVehicle=1&${params}`);
+                const data = await res.json();
+
+                this.vehicles = data;
+                console.log("AVAILABLE VEHICLES:", data);
+            } 
+            catch (err) {
+                console.error("VEHICLE LOAD ERROR:", err);
+                Swal.fire("Error", "Failed to load vehicles.", "error");
+            }
         }
-      }
-    });
-}); 
+    }));
+});

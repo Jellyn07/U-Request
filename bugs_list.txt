@@ -57,12 +57,12 @@ Motorpool Admin
     request
     - should print on what is in the table ex. is the table is all completed in export it should display only completed
     - what if theirs new chancellor or president? ✅ input nlng
-    - should not be assigned any vehicle is request is not been approved
-    - assigning a vehicle in request not working
+    - should not be assigned any vehicle is request is not been approved✅
+    - assigning a vehicle in request not working✅
     - should assign a vehicle only if its approved and will only show vehicles that will fit the passanger if passengers are too many should allow to book 2 vehicle too fit them all
-    - wont update any change in request except status
+    - wont update any change in request except status✅
     - completed and on going status should be automatically updated
-    - pending, approved, and rejected/cancelled are the only status that the motorpool admin can update
+    - pending, approved, and rejected/cancelled are the only status that the motorpool admin can update✅
     - sa status na part ky for example if ever mamali and admin og click sa status ba like maclick nya ang completed accidentally. Dli na sya makabalik atong last status ang mogawas 
     nlng sa status ky completed nlng tong unsa ang naclick.
     vehicle

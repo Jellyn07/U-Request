@@ -12,8 +12,8 @@ class VehicleController {
         return $this->vehicleModel->getDrivers();
     }
 
-    public function getVehicles() {
-        return $this->vehicleModel->getVehicles();
+    public function getVehicle($control_no, $travel_date, $return_date) {
+        return $this->vehicleModel->getVehicle($control_no, $travel_date, $return_date);
     }
 
     public function getVehiclesWithLastMaintenance() {
@@ -172,81 +172,7 @@ class VehicleController {
         echo json_encode($data);
         exit;
     }
-    
-    public function updateStatusByToken($token, $status) {
-        require_once __DIR__ . '/../models/RequestVehicleModel.php';
-        $model = new VehicleRequestModel();
-        return $model->updateRequestStatusByToken($token, $status);
-    }
 
-    public function approveVehicleRequest($token, $status) {
-    require_once __DIR__ . '/../models/RequestVehicleModel.php';
-    $model = new VehicleRequestModel();
-
-    return $model->updateVehicleRequestStatusByToken($token, $status);
-}
-
-
-    public function sendVehicleRequestEmail($controlNo) {
-    require_once __DIR__ . '/../models/RequestVehicleModel.php';
-    $model = new VehicleRequestModel();
-    $request = $model->getVehicleRequestByControlNo($controlNo);
-
-    if (!$request) {
-        echo json_encode(['success' => false, 'message' => 'Vehicle request not found.']);
-        return;
-    }
-
-    $token = bin2hex(random_bytes(16));
-    $model->updateApprovalToken($controlNo, $token);
-
-    // Send email
-    require_once __DIR__ . '/../config/constants.php';
-    require_once __DIR__ . '/../../vendor/autoload.php';
-    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
-
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'jonagujol@gmail.com';;
-        $mail->Password = 'wqhb eszj mxiz rmmh';
-        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        $mail->setFrom('jonagujol@gmail.com', 'U-Request System');
-        $mail->addAddress('jsgujol00060@usep.edu.ph', 'Top Management');
-
-        // ✅ Build base URL dynamically to avoid "http:///" issue
-// ✅ Build full base URL dynamically (works with localhost:3000)
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-$host = $_SERVER['HTTP_HOST']; // includes port like localhost:3000
-$basePath = "/U--Request"; // adjust if project folder differs
-
-$approveLink = "{$protocol}://{$host}{$basePath}/app/modules/email/approve_vehicle_request.php?token={$token}&status=Approved";
-$rejectLink  = "{$protocol}://{$host}{$basePath}/app/modules/email/approve_vehicle_request.php?token={$token}&status=Rejected";
-
-        $mail->isHTML(true);
-        $mail->Subject = "Vehicle Request Pending Approval";
-        $mail->Body = "
-            <p>A new vehicle request (Control No: {$controlNo}) is ready for approval.</p>
-            <p><b>Requester:</b> {$request['requester_name']}<br>
-            <b>Destination:</b> {$request['travel_destination']}<br>
-            <b>Date Needed:</b> {$request['date_request']}</p>
-            <p>
-              <a href='$approveLink' style='padding:10px 15px;background-color:green;color:white;text-decoration:none;'>Approve</a>
-              <a href='$rejectLink' style='padding:10px 15px;background-color:red;color:white;text-decoration:none;margin-left:10px;'>Reject</a>
-            </p>
-        ";
-
-        $mail->send();
-
-        echo json_encode(['success' => true, 'message' => 'Email sent to Top Management successfully.']);
-        exit;
-    } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => 'Mailer Error: ' . $mail->ErrorInfo]);
-    }
-}
 
 }
 
@@ -267,13 +193,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
     $controller->fetchTravelHistory();
 }
 
-if (isset($_GET['send_email']) && isset($_GET['control_no'])) {
-    $controller = new VehicleController();
-    $controller->sendVehicleRequestEmail($_GET['control_no']);
-    exit;
-}
+// if (isset($_GET['send_email']) && isset($_GET['control_no'])) {
+//     $controller = new VehicleController();
+//     $controller->sendVehicleRequestEmail($_GET['control_no']);
+//     exit;
+// }
 
 // --- HANDLE GET REQUEST (DELETE) ---
 // if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['delete'])) {
 //     $controller->deleteDriver($_GET['delete']);
 // }
+if (isset($_GET['getVehicle'])) {
+
+    $controller = new VehicleController();
+
+    $control_no  = $_GET['control_no'] ?? null;
+    $travel_date = $_GET['travel_date'] ?? null;
+    $return_date = $_GET['return_date'] ?? null;
+
+    $vehicles = $controller->getVehicle($control_no, $travel_date, $return_date); // assign result
+
+    header("Content-Type: application/json");
+    echo json_encode($vehicles);
+    exit;
+}
+
+

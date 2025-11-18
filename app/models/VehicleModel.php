@@ -68,6 +68,47 @@ class VehicleModel extends BaseModel {
         return $vehicles;
     }
 
+    public function getVehicle($control_no, $travel_date, $return_date) {
+
+        $query = "
+            SELECT 
+                v.vehicle_id,
+                v.vehicle_name,
+                v.driver_id,
+                CONCAT(d.firstName, ' ', d.lastName) AS driver_name
+            FROM vehicle v
+            LEFT JOIN driver d ON v.driver_id = d.driver_id
+            WHERE v.status NOT IN ('Under Maintenance', 'In Use', 'Out of Use')  -- exclude these statuses
+            AND v.vehicle_id NOT IN (
+                SELECT va.vehicle_id
+                FROM vehicle_request_assignment va
+                JOIN vehicle_request vr ON va.control_no = vr.control_no
+                WHERE 
+                    vr.travel_date <= ?   -- requested return date
+                    AND vr.return_date >= ?  -- requested travel date
+            )
+            ORDER BY v.vehicle_name ASC;
+        ";
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Prepare failed: " . $this->db->error);
+            return [];
+        }
+
+        $stmt->bind_param("ss", $return_date, $travel_date);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $vehicles = [];
+        while ($row = $result->fetch_assoc()) {
+            $vehicles[] = $row;
+        }
+
+        return $vehicles;
+    }
+
+
     public function updateVehicle($data) {
         $photo = $data['photo'] ?? null;
 
@@ -226,4 +267,4 @@ class VehicleModel extends BaseModel {
 
         return null;
     }
-    }
+}

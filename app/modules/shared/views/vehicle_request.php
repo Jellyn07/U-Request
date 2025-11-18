@@ -199,32 +199,9 @@ $requests = $data['requests'];
                 <input type="text" class="w-full view-field" x-model="selected.passenger_count" readonly />
               </div>
 
-              <!-- VEHICLE DROPDOWN -->
-              <div x-data="vehicleDropdown" x-init="init()">
-                <label class="text-xs text-text mb-1">Assign Vehicle</label>
-
-                <select 
-                  id="vehicleSelect"
-                  name="vehicle_id"
-                  x-model="selected.vehicle_id"
-                  class="w-full input-field"
-                  :disabled="isLocked()"
-                >
-                  <option value="">Select Vehicle</option>
-
-                  <template x-for="v in vehicles" :key="v.vehicle_id">
-                    <option :value="v.vehicle_id" x-text="v.vehicle_name"></option>
-                  </template>
-                </select>
-
-                <p class="text-xs text-gray-500 mt-1">
-                  Current Assigned Vehicle:
-                  <span x-text="selected.vehicle_name"></span>
-                </p>
-              </div>
-
               <!-- STATUS + APPROVED BY + REASON -->
               <div>
+                 <label class="text-xs text-text mb-1">Status</label>
                   <!-- STATUS SELECT -->
                 <select 
                     id="status"  
@@ -292,6 +269,41 @@ $requests = $data['requests'];
                     required
                   ></textarea>
                 </div>
+              </div>
+
+              <!-- VEHICLE DROPDOWN -->
+              <div 
+                  x-data="vehicleDropdown" 
+                  x-init="init()"
+                  data-controlno="{{ $selected_request['control_no'] }}"
+                  data-traveldate="{{ $selected_request['travel_date'] }}"
+                  data-returndate="{{ $selected_request['return_date'] }}"
+              >
+
+                  <label class="text-xs text-text mb-1">Assign Vehicle</label>
+                  <select 
+                      id="vehicleSelect"
+                      x-model="selected.vehicle_id"
+                      name="vehicle_id"
+                      class="w-full input-field"
+                      :disabled="selected.req_status !== 'Approved'"  <!-- Disable if status is not Approved -->
+                  >
+                      <option value="">Select Vehicle</option>
+
+                      <template x-for="v in vehicles" :key="v.vehicle_id">
+                          <option 
+                              :value="v.vehicle_id"
+                              :data-driver="v.driver_id"
+                              x-text="v.vehicle_name">
+                          </option>
+                      </template>
+                  </select>
+
+                <p class="text-xs text-gray-500 mt-1" 
+                x-show="selected.req_status !== 'Pending' && selected.req_status !== 'Rejected/Cancelled'">
+                  Current Assigned Vehicle:
+                  <span x-text="selected.vehicle_name"></span>
+              </p>
               </div>
 
               <div class="flex justify-center pt-2 space-x-2">
