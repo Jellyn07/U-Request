@@ -34,14 +34,14 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
 
     <?php include COMPONENTS_PATH . '/header.php'; ?>
 
-        <?php
-foreach ($list as $track) {
-    error_log('Tracking item control_no=' . ($track['control_no'] ?? 'NULL'));
-}
+<!-- <?php
+  foreach ($list as $track) {
+      error_log('Tracking item control_no=' . ($track['control_no'] ?? 'NULL'));
+  }
 
-$control_no = $track['control_no'] ?? 'UNKNOWN';
-echo "Last control_no processed: $control_no";
-?>
+  $control_no = $track['control_no'] ?? 'UNKNOWN';
+  echo "Last control_no processed: $control_no";
+?> -->
 
     <main class="flex-1 px-4 sm:px-8 lg:px-20">
       <!-- Page Heading -->
@@ -180,12 +180,8 @@ echo "Last control_no processed: $control_no";
                   <?php } ?>
 
                   <?php if ($status === 'Pending'): ?>
-                    <button 
-                      class="btn btn-danger mt-2"
-                       onclick="openCancelModal('<?php echo $track['control_no']; ?>')"
-                    >
-                      Cancel Request
-                    </button>
+                   <button class="btn btn-danger mt-2" onclick="openCancelModal(<?= $track['control_no']; ?>)">Cancel Request</button>
+
                   <?php endif; ?>
 
 
@@ -221,10 +217,12 @@ function openCancelModal(control_no) {
                 return false;
             }
 
-            // Send POST request
+            // Send POST request to controller
             return fetch("../../../controllers/VehicleRequestController.php", {
                 method: "POST",
-                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
                 body: new URLSearchParams({
                     form_action: "cancelRequest",
                     control_no: control_no,
@@ -247,7 +245,7 @@ function openCancelModal(control_no) {
                 icon: "success",
                 title: "Cancelled",
                 text: "Your request has been cancelled.",
-            }).then(() => location.reload());
+            }).then(() => location.reload()); // You can later replace this with dynamic UI update
         }
     });
 }

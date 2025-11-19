@@ -323,46 +323,40 @@ class VehicleRequestModel extends BaseModel {
         }
     }
 
-    // ==========================
-    // ❌ USER Cancel Request
-    // ==========================
-    // public function cancelRequest($control_no, $reason)
-    // {
-    //     try {
-    //         // Update request status + reason
-    //         $sql = "UPDATE vehicle_request_assignment 
-    //                 SET req_status = 'Rejected/Cancelled', reason = ?
-    //                 WHERE control_no = ?";
-
-    //         $stmt = $this->db->prepare($sql);
-    //         $stmt->bind_param("ss", $reason, $control_no);
-    //         $stmt->execute();
-
-    //         return $stmt->affected_rows > 0;
-
-    //     } catch (Exception $e) {
-    //         error_log("CancelRequest Error: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
-
-    public function cancelRequest($control_no, $reason) {
-    try {
-        $sql = "UPDATE vehicle_request_assignment
-                SET req_status = 'Rejected/Cancelled', reason = ?
-                WHERE control_no = ?";
-
+    public function cancelRequestInDB(int $control_no, string $reason): bool {
+        
+                if (isset($_SESSION['req_id'])) {
+                    setCurrentRequester($this->db); // Use model's connection
+                }
+        $sql = "UPDATE vehicle_request_assignment 
+                SET req_status = 'Cancelled', reason = ? 
+                WHERE control_no = ? AND req_status = 'Pending'";
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("ss", $reason, $control_no);
-        $stmt->execute();
+        if (!$stmt) {
+            error_log("Prepare failed: " . $this->db->error);
+            return false;
+        }
+
+        $stmt->bind_param("si", $reason, $control_no);
+
+        if (!$stmt->execute()) {
+            error_log("Execute failed: " . $stmt->error);
+            return false;
+        }
 
         return $stmt->affected_rows > 0;
-
-    } catch (Exception $e) {
-        error_log("CancelRequest Error: " . $e->getMessage());
-        return false;
     }
-}
 
 
+    // Check if request is still pending
+    public function isPending(int $control_no): bool {
+        $sql = "SELECT req_status FROM vehicle_request_assignment 
+                WHERE control_no = ? AND req_status = 'Pending'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $control_no);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
 }

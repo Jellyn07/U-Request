@@ -1904,3 +1904,73 @@ ADD INDEX idx_email (email);
 
 ALTER TABLE vehicle_request ADD INDEX idx_tracking_id (tracking_id); 
 ALTER TABLE request ADD INDEX idx_tracking_id (tracking_id);
+
+------------------------------------------------------------------------------------
+
+drop trigger trg_vehicle_request_assignment_update;
+DELIMITER $$
+CREATE TRIGGER trg_vehicle_request_assignment_update
+AFTER UPDATE ON vehicle_request_assignment
+FOR EACH ROW
+BEGIN
+    DECLARE actor_name VARCHAR(150);
+    DECLARE vehicle_old VARCHAR(100);
+    DECLARE vehicle_new VARCHAR(100);
+    DECLARE driver_old VARCHAR(150);
+    DECLARE driver_new VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+
+    -- Determine actor: staff or requester
+    IF @current_staff_id IS NOT NULL THEN
+        SET actor_name = (
+            SELECT CONCAT(first_name, ' ', last_name)
+            FROM administrator
+            WHERE staff_id = @current_staff_id
+        );
+    ELSEIF @current_req_id IS NOT NULL THEN
+        SET actor_name = (
+            SELECT CONCAT(firstName, ' ', lastName)
+            FROM requester
+            WHERE req_id = @current_req_id
+        );
+    ELSE
+        SET actor_name = 'Unknown';
+    END IF;
+
+    -- Get old/new vehicle names
+    SET vehicle_old = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = OLD.vehicle_id);
+    SET vehicle_new = (SELECT vehicle_name FROM vehicle WHERE vehicle_id = NEW.vehicle_id);
+
+    -- Get old/new driver names
+    SET driver_old = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = OLD.driver_id);
+    SET driver_new = (SELECT CONCAT(firstName, ' ', lastName) FROM driver WHERE driver_id = NEW.driver_id);
+
+    -- Detect changes and create summary
+    IF OLD.vehicle_id != NEW.vehicle_id THEN
+        SET changes = CONCAT(changes, 'Vehicle changed from ', IFNULL(vehicle_old,'N/A'), ' to ', IFNULL(vehicle_new,'N/A'), '; ');
+    END IF;
+
+    IF OLD.driver_id != NEW.driver_id THEN
+        SET changes = CONCAT(changes, 'Driver changed from ', IFNULL(driver_old,'N/A'), ' to ', IFNULL(driver_new,'N/A'), '; ');
+    END IF;
+
+    IF OLD.req_status != NEW.req_status THEN
+        SET changes = CONCAT(changes, 'Status changed from "', OLD.req_status, '" to "', NEW.req_status, '"; ');
+    END IF;
+
+    IF OLD.approved_by != NEW.approved_by THEN
+        SET changes = CONCAT(changes, 'Approved by changed from "', OLD.approved_by, '" to "', NEW.approved_by, '"; ');
+    END IF;
+
+    -- Only insert if there is a change
+    IF changes != '' THEN
+        INSERT INTO activity_logs(source, name, action, description)
+        VALUES (
+            'Vehicle Request Assignment',
+            actor_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;

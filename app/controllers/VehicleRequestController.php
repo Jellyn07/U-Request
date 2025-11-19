@@ -107,38 +107,38 @@ class VehicleRequestController {
     // ==============================
     // ❌ USER: Cancel Request (called by user)
     // ==============================
-public function cancelRequest() {
-    header('Content-Type: application/json');
+    public function cancelRequest() {
+        header('Content-Type: application/json');
 
-    $control_no = $_POST['control_no'] ?? null;
-    $reason = $_POST['reason'] ?? null;
+        $control_no = isset($_POST['control_no']) ? (int)$_POST['control_no'] : null;
+        $reason = $_POST['reason'] ?? null;
 
-    if (!$control_no || !$reason) {
+        if (!$control_no || !$reason) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Control number and reason are required.'
+            ]);
+            return;
+        }
+
+        // Check if still pending
+        if (!$this->model->isPending($control_no)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'This request is no longer pending.'
+            ]);
+            return;
+        }
+
+        $result = $this->model->cancelRequestInDB($control_no, $reason);
+
         echo json_encode([
-            'success' => false,
-            'message' => 'Control number and reason are required.'
+            'success' => $result,
+            'message' => $result
+                ? 'Request cancelled successfully.'
+                : 'Database update failed.'
         ]);
-        return;
     }
-
-    $result = $this->model->cancelRequest($control_no, $reason);
-
-    if ($result) {
-        echo json_encode([
-            'success' => true,
-            'message' => 'Request cancelled successfully.'
-        ]);
-    } else {
-        // Add debug info
-        echo json_encode([
-            'success' => false,
-            'message' => 'Failed to cancel request. It may not be pending or already cancelled.'
-        ]);
-    }
-}
-
-
-    
 
     // ==============================
     // 🔵 Fetchers
