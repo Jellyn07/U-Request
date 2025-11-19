@@ -95,8 +95,16 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
           <h2 class="text-xl font-semibold">
             Profile Information
           </h2>
-          <form id="contact-form" class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
+          <form id="contact-form"
+            data-original-office="<?= htmlspecialchars($profile['officeOrDept'] ?? '') ?>"
+            data-original-contact="<?= htmlspecialchars($profile['contact'] ?? '') ?>"
+            class="space-y-5"
+            method="post"
+            action="../../../controllers/ProfileController.php">
+
             <input type="hidden" name="requester_email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
+            <input type="hidden" name="action" value="update_contact">
+
             <div>
               <label class="text-sm text-text mb-1">
                 Student/Staff ID No.
@@ -126,7 +134,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                 <input type="text" value="<?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>" disabled class="w-full view-field cursor-not-allowed"/>
               </div>
             </div>
-
+            
             <div>
               <label for="dept" class="text-sm text-text mb-1">Program/Office</label>
                 <select id="dept" name="officeOrDept" class="w-full input-field">
@@ -163,7 +171,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
                 </label>
                 <input 
                   type="text" 
-                  name="requester_contact" 
+                  name="contact_no" 
                   value="<?php echo htmlspecialchars($profile['contact'] ?? ''); ?>" 
                   class="w-full input-field" 
                   placeholder="Ex. 09123456789"
@@ -172,7 +180,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
               </div>
 
               <div class="flex justify-end">
-                <button type="submit" class="btn btn-primary" id="save-contact-btn">
+                <button type="submit" class="btn btn-primary" id="saveContactBtn">
                   Save Changes
                 </button>
             </div>
@@ -182,7 +190,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         <!-- Password Update -->
         <div class="bg-white shadow-md rounded-xl p-6 mb-5 border border-gray-200">
           <h2 class="text-xl font-semibold">Update Password</h2>
-          <form class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
+          <form id="password-form" class="space-y-5" method="post" action="../../../controllers/ProfileController.php">
             <input type="hidden" name="action" value="change_password">
 
             <div class="relative">
@@ -213,7 +221,7 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
             </div>
 
             <div class="flex justify-end">
-              <button type="submit" class="btn btn-primary" >
+              <button type="submit" class="btn btn-primary" id="savePasswordBtn">
                 Save New Password
               </button>
             </div>
@@ -247,87 +255,17 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
     </main>
 
     <?php include COMPONENTS_PATH . '/footer.php'; ?>
-
-    <script>
-      document.getElementById("profile_picture").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const previewImg = document.getElementById("profile-preview");
-        const oldSrc = previewImg.src;
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-          previewImg.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-
-        Swal.fire({
-          title: "Change Profile Picture?",
-          text: "Do you want to save this new profile picture?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Yes, save it",
-          cancelButtonText: "Cancel"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire({
-              icon: "success",
-              title: "Profile Picture Updated",
-              text: "Your new profile picture will be saved.",
-              showConfirmButton: false,
-              timer: 1500
-            }).then(() => {
-              document.getElementById("pictureForm").submit();
-            });
-          } else {
-            previewImg.src = oldSrc;
-            event.target.value = "";
-          }
-        });
-      });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('contact-form');
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const contactInput = form.querySelector('input[name="requester_contact"]');
-        const contactValue = contactInput.value.trim();
-
-        // Validate format
-        const pattern = /^09\d{9}$/;
-        if (!pattern.test(contactValue)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Contact',
-                text: 'Contact number must start with 09 and be 11 digits.'
-            });
-            return;
-        }
-
-        // Confirmation before saving
-        Swal.fire({
-            title: 'Confirm Update',
-            text: `You are about to update your contact number to: ${contactValue}`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, save it!',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Directly save by submitting the form
-                form.submit();
-            }
-        });
-    });
-});
-</script>
-
     <script src="/public/assets/js/shared/password-visibility.js"></script>
+    <script src="/public/assets/js/user/profile.js"></script>
   </body>
 </html>
+<?php if (isset($alert)) : ?>
+<script>
+  Swal.fire({
+    title: "<?php echo $alert['title']; ?>",
+    text: "<?php echo $alert['message']; ?>",
+    icon: "<?php echo $alert['icon']; ?>",
+    confirmButtonColor: "#0F69AF"
+  });
+</script>
+<?php endif; ?>

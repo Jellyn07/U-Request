@@ -41,43 +41,10 @@ class ProfileController extends BaseModel {
         return $this->model->updatePassword($requester_email, $newPassword);
     }
 
-    // Delete account
-    public function deleteAccount($requester_id) {
-        return $this->model->deleteAccount($requester_id);
-    }
-
-    // Update full profile
-    public function updateProfile($data) {
-        $sql = "UPDATE requester SET 
-                    requester_id = ?, 
-                    firstName = ?, 
-                    lastName = ?, 
-                    officeOrDept = ?, 
-                    contact_no = ?, 
-                    accessLevel_id = ?
-                WHERE email = ?";
-        $stmt = $this->db->prepare($sql);
-
-        if (!$stmt) {
-            throw new Exception("SQL Prepare failed: " . $this->db->error);
-        }
-
-        return $stmt->execute([
-            $data['requester_id'],
-            $data['firstName'],
-            $data['lastName'],
-            $data['officeOrDept'],
-            $data['contact_no'] ?? null,
-            $data['accessLevel_id'] ?? null,
-            $data['email']
-        ]);
-    }
-
     // Update contact number with validation
     public function saveContact($req_id, $contact) {
-
         //  Check uniqueness across other tables
-        if ($this->contactExistsElsewhere($contact)) {
+        if ($this->model->contactExistsElsewhere($contact)) {
             $_SESSION['error'] = "Contact number already exists in the system.";
             return false;
         }
@@ -85,35 +52,8 @@ class ProfileController extends BaseModel {
         // 3. Update contact
         return $this->model->updateContact($req_id, $contact);
     }
-
-    // Check if contact exists in gsu_personnel, driver, administrator
-    private function contactExistsElsewhere($contact) {
-        $tables = [
-            'gsu_personnel' => 'contact',
-            'driver'        => 'contact',
-            'administrator' => 'contact_no'
-        ];
-
-        foreach ($tables as $table => $column) {
-            $stmt = $this->model->db->prepare("SELECT COUNT(*) AS count FROM {$table} WHERE {$column} = ?");
-            if (!$stmt) {
-                die("Prepare failed: " . $this->model->db->error);
-            }
-            $stmt->bind_param("s", $contact);
-            $stmt->execute();
-            $result = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-
-            if ($result['count'] > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
 
-// Update Password
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_password') {
 
     $email = $_SESSION['email'];
@@ -123,21 +63,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $controller = new ProfileController();
 
-    if ($newPassword !== $confirmPassword) {
-        $_SESSION['error'] = "New passwords do not match.";
-    } else {
+    // 1. Check if old password is correct
+    if (!$controller->savePassword($email, $oldPassword, $oldPassword)) {
+        $_SESSION["alert"] = [
+            "title" => "Failed",
+            "message" => "Old password is incorrect.",
+            "icon" => "error"
+        ];
+    }
+    // 2. Check if new password matches confirmation
+    elseif ($newPassword !== $confirmPassword) {
+        $_SESSION["alert"] = [
+            "title" => "Failed",
+            "message" => "New passwords do not match.",
+            "icon" => "error"
+        ];
+    }
+    // 3. Update password
+    else {
         if ($controller->savePassword($email, $oldPassword, $newPassword)) {
-            $_SESSION['success'] = "Password updated successfully.";
+            $_SESSION["alert"] = [
+                "title" => "Success",
+                "message" => "Password changed successfully.",
+                "icon" => "success"
+            ];
         } else {
-            $_SESSION['error'] = "Old password is incorrect or update failed.";
+            $_SESSION["alert"] = [
+                "title" => "Failed",
+                "message" => "Unable to update password. Try again.",
+                "icon" => "error"
+            ];
         }
     }
 
     header("Location: /app/modules/user/views/profile.php");
     exit;
 }
-
-
 
 //Update Pic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'upload_picture') {
@@ -187,44 +148,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit();
 }
 
-//Update Office
-$controller = new ProfileController();
+if (isset($_POST['action'])) {
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['officeOrDept'], $_POST['requester_email'])) {
+    $controller = new ProfileController();
+    $email = $_SESSION['email'];
+    $req_id = $_SESSION['req_id'];
 
-    $email = $_POST['requester_email'];
-    $officeOrDept = $_POST['officeOrDept'];
+    $messages = [];
+    $icon = "success";
 
-    if ($controller->saveOfficeOrDept($email, $officeOrDept)) {
-    $_SESSION['success'] = "Department/Office updated successfully.";
-    } else {
-        $_SESSION['error'] = "Failed to update Department/Office.";
+    switch ($_POST['action']) {
+
+        case 'update_contact':
+            $office = $_POST['officeOrDept'];
+            $contact = $_POST['contact_no'];
+
+            // Get current profile for comparison
+            $profile = $controller->getProfile($email);
+
+            // Only update office if it changed
+            if ($office !== $profile['officeOrDept']) {
+                if ($controller->saveOfficeOrDept($email, $office)) {
+                    $messages[] = "Program/Office updated successfully.";
+                } else {
+                    $messages[] = "Failed to update Program/Office.";
+                    $icon = "error";
+                }
+            }
+
+            // Only update contact if it changed
+            if ($contact !== $profile['contact']) {
+                if ($controller->saveContact($req_id, $contact)) {
+                    $messages[] = "Contact number updated successfully.";
+                } else {
+                    $messages[] = "Contact number already exists.";
+                    $icon = "error";
+                }
+            }
+
+            if (empty($messages)) {
+                $_SESSION["alert"] = [
+                    "title" => "No Changes",
+                    "message" => "No updates were made.",
+                    "icon" => "info"
+                ];
+            } else {
+                $_SESSION["alert"] = [
+                    "title" => "Update Result",
+                    "message" => implode(" ", $messages),
+                    "icon" => $icon
+                ];
+            }
+
+            break;
     }
 
-    header("Location: /app/modules/user/views/profile.php");
-    exit;
-}
-$controller = new ProfileController();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requester_contact'])) {
-
-    // Retrieve req_id from session
-    $req_id = $_SESSION['req_id'] ?? null;
-    $contact = $_POST['requester_contact'];
-
-    if (!$req_id) {
-        $_SESSION['error'] = "Unable to identify your account.";
-        header("Location: /app/modules/user/views/profile.php");
-        exit;
-    }
-
-    if ($controller->saveContact($req_id, $contact)) {
-        $_SESSION['success'] = "Contact number updated successfully.";
-    } else {
-        $_SESSION['error'] = "Failed to update contact number.";
-    }
-
-    // Redirect back
     header("Location: /app/modules/user/views/profile.php");
     exit;
 }

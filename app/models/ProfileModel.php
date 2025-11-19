@@ -28,26 +28,53 @@ class ProfileModel extends BaseModel {
         return $stmt->execute();
     }
 
-public function updateContact($req_id, $contact) {
-    $stmt = $this->db->prepare("UPDATE requester SET contact = ? WHERE req_id = ?");
-    $stmt->bind_param("si", $contact, $req_id);
-    $success = $stmt->execute();
-    $stmt->close();
-    return $success;
-}
+    public function updateContact($req_id, $contact) {
+        $stmt = $this->db->prepare("UPDATE requester SET contact = ? WHERE req_id = ?");
+        $stmt->bind_param("si", $contact, $req_id);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
+    }
+
+        // Check if contact exists in gsu_personnel, driver, administrator
+    public function contactExistsElsewhere($contact) {
+        $tables = [
+            'gsu_personnel' => 'contact',
+            'driver'        => 'contact',
+            'administrator' => 'contact_no',
+            'requester'     => 'contact'
+        ];
+
+        foreach ($tables as $table => $column) {
+            $stmt = $this->db->prepare("SELECT COUNT(*) AS count FROM {$table} WHERE {$column} = ?");
+            if (!$stmt) {
+                die("Prepare failed: " . $this->db->error);
+            }
+            $stmt->bind_param("s", $contact);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if ($result['count'] > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // Update profile picture
     public function updateProfilePicture($fileName, $filePath) {
-    $sql = "
-        UPDATE requester 
-        SET profile_pic = ? 
-        WHERE email = ?";
-    $stmt = $this->db->prepare($sql);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $this->db->error);
-    }
-    $stmt->bind_param("ss", $filePath, $fileName);
-    return $stmt->execute();
+        $sql = "
+            UPDATE requester 
+            SET profile_pic = ? 
+            WHERE email = ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $this->db->error);
+        }
+        $stmt->bind_param("ss", $filePath, $fileName);
+        return $stmt->execute();
     }
 
     // Update password with encryption
