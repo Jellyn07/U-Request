@@ -22,7 +22,8 @@ $dateFilter = $_GET['date'] ?? 'all';
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/admin-user.js"></script>
-  <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/alert.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -79,7 +80,6 @@ $dateFilter = $_GET['date'] ?? 'all';
             </form>
 
             <img id="logo" src="/public/assets/img/usep.png" class="hidden">
-
             <button title="Export" id="export" class="btn-upper">
               <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
@@ -88,7 +88,7 @@ $dateFilter = $_GET['date'] ?? 'all';
 
           <!-- TABLE -->
           <div class="overflow-x-auto h-[578px] overflow-y-auto rounded-b-lg shadow bg-white">
-            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+            <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
                   <th class="pl-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
