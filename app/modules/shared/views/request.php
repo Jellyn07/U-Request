@@ -115,6 +115,8 @@ $profile = $controller->getProfile($_SESSION['email']);
               <option value="30">Last 30 days</option>
             </select>
 
+            <!-- DON'T REMOVE THE HIDDEN IMAGE -->
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
             <button title="Export" id="export" class="btn-upper">
               <img src="/public/assets/img/export.png" alt="Export" class="size-4 my-0.5">
             </button>
@@ -122,7 +124,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <!-- Table -->
           <div class="overflow-x-auto h-[545px] overflow-y-auto rounded-b-lg shadow bg-white">
-            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+            <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
                   <?php foreach (['Request ID','Requester','Category','Location','Date Request','Status'] as $header): ?>

@@ -1,5 +1,15 @@
 BUGS LISTS
 
+Lacking in request view/full view
+Users
+    - no unit in tracking
+
+GSU Admin
+    - no program/office in full details
+
+Motorpool
+    - no source of fund in full details
+
 Too Add functionality
     - Can print the request with the same format of their physical request in GSU
     - super admin can see admin activity logs in account Management
@@ -189,6 +199,9 @@ UI
         - user history ui
 
     Superadmin
+        sidebar
+        - not responsive in dropdown
+
         dashboard
         - status in vehicle recent request ✅
         

@@ -62,7 +62,7 @@ require_once __DIR__ . '/../../../config/auth.php';
             </div>
 
             <div>
-              <label for="exLocr" class="text-sm mb-1 block">Room Location <span class="text-red-500">*</span></label>
+              <label for="exLocr" class="text-sm mb-1 block">Exact Location <span class="text-red-500">*</span></label>
               <select id="exLocr" name="exLocr" required class="input-field w-full">
                 <option value="" selected disabled>Select Room</option>
               </select>
