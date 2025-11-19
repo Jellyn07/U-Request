@@ -63,7 +63,9 @@
     <div class="p-2 md:p-3 mt-auto text-sm relative">
       <button id="profileButton" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition">
         <img id="profile-preview"
-          src="<?php echo htmlspecialchars(!empty($profile['profile_picture']) ? $profile['profile_picture'] : '/public/assets/img/user-default.png'); ?>"
+           src="<?php echo !empty($profile['profile_picture']) 
+            ? '/public/uploads/profile_pics/' . htmlspecialchars($profile['profile_picture']) 
+            : '/public/assets/img/user-default.png'; ?>" 
           class="w-10 h-10 rounded-full object-cover border border-secondary shadow-sm" />
 
         <?php

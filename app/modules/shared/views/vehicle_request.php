@@ -49,7 +49,8 @@ $requests = $data['requests'];
         <button class="btn"><p>Pending</p></button>
         <button class="btn"><p>Approved</p></button>
         <button class="btn"><p>On Going</p></button>
-        <button class="btn"><p>Rejected/Cancelled</p></button>
+        <button class="btn"><p>Rejected</p></button>
+        <button class="btn"><p>Cancelled</p></button>
         <button class="btn"><p>Completed</p></button>
       </div>
 
@@ -148,7 +149,7 @@ $requests = $data['requests'];
 
                 isLocked() {
                     return this.isSuperadmin ||
-                      this.selected.original_status === 'Rejected/Cancelled' ||
+                      this.selected.original_status === 'Rejected' || this.selected.original_status === 'Cancelled'
                       this.selected.original_status === 'Completed';
                 }
 
@@ -230,10 +231,16 @@ $requests = $data['requests'];
                         On Going
                     </option>
 
-                    <option value="Rejected/Cancelled" 
+                    <option value="Rejected" 
                         x-show="selected.original_status !== 'Approved'" 
-                        x-bind:selected="selected.req_status === 'Rejected/Cancelled'">
-                        Rejected/Cancelled
+                        x-bind:selected="selected.req_status === 'Rejected'">
+                        Rejected
+                    </option>
+
+                    <option value="Cancelled" 
+                        x-show="selected.original_status !== 'Approved'" 
+                        x-bind:selected="selected.req_status === 'Cancelled'">
+                        Cancelled
                     </option>
 
                     <!-- Completed is always visible if original_status is Approved or already Completed -->
@@ -257,7 +264,7 @@ $requests = $data['requests'];
                 </div>
 
                 <!-- REASON TEXTAREA -->
-                <div x-show="selected.req_status === 'Rejected/Cancelled'" x-cloak>
+                <div x-show="selected.req_status === 'Rejected' || selected.req_status === 'Cancelled'" x-cloak>
                   <label class="text-xs text-text mb-1 mt-2">Reason</label>
                   <textarea 
                     name="reason" 
@@ -300,7 +307,7 @@ $requests = $data['requests'];
                   </select>
 
                 <p class="text-xs text-gray-500 mt-1" 
-                x-show="selected.req_status !== 'Pending' && selected.req_status !== 'Rejected/Cancelled'">
+                x-show="selected.req_status !== 'Pending' && selected.req_status !== 'Rejected' && selected.req_status !== 'Rejected'">
                   Current Assigned Vehicle:
                   <span x-text="selected.vehicle_name"></span>
               </p>

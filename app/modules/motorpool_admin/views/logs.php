@@ -14,6 +14,7 @@ $role = $_GET['table'] ?? 'motorpool';
 $tableFilter = $_GET['table'] ?? 'all';
 $actionFilter = $_GET['action'] ?? 'all';
 $dateFilter = $_GET['date'] ?? 'all';
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">

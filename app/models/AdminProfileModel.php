@@ -1,12 +1,11 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
 require_once __DIR__ . '/../config/encryption.php';
+require_once __DIR__ . '/../config/db_helpers.php';
 
-class AdminProfileModel extends BaseModel
-{
+class AdminProfileModel extends BaseModel{
     // Get profile data by email
-    public function getProfileByEmail($admin_email)
-    {
+    public function getProfileByEmail($admin_email){
         $stmt = $this->db->prepare("
             SELECT staff_id, email, first_name, last_name, profile_picture
             FROM administrator
@@ -20,8 +19,10 @@ class AdminProfileModel extends BaseModel
     }
 
     // Update profile picture
-    public function updateProfilePicture($email, $filePath)
-    {
+    public function updateProfilePicture($email, $filePath){
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $sql = "UPDATE administrator SET profile_picture = ? WHERE email = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
@@ -32,8 +33,7 @@ class AdminProfileModel extends BaseModel
     }
 
     // Update password (plain text)
-    public function updatePassword($requester_email, $newPassword)
-    {
+    public function updatePassword($requester_email, $newPassword){
         $encryptedNewPass = encrypt($newPassword);
         $stmt = $this->db->prepare("
             UPDATE administrator 
@@ -45,11 +45,11 @@ class AdminProfileModel extends BaseModel
     }
 
     // Verify old password (plain text)
-    public function verifyPassword($requester_email, $oldPassword)
-    {
+    public function verifyPassword($requester_email, $oldPassword){
         $stmt = $this->db->prepare("SELECT password FROM administrator WHERE email = ?");
         $stmt->bind_param("s", $requester_email);
         $stmt->execute();
+        $dbPassword = null;
         $stmt->bind_result($dbPassword);
         $stmt->fetch();
         $stmt->close();

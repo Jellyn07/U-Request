@@ -12,6 +12,7 @@ $feedbackData = $controller->getAllMotorpoolFeedbacks();
 $total = 0;
 foreach ($feedbackData as $fb) $total += $fb['overall_rating'];
 $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData), 2) : 0;
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -207,6 +208,7 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
     });
 
   </script>
+  <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 
 </html>

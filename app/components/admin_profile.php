@@ -6,10 +6,10 @@
     <div class="rounded-xl flex flex-col items-center">
       <div class="relative">
         <img id="profile-preview"
-          src="<?php echo htmlspecialchars(!empty($profile['profile_picture']) ? $profile['profile_picture'] : '/public/assets/img/user-default.png'); ?>"
-          alt="<?php echo htmlspecialchars($profile['first_name'] ?? 'User Profile'); ?>"
-          class="w-36 h-36 rounded-full object-cover border border-secondary shadow-sm" />
-
+          src="<?php echo !empty($profile['profile_picture']) 
+            ? '/public/uploads/profile_pics/' . htmlspecialchars($profile['profile_picture']) 
+            : '/public/assets/img/user-default.png'; ?>" 
+            alt="Profile Picture" class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4">
         <?php
         $defaultPic = '/public/assets/img/user-default.png';
         $profilePic = (!empty($profile['profile_picture']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $profile['profile_picture']))

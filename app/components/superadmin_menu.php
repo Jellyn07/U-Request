@@ -147,7 +147,11 @@ if (session_status() === PHP_SESSION_NONE) {
       <!-- Profile dropdown at bottom -->
       <div class="p-2 md:p-3 mt-auto text-sm relative">
         <button id="profileButton" class="flex items-center w-full p-2 rounded-lg hover:bg-accent transition">
-          <img src="/public/assets/img/user-default.png" alt="Profile" class="w-8 h-8 md:h-10 md:w-10 border border-white rounded-full object-cover">
+          <img id="profile-preview"
+           src="<?php echo !empty($profile['profile_picture']) 
+            ? '/public/uploads/profile_pics/' . htmlspecialchars($profile['profile_picture']) 
+            : '/public/assets/img/user-default.png'; ?>" 
+           class="w-8 h-8 md:h-10 md:w-10 border border-white rounded-full object-cover">
 
           <div class="hidden md:block pl-2 text-left">
             <p class="text-white text-sm font-medium">
