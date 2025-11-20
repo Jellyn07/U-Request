@@ -47,7 +47,8 @@ Super Admin
     - can edit staff ID? ✅
     - super admins should be anable in access and cannot be change
     - cannot add new admin (Prepare failed for add_admin_access: Table 'u_request.add_admin_access' doesn't exist)✅ naa kay need ih add sa db boss (naas pa run)
-    - filter in user mgt.
+    - cant filter (active and inactive) in user mgt.
+    - cant edit user id
 
     GSU oversight
     - no material history ✅

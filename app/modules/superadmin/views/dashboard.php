@@ -111,7 +111,7 @@ if (!isset($_SESSION['email'])) {
                   <th class="px-4 py-2">Date</th>
                   <th class="px-4 py-2">Requester</th>
                   <th class="px-4 py-2">Vehicle</th>
-                  <th class="px-4 py-2">Status</th>
+                  <th class="px-6 py-2">Status</th>
                 </tr>
               </thead>
               <tbody id="requestsTable" class="text-sm">
@@ -175,7 +175,7 @@ if (!isset($_SESSION['email'])) {
                   <th class="px-4 py-2">Date</th>
                   <th class="px-4 py-2">Requester</th>
                   <th class="px-4 py-2">Facility</th>
-                  <th class="px-4 py-2">Status</th>
+                  <th class="px-6 py-2">Status</th>
                 </tr>
               </thead>
               <tbody id="requestsTable" class="text-sm">
