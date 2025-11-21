@@ -6,6 +6,7 @@ class ScheduleModel extends BaseModel {
     public function getTrips() {
     $query = "
     SELECT 
+        vr.control_no,
         vr.tracking_id,
         vr.req_id,
         vr.travel_date,

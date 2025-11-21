@@ -1974,3 +1974,48 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+--------------------------------------------------------------------------------------
+
+drop trigger trg_administrator_update;
+DELIMITER $$
+CREATE TRIGGER trg_administrator_update
+AFTER UPDATE ON administrator
+FOR EACH ROW
+BEGIN
+    DECLARE changes TEXT DEFAULT '';
+    DECLARE admin_name VARCHAR(150);
+
+    -- Set the admin name for logging (assuming first_name + last_name)
+    SET admin_name = (SELECT CONCAT(first_name,' ',last_name) FROM administrator WHERE staff_id = @current_staff_id);
+
+    -- Track changes
+    IF OLD.first_name != NEW.first_name OR OLD.last_name != NEW.last_name THEN
+        SET changes = CONCAT(changes, 'Name from "', OLD.first_name,' ',OLD.last_name,'" to "', NEW.first_name,' ',NEW.last_name,'"; ');
+    END IF;
+    IF OLD.email != NEW.email THEN
+        SET changes = CONCAT(changes, 'Email from "', OLD.email,'" to "', NEW.email,'"; ');
+    END IF;
+    IF OLD.contact_no != NEW.contact_no THEN
+        SET changes = CONCAT(changes, 'Contact from "', OLD.contact_no,'" to "', NEW.contact_no,'"; ');
+    END IF;
+    IF OLD.accessLevel_id != NEW.accessLevel_id THEN
+        SET changes = CONCAT(changes, 'Access Level changed; ');
+    END IF;
+    IF OLD.status != NEW.status THEN
+        SET changes = CONCAT(changes, 'Status from "', OLD.status,'" to "', NEW.status,'"; ');
+    END IF;
+    IF OLD.profile_picture != NEW.profile_picture THEN
+        SET changes = CONCAT(changes, 'Profile Picture updated; ');
+    END IF;
+
+    -- Insert into activity logs
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+        'Administrator',
+        admin_name,
+        'UPDATE',
+        CONCAT(admin_name, ' updated administrator: ', changes)
+    );
+END$$
+DELIMITER ;

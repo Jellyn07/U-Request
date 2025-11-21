@@ -146,22 +146,38 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <td class="px-4 py-3"><?= htmlspecialchars($row['location']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars(date("F d, Y", strtotime($row['request_date']))) ?></td>
                     <td class="px-4 py-3">
-                      <?php if ($row['req_status'] === 'Completed'): ?>
-                        <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span>
-                      <?php elseif ($row['req_status'] === 'To Inspect'): ?>
-                        <select class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800" 
-                          data-request-id="<?= $row['request_id'] ?>" data-current-status="<?= $row['req_status'] ?>">
-                          <option hidden disabled value="To Inspect" selected>To Inspect</option>
-                          <option value="In Progress" class="bg-blue-100 text-blue-800">In Progress</option>
-                          <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
-                        </select>
-                      <?php else: ?>
-                        <select class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
-                          data-request-id="<?= $row['request_id'] ?>" data-current-status="<?= $row['req_status'] ?>">
-                          <option hidden disabled value="In Progress" selected>In Progress</option>
-                          <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
-                        </select>
-                      <?php endif; ?>
+                        <?php if ($_SESSION['access_level'] == 1): ?>
+                            <!-- READ-ONLY STATUS FOR SUPERADMIN -->
+                            <?php if ($row['req_status'] === 'Completed'): ?>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span>
+                            <?php elseif ($row['req_status'] === 'To Inspect'): ?>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">To Inspect</span>
+                            <?php else: ?>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">In Progress</span>
+                            <?php endif; ?>
+
+                        <?php else: ?>
+                            <!-- DROPDOWN FOR ACCESS LEVEL 2 or others -->
+                            <?php if ($row['req_status'] === 'Completed'): ?>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span>
+
+                            <?php elseif ($row['req_status'] === 'To Inspect'): ?>
+                                <select class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800" 
+                                    data-request-id="<?= $row['request_id'] ?>" data-current-status="<?= $row['req_status'] ?>">
+                                    <option hidden disabled value="To Inspect" selected>To Inspect</option>
+                                    <option value="In Progress" class="bg-blue-100 text-blue-800">In Progress</option>
+                                    <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                                </select>
+
+                            <?php else: ?>
+                                <select class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
+                                    data-request-id="<?= $row['request_id'] ?>" data-current-status="<?= $row['req_status'] ?>">
+                                    <option hidden disabled value="In Progress" selected>In Progress</option>
+                                    <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                                </select>
+                            <?php endif; ?>
+
+                        <?php endif; ?>
                     </td>
                   </tr>
                 <?php endforeach; ?>
