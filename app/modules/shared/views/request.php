@@ -139,7 +139,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                     data-status="<?= htmlspecialchars($row['req_status']) ?>"
                     @click="selected = <?= htmlspecialchars(json_encode($row)) ?>; selected.original_status = '<?= htmlspecialchars($row['req_status']) ?>'; showDetails = true"
                     class="hover:bg-gray-100 cursor-pointer text-left border-b border-gray-100"
-                  >
+                  > 
                     <td class="pl-8 py-3"><?= htmlspecialchars($row['request_id']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($row['Name']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($row['request_Type']) ?></td>
@@ -231,6 +231,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 <!-- Edit / Save Buttons -->
 <!-- Edit Button -->
     <button 
+    hidden
       type="button" 
       class="btn btn-secondary text-xs mt-1"
       x-show="!editingLocation"

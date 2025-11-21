@@ -84,6 +84,7 @@ $vehicles = $vehicleController->getVehiclesWithLastMaintenance();
               ?>
             </select>
 
+            <img id="logo" src="/public/assets/img/usep.png" class="hidden">
             <button title="Export" id="export" class="btn-upper">
               <img src="/public/assets/img/export.png" alt="Export" class="size-4 my-0.5">
             </button>
@@ -240,6 +241,34 @@ $vehicles = $vehicleController->getVehiclesWithLastMaintenance();
           </div>
 
         </div>
+
+        <!-- ✅ Hidden table for export -->
+        <table id="table" class="hidden">
+          <thead>
+            <tr>
+              <th>Vehicle Name</th>
+              <th>Plate Number</th>
+              <th>Capacity</th>
+              <th>Vehicle Type</th>
+              <th>Driver</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($vehicles as $v): ?>
+              <tr>
+                <td><?= htmlspecialchars($v['vehicle_name']) ?></td>
+                <td><?= htmlspecialchars($v['plate_no']) ?></td>
+                <td><?= htmlspecialchars($v['capacity']) ?></td>
+                <td><?= htmlspecialchars($v['vehicle_type']) ?></td>
+                <td><?= htmlspecialchars($v['driver_name'] ?? 'Unassigned') ?></td>
+                <td><?= htmlspecialchars($v['status'] ?? 'Available') ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
+
 
         <!-- Right Section (Vehicle Details + Edit) -->
         <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-y-auto">

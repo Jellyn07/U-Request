@@ -34,6 +34,9 @@ class AdminProfileModel extends BaseModel{
 
     // Update password (plain text)
     public function updatePassword($requester_email, $newPassword){
+         if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $encryptedNewPass = encrypt($newPassword);
         $stmt = $this->db->prepare("
             UPDATE administrator 

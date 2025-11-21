@@ -14,6 +14,10 @@ if (isset($_SESSION['alert'])) {
     unset($_SESSION['alert']); // prevent repeat alerts
 }
 
+if (isset($_SESSION['succcess'])) {
+    $alert = $_SESSION['success'];
+    unset($_SESSION['success']); // prevent repeat alerts
+}
 // Check if req_id exists, otherwise redirect
 if (!isset($_SESSION['req_id'])) {
     header("Location: http://localhost:3000/app/modules/user/views/login.php");

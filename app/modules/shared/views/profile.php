@@ -24,6 +24,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
   <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/public/assets/css/remove-password-eye.css">
 </head>
 <body class="bg-gray-100">
   <?php 

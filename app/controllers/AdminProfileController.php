@@ -102,9 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } else {
         $_SESSION['error'] = "Old password is incorrect or update failed.";
     }
+    $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
 
-    header("Location: /app/modules/gsu_admin/views/profile.php");
-    exit;
+            header("Location: $redirect");
+            exit;
 }
 
 // Update Profile Picture

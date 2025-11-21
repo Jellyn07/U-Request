@@ -151,69 +151,94 @@
   </script>
 
   <!-- Change Password Logic -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const form = document.getElementById("passwordForm");
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("passwordForm");
 
-      form.addEventListener("submit", function(e) {
-        e.preventDefault();
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-        const oldPassword = document.getElementById("old_password").value;
-        const newPassword = document.getElementById("new_password").value;
-        const confirmPassword = document.getElementById("confirm_password").value;
+    const oldPassword = document.getElementById("old_password").value;
+    const newPassword = document.getElementById("new_password").value;
+    const confirmPassword = document.getElementById("confirm_password").value;
 
-        if (newPassword !== confirmPassword) {
-          Swal.fire({
-            icon: "error",
-            title: "Password Mismatch",
-            text: "New Password and Confirm Password do not match."
-          });
-          return;
-        }
+    // 🔍 Password Strength Regex
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
-        fetch("../../../controllers/AdminProfileController.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            action: "verify_old_password",
-            old_password: oldPassword
-          })
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (!data.valid) {
-              Swal.fire({
-                icon: "error",
-                title: "Mismatched Current Password",
-                text: "The entered Old Password is incorrect!"
-              });
-              return;
-            }
+    // ❌ Check password mismatch
+    if (newPassword !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "New Password and Confirm Password do not match."
+      });
+      return;
+    }
 
-            Swal.fire({
-              title: "Are you sure?",
-              text: "Do you want to save the new password?",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
-              confirmButtonText: "Yes, save it",
-              cancelButtonText: "Cancel"
-            }).then((result) => {
-              if (result.isConfirmed) form.submit();
-            });
-          })
-          .catch(err => {
-            console.error("Error verifying password:", err);
-            Swal.fire({
-              icon: "error",
-              title: "Server Error",
-              text: "Something went wrong. Please try again."
-            });
-          });
+    // ❌ Check password strength
+    if (!strongPasswordRegex.test(newPassword)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Weak Password",
+        html: `
+          Your password must contain:<br>
+          • At least <b>8 characters</b><br>
+          • At least <b>one uppercase</b> letter<br>
+          • At least <b>one lowercase</b> letter<br>
+          • At least <b>one number</b><br>
+          • At least <b>one special character</b>
+        `,
+      });
+      return;
+    }
+
+    // ✔ Verify old password via AJAX
+    fetch("../../../controllers/AdminProfileController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "verify_old_password",
+        old_password: oldPassword
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.valid) {
+        Swal.fire({
+          icon: "error",
+          title: "Incorrect Current Password",
+          text: "The entered Old Password is incorrect!"
+        });
+        return;
+      }
+
+      // ✔ Ask confirmation to save
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save the new password?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) form.submit();
+      });
+    })
+    .catch(err => {
+      console.error("Error verifying password:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Something went wrong. Please try again."
       });
     });
-  </script>
+  });
+});
+</script>
+
   <!-- Password Visibility Script -->
   <script src="/public/assets/js/shared/password-visibility.js"></script>
 </main>

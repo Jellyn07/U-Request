@@ -23,6 +23,8 @@ Overall
     - when adding contact 09 should be given and cannot be change like what if user input 06?✅
     - should not allow use to have name with number
     - profiles in admin wont change after i change it ex. i change profile it does change but when i go back the sidemenu profile not change
+    - dont accept Ñ
+    - wrong email wont promt wrong ex. user@gmail.com
 
     feedback
     - chart not working
