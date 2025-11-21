@@ -8,6 +8,10 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
 $controller = new AdminController();
 $feedbackData = $controller->getoverallFeedbacks();
 
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+$controller = new DashboardController();
+$profile = $controller->getProfile($_SESSION['email']);
+
 // calculate average rating if needed
 $total = 0;
 foreach ($feedbackData as $fb) $total += $fb['overall_rating'];

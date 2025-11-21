@@ -8,6 +8,11 @@ require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../controllers/ScheduleController.php';
 $controller = new ScheduleController();
 $trips = $controller->fetchTrips();
+
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+$controller = new DashboardController();
+$profile = $controller->getProfile($_SESSION['email']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

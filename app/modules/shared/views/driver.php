@@ -17,6 +17,11 @@ if (!isset($_SESSION['email'])) {
     exit;
 }
 $controller = new DriverController(); $drivers = $controller->getAllDriver();
+
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+$controller = new DashboardController();
+$profile = $controller->getProfile($_SESSION['email']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

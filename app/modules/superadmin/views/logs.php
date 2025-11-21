@@ -10,6 +10,10 @@ $tableFilter = $_GET['table'] ?? 'all';
 $actionFilter = $_GET['action'] ?? 'all';
 $dateFilter = $_GET['date'] ?? 'all';
 
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+$controller = new DashboardController();
+$profile = $controller->getProfile($_SESSION['email']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -13,6 +13,11 @@ $locationController->addLocation($_POST);
 
 $controller = new AdminController();
 $admins = $controller->getAllAdmins();
+
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+$controller = new DashboardController();
+$profile = $controller->getProfile($_SESSION['email']);
+  
 ?>
 
 <!DOCTYPE html>

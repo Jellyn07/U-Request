@@ -13,6 +13,11 @@ $vehicleController = new VehicleController();
 $vehicleController->addVehicle();
 $drivers = $vehicleController->getDrivers();
 $vehicles = $vehicleController->getVehiclesWithLastMaintenance();
+
+require_once __DIR__ . '/../../../controllers/DashboardController.php';
+$controller = new DashboardController();
+$profile = $controller->getProfile($_SESSION['email']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
