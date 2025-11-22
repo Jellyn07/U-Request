@@ -45,11 +45,11 @@ $profile = $controller->getProfile($_SESSION['email']);
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
-            <select class="input-field">
+            <!-- <select class="input-field">
               <option value="all">All</option>
               <option value="have_pending">Active</option>
               <option value="no_pending">Inactive</option>
-            </select>
+            </select> -->
             <select id="sortUsers" class="input-field">
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
