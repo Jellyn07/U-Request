@@ -82,6 +82,11 @@ document.addEventListener("alpine:init", () => {
             <input type="text" class="view-field w-full font-normal" value="${selected.Name}" readonly />
           </div>
 
+          <div class="text-sm mb-1 font-medium mt-3">
+            <label class="text-base">Requester Office / Department</label>
+            <input type="text" class="view-field w-full font-normal" value="${selected.requester_officeOrDept || 'Undefined'}" readonly />
+          </div>
+
           <div class="text-sm mb-1 font-medium">
             <label class="text-base">Tracking No.</label>
             <input type="text" class="view-field w-full font-normal" value="${selected.tracking_id}" readonly />

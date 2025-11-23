@@ -5,7 +5,7 @@ Users
     - no unit in tracking
 
 GSU Admin
-    - no program/office in full details
+    - no program/office in full details ✅
 
 Motorpool
     - no source of fund in full details
