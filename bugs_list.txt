@@ -25,6 +25,8 @@ Overall
     - profiles in admin wont change after i change it ex. i change profile it does change but when i go back the sidemenu profile not change
     - dont accept Ñ
     - wrong email wont promt wrong ex. user@gmail.com
+    - sign in first/last name is not automatically get uppercase in the first letter
+
 
     feedback
     - chart not working
@@ -111,6 +113,8 @@ GSU Admin
     - pag iset ang status pag nakaclick nka og completed ky dli na sya makachoose og balik./same sa priority level if nakapili na sya dli na makapilig balik.
     -assigning sa personnel dli sya maka assign biskan og nag assign nka.
     - export dli mag work
+    - cant add personnel even if they are available
+    - wont change request status in table
     inventory
     - no material history ✅
 
@@ -162,6 +166,8 @@ Users
     - no source of fund in more details✅
     - if change department it pop up the contact no ✅
     - if dili mag upload ug pic dili ka submit pero walay warning nga naay kulang nga fillupan
+    - user cant request directly after adding contact number
+    - dont make the detailed description get uppercase every first letter in a word
 
 UI
     All
