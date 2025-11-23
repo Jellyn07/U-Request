@@ -9,6 +9,7 @@ class AdministratorModel extends BaseModel {
     // ADD ADMINISTRATOR
     public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
         $encrypted_pass = encrypt($password);
+        // $encrypted_email = encrypt($email);
 
         // Optional: record who added this admin
         if (isset($_SESSION['staff_id'])) {
@@ -132,6 +133,47 @@ class AdministratorModel extends BaseModel {
         $stmt->close();
         return $admins;
     }
+
+    // --- EMAIL DECRYPTION VERSION (FUTURE) ---
+    // public function getAdministrators($currentAccessLevel = 1) {
+    //     // Base query: fetch all columns including the encrypted email
+    //     $query = "SELECT * FROM vw_administrator";
+    //     $params = [];
+
+    //     // Apply filter for non-superadmins
+    //     if ($currentAccessLevel == 2) {
+    //         $query .= " WHERE accessLevel_id = ?";
+    //         $params[] = 2;
+    //     } elseif ($currentAccessLevel == 3) {
+    //         $query .= " WHERE accessLevel_id = ?";
+    //         $params[] = 3;
+    //     }
+
+    //     $stmt = $this->db->prepare($query);
+    //     if (!$stmt) {
+    //         $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
+    //         return [];
+    //     }
+
+    //     if (!empty($params)) {
+    //         $stmt->bind_param(str_repeat('i', count($params)), ...$params);
+    //     }
+
+    //     $stmt->execute();
+    //     $result = $stmt->get_result();
+    //     $admins = [];
+
+    //     while ($row = $result->fetch_assoc()) {
+    //         // Decrypt email
+    //         if (!empty($row['email'])) {
+    //             $row['email'] = decrypt($row['email']);
+    //         }
+    //         $admins[] = $row;
+    //     }
+
+    //     $stmt->close();
+    //     return $admins;
+    // }
 
      // Update admin details
      public function updateAdminDetails($data) {

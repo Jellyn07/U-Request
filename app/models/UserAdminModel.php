@@ -71,8 +71,8 @@ class UserAdminModel extends BaseModel
 
 
     // Get profile data by email
-    public function getProfileByEmail($admin_email)
-    {
+    public function getProfileByEmail($admin_email){
+            // $encrypted_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_pic
             FROM vw_requesters
@@ -85,8 +85,7 @@ class UserAdminModel extends BaseModel
         return $result->fetch_assoc(); // returns single row
     }
 
-    public function getUserDetails($requester_id)
-    {
+    public function getUserDetails($requester_id){
         $stmt = $this->db->prepare("
             SELECT 
                 requester_id,
@@ -101,9 +100,19 @@ class UserAdminModel extends BaseModel
         ");
         $stmt->bind_param("s", $requester_id);
         $stmt->execute();
-
+        
         $result = $stmt->get_result();
         return $result->fetch_assoc(); // return one user record
+
+        // $result = $stmt->get_result()->fetch_assoc(); // fetch one record
+
+        // // Decrypt email if it exists
+        // if ($result && isset($result['email'])) {
+        //     $result['email'] = decrypt($result['email']);
+        // }
+
+        // $stmt->close();
+        // return $result;
     }
 
     // Get GSU Personnel Work History

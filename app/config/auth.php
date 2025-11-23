@@ -1,6 +1,6 @@
 <?php
 // Auto logout after 1 minute (60 seconds) of inactivity
-$timeout_duration = 60;
+$timeout_duration = 300;
 
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
     // Session expired

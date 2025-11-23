@@ -95,9 +95,9 @@ Motorpool Admin
 
 GSU Admin
     - can be completed even if request have no assigned personel✅
-    - request: no dropdown for request in (to inspect) to avoid updating request without personel
+    - request: no dropdown for request in (to inspect) to avoid updating request without personel✅
     - request: in progress no option to go back to (to inspect) ✅
-    - if admin assigned a personel the status will automatically go to in progress (idunno kung tama)// need sya iselect ug to inspect para mugawas ang materials (used/needed) na div 
+    - if admin assigned a personel the status will automatically go to in progress (idunno kung tama)// need sya iselect ug to inspect para mugawas ang materials (used/needed) na div ✅
     - if i change the name of a building in one of the locations the other same building wont me change  ✅ //mugana sa ako
     - Menu logout/profile ✅
 
@@ -129,7 +129,7 @@ GSU Admin
     - adding building should be base on unit ex. mabini unit all building from mabini should display ✅
 
     logs
-    - export not working
+    - export not working✅
     
 
     - Personnel work history (unable) ✅

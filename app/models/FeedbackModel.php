@@ -27,6 +27,7 @@ class FeedbackModel extends BaseModel {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM VW_feedback WHERE tracking_id = ?");
         $stmt->bind_param("s", $tracking_id);
         $stmt->execute();
+        $count = 0;
         $stmt->bind_result($count);
         $stmt->fetch();
         $stmt->close();

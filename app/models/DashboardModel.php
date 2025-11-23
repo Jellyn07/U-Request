@@ -125,8 +125,8 @@ class DashboardModel extends BaseModel  {
     }
 
     // Get profile data by email
-    public function getProfileByEmail($admin_email)
-    {
+    public function getProfileByEmail($admin_email){
+        // $encrypted_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_picture
             FROM administrator

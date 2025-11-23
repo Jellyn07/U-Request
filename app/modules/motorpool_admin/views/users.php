@@ -187,7 +187,7 @@ $profile = $controller->getProfile($_SESSION['email']);
       filterId: "statusFilter",        // dropdown for Active/Inactive
       sortId: "sortUsers",             // dropdown for sorting A–Z / Z–A
       searchColumns: [1, 3],           // Full Name and Email columns
-      filterColumn: 2                  // Status column
+      filterColumn: 4                  // Status column
     });
   });
 </script>

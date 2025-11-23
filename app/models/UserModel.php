@@ -8,6 +8,7 @@ class UserModel extends BaseModel  {
     // SIGNUP - Create User
     public function createUser($ssid, $email, $fn, $ln, $pass) {
         $encrypted_pass = encrypt($pass);
+         // $encrypted_email = encrypt($email);
 
         $stmt = $this->db->prepare("CALL spAddRequester(?, ?, ?, ?, ?)");
         if (!$stmt) {
@@ -30,6 +31,7 @@ class UserModel extends BaseModel  {
 
     // LOGIN - Get User by Email
     public function getUserByEmail($email) {
+         // $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT pass FROM REQUESTER WHERE email = ?");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
@@ -62,6 +64,7 @@ class UserModel extends BaseModel  {
 
     // LOGIN - Get Requester ID
     public function getRequesterId($email) {
+         // $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT fnGetRequesterIdByEmail(?) AS req_id");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
@@ -82,6 +85,7 @@ class UserModel extends BaseModel  {
 
     // CHECK if Email Exists
     public function emailExists($email) {
+         // $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT COUNT(*) AS cnt FROM vw_requesters WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -109,6 +113,32 @@ class UserModel extends BaseModel  {
         $stmt->close();
         return $result;
     }
+
+    //  GET Encrypted Email ADMIN User
+    // public function getAdminUserByEmail($email) {
+    //     // Encrypt the email to match the database value
+    //     $encryptedEmail = encrypt($email);
+
+    //     $stmt = $this->db->prepare("CALL spGetAdminByEmail(?)");
+    //     if (!$stmt) {
+    //         error_log("Prepare failed: " . $this->db->error);
+    //         return null;
+    //     }
+
+    //     $stmt->bind_param("s", $encryptedEmail);
+    //     $stmt->execute();
+
+    //     // Get the result
+    //     $result = $stmt->get_result()->fetch_assoc();
+
+    //     // Decrypt email in the returned row, if exists
+    //     if ($result && isset($result['email'])) {
+    //         $result['email'] = decrypt($result['email']);
+    //     }
+
+    //     $stmt->close();
+    //     return $result;
+    // }
 
     public function getRequestHistory($requester_id) {
     $records = [];

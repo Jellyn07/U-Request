@@ -5,6 +5,7 @@ class ProfileModel extends BaseModel {
 
     // Get profile data by requester_id
     public function getProfileByEmail($requester_email) {
+         // $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("
             SELECT requester_id, firstName, lastName, contact, email, officeOrDept, profile_pic
             FROM vw_requesters
@@ -19,6 +20,7 @@ class ProfileModel extends BaseModel {
 
     // Update department/office
     public function updateOfficeOrDept($email, $officeOrDept) {
+         // $encrypted_email = encrypt(email);
         $stmt = $this->db->prepare("
             UPDATE requester
             SET officeOrDept = ?
@@ -81,7 +83,7 @@ class ProfileModel extends BaseModel {
     public function updatePassword($requester_email, $newPassword) {
         require_once __DIR__ . '/../config/encryption.php';
         $encryptedPassword = encrypt($newPassword);
-
+         // $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("
             UPDATE requester 
             SET pass = ?
@@ -94,6 +96,7 @@ class ProfileModel extends BaseModel {
     // Verify old password
     public function verifyPassword($requester_email, $oldPassword) {
         require_once __DIR__ . '/../config/encryption.php';
+         // $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("SELECT pass FROM requester WHERE email = ?");
         $stmt->bind_param("s", $requester_email);
         $stmt->execute();
