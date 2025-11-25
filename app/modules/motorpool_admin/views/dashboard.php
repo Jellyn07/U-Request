@@ -159,10 +159,10 @@ $dateRange = "$startDate - $endDate";
                             <span class="px-9 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
                                 On Going
                             </span>   
-                        <?php elseif ($row['req_status'] === 'Rejected/Cancelled'): ?>
+                        <?php elseif ($row['req_status'] === 'Cancelled' || $row['req_status'] === 'Rejected'): ?>
                             <!-- ✅ Show label only when Rejected/Cancelled -->
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                                Rejected/Cancelled
+                            <span class="px-9 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                <?= htmlspecialchars($row['req_status']) ?>
                             </span>         
                         <?php else: ?>
                             <!-- Fallback for any other statuses -->
