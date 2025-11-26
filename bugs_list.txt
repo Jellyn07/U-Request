@@ -80,6 +80,10 @@ Motorpool Admin
     - pending, approved, and rejected/cancelled are the only status that the motorpool admin can update✅
     - sa status na part ky for example if ever mamali and admin og click sa status ba like maclick nya ang completed accidentally. Dli na sya makabalik atong last status ang mogawas 
     nlng sa status ky completed nlng tong unsa ang naclick.
+
+    Schedule
+    - isame nlang sa full view sa request like ireuse ang ktong naa sa request page na full details
+
     vehicle
     - vehicle filter should be dynamic ✅
     - vehicle type should be dynamic. what if usep wants to buy sports car? theirs no option in that ✅
@@ -144,6 +148,12 @@ GSU Admin
              - views ✅
              - index ✅
              - triggers ✅
+
+To add users suggestions
+- restrict the users in cancelling the request in vehicle. Max cancellation should be 3 in a week if that exceed restrict the users from making a request in vehicle
+- add a remainder that cancelling in vehicle can only be done 3 in a week
+- let motorpool admin add a request. Let admin add who requested the request. reuse the form in user but add a inout field for the requester
+- dont let users request another in vehicle if they still have an unfilled feedback
 
 +++++++++++++++++++++++++++++++++JELLYN+++++++++++++++++++++++++++++++++
 Users
@@ -233,3 +243,7 @@ UI
 
         backup
         - ui should be top and bottom not side by side ✅
+
+To add users suggestions
+- make the full view in gsu same with the actual paper format and make it printable or saveable
+- add admin request in motorpool ui
