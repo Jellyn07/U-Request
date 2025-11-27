@@ -91,8 +91,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ NEW — clone table and remove columns with img
     const tempTable = table.cloneNode(true);
 
-    // Detect columns containing images
-    const rows = Array.from(tempTable.rows);
+    // ✅ Get active tab from global variable (set in tab script)
+    const activeStatus = window.currentExportStatus || "All";
+
+    // ✅ Remove rows not matching active tab OR hidden by filters
+    const rows = Array.from(tempTable.querySelectorAll("tbody tr"));
+
+    rows.forEach(row => {
+      const status = row.getAttribute("data-status");
+      const isHidden = row.style.display === "none";
+
+      if (
+        isHidden ||
+        (activeStatus !== "All" && status !== activeStatus)
+      ) {
+        row.remove();
+      }
+    });
+
+    // // Detect columns containing images
+    // const rows = Array.from(tempTable.rows);
     const removeColumns = new Set();
 
     rows.forEach(row => {
@@ -156,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pageTitle = pageTitle.replace(/[\\/:*?"<>|]/g, "").trim();
     doc.setFont("times", "normal");
     doc.setFontSize(12);
-    doc.text(pageTitle, pageWidth / 2, currentY, { align: "center" });
+    doc.text(`${pageTitle} (${activeStatus})`, pageWidth / 2, currentY, { align: "center" });
     currentY += 10;
 
     // ✅ Use the cleaned table (tempTable) instead of original

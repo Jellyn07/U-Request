@@ -67,9 +67,57 @@ class BaseModel {
             // Content
             $mail->isHTML(true);
             $mail->Subject = $success ? 'Database Backup Successful' : 'Database Backup Failed';
-            $body = $success 
-                ? "Backup created successfully!<br>File: <b>$file</b>"
-                : "Backup failed!<br>Reason: <b>$message</b>";
+
+            $color = $success ? '#16a34a' : '#dc2626'; // green / red
+            $bg    = $success ? '#ecfdf5' : '#fef2f2'; // light background
+
+            $body = "
+            <!DOCTYPE html>
+            <html>
+            <body style='margin:0;background:#f3f4f6;font-family:Arial,sans-serif;padding:40px;'>
+
+            <div style='max-width:520px;margin:auto;background:white;border-radius:8px;
+                        padding:24px;box-shadow:0 4px 10px rgba(0,0,0,.05);'>
+
+                <h2 style='margin:0;font-size:18px;color:$color;'>
+                ".($success ? "Backup Successful ✅" : "Backup Failed ❌")."
+                </h2>
+
+                <div style='width:40px;height:3px;background:$color;border-radius:5px;margin:12px 0;'></div>
+
+                <p style='font-size:14px;color:#374151;'>Hello Admin,</p>
+
+                <p style='font-size:14px;color:#374151;'>
+                This is an automated notification from your database backup system.
+                </p>
+
+                <div style='background:$bg;border-left:4px solid $color;
+                            padding:12px;border-radius:6px;margin:14px 0;font-size:13px;'>
+
+                ".($success
+                    ? "✅ Backup file created: <b>$file</b>"
+                    : "❌ Backup error: <b>$message</b>"
+                )."
+
+                </div>
+
+                <p style='font-size:13px;color:#374151;'>Please review if necessary.</p>
+
+                <p style='font-size:13px;color:#374151;'>
+                Regards,<br>
+                <b>Database Backup System</b>
+                </p>
+
+                <p style='margin-top:16px;font-size:11px;color:#9ca3af;text-align:center;'>
+                This is an automated message. Do not reply.
+                </p>
+
+            </div>
+
+            </body>
+            </html>
+            ";
+
             $mail->Body = $body;
 
             $mail->send();

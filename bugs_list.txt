@@ -12,7 +12,7 @@ Motorpool
 
 Too Add functionality
     - Can print the request with the same format of their physical request in GSU
-    - super admin can see admin activity logs in account Management
+    - super admin can see admin activity logs in account Management ✅
 
 +++++++++++++++++++++++++++++++++BFELL+++++++++++++++++++++++++++++++++
 Overall
@@ -44,12 +44,12 @@ Super Admin
     - no profile ✅
     - user history (no vehicle request) ✅ 
     - if completed vehicle request the date finished is the return date
-    - Menu logout/profile
+    - Menu logout/profile ✅
     - change location button gsu request
 
     account mgt.
     - can edit staff ID? ✅
-    - super admins should be anable in access and cannot be change
+    - super admins should be anable in access and cannot be change ✅
     - cannot add new admin (Prepare failed for add_admin_access: Table 'u_request.add_admin_access' doesn't exist)✅ naa kay need ih add sa db boss (naas pa run)
     - cant filter (active and inactive) in user mgt.
     - cant edit user id
@@ -110,15 +110,15 @@ GSU Admin
 
     request
     - bugs in changing request status
-    - it display all status in export functionality ex. to inspectinprogresscompleted
-    - should print on what is in the table ex. is the table is all completed in export it should display only completed
+    - it display all status in export functionality ex. to inspectinprogresscompleted ✅
+    - should print on what is in the table ex. is the table is all completed in export it should display only completed ✅
     - should not allow to delete all the personnel input field
     - cant change the status in side details
-    - pag iset ang status pag nakaclick nka og completed ky dli na sya makachoose og balik./same sa priority level if nakapili na sya dli na makapilig balik.
-    -assigning sa personnel dli sya maka assign biskan og nag assign nka.
-    - export dli mag work
-    - cant add personnel even if they are available
-    - wont change request status in table
+    - pag iset ang status pag nakaclick nka og completed ky dli na sya makachoose og balik./same sa priority level if nakapili na sya dli na makapilig balik.✅
+    -assigning sa personnel dli sya maka assign biskan og nag assign nka.✅
+    - export dli mag work ✅
+    - cant add personnel even if they are available✅
+    - wont change request status in table✅
     inventory
     - no material history ✅
 
@@ -171,8 +171,8 @@ Users
     - contact should be required before the user can request in motorpool✅
     - should have popup when i update something in the user profile ✅
     - no source of fund in more details ✅
-    - add cancel button in vehicle tracking 
-    - should have popup when i update something in the user profile
+    - add cancel button in vehicle tracking ✅
+    - should have popup when i update something in the user profile ✅
     - no source of fund in more details✅
     - if change department it pop up the contact no ✅
     - if dili mag upload ug pic dili ka submit pero walay warning nga naay kulang nga fillupan

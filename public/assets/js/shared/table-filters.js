@@ -126,6 +126,7 @@ export function initTableFilters({
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         activeStatus = tab.textContent.trim();
+        window.currentExportStatus = activeStatus; 
         setActiveTab(tab);
         applyFilters();
       });

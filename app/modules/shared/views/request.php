@@ -66,7 +66,12 @@ $profile = $controller->getProfile($_SESSION['email']);
       <!-- Tabs -->
       <div id="tabs" class="flex gap-2 mt-4 text-xs text-text">
         <?php foreach (['All', 'To Inspect', 'In Progress', 'Completed'] as $tab): ?>
-          <button class="ml-5 btn"><p><?= $tab ?></p></button>
+          <button 
+            class="ml-5 btn tab-btn"
+            data-status="<?= $tab ?>"
+          >
+            <p><?= $tab ?></p>
+          </button>
         <?php endforeach; ?>
       </div>
 

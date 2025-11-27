@@ -75,27 +75,7 @@ document.addEventListener('alpine:init', () => {
                 : `<p class="text-xs text-gray-500">No Passengers</p>`}
             </div>
 
-           <!-- SOURCE OF FUND -->
-            <h4 class="text-base font-semibold mb-2">Source of Fund</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="text-xs mb-1 block font-medium">Fuel</label>
-                <p class="view-field w-full">${selected.source_of_fuel || 'N/A'}</p>
-              </div>
-              <div>
-                <label class="text-xs mb-1 block font-medium">Oil</label>
-                <p class="view-field w-full">${selected.source_of_oil || 'N/A'}</p>
-              </div>
-              <div>
-                <label class="text-xs mb-1 block font-medium">Repair/Maintenance</label>
-                <p class="view-field w-full">${selected.source_of_repair_maintenance || 'N/A'}</p>
-              </div>
-              <div>
-                <label class="text-xs mb-1 block font-medium">Driver/Assistant Per Diem</label>
-                <p class="view-field w-full">${selected.source_of_driver_assistant_per_diem || 'N/A'}</p>
-              </div>
-            </div>
-            <hr class="my-6 border-gray-300">
+            <hr class="my-6 border-gray-300"></hr>
 
             <!-- VEHICLE & DRIVER -->
             <h4 class="text-base font-semibold mb-2">Assignment Details</h4>
@@ -168,3 +148,25 @@ document.addEventListener("alpine:init", () => {
         }
     }));
 });
+
+// <!-- SOURCE OF FUND -->
+//             <h4 class="text-base font-semibold mb-2">Source of Fund</h4>
+//             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+//               <div>
+//                 <label class="text-xs mb-1 block font-medium">Fuel</label>
+//                 <p class="view-field w-full">${selected.source_of_fuel || 'N/A'}</p>
+//               </div>
+//               <div>
+//                 <label class="text-xs mb-1 block font-medium">Oil</label>
+//                 <p class="view-field w-full">${selected.source_of_oil || 'N/A'}</p>
+//               </div>
+//               <div>
+//                 <label class="text-xs mb-1 block font-medium">Repair/Maintenance</label>
+//                 <p class="view-field w-full">${selected.source_of_repair_maintenance || 'N/A'}</p>
+//               </div>
+//               <div>
+//                 <label class="text-xs mb-1 block font-medium">Driver/Assistant Per Diem</label>
+//                 <p class="view-field w-full">${selected.source_of_driver_assistant_per_diem || 'N/A'}</p>
+//               </div>
+//             </div>
+//            

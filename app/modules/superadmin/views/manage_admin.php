@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
 $controller = new AdminController();
 $admins = $controller->getAllAdmins();
 $formData = $_SESSION['admin_form_data'] ?? []; 
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -255,6 +256,7 @@ $formData = $_SESSION['admin_form_data'] ?? [];
                                 id="access-<?= $admin['staff_id'] ?>"
                                 <?= $checked ? 'checked' : '' ?>
                                 <?= $isSuperAdmin ? 'disabled' : '' ?>
+                                <?= $admin['accessLevel_id'] == 1 ? 'disabled' : '' ?>
                                 @click.stop
                                 @change.stop="toggleAdminMenuAccess($event, '<?= $admin['staff_id'] ?>'); updateStatusText(this)"
                             >
@@ -350,7 +352,7 @@ $formData = $_SESSION['admin_form_data'] ?? [];
 
   <script type="module">
     import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
-
+    window.currentExportStatus = "All";
     initTableFilters({
     tableId: "usersTable",
     searchId: "searchUser",
