@@ -74,8 +74,8 @@ class UserAdminModel extends BaseModel
     public function getProfileByEmail($admin_email){
             // $encrypted_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
-            SELECT profile_pic
-            FROM vw_requesters
+            SELECT profile_picture
+            FROM administrator
             WHERE email = ?
         ");
         $stmt->bind_param("s", $admin_email);
