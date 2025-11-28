@@ -1,26 +1,33 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
-
+require_once __DIR__ . '/../config/encryption.php'; 
 class ProfileModel extends BaseModel {
 
     // Get profile data by requester_id
     public function getProfileByEmail($requester_email) {
-         // $encrypted_email = encrypt($requester_email);
+        $requester_email = encrypt($requester_email);
         $stmt = $this->db->prepare("
             SELECT requester_id, firstName, lastName, contact, email, officeOrDept, profile_pic
             FROM vw_requesters
             WHERE email = ?
         ");
+
         $stmt->bind_param("s", $requester_email);
         $stmt->execute();
 
         $result = $stmt->get_result();
-        return $result->fetch_assoc(); // returns single row
+        $row = $result->fetch_assoc(); // single row
+
+        if ($row && isset($row['email'])) {
+            $row['email'] = decrypt($row['email']); // decrypt email before returning
+        }
+
+        return $row;
     }
 
     // Update department/office
     public function updateOfficeOrDept($email, $officeOrDept) {
-         // $encrypted_email = encrypt(email);
+        $email = encrypt($email);
         $stmt = $this->db->prepare("
             UPDATE requester
             SET officeOrDept = ?
@@ -67,6 +74,7 @@ class ProfileModel extends BaseModel {
 
     // Update profile picture
     public function updateProfilePicture($fileName, $filePath) {
+        $fileName = encrypt($fileName);
         $sql = "
             UPDATE requester 
             SET profile_pic = ? 
@@ -83,22 +91,22 @@ class ProfileModel extends BaseModel {
     public function updatePassword($requester_email, $newPassword) {
         require_once __DIR__ . '/../config/encryption.php';
         $encryptedPassword = encrypt($newPassword);
-         // $encrypted_email = encrypt($requester_email);
+        $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("
             UPDATE requester 
             SET pass = ?
             WHERE email = ?
         ");
-        $stmt->bind_param("ss", $encryptedPassword, $requester_email);
+        $stmt->bind_param("ss", $encryptedPassword,  $encrypted_email);
         return $stmt->execute();
     }
 
     // Verify old password
     public function verifyPassword($requester_email, $oldPassword) {
         require_once __DIR__ . '/../config/encryption.php';
-         // $encrypted_email = encrypt($requester_email);
+        $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("SELECT pass FROM requester WHERE email = ?");
-        $stmt->bind_param("s", $requester_email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
         $stmt->bind_result($encryptedPassword);
         $stmt->fetch();
@@ -107,11 +115,10 @@ class ProfileModel extends BaseModel {
         return decrypt($encryptedPassword) === $oldPassword;
     }
 
-
-    // Delete account
-        public function deleteAccount($requester_email) {
-        $stmt = $this->db->prepare("DELETE FROM requester WHERE email = ?");
-        $stmt->bind_param("s", $requester_email);
-        return $stmt->execute();
-    }   
+    // // Delete account
+    //     public function deleteAccount($requester_email) {
+    //     $stmt = $this->db->prepare("DELETE FROM requester WHERE email = ?");
+    //     $stmt->bind_param("s", $requester_email);
+    //     return $stmt->execute();
+    // }   
 }

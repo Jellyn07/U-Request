@@ -3,6 +3,17 @@ session_start();
 
 require_once __DIR__ . '/../models/UserModel.php';
 
+function saveFormData($ssid, $email, $fn, $ln, $pass, $rpass) {
+    $_SESSION['form_data'] = [
+        'ssid' => $ssid,
+        'email' => $email,
+        'fn' => $fn,
+        'ln' => $ln,
+        'pass' => $pass,
+        'rpass' => $rpass
+    ];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ssid = $_POST['ssid'] ?? '';
     $email = $_POST['email'] ?? '';
@@ -46,17 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         saveFormData($ssid, $email, $fn, $ln, $pass, $rpass);
         header("Location: ../modules/user/views/signup.php");
         exit;
-    }
-
-    function saveFormData($ssid, $email, $fn, $ln, $pass, $rpass) {
-        $_SESSION['form_data'] = [
-            'ssid' => $ssid,
-            'email' => $email,
-            'fn' => $fn,
-            'ln' => $ln,
-            'pass' => $pass,
-            'rpass' => $rpass
-        ];
     }
 
     // ✅ Password match validation

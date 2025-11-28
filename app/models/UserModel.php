@@ -8,7 +8,7 @@ class UserModel extends BaseModel  {
     // SIGNUP - Create User
     public function createUser($ssid, $email, $fn, $ln, $pass) {
         $encrypted_pass = encrypt($pass);
-         // $encrypted_email = encrypt($email);
+        $encrypted_email = encrypt($email);
 
         $stmt = $this->db->prepare("CALL spAddRequester(?, ?, ?, ?, ?)");
         if (!$stmt) {
@@ -16,7 +16,7 @@ class UserModel extends BaseModel  {
             return false;
         }
 
-        $stmt->bind_param("sssss", $ssid, $fn, $ln, $encrypted_pass, $email);
+        $stmt->bind_param("sssss", $ssid, $fn, $ln, $encrypted_pass, $encrypted_email);
         $result = $stmt->execute();
 
         if (!$result) {
@@ -31,14 +31,14 @@ class UserModel extends BaseModel  {
 
     // LOGIN - Get User by Email
     public function getUserByEmail($email) {
-         // $encrypted_email = encrypt($email);
+        $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT pass FROM REQUESTER WHERE email = ?");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
             return null;
         }
 
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -64,14 +64,14 @@ class UserModel extends BaseModel  {
 
     // LOGIN - Get Requester ID
     public function getRequesterId($email) {
-         // $encrypted_email = encrypt($email);
+        $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT fnGetRequesterIdByEmail(?) AS req_id");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
             return null;
         }
 
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -85,9 +85,9 @@ class UserModel extends BaseModel  {
 
     // CHECK if Email Exists
     public function emailExists($email) {
-         // $encrypted_email = encrypt($email);
+        $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT COUNT(*) AS cnt FROM vw_requesters WHERE email = ?");
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();

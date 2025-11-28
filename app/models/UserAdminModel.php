@@ -15,8 +15,7 @@ class UserAdminModel extends BaseModel
     /**
      * Get users with search, status, and sort filters
      */
-    public function getUsers($search = '', $status = 'all', $sort = 'az')
-    {
+    public function getUsers($search = '', $status = 'all', $sort = 'az'){
         $sql = "
         SELECT 
             r.req_id,
@@ -68,8 +67,6 @@ class UserAdminModel extends BaseModel
 
         return $result->fetch_all(MYSQLI_ASSOC);
     }
-
-
 
     // Get profile data by email
     public function getProfileByEmail($admin_email){
