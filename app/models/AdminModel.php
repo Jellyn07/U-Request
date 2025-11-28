@@ -310,7 +310,7 @@ class AdministratorModel extends BaseModel {
 
     // For Add: Email
     public function isAdminEmailExistsOnAdd($email) {
-            $email = encrypt($email);
+        $email = encrypt($email);
         $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE email = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) return false;
@@ -422,8 +422,8 @@ class AdministratorModel extends BaseModel {
     }
 
     // Get profile data by email
-    public function getProfileByEmail($admin_email)
-    {
+    public function getProfileByEmail($admin_email){
+        $admin_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_picture
             FROM administrator

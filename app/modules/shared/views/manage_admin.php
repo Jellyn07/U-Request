@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../../controllers/AdminController.php';
 $controller = new AdminController();
 $admins = $controller->getAllAdmins();
 $formData = $_SESSION['admin_form_data'] ?? []; 
+$profile = $controller->getProfile($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,22 +29,16 @@ $formData = $_SESSION['admin_form_data'] ?? [];
   <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <link rel="stylesheet" href="/public/assets/css/remove-password-eye.css">
   
 </head>
 <body class="bg-gray-200">
-  <!-- Menu & Header -->
-  <?php
-  // Determine which dashboard menu to include based on access level
-  if ($_SESSION['access_level'] == 2) {
-      // Gsu Admin
+ <?php
+  if ($_SESSION['access_level'] == 1) {
+      include COMPONENTS_PATH . '/superadmin_menu.php';
+  } elseif ($_SESSION['access_level'] == 2) {
       include COMPONENTS_PATH . '/gsu_menu.php';
   } elseif ($_SESSION['access_level'] == 3) {
-      // Motorpool Admin
       include COMPONENTS_PATH . '/motorpool_menu.php';
-  } else {
-      // Fallback: no menu or default
-      echo "<p>No menu available for your access level.</p>";
   }
   ?>
   <main class="ml-16 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
@@ -56,12 +51,12 @@ $formData = $_SESSION['admin_form_data'] ?? [];
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
             <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
-            <!-- <select id="roleFilter" class="input-field">
+            <select id="roleFilter" class="input-field">
               <option value="all">All</option>
               <option value="1">Super Admin</option>
               <option value="2">GSU Admin</option>
               <option value="3">Motorpool Admin</option>
-            </select> -->
+            </select>
             <select id="sortUsers" class="input-field">
               <option value="az">Sort A-Z</option>
               <option value="za">Sort Z-A</option>
@@ -144,37 +139,22 @@ $formData = $_SESSION['admin_form_data'] ?? [];
                         </div>
 
                         <div>
-                            <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
-                            <select name="access_level" class="w-full input-field" required>
-                                <option value="" disabled <?= !isset($formData['access_level']) ? 'selected' : '' ?>>Select Access</option>
-                                <?php
-                                // Define all access levels
-                                $accessLevels = [
-                                    1 => 'Super Admin',
-                                    2 => 'GSU Admin',
-                                    3 => 'Motorpool Admin'
-                                ];
+                          <label class="text-xs text-text mb-1">Access Level<span class="text-secondary">*</span></label>
+                          <select name="access_level" class="w-full input-field" required>
+                          <?php if ($_SESSION['access_level'] == 1): ?>
+                              <option value="" disabled selected>Select Access</option>
+                              <option value="1">Super Admin</option>
+                              <option value="2">GSU Admin</option>
+                              <option value="3">Motorpool Admin</option>
 
-                                // Determine which options the user can see
-                                foreach ($accessLevels as $id => $label) {
-                                    if ($_SESSION['access_level'] == 1) {
-                                        // Super Admin sees all
-                                        $show = true;
-                                    } elseif ($_SESSION['access_level'] == 2 && $id == 2) {
-                                        $show = true; // GSU Admin sees only GSU
-                                    } elseif ($_SESSION['access_level'] == 3 && $id == 3) {
-                                        $show = true; // Motorpool Admin sees only Motorpool
-                                    } else {
-                                        $show = false;
-                                    }
+                          <?php elseif ($_SESSION['access_level'] == 2): ?>
+                              <option value="2" selected>GSU Admin</option>
 
-                                    if ($show) {
-                                        $selected = (isset($formData['access_level']) && (int)$formData['access_level'] === $id) ? 'selected' : '';
-                                        echo "<option value=\"$id\" $selected>$label</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
+                          <?php elseif ($_SESSION['access_level'] == 3): ?>
+                              <option value="3" selected>Motorpool Admin</option>
+
+                          <?php endif; ?>
+                          </select>
                         </div>
                       <!-- </form> -->
                     </div>
@@ -221,80 +201,104 @@ $formData = $_SESSION['admin_form_data'] ?? [];
           <div class="overflow-x-auto h-[580px] overflow-y-auto rounded-b-lg shadow bg-white">
           <table class="min-w-full divide-y divide-gray-200 p-2">
             <thead class="bg-gray-50">
-              <tr>
-                <th class="px-1 py-2 rounded-tl-lg">&nbsp;</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Email</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase rounded-tr-lg">Contact No</th>
-              </tr>
+            <tr>
+                <th class="px-1 py-2"></th>
+                <th class="px-4 py-2 text-left text-xs font-medium uppercase">Full Name</th>
+                <th class="px-4 py-2 text-left text-xs font-medium uppercase">Email</th>
+
+            <?php if ($_SESSION['access_level'] == 1): ?>
+                <th class="px-4 py-2 text-left text-xs font-medium uppercase">Access Level</th>
+                <th class="px-4 py-2 text-left text-xs font-medium uppercase">Status</th>
+                <th class="px-4 py-2 text-center text-xs font-medium uppercase">Admin Mgmt</th>
+            <?php else: ?>
+                <th class="px-4 py-2 text-left text-xs font-medium uppercase">Contact No.</th>
+            <?php endif; ?>
+
+            </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
               <?php if (!empty($admins)): ?>
-                <?php foreach ($admins as $admin): ?>
-                  <tr 
-                      data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
-                      data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
-                      data-role="<?= htmlspecialchars($admin['accessLevel_id']) ?>"
-                      @click="showDetails = true; selected = {
-                        staff_id: '<?php echo $admin['staff_id']; ?>',
-                        email: '<?php echo $admin['email']; ?>',
-                        first_name: '<?php echo $admin['first_name']; ?>',
-                        last_name: '<?php echo $admin['last_name']; ?>',
-                        full_name: '<?php echo $admin['full_name']; ?>',
-                        contact_no: '<?php echo $admin['contact_no']; ?>',
-                        profile_picture: '<?php echo $admin['profile_picture']; ?>',
-                        accessLevel_id: '<?php echo $admin['accessLevel_id']; ?>',
-                        accessLevel_desc: '<?php echo $admin['accessLevel_desc']; ?>',
-                        status: '<?php echo $admin['status']; ?>'
-                      }"
-                      class="cursor-pointer hover:bg-gray-100 border-b border-gray-200"
-                    >
+                  <?php foreach ($admins as $admin): ?>
+                      <?php 
+                          // Check if menu access is enabled
+                          $adminModel = new AdministratorModel();
+                          $menuAccess = $adminModel->getAdminMenuAccess($admin['staff_id']);
 
-                    <!-- Profile picture -->
-                    <td class="pl-8 py-2">
-                      <img src="<?php echo !empty($admin['profile_picture']) 
-                                  ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) 
-                                  : '/public/assets/img/user-default.png'; ?>" 
-                                    alt="User" 
-                                    class="size-8 rounded-full object-cover">
-                    </td>
+                          // Superadmin cannot be unchecked
+                          $isSuperAdmin = strtolower($admin['accessLevel_desc']) === 'superadmin';
+                          $checked = $isSuperAdmin || $menuAccess == 1;
+                      ?>
+                      <tr 
+                           data-status="<?= htmlspecialchars($admin['status']) ?>"
+                           data-firstname="<?= htmlspecialchars($admin['first_name']) ?>"
+                           data-lastname="<?= htmlspecialchars($admin['last_name']) ?>"
+                           data-role="<?= htmlspecialchars($admin['accessLevel_id']) ?>"
+                          @click="showDetails = true; selected = {
+                              staff_id: '<?= $admin['staff_id'] ?>',
+                              email: '<?= $admin['email'] ?>',
+                              first_name: '<?= $admin['first_name'] ?>',
+                              last_name: '<?= $admin['last_name'] ?>',
+                              full_name: '<?= $admin['full_name'] ?>',
+                              contact_no: '<?= $admin['contact_no'] ?>',
+                              profile_picture: '<?= $admin['profile_picture'] ?>',
+                              accessLevel_id: '<?= $admin['accessLevel_id'] ?>',
+                              accessLevel_desc: '<?= $admin['accessLevel_desc'] ?>',
+                              status: '<?= $admin['status'] ?>'
+                          }"
+                          class="cursor-pointer hover:bg-gray-100 border-b border-gray-200"
+                      >
+                          <!-- Profile picture -->
+                         <td class="pl-8 py-2">
+                            <img src="<?= !empty($admin['profile_picture']) ? '/public/uploads/profile_pics/' . htmlspecialchars($admin['profile_picture']) : '/public/assets/img/user-default.png'; ?>" 
+                                alt="User" class="size-8 rounded-full object-cover">
+                        </td>
 
-                    <!-- Full Name -->
-                    <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['full_name']); ?>
-                    </td>
+                        <td class="px-4 py-2"><?= htmlspecialchars($admin['full_name']); ?></td>
+                        <td class="px-4 py-2"><?= htmlspecialchars($admin['email']); ?></td>
 
-                    <!-- Status -->
-                    <td class="px-4 py-2">
-                      <span class="text-xs px-3 py-1 rounded-full font-semibold <?php echo strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'text-red-800'; ?>">
-                        <?php echo htmlspecialchars($admin['status']); ?>
-                      </span>
-                    </td>
+                        <?php if ($_SESSION['access_level'] == 1): ?>
 
-                    <!-- Email -->
-                    <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['email']); ?>
-                    </td>
+                        <td class="px-4 py-2"><?= htmlspecialchars($admin['accessLevel_desc']); ?></td>
 
-                    <!-- Access Level -->
-                    <td class="px-4 py-2">
-                      <?php echo htmlspecialchars($admin['contact_no']); ?>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
+                        <td class="px-4 py-2">
+                            <span class="text-xs px-3 py-1 rounded-full font-semibold <?= strtolower($admin['status']) === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'; ?>">
+                                <?= htmlspecialchars($admin['status']); ?>
+                            </span>
+                        </td>
+
+                        <td class="pl-4 py-2 text-center">
+                          <input 
+                              type="checkbox"
+                              class="admin-checkbox"
+                              <?= $checked ? 'checked' : '' ?>
+                              <?= $isSuperAdmin || $admin['accessLevel_id'] == 1 ? 'disabled' : '' ?>
+                              @click.stop
+                              @change.stop="toggleAdminMenuAccess($event, '<?= $admin['staff_id'] ?>'); updateStatusText(this)"
+                          >
+                          <p id="status-text-<?= $admin['staff_id'] ?>" class="text-xs mt-1 text-gray-600 hidden" >
+                                <?= $checked ? 'Enabled' : 'Disabled' ?>
+                          </p>
+                        </td>
+
+                        <?php else: ?>
+
+                        <td class="px-4 py-2"><?= htmlspecialchars($admin['contact_no']); ?></td>
+
+                        <?php endif; ?>
+                      </tr>
+                  <?php endforeach; ?>
               <?php else: ?>
-                <tr>
-                  <td colspan="6" class="text-center py-4 text-gray-500">No administrators found.</td>
-                </tr>
+                  <tr>
+                      <td colspan="6" class="text-center py-4 text-gray-500">No administrators found.</td>
+                  </tr>
               <?php endif; ?>
-            </tbody>
+          </tbody>
           </table>
           </div>
         </div>
 
         <!-- Right Section (Details) -->
-        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px]">
+        <div x-show="showDetails" x-cloak class="bg-white shadow rounded-lg p-4 max-h-[640px] overflow-auto">
           <button @click="showDetails = false" class="text-sm text-gray-500 hover:text-gray-800 float-right">
             <img src="/public/assets/img/exit.png" class="size-4" alt="Close">
           </button>
@@ -341,7 +345,28 @@ $formData = $_SESSION['admin_form_data'] ?? [];
 
             <div>
               <label class="text-xs text-text mb-1">Access Level</label>
-              <input type="text" id="accessLevel_id" name="contact_no" :value="selected.accessLevel_desc || ''" readonly class="w-full input-field"/>
+              <select name="accessLevel_id" x-model="selected.accessLevel_id" class="w-full input-field"
+                <?= $_SESSION['access_level'] != 1 ? 'disabled' : '' ?>>
+                <?php if ($_SESSION['access_level'] == 1): ?>
+                    <option value="1">Superadmin</option>
+                    <option value="2">GSU Administrator</option>
+                    <option value="3">Motorpool Administrator</option>
+                <?php else: ?>
+                    <option :value="selected.accessLevel_id" selected x-text="
+                        selected.accessLevel_id == 1 ? 'Superadmin' :
+                        selected.accessLevel_id == 2 ? 'GSU Administrator' :
+                        'Motorpool Administrator'
+                    "></option>
+                <?php endif; ?>
+                </select>
+            </div>
+
+            <div>
+              <label class="text-xs text-text mb-1">Status</label>
+              <select name="status" x-model="selected.status" class="w-full input-field" required>
+                <option value="Active" <?= (!isset($formData['status']) || $formData['status'] === 'Active') ? 'selected' : '' ?>>Active</option>
+                <option value="Inactive" <?= (isset($formData['status']) && $formData['status'] === 'Inactive') ? 'selected' : '' ?>>Deactivate</option>
+              </select>
             </div>
 
             <div class="flex justify-center">
@@ -357,13 +382,13 @@ $formData = $_SESSION['admin_form_data'] ?? [];
 
   <script type="module">
     import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
-
+    window.currentExportStatus = "All";
     initTableFilters({
     tableId: "usersTable",
     searchId: "searchUser",
     filterId: "roleFilter",    
     sortId: "sortUsers",     
-    searchColumns: [1, 3],     
+    searchColumns: [1, 2],     
     filterAttr: "data-role"    
   });
       function previewProfile(event) {
@@ -375,6 +400,7 @@ $formData = $_SESSION['admin_form_data'] ?? [];
   </script>
   <script src="/public/assets/js/shared/password-visibility.js"></script>
   <script src="/public/assets/js/shared/export.js"></script>
+  <script src="/public/assets/js/shared/manage-admin.js"></script>
   <script src="/public/assets/js/shared/menus.js"></script>
 </body>
 </html>

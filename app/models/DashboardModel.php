@@ -1,8 +1,7 @@
 <?php
 // filepath: app/models/DashboardModel.php
-
 require_once __DIR__ . '/../core/BaseModel.php';
-
+require_once __DIR__ . '/../config/encryption.php';
 class DashboardModel extends BaseModel  {
 
     // SUMMARY - Total Requests, Pending, Approved, Admins, Users
@@ -126,13 +125,13 @@ class DashboardModel extends BaseModel  {
 
     // Get profile data by email
     public function getProfileByEmail($admin_email){
-        // $encrypted_email = encrypt($admin_email);
+        $encrypted_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_picture
             FROM administrator
             WHERE email = ?
         ");
-        $stmt->bind_param("s", $admin_email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
 
         $result = $stmt->get_result();

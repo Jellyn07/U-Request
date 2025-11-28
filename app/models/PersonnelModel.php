@@ -2,6 +2,7 @@
 // filepath: app/models/PersonnelModel.php
 require_once __DIR__ . '/../core/BaseModel.php';
 require_once __DIR__ . '/../config/db_helpers.php';
+require_once __DIR__ . '/../config/encryption.php';
 
 class PersonnelModel extends BaseModel {
 
@@ -194,7 +195,7 @@ class PersonnelModel extends BaseModel {
 
     // Get profile data by email
     public function getProfileByEmail($admin_email){
-        // $encrypted_email = encrypt($admin_email);
+        $admin_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_picture
             FROM administrator

@@ -1,6 +1,7 @@
 <?php
 // filepath: app/models/UserAdminModel.php
 require_once __DIR__ . '/../core/BaseModel.php';
+require_once __DIR__ . '/../config/encryption.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -72,7 +73,7 @@ class UserAdminModel extends BaseModel
 
     // Get profile data by email
     public function getProfileByEmail($admin_email){
-            // $encrypted_email = encrypt($admin_email);
+        $admin_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_picture
             FROM administrator

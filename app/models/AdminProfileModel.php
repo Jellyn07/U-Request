@@ -6,6 +6,7 @@ require_once __DIR__ . '/../config/db_helpers.php';
 class AdminProfileModel extends BaseModel{
     // Get profile data by email
     public function getProfileByEmail($admin_email){
+        // Query using the encrypted value (DB stores encrypted email)
         $encrypted_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT staff_id, email, first_name, last_name, profile_picture
@@ -14,9 +15,12 @@ class AdminProfileModel extends BaseModel{
         ");
         $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
-
         $result = $stmt->get_result();
-        return $result->fetch_assoc(); // returns single row
+        $row = $result->fetch_assoc();
+        if ($row && isset($row['email'])) {
+            $row['email'] = decrypt($row['email']);
+        }
+        return $row;
     }
 
     // Update profile picture

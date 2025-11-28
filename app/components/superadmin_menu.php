@@ -45,7 +45,7 @@ if (session_status() === PHP_SESSION_NONE) {
               </a>
             </li>
             <li>
-              <a href="../../superadmin/views/manage_admin.php" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">
+              <a href="../../shared/views/manage_admin.php" class="flex p-2 rounded-lg hover:bg-accent transition sidebar-text">
                 <img src="/public/assets/img/admin-management.png" alt="Manage Admins" class="size-5 object-cover overflow-hidden mr-2" />
                 Admins
               </a>
