@@ -82,6 +82,9 @@ $profile = $controller->getProfile($_SESSION['email']);
             <button title="Export" id="export" class="btn-upper">
               <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
+            <button title="Add Request" id="add_request" class="btn btn-primary">
+              <img src="/public/assets/img/add_white.png" alt="User" class="size-4 my-0.5">
+            </button>
           </div>
 
           <!-- TABLE -->
@@ -479,4 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+<script>
+   const BASE_URL = "<?php echo PUBLIC_URL; ?>";
+</script>
 <script src="/public/assets/js/shared/export.js"></script>
+<script src="/public/assets/js/motorpool_admin/vehicle-request.js"></script>
