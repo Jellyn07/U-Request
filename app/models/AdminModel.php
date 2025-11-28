@@ -9,7 +9,7 @@ class AdministratorModel extends BaseModel {
     // ADD ADMINISTRATOR
     public function addAdministrator($staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $password, $profile_picture) {
         $encrypted_pass = encrypt($password);
-        // $encrypted_email = encrypt($email);
+        $encrypted_email = encrypt($email);
 
         // Optional: record who added this admin
         if (isset($_SESSION['staff_id'])) {
@@ -26,7 +26,7 @@ class AdministratorModel extends BaseModel {
                 throw new Exception("Prepare failed: " . $this->db->error);
             }
 
-            $stmt->bind_param("sssssiss", $staff_id, $email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
+            $stmt->bind_param("sssssiss", $staff_id, $encrypted_email, $first_name, $last_name, $contact_no, $access_level, $encrypted_pass, $profile_picture);
             if (!$stmt->execute()) {
                 throw new Exception("Execute failed: " . $stmt->error);
             }
@@ -61,13 +61,14 @@ class AdministratorModel extends BaseModel {
 
     // GET ADMIN BY EMAIL (FOR LOGIN OR DUPLICATE CHECKING)
     public function getAdminByEmail($email) {
+        $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("CALL spGetAdminByEmail(?)");
         if (!$stmt) {
             $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
             return null;
         }
 
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -75,8 +76,9 @@ class AdministratorModel extends BaseModel {
     }  
     // CHECK IF EMAIL EXISTS
     public function emailExists($email) {
+        $encrypted_email = encrypt($email);
         $stmt = $this->db->prepare("SELECT COUNT(*) AS cnt FROM vw_administrator WHERE email = ?");
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $encrypted_email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -94,86 +96,86 @@ class AdministratorModel extends BaseModel {
     }
 
     // VERIFY PASSWORD (DECRYPT AND COMPARE)
-    public function verifyPassword($input_pass, $stored_encrypted_pass) {
-        return $input_pass === decrypt($stored_encrypted_pass);
-    }
+    // public function verifyPassword($input_pass, $stored_encrypted_pass) {
+    //     return $input_pass === decrypt($stored_encrypted_pass);
+    // }
 
-    public function getAdministrators($currentAccessLevel = 1) {
-        // Base query
-        $query = "SELECT * FROM vw_administrator";
-        $params = [];
-        
-        // Apply filter for non-superadmins
-        if ($currentAccessLevel == 2) {
-            // GSU Admin sees only GSU admins
-            $query .= " WHERE accessLevel_id = ?";
-            $params[] = 2;
-        } elseif ($currentAccessLevel == 3) {
-            // Motorpool Admin sees only Motorpool admins
-            $query .= " WHERE accessLevel_id = ?";
-            $params[] = 3;
-        }
-
-        $stmt = $this->db->prepare($query);
-        
-        if (!$stmt) {
-            $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
-            return [];
-        }
-
-        // Bind parameters if needed
-        if (!empty($params)) {
-            $stmt->bind_param(str_repeat('i', count($params)), ...$params);
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $admins = $result->fetch_all(MYSQLI_ASSOC);
-
-        $stmt->close();
-        return $admins;
-    }
-
-    // --- EMAIL DECRYPTION VERSION (FUTURE) ---
     // public function getAdministrators($currentAccessLevel = 1) {
-    //     // Base query: fetch all columns including the encrypted email
+    //     // Base query
     //     $query = "SELECT * FROM vw_administrator";
     //     $params = [];
-
+        
     //     // Apply filter for non-superadmins
     //     if ($currentAccessLevel == 2) {
+    //         // GSU Admin sees only GSU admins
     //         $query .= " WHERE accessLevel_id = ?";
     //         $params[] = 2;
     //     } elseif ($currentAccessLevel == 3) {
+    //         // Motorpool Admin sees only Motorpool admins
     //         $query .= " WHERE accessLevel_id = ?";
     //         $params[] = 3;
     //     }
 
     //     $stmt = $this->db->prepare($query);
+        
     //     if (!$stmt) {
     //         $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
     //         return [];
     //     }
 
+    //     // Bind parameters if needed
     //     if (!empty($params)) {
     //         $stmt->bind_param(str_repeat('i', count($params)), ...$params);
     //     }
 
     //     $stmt->execute();
     //     $result = $stmt->get_result();
-    //     $admins = [];
-
-    //     while ($row = $result->fetch_assoc()) {
-    //         // Decrypt email
-    //         if (!empty($row['email'])) {
-    //             $row['email'] = decrypt($row['email']);
-    //         }
-    //         $admins[] = $row;
-    //     }
+    //     $admins = $result->fetch_all(MYSQLI_ASSOC);
 
     //     $stmt->close();
     //     return $admins;
     // }
+
+    // --- EMAIL DECRYPTION VERSION (FUTURE) ---
+    public function getAdministrators($currentAccessLevel = 1) {
+        // Base query: fetch all columns including the encrypted email
+        $query = "SELECT * FROM vw_administrator";
+        $params = [];
+
+        // Apply filter for non-superadmins
+        if ($currentAccessLevel == 2) {
+            $query .= " WHERE accessLevel_id = ?";
+            $params[] = 2;
+        } elseif ($currentAccessLevel == 3) {
+            $query .= " WHERE accessLevel_id = ?";
+            $params[] = 3;
+        }
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            $_SESSION['db_error'] = "Prepare failed: " . $this->db->error;
+            return [];
+        }
+
+        if (!empty($params)) {
+            $stmt->bind_param(str_repeat('i', count($params)), ...$params);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $admins = [];
+
+        while ($row = $result->fetch_assoc()) {
+            // Decrypt email
+            if (!empty($row['email'])) {
+                $row['email'] = decrypt($row['email']);
+            }
+            $admins[] = $row;
+        }
+
+        $stmt->close();
+        return $admins;
+    }
 
      // Update admin details
      public function updateAdminDetails($data) {
@@ -217,7 +219,7 @@ class AdministratorModel extends BaseModel {
 
         // Append WHERE parameter
         $types .= 's';
-        $values[] = $data['admin_email'];
+        $values[] = encrypt($data['admin_email']);
 
         // bind_param requires references
         $bindParams = [];
@@ -308,6 +310,7 @@ class AdministratorModel extends BaseModel {
 
     // For Add: Email
     public function isAdminEmailExistsOnAdd($email) {
+            $email = encrypt($email);
         $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE email = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) return false;
@@ -337,11 +340,12 @@ class AdministratorModel extends BaseModel {
 
     // Check staff_id (exclude current admin by email)
     public function isAdminIdExists($staff_id, $currentEmail) {
+        $email = encrypt($currentEmail);
         $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE staff_id = ? AND email != ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) return false;
 
-        $stmt->bind_param('ss', $staff_id, $currentEmail);
+        $stmt->bind_param('ss', $staff_id, $email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -351,11 +355,12 @@ class AdministratorModel extends BaseModel {
 
     // Check email (exclude current admin by staff_id)
     public function isAdminEmailExists($email, $currentStaffId) {
+        $encrypted_email = encrypt($email);
         $sql = "SELECT COUNT(*) as count FROM vw_administrator WHERE email = ? AND staff_id != ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) return false;
 
-        $stmt->bind_param('ss', $email, $currentStaffId);
+        $stmt->bind_param('ss', $email, $encrypted_email);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();

@@ -105,40 +105,40 @@ class UserModel extends BaseModel  {
     }
 
     // GET ADMIN User
-    public function getAdminUserByEmail($email) {
-        $stmt = $this->db->prepare("CALL spGetAdminByEmail(?)");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        return $result;
-    }
-
-    //  GET Encrypted Email ADMIN User
     // public function getAdminUserByEmail($email) {
-    //     // Encrypt the email to match the database value
-    //     $encryptedEmail = encrypt($email);
-
     //     $stmt = $this->db->prepare("CALL spGetAdminByEmail(?)");
-    //     if (!$stmt) {
-    //         error_log("Prepare failed: " . $this->db->error);
-    //         return null;
-    //     }
-
-    //     $stmt->bind_param("s", $encryptedEmail);
+    //     $stmt->bind_param("s", $email);
     //     $stmt->execute();
-
-    //     // Get the result
     //     $result = $stmt->get_result()->fetch_assoc();
-
-    //     // Decrypt email in the returned row, if exists
-    //     if ($result && isset($result['email'])) {
-    //         $result['email'] = decrypt($result['email']);
-    //     }
-
     //     $stmt->close();
     //     return $result;
     // }
+
+    //  GET Encrypted Email ADMIN User
+    public function getAdminUserByEmail($email) {
+        // Encrypt the email to match the database value
+        $encryptedEmail = encrypt($email);
+
+        $stmt = $this->db->prepare("CALL spGetAdminByEmail(?)");
+        if (!$stmt) {
+            error_log("Prepare failed: " . $this->db->error);
+            return null;
+        }
+
+        $stmt->bind_param("s", $encryptedEmail);
+        $stmt->execute();
+
+        // Get the result
+        $result = $stmt->get_result()->fetch_assoc();
+
+        // Decrypt email in the returned row, if exists
+        if ($result && isset($result['email'])) {
+            $result['email'] = decrypt($result['email']);
+        }
+
+        $stmt->close();
+        return $result;
+    }
 
     public function getRequestHistory($requester_id) {
     $records = [];
