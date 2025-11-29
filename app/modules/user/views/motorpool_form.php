@@ -138,23 +138,34 @@ require_once __DIR__ . '/../../../config/constants.php';
     <!-- JS -->
     <script>
       function addPassengerField() {
-        const container = document.getElementById('passenger-fields');
-        const newRow = document.createElement('div');
-        newRow.classList.add('flex', 'gap-2', 'passenger-row', 'items-end', 'mt-2');
-        newRow.innerHTML = `
-          <div class="w-1/2">
-            <input type="text" name="first_name[]" required placeholder="First Name" class="input-field w-full">
-          </div>
-          <div class="w-1/2">
-            <input type="text" name="last_name[]" required placeholder="Last Name" class="input-field w-full">
-          </div>
-          <button type="button" class="bg-gray-700 hover:bg-gray-600 text-gray-700 rounded-full w-9 h-9 flex items-center justify-center" onclick="this.parentElement.remove()" title="Remove Passenger">
-            <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
-          </button>
-        `;
-        container.appendChild(newRow);
-      }
+          const container = document.getElementById('passenger-fields');
+          const currentCount = container.querySelectorAll('.passenger-row').length;
 
+          if (currentCount >= 60) {
+              Swal.fire({
+                  icon: 'warning',
+                  title: 'Maximum Limit Reached',
+                  text: 'You have reached the maximum of 60 passengers. Please submit and request again for the remaining passengers.',
+                  confirmButtonColor: '#800000'
+              });
+              return;
+          }
+
+          const newRow = document.createElement('div');
+          newRow.classList.add('flex', 'gap-2', 'passenger-row', 'items-end', 'mt-2');
+          newRow.innerHTML = `
+              <div class="w-1/2">
+                  <input type="text" name="first_name[]" required placeholder="First Name" class="input-field w-full">
+              </div>
+              <div class="w-1/2">
+                  <input type="text" name="last_name[]" required placeholder="Last Name" class="input-field w-full">
+              </div>
+              <button type="button" class="bg-gray-700 hover:bg-gray-600 text-gray-700 rounded-full w-9 h-9 flex items-center justify-center" onclick="this.parentElement.remove()" title="Remove Passenger">
+                  <img src="<?php echo PUBLIC_URL; ?>/assets/img/minus.png" alt="Minus" class="w-3 h-3">
+              </button>
+          `;
+          container.appendChild(newRow);
+      }
       document.addEventListener('DOMContentLoaded', () => {
         const travelInput = document.getElementById('date_of_travel');
         const returnInput = document.getElementById('date_of_return');

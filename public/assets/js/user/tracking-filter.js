@@ -37,3 +37,62 @@ document.addEventListener('DOMContentLoaded', () => {
   statusSelect.addEventListener('change', () => form.submit());
   document.querySelector('select[name="sort"]').addEventListener('change', () => form.submit());
 });
+
+function openCancelModal(control_no) {
+    Swal.fire({
+        title: "Cancel This Request?",
+        html: `
+            <p class="mb-2 text-sm text-gray-700">
+                Please provide your reason for cancellation.
+            </p>
+            <p class="mb-4 text-xs text-red-600">
+                Note: Please refrain from cancelling more than 3 times in a week.
+            </p>
+        `,
+        icon: "warning",
+        input: "textarea",
+        inputPlaceholder: "Enter your reason...",
+        showCancelButton: true,
+        confirmButtonText: "Submit",
+        cancelButtonText: "Close",
+        preConfirm: (reason) => {
+            if (!reason) {
+                Swal.showValidationMessage("Reason is required.");
+                return false;
+            }
+
+            // You can optionally check cancel count here via an API
+            // Example: if (cancelCount >= 3) { Swal.showValidationMessage("You have reached the weekly limit."); return false; }
+
+            // Send POST request to controller
+            return fetch("../../../controllers/VehicleRequestController.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    form_action: "cancelRequest",
+                    control_no: control_no,
+                    reason: reason
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.showValidationMessage(data.message || "Request failed");
+                    return false;
+                }
+                return data;
+            })
+            .catch(() => Swal.showValidationMessage("Request failed."));
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                icon: "success",
+                title: "Cancelled",
+                text: "Your request has been cancelled.",
+            }).then(() => location.reload()); // You can later replace this with dynamic UI update
+        }
+    });
+}
