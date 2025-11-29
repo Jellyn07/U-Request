@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
 require_once __DIR__ . '/../config/encryption.php'; 
+require_once __DIR__ . '/../config/db_helpers.php';
 class ProfileModel extends BaseModel {
 
     // Get profile data by requester_id
@@ -27,6 +28,9 @@ class ProfileModel extends BaseModel {
 
     // Update department/office
     public function updateOfficeOrDept($email, $officeOrDept) {
+        if (isset($_SESSION['req_id'])) {
+            setCurrentRequester($this->db); // Use model's connection
+        }
         $email = encrypt($email);
         $stmt = $this->db->prepare("
             UPDATE requester
@@ -38,6 +42,9 @@ class ProfileModel extends BaseModel {
     }
 
     public function updateContact($req_id, $contact) {
+        if (isset($_SESSION['req_id'])) {
+            setCurrentRequester($this->db); // Use model's connection
+        }
         $stmt = $this->db->prepare("UPDATE requester SET contact = ? WHERE req_id = ?");
         $stmt->bind_param("si", $contact, $req_id);
         $success = $stmt->execute();
@@ -74,6 +81,9 @@ class ProfileModel extends BaseModel {
 
     // Update profile picture
     public function updateProfilePicture($fileName, $filePath) {
+        if (isset($_SESSION['req_id'])) {
+            setCurrentRequester($this->db); // Use model's connection
+        }
         $fileName = encrypt($fileName);
         $sql = "
             UPDATE requester 
@@ -89,7 +99,9 @@ class ProfileModel extends BaseModel {
 
     // Update password with encryption
     public function updatePassword($requester_email, $newPassword) {
-        require_once __DIR__ . '/../config/encryption.php';
+        if (isset($_SESSION['req_id'])) {
+            setCurrentRequester($this->db); // Use model's connection
+        }
         $encryptedPassword = encrypt($newPassword);
         $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("

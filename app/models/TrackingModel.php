@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
-
+require_once __DIR__ . '/../config/encryption.php';
 class TrackingModel extends BaseModel {
 
     // Get all tracking requests by email (merged: repair + vehicle)
     public function getTrackingByEmail($email) {
+        $email = encrypt($email);
         $tracking = [];
 
         // --- REPAIR (vw_rqtrack) ---
@@ -78,6 +79,7 @@ class TrackingModel extends BaseModel {
 
     // Get repair tracking requests by email
     public function getRepairTrackingByEmail($email) {
+        $email = encrypt($email);
         $sqlRepair = "
             SELECT 
                 t.tracking_id,
@@ -120,6 +122,7 @@ class TrackingModel extends BaseModel {
 
     // Get vehicle tracking requests by email
     public function getVehicleTrackingByEmail($email) {
+        $email = encrypt($email);
         $sqlVehicle = "
         SELECT 
             vrq.*,  -- vehicle_request columns
@@ -160,6 +163,7 @@ class TrackingModel extends BaseModel {
 
     // Get single tracking details by email + tracking_id
     public function getTrackingDetails($tracking_id, $email) {
+        $email = encrypt($email);
         // 1) try repair/vw_rqtrack
         $sqlRepair = "
             SELECT 

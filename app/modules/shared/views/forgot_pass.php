@@ -206,7 +206,6 @@ function verifyOtp() {
 
 /* ─────────────── STEP 3: RESET PASSWORD ─────────────── */
 function resetPassword() {
-  const email = document.getElementById("email").value.trim();
   const newPass = document.getElementById("new_password").value.trim();
   const confirmPass = document.getElementById("confirm_password").value.trim();
 
@@ -234,7 +233,7 @@ function resetPassword() {
   fetch(HANDLER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ action: "reset_password", email, new_password: newPass })
+    body: new URLSearchParams({ action: "reset_password", new_password: newPass })
   })
   .then(r => r.json())
   .then(data => {

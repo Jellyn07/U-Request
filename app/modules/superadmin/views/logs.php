@@ -60,6 +60,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <option value="gsu personnel" <?= $tableFilter==='gsu personnel'?'selected':'' ?>>GSU Personnel</option>
                 <option value="materials" <?= $tableFilter==='materials'?'selected':'' ?>>Materials</option>
                 <option value="request" <?= $tableFilter==='request'?'selected':'' ?>>Request</option>
+                <option value="requester" <?= $tableFilter==='requester'?'selected':'' ?>>Requester</option>
                 <option value="request status" <?= $tableFilter==='request status'?'selected':'' ?>>Request Status</option>
                 <option value="vehicle" <?= $tableFilter==='vehicle'?'selected':'' ?>>Vehicle</option>
                 <option value="vehicle request" <?= $tableFilter==='vehicle request'?'selected':'' ?>>Vehicle Request</option>

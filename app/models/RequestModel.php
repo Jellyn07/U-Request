@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php'; 
 require_once __DIR__ . '/../config/db_helpers.php';
+require_once __DIR__ . '/../config/encryption.php';
 
 class RequestModel extends BaseModel {
     public $lastError = null;
@@ -68,11 +69,17 @@ class RequestModel extends BaseModel {
         return $result->fetch_assoc(); // returns row if found, null if not
     }
 
-    // In RequestModel.php
     public function getAllRequesters() {
-        $sql = "SELECT * FROM vw_requesters"; 
+        $sql = "SELECT * FROM vw_requesters";
         $result = $this->db->query($sql);
-        return $result->fetch_all(MYSQLI_ASSOC);
+
+        $rows = $result->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($rows as &$row) {
+            $row['email'] = decrypt($row['email']);
+        }
+
+        return $rows;
     }
 
     public function getRequesterById($id) {
@@ -86,37 +93,40 @@ class RequestModel extends BaseModel {
       // Get all requests from vw_requests
       public function getAllRequests() {
         $sql = "SELECT 
-                    vw.*,
-                    r.*,
-                    ra.*,
-                    COALESCE(
-                        GROUP_CONCAT(
-                            DISTINCT vwg.full_name SEPARATOR ', '
-                        ),
-                        'No personnel assigned'
-                    ) AS assigned_personnel,
-                    COALESCE(
-                        GROUP_CONCAT(
-                            DISTINCT CONCAT(m.material_desc, ' (Qty: ', rm.quantity_needed, ')')
-                            SEPARATOR ', '
-                        ),
-                        'No materials used'
-                    ) AS materials_needed
-                FROM vw_requests vw
-                INNER JOIN request r 
-                    ON vw.request_id = r.request_id
-                LEFT JOIN request_assignment ra
-                    ON r.request_id = ra.request_id
-                LEFT JOIN request_assigned_personnel rap
-                    ON r.request_id = rap.request_id
-                LEFT JOIN vw_gsu_personnel vwg
-                    ON rap.staff_id = vwg.staff_id
-                LEFT JOIN request_materials_needed rm
-                    ON ra.reqAssignment_id = rm.reqAssignment_id
-                LEFT JOIN materials m
-                    ON rm.material_code = m.material_code
-                GROUP BY r.request_id
-                ORDER BY vw.request_date DESC;
+                vw.*,
+                rq.officeOrDept AS requester_officeOrDept,
+                r.*,
+                ra.*,
+                COALESCE(
+                    GROUP_CONCAT(
+                        DISTINCT vwg.full_name SEPARATOR ', '
+                    ),
+                    'No personnel assigned'
+                ) AS assigned_personnel,
+                COALESCE(
+                    GROUP_CONCAT(
+                        DISTINCT CONCAT(m.material_desc, ' (Qty: ', rm.quantity_needed, ')')
+                        SEPARATOR ', '
+                    ),
+                    'No materials used'
+                ) AS materials_needed
+            FROM vw_requests vw
+            INNER JOIN request r 
+                ON vw.request_id = r.request_id
+            LEFT JOIN request_assignment ra
+                ON r.request_id = ra.request_id
+            LEFT JOIN requester rq
+                ON ra.req_id = rq.req_id
+            LEFT JOIN request_assigned_personnel rap
+                ON r.request_id = rap.request_id
+            LEFT JOIN vw_gsu_personnel vwg
+                ON rap.staff_id = vwg.staff_id
+            LEFT JOIN request_materials_needed rm
+                ON ra.reqAssignment_id = rm.reqAssignment_id
+            LEFT JOIN materials m
+                ON rm.material_code = m.material_code
+            GROUP BY r.request_id
+            ORDER BY vw.request_date DESC;
                 ";
         $result = $this->db->query($sql);
 
@@ -325,8 +335,8 @@ class RequestModel extends BaseModel {
     
 
     // Get profile data by email
-    public function getProfileByEmail($admin_email)
-    {
+    public function getProfileByEmail($admin_email) {
+        $admin_email = encrypt($admin_email);
         $stmt = $this->db->prepare("
             SELECT profile_picture
             FROM administrator
@@ -391,59 +401,76 @@ class RequestModel extends BaseModel {
     }
 
     // Vehicle Requests
-   public function getAllVehicleRequests() {
-    // First, get the main vehicle requests
-    $query = "
-        SELECT 
-            v.*,
-            CONCAT(r.firstName, ' ', r.lastName) AS requester_name,
-            r.contact,
-            vr.vehicle_id,
-            vr.driver_id,
-            CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
-            vr.req_status,
-            vr.approved_by,
-            vr.reason,
-            vl.vehicle_name
-        FROM vehicle_request v
-        INNER JOIN requester r ON v.req_id = r.req_id
-        LEFT JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no
-        LEFT JOIN vehicle vl ON vl.vehicle_id = vr.vehicle_id
-        LEFT JOIN driver d ON d.driver_id = vr.driver_id
-        ORDER BY v.date_request DESC;
-        ";
-        
-        $result = $this->db->query($query);
-        if (!$result) {
-            die('Query Error: ' . $this->db->error);
-        }
+public function getAllVehicleRequests() {
+    // 1) Get the main vehicle requests
+  $query = "
+    SELECT 
+        v.*,
+        CONCAT(r.firstName, ' ', r.lastName) AS requester_name,
+        r.contact,
+        vr.vehicle_id,
+        vr.driver_id,
+        CONCAT(d.firstName, ' ', d.lastName) AS driver_name,
+        vr.req_status,
+        vr.approved_by,
+        vr.reason,
+        vl.vehicle_name,
+        sf.source_of_fuel,
+        sf.source_of_oil,
+        sf.source_of_repair_maintenance,
+        sf.source_of_driver_assistant_per_diem
+    FROM vehicle_request v
+    INNER JOIN requester r ON v.req_id = r.req_id
+    LEFT JOIN vehicle_request_assignment vr ON v.control_no = vr.control_no
+    LEFT JOIN vehicle vl ON vl.vehicle_id = vr.vehicle_id
+    LEFT JOIN driver d ON d.driver_id = vr.driver_id
+    LEFT JOIN source_of_fund sf ON v.control_no = sf.control_no
+    ORDER BY v.date_request DESC;
+";
 
-        $requests = [];
-        while ($row = $result->fetch_assoc()) {
-            // Fetch passengers for this request
-            $control_no = $row['control_no'];
-            $passengersQuery = "
-                SELECT CONCAT(p.firstName, ' ', p.lastName) AS name
-                FROM passengers p
-                INNER JOIN vehicle_request_passengers vrp ON p.passenger_id = vrp.passenger_id
-                WHERE vrp.control_no = '{$this->db->real_escape_string($control_no)}'
-            ";
-            $passengersResult = $this->db->query($passengersQuery);
-            $passengers = [];
-            if ($passengersResult) {
-                while ($p = $passengersResult->fetch_assoc()) {
-                    $passengers[] = $p['name'];
-                }
-            }
 
-            $row['passengers'] = $passengers;                     // Array of passenger names
-            $row['passenger_count'] = count($passengers);         // Number of passengers
-
-            $requests[] = $row;
-        }
-
-        return $requests;
+    $result = $this->db->query($query);
+    if (!$result) {
+        die('Query Error: ' . $this->db->error);
     }
+
+    $requests = [];
+
+    while ($row = $result->fetch_assoc()) {
+    $control_no = $row['control_no'];
+
+    // Fetch passengers
+    $passengersQuery = "
+        SELECT CONCAT(p.firstName, ' ', p.lastName) AS name
+        FROM passengers p
+        INNER JOIN vehicle_request_passengers vrp 
+        ON p.passenger_id = vrp.passenger_id
+        WHERE vrp.control_no = '{$this->db->real_escape_string($control_no)}'
+    ";
+    $passengersResult = $this->db->query($passengersQuery);
+    $passengers = [];
+    if ($passengersResult) {
+        while ($p = $passengersResult->fetch_assoc()) {
+            $passengers[] = $p['name'];
+        }
+    }
+    $row['passengers'] = $passengers;
+    $row['passenger_count'] = count($passengers);
+
+    // Default N/A if LEFT JOIN returned null
+    $row['source_of_fuel'] = $row['source_of_fuel'] ?? 'N/A';
+    $row['source_of_oil'] = $row['source_of_oil'] ?? 'N/A';
+    $row['source_of_repair_maintenance'] = $row['source_of_repair_maintenance'] ?? 'N/A';
+    $row['source_of_driver_assistant_per_diem'] = $row['source_of_driver_assistant_per_diem'] ?? 'N/A';
+
+    $requests[] = $row;
+}
+
+
+    return $requests;
+}
+
+
 
     public function getAssignedPersonnel($request_id) {
         $stmt = $this->db->prepare("SELECT staff_id FROM request_assigned_personnel WHERE request_id = ?");
@@ -467,16 +494,42 @@ class RequestModel extends BaseModel {
 //         return $success;
 //     }
 
+// In RequestModel.php
 public function updateLocation($request_id, $location) {
-   if (isset($_SESSION['staff_id'])) {
-                setCurrentStaff($this->db); // Use model's connection
-        }
-        $stmt = $this->db->prepare("UPDATE request SET location = ? WHERE request_id = ?");
-        $stmt->bind_param("si", $location, $request_id);
-        $success = $stmt->execute();
-        $stmt->close();
-        return $success;
+    $stmt = $this->db->prepare("UPDATE vw_requests SET location = ? WHERE request_id = ?");
+    $stmt->bind_param("si", $location, $request_id);
+    $success = $stmt->execute();
+    $stmt->close();
+
+    return $success;
 }
+
+    public function getSourceOfFundByControlNo($control_no) {
+        $sql = "
+            SELECT 
+                source_of_fuel,
+                source_of_oil,
+                source_of_repair_maintenance,
+                source_of_driver_assistant_per_diem
+            FROM source_of_fund
+            WHERE control_no = ?
+            LIMIT 1
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            error_log("getSourceOfFundByControlNo prepare failed: " . $this->db->error);
+            return null;
+        }
+
+        $stmt->bind_param("i", $control_no);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $fund = $res->fetch_assoc();
+        $stmt->close();
+
+        return $fund;
+    }
 
 
 }

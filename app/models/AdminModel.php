@@ -239,6 +239,9 @@ class AdministratorModel extends BaseModel {
     }
 
     public function updateUserDetails($data) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db); // Use model's connection
+        }
         $allowedFields = [
             'requester_id' => ['col' => 'requester_id', 'type' => 's'],
             'firstName' => ['col' => 'firstName', 'type' => 's'],
@@ -265,7 +268,7 @@ class AdministratorModel extends BaseModel {
         if (!$stmt) return false;
     
         $types .= 's';
-        $values[] = $data['email'];
+        $values[] = encrypt($data['email']);
     
         $bindParams = [];
         $bindParams[] = & $types;
@@ -280,18 +283,15 @@ class AdministratorModel extends BaseModel {
         return $result;
     }
 
-    // Check if requester_id already exists (excluding the current user)
-    public function isRequesterIdExists($requester_id, $currentEmail) {
-        $sql = "SELECT COUNT(*) as count FROM vw_requesters WHERE requester_id = ? AND email != ?";
+    public function isRequesterIdExists($requester_id, $email) {
+        $sql = "SELECT COUNT(*) AS count FROM requester 
+                WHERE requester_id = ? 
+                AND email != ?";
         $stmt = $this->db->prepare($sql);
-        if (!$stmt) return false;
-
-        $stmt->bind_param('ss', $requester_id, $currentEmail);
+        $stmt->bind_param("ss", $requester_id, encrypt($email));
         $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-
-        return $result['count'] > 0;
+        $row = $stmt->get_result()->fetch_assoc();
+        return $row['count'] > 0;
     }
 
     // For Add: Staff ID

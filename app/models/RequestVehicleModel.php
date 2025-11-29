@@ -325,9 +325,10 @@ class VehicleRequestModel extends BaseModel {
 
     public function cancelRequestInDB(int $control_no, string $reason): bool {
         
-                if (isset($_SESSION['req_id'])) {
-                    setCurrentRequester($this->db); // Use model's connection
-                }
+        if (isset($_SESSION['req_id'])) {
+            setCurrentRequester($this->db); // Use model's connection
+        }
+        
         $sql = "UPDATE vehicle_request_assignment 
                 SET req_status = 'Cancelled', reason = ? 
                 WHERE control_no = ? AND req_status = 'Pending'";

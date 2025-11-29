@@ -43,7 +43,7 @@ class ActivityLogsModel extends BaseModel {
         'super' => [
             'gsu personnel', 'materials', 'request', 'request status',
             'assigned personnel', 'administrator', 'campus location',
-            'driver', 'vehicle', 'vehicle request', 'vehicle request assignment'
+            'driver', 'vehicle', 'vehicle request', 'vehicle request assignment', 'requester'
         ],
 
         'gsu' => [

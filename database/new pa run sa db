@@ -2019,3 +2019,22 @@ BEGIN
     );
 END$$
 DELIMITER ;
+
+------------------------------------------------------------------------------------
+DELIMITER $$
+CREATE TRIGGER trg_requester_insert
+AFTER INSERT ON requester
+FOR EACH ROW
+BEGIN
+    DECLARE requester_name VARCHAR(150);
+    SET requester_name = CONCAT(NEW.firstName, ' ', NEW.lastName);
+
+    INSERT INTO activity_logs(source, name, action, description)
+    VALUES(
+        'Requester',
+        requester_name,
+        'INSERT',
+        CONCAT(requester_name, ' signed up and created an account')
+    );
+END$$
+DELIMITER ;

@@ -10,8 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-class UserAdminModel extends BaseModel
-{
+class UserAdminModel extends BaseModel{
     /**
      * Get users with search, status, and sort filters
      */

@@ -18,13 +18,13 @@ Too Add functionality
 Overall
     - should show default picture (for img not found) in profiles & others if no pic found
     - if logout cannot go back to last page open
-    - export should be the same in the table ex. if i filter only the available then it should be the same when exporting
+    - export should be the same in the table ex. if i filter only the available then it should be the same when exporting✅
     - should display/refresh by year in dashboard and should have an all year option too in all admin
     - when adding contact 09 should be given and cannot be change like what if user input 06?✅
-    - should not allow use to have name with number
+    - should not allow use to have name with number✅
     - profiles in admin wont change after i change it ex. i change profile it does change but when i go back the sidemenu profile not change
     - dont accept Ñ
-    - wrong email wont promt wrong ex. user@gmail.com
+    - wrong email wont promt wrong ex. user@gmail.com✅
     - sign in first/last name is not automatically get uppercase in the first letter
 
 
@@ -36,7 +36,7 @@ Overall
     - activity type not working properly✅
 
     -Admin Model Store Procedures✅ oki rani
-    -All email must encrypted(last)
+    -All email must encrypted(last)✅
     -Password(8 characters with uppercase lowercase and special characters)✅
 
 Super Admin

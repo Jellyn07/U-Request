@@ -1,4 +1,6 @@
 <?php
+error_reporting(0);
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -245,8 +247,7 @@ class RequestController {
         exit;
     }
 
-    public function getProfile($admin_email)
-    {
+    public function getProfile($admin_email){
         return $this->model->getProfileByEmail($admin_email);
     }
 
@@ -278,26 +279,29 @@ if (isset($_GET['action']) && $_GET['action'] === 'getLocationsByUnit') {
 
 require_once __DIR__ . '/../models/RequestModel.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updateLocation') {
+    header('Content-Type: application/json'); // important for AJAX
 
-    if ($action === 'updateLocation') {
-        $request_id = $_POST['request_id'] ?? null;
-        $location = $_POST['location'] ?? null;
+    $request_id = $_POST['request_id'] ?? null;
+    $location   = $_POST['location'] ?? null;
 
-        if (!$request_id || !$location) {
-            echo json_encode(['success' => false, 'message' => 'Missing required fields']);
-            exit;
-        }
-
-        $model = new RequestModel();
-        $updated = $model->updateLocation($request_id, $location);
-
-        if ($updated) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update location']);
-        }
+    if (!$request_id || !$location) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Missing required fields'
+        ]);
         exit;
     }
+
+    $model = new RequestModel();
+    $updated = $model->updateLocation($request_id, $location);
+
+    echo json_encode([
+        'success' => $updated,
+        'message' => $updated ? 'Location updated successfully' : 'Failed to update location'
+    ]);
+    exit;
 }
+
+
+

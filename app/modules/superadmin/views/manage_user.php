@@ -44,7 +44,7 @@ $profile = $controller->getProfile($_SESSION['email']);
         <div :class="showDetails ? 'col-span-2' : 'col-span-3'">
           <div class="p-3 flex flex-wrap gap-2 justify-between items-center bg-white shadow rounded-t-lg">
             <!-- Search + Filters + Buttons -->
-            <input type="text" id="searchUser" placeholder="Search by name or email" class="flex-1 min-w-[200px] input-field">
+            <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
             <!-- <select class="input-field">
               <option value="all">All</option>
               <option value="have_pending">Active</option>
