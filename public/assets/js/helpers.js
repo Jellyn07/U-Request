@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Capitalize each word in a name
+// Capitalize each word in a name
 function formatNameJS(name) {
   return name
     .trim()
@@ -32,13 +32,15 @@ function formatNameJS(name) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Automatically apply when typing or leaving the input field
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('input[name="first_name"], input[name="last_name"], input[name="first_name[]"], input[name="last_name[]"], input[name="material_desc"], textarea[name="description"], input[name="purpose_of_trip"], input[name="travel_destination"]'
-    
-  ).forEach(input => {
-    input.addEventListener('blur', () => {
-      input.value = formatNameJS(input.value);
-    });
-  });
-});
+// Automatically apply formatting on blur for current and future inputs
+document.addEventListener('blur', (e) => {
+  const el = e.target;
+
+  if (
+    el.matches(
+      'input[name="first_name"], input[name="last_name"], input[name="first_name[]"], input[name="last_name[]"], input[name="fn"], input[name="ln"], input[name="material_desc"], textarea[name="description"], input[name="purpose_of_trip"], input[name="travel_destination"], input[name="source_of_fuel"], input[name="source_of_oil"], input[name="source_of_repair_maintenance"], input[name="source_of_driver_assistant_per_diem"], input[name="new_building"], input[name="exact_location"], input[name="vehicle_name"], input[name="vehicle_type"], input[name="approved_by"]'
+    )
+  ) {
+    el.value = formatNameJS(el.value);
+  }
+}, true); // useCapture true so blur event is captured during capturing phase

@@ -30,6 +30,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/public/assets/js/motorpool_admin/vehicle.js"></script>
+  <script src="<?php echo PUBLIC_URL; ?>/assets/js/helpers.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -446,7 +447,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <!-- Vehicle Name -->
                   <div>
                     <label class="text-xs text-text mb-1">Vehicle Name<span class="text-red-500">*</span></label>
-                    <input type="text" class="w-full input-field" x-model="selected.name" required>
+                    <input type="text" name="vehicle_name" class="w-full input-field" x-model="selected.name" required>
                   </div>
 
                   <!-- Plate No and Capacity -->
@@ -464,7 +465,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                   <!-- Type -->
                   <div>
                     <label class="text-xs text-text mb-1">Vehicle Type<span class="text-red-500">*</span></label>
-                    <input type="text" class="w-full input-field" x-model="selected.type" required>
+                    <input type="text" name="vehicle_type" class="w-full input-field" x-model="selected.type" required>
                   </div>
 
                   <!-- Driver -->
