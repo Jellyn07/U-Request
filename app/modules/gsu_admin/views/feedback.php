@@ -67,61 +67,61 @@ $profile = $controller->getProfile($_SESSION['email']);
         <!-- <hr class="mb-2 border-b border-gray-300 mx-10"> -->
 
         <!-- Feedback Cards -->
-        <div id="feedbackCards" class="flex grid-cols-3 gap-4 p-3 h-max-[500px] overflow-y-auto">
-          <!-- <div> -->
+        <div id="feedbackCards" class="grid grid-cols-4">
+
+        <?php if (empty($feedbackData)): ?>
+          <div class="col-span-4 text-center py-10 font-medium">
+            <p class="text-gray-300">No comments added.</p>
+          </div>
+        <?php endif; ?>
+
           <?php foreach ($feedbackData as $feedback): ?>
-            <div class="feedback-card border border-gray-800 p-6" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
-              <div class="flex items-start gap-4">
-                <!-- Profile -->
-                <!-- <img src="<?= !empty($feedback['profile_pic']) ? htmlspecialchars($feedback['profile_pic']) : '/public/assets/img/user-default.png' ?>"
-                  alt="User photo"
-                  class="w-14 h-14 rounded-full object-cover"> -->
+            <div class="feedback-card p-2" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
+              <div class="flex flex-col min-h-[200px] gap-2 border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow duration-300">
+
+                <!-- Header (Tracking ID + Stars + Date) -->
                 <div class="flex flex-col">
-                  <p class="font-semibold text-sm mb-1">
+                  <p class="font-semibold text-sm mb-1 text-left">
                     <?= htmlspecialchars($feedback['tracking_id'] ?? 'Anonymous User') ?>
                   </p>
-                  <p class="text-xs text-gray-600">
-                    <span class="font-medium text-xs">Total Repair Request: </span><?= htmlspecialchars($feedback['total_requests'] ?? 0) ?><br>
-                    <span class="font-medium text-xs">Total Feedback:</span> <?= htmlspecialchars($feedback['total_feedback'] ?? 0) ?>
-                  </p>
-                </div>
 
-                <!-- Main Content -->
-                <div class="flex-1 pl-5">
-                  <div class="flex flex-wrap items-center justify-between mb-1">
-                    <!-- Stars and Date -->
-                    <div class="flex items-center text-sm text-gray-500 mb-3">
+                  <div class="flex flex-wrap items-center justify-between mb-0">
+                    <div class="flex items-center text-sm text-gray-500 mb-2 text-center">
                       <div class="stars flex mr-2" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
                         <?php
-                        $stars = round($feedback['overall_rating']);
-                        for ($i = 1; $i <= 5; $i++) {
-                          if ($i <= $stars) {
-                            echo '<span class="text-yellow-400 text-base">★</span>';
-                          } else {
-                            echo '<span class="text-gray-300 text-base">★</span>';
-                          }
-                        }
+                        // $stars = round($feedback['overall_rating']);
+                        // for ($i = 1; $i <= 5; $i++) {
+                        //   if ($i <= $stars) {
+                        //     echo '<span class="text-yellow-400 text-base">★</span>';
+                        //   } else {
+                        //     echo '<span class="text-gray-300 text-base">★</span>';
+                        //   }
+                        // }
                         ?>
+                        <!-- <span class="ml-2 text-gray-600"><?= htmlspecialchars($feedback['overall_rating']) ?></span> -->
                       </div>
                       <span><?= htmlspecialchars(date('Y-m-d', strtotime($feedback['submitted_at']))) ?></span>
                     </div>
                   </div>
+                </div>
 
-                  <p class="text-sm leading-relaxed text-justify">
-                    <?= htmlspecialchars($feedback['suggest_overall'] ?? 'No feedback comment provided.') ?>
+                <!-- Comment Section -->
+                <div class="flex-1">
+                  <p class="text-xs leading-relaxed text-justify text-gray-700">
+                    <?= htmlspecialchars($feedback['suggest_overall'] ?: 'No comment added.') ?>
                   </p>
+                </div>
 
-                  <div class="flex items-center gap-3 mt-5 justify-end">
-                    <a href="../../user/views/feedback.php?tracking_id=<?= urlencode($feedback['tracking_id']) ?>"
-                      class="btn btn-primary">
-                      Detailed Feedback
-                    </a>
-                  </div>
+                <!-- Button at Bottom -->
+                <div class="flex mt-auto pt-4">
+                  <a href="../../user/views/feedback.php?tracking_id=<?= urlencode($feedback['tracking_id']) ?>"
+                    class="btn btn-primary mx-auto">
+                    Detailed Feedback
+                  </a>
                 </div>
               </div>
             </div>
           <?php endforeach; ?>
-          <!-- </div> -->
           
         </div>
       </div>
