@@ -82,7 +82,7 @@ $averageRating = count($feedbackData) > 0 ? round($total / count($feedbackData),
 
                 <!-- Header (Tracking ID + Stars + Date) -->
                 <div class="flex flex-col">
-                  <p class="font-semibold text-sm mb-1 text-center">
+                  <p class="font-semibold text-sm mb-1 text-left">
                     <?= htmlspecialchars($feedback['tracking_id'] ?? 'Anonymous User') ?>
                   </p>
 

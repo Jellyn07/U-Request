@@ -62,6 +62,8 @@ Super Admin
     - right details not working✅
 
 +++++++++++++++++++++++++++++++++JUNA+++++++++++++++++++++++++++++++++
+users page in admin side the email display encrypted
+
 Motorpool Admin
     - Motorpool Vehicle Request if reject with remarks why it is rejected ✅
     - Motorpool Vehicle Request Schedule (by color)✅
@@ -95,6 +97,7 @@ Motorpool Admin
     - driver profile dont work
     - changing unit in driver dont work
     - hire date should not be change ✅
+    - profile pic for driver not working
 
 
 GSU Admin
