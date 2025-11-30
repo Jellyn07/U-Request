@@ -201,7 +201,7 @@ foreach ($adminFeedbackPages as $page) {
             </tbody>
           </table>
           <p class="text-sm mt-4 mb-1">Comments & Suggestions:</p>
-          <textarea name="suggest_overall" placeholder="" class="w-full input-field"></textarea>
+          <textarea name="suggest_overall" placeholder="" rows="5" class="w-full input-field"></textarea>
         </section>
 
         <div class="text-center mt-5">

@@ -56,7 +56,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
       <!-- Feedback Cards Section -->
       <div class="bg-white rounded-2xl shadow">
-        <div class="mb-5 flex items-center justify-end gap-2">
+        <div class="flex items-center justify-end gap-2">
           <!-- <input type="text" id="searchUser" placeholder="Search by name" class="flex-1 min-w-[200px] input-field">
           <select id="sortSelect" class="input-field">
             <option value="desc">Sort by Rating Desc</option>
@@ -67,7 +67,7 @@ $profile = $controller->getProfile($_SESSION['email']);
         <!-- <hr class="mb-2 border-b border-gray-300 mx-10"> -->
 
         <!-- Feedback Cards -->
-        <div id="feedbackCards" class="grid grid-cols-4">
+        <div id="feedbackCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4">
 
         <?php if (empty($feedbackData)): ?>
           <div class="col-span-4 text-center py-10 font-medium">
@@ -77,13 +77,13 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <?php foreach ($feedbackData as $feedback): ?>
             <div class="feedback-card p-2" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
-              <div class="flex flex-col min-h-[200px] gap-2 border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div class="flex flex-col min-h-[210px] gap-2 border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow duration-300">
 
                 <!-- Header (Tracking ID + Stars + Date) -->
                 <div class="flex flex-col">
-                  <p class="font-semibold text-sm mb-1 text-left">
+                  <!-- <p class="font-semibold text-sm mb-1 text-left">
                     <?= htmlspecialchars($feedback['tracking_id'] ?? 'Anonymous User') ?>
-                  </p>
+                  </p> -->
 
                   <div class="flex flex-wrap items-center justify-between mb-0">
                     <div class="flex items-center text-sm text-gray-500 mb-2 text-center">
@@ -106,17 +106,26 @@ $profile = $controller->getProfile($_SESSION['email']);
                 </div>
 
                 <!-- Comment Section -->
-                <div class="flex-1">
+                <!-- <div class="flex-1">
                   <p class="text-xs leading-relaxed text-justify text-gray-700">
                     <?= htmlspecialchars($feedback['suggest_overall'] ?: 'No comment added.') ?>
                   </p>
-                </div>
+                </div> -->
+                <?php
+                $comment = $feedback['suggest_overall'] ?: 'No comment added.';
+                $shortComment = strlen($comment) > 240 
+                    ? substr($comment, 0, 240) . "..." 
+                    : $comment;
+                ?>
+                <p class="text-xs leading-relaxed text-justify text-gray-700">
+                    <?= htmlspecialchars($shortComment) ?>
+                </p>
 
                 <!-- Button at Bottom -->
-                <div class="flex mt-auto pt-4">
+                <div class="flex mt-auto">
                   <a href="../../user/views/feedback.php?tracking_id=<?= urlencode($feedback['tracking_id']) ?>"
-                    class="btn btn-primary mx-auto">
-                    Detailed Feedback
+                    class="btn-tertiary">
+                    Read Full Feedback →
                   </a>
                 </div>
               </div>
