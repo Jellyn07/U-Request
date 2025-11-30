@@ -62,7 +62,7 @@ Super Admin
     - right details not working✅
 
 +++++++++++++++++++++++++++++++++JUNA+++++++++++++++++++++++++++++++++
-users page in admin side the email display encrypted
+users page in admin side the email display encrypted✅
 
 Motorpool Admin
     - Motorpool Vehicle Request if reject with remarks why it is rejected ✅

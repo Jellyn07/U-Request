@@ -14,8 +14,9 @@ class UserAdminModel extends BaseModel{
     /**
      * Get users with search, status, and sort filters
      */
-    public function getUsers($search = '', $status = 'all', $sort = 'az'){
-        $sql = "
+public function getUsers($search = '', $status = 'all', $sort = 'az') {
+
+    $sql = "
         SELECT 
             r.req_id,
             r.requester_id,
@@ -38,34 +39,47 @@ class UserAdminModel extends BaseModel{
         WHERE 1=1
     ";
 
-        // 🔍 Optional search
-        if (!empty($search)) {
-            $escaped = $this->db->real_escape_string($search);
-            $sql .= " AND (r.firstName LIKE '%$escaped%' OR r.lastName LIKE '%$escaped%' OR r.email LIKE '%$escaped%')";
-        }
-
-        // ⚙️ Filter by account status
-        if ($status === 'have_pending') {
-            $sql .= " HAVING account_status = 'Active'";
-        } elseif ($status === 'no_pending') {
-            $sql .= " HAVING account_status = 'Inactive'";
-        }
-
-        // 🔤 Sorting options
-        if ($sort === 'az') {
-            $sql .= " ORDER BY full_name ASC";
-        } elseif ($sort === 'za') {
-            $sql .= " ORDER BY full_name DESC";
-        }
-
-        $result = $this->db->query($sql);
-
-        if (!$result) {
-            die('Database query failed: ' . $this->db->error);
-        }
-
-        return $result->fetch_all(MYSQLI_ASSOC);
+    // 🔍 Search (encrypt search if email is typed)
+    if (!empty($search)) {
+        $escaped = $this->db->real_escape_string($search);
+        $encryptedSearch = encrypt($escaped); // important
+        $sql .= " AND (
+            r.firstName LIKE '%$escaped%' 
+            OR r.lastName LIKE '%$escaped%' 
+            OR r.email = '$encryptedSearch'
+        )";
     }
+
+    // ⚙️ Filter by account status
+    if ($status === 'have_pending') {
+        $sql .= " HAVING account_status = 'Active'";
+    } elseif ($status === 'no_pending') {
+        $sql .= " HAVING account_status = 'Inactive'";
+    }
+
+    // 🔤 Sorting
+    if ($sort === 'az') {
+        $sql .= " ORDER BY full_name ASC";
+    } elseif ($sort === 'za') {
+        $sql .= " ORDER BY full_name DESC";
+    }
+
+    $result = $this->db->query($sql);
+
+    if (!$result) {
+        die('Database query failed: ' . $this->db->error);
+    }
+
+    $users = $result->fetch_all(MYSQLI_ASSOC);
+
+    // 🔓 DECRYPT EMAIL HERE
+    foreach ($users as &$user) {
+        $user['email'] = decrypt($user['email']);
+    }
+
+    return $users;
+}
+
 
     // Get profile data by email
     public function getProfileByEmail($admin_email){

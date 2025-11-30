@@ -69,7 +69,6 @@ class VehicleModel extends BaseModel {
     }
 
     public function getVehicle($control_no, $travel_date, $return_date) {
-
         $query = "
             SELECT 
                 v.vehicle_id,
@@ -78,14 +77,15 @@ class VehicleModel extends BaseModel {
                 CONCAT(d.firstName, ' ', d.lastName) AS driver_name
             FROM vehicle v
             LEFT JOIN driver d ON v.driver_id = d.driver_id
-            WHERE v.status NOT IN ('Under Maintenance', 'In Use', 'Out of Use')  -- exclude these statuses
+            WHERE v.status NOT IN ('Under Maintenance', 'In Use', 'Out of Use')
             AND v.vehicle_id NOT IN (
                 SELECT va.vehicle_id
                 FROM vehicle_request_assignment va
                 JOIN vehicle_request vr ON va.control_no = vr.control_no
-                WHERE 
-                    vr.travel_date <= ?   -- requested return date
-                    AND vr.return_date >= ?  -- requested travel date
+                WHERE NOT (
+                    vr.return_date < ? OR vr.travel_date > ?  -- no overlap
+                )
+                AND vr.control_no != ?  -- exclude current request
             )
             ORDER BY v.vehicle_name ASC;
         ";
@@ -96,7 +96,8 @@ class VehicleModel extends BaseModel {
             return [];
         }
 
-        $stmt->bind_param("ss", $return_date, $travel_date);
+        // Bind the travel_date and return_date for overlap check, and current control_no
+        $stmt->bind_param("ssi", $travel_date, $return_date, $control_no);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -107,7 +108,6 @@ class VehicleModel extends BaseModel {
 
         return $vehicles;
     }
-
 
     public function updateVehicle($data) {
         $photo = $data['photo'] ?? null;
