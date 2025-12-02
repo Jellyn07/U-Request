@@ -157,7 +157,7 @@
                 </tr>
             </table>
 
-            <table class="pdf-table w-full text-xs mt-[-1px]">
+            <table class="pdf-table w-full text-xs mt-[-1px]" style="border-top: none; margin-top: 0.5px;">
                 <tr>
                     <td class="w-1/3 align-top-cell h-32 relative">
                         <p class="font-semibold absolute top-2 left-2">Prepared by:</p>
@@ -233,9 +233,201 @@
                 </tr>
             </table>
 
-             <div class="w-full h-[600px] border border-black mt-4 flex items-center justify-center bg-gray-50">
-                <p class="text-gray-400 italic">Job Order Details Here</p>
-             </div>
+            <div class="flex justify-between">
+                <div class="mt-5 flex">
+                    <div class="w-32">
+                        <p class="text-xs">Date Requested</p>
+                        <p class="text-xs">Date Needed</p>
+                        <p class="text-xs">Requested by</p>
+                    </div>
+                    <div>
+                        <p class="text-xs">:</p>
+                        <p class="text-xs">:</p>
+                        <p class="text-xs">:</p>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <p class="text-xs">JO No.______________________________</p>
+                    <p class="text-xs">For Maintenance In-charge:</p>
+                </div>
+            </div>
+
+            <!-- In diagnose details use this if this ⧄ if the selected one and use this ◻ if not-->
+
+            <table class="pdf-table mt-4 w-full text-xs">
+                <tr>
+                    <td rowspan="2" class="text-center">Diagnose Details</td>
+                    <td colspan="2" class="text-center">Report Details</td>
+                </tr>
+                <tr>
+                    <td class="text-center">Action Taken</td>
+                    <td>
+                        <div>
+                            <p class="text-center">Repair Results</p>
+                            <p class="text-center italic text-[10px]">To be filled by GSU Head</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flex">
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p class="ml-2">◻</p>
+                            <p  class="align-center">Carpentry</p>
+                        </div>
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p>◻</p>
+                            <p >Masonry</p>
+                        </div>
+                    </td>
+                    <td rowspan="6"></td>
+                    <td class="">OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</td>
+                </tr>
+                <tr>
+                    <td class="flex">
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p class="ml-2">◻</p>
+                            <p  class="align-center">Aircondition</p>
+                        </div>
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p>◻</p>
+                            <p >Electrical</p>
+                        </div>
+                    </td>
+                    <td rowspan="3" class="align-top-cell">Not OK : <br>Remarks :</td>
+                </tr>
+                <tr>
+                    <td class="flex">
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p class="ml-2">◻</p>
+                            <p  class="align-center">Welding</p>
+                        </div>
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p>◻</p>
+                            <p>Plumbing</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="flex">
+                        <div class="w-1/2 flex items-center gap-1">
+                            <p class="ml-2">◻</p>
+                            <p  class="align-center">Painting</p>
+                        </div>
+                        <div class="w-1/2">
+                            <div class=" flex items-center gap-1">
+                                <p>◻</p>
+                                <p>Others (Please Specify)</p>
+                            </div>
+                            <p class="border-b border-black w-full mt-1">&nbsp;</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2" class="align-top-cell">Remarks:</td>
+                    <td>Repair Started:</td>
+                </tr>
+                <tr>
+                    <td>Repair Ended:</td>
+                </tr>
+                <tr>
+                    <td colspan="3">(*Note: Indicate parts number if applicable)</td>
+                </tr>
+            </table>
+
+            <table class="pdf-table w-full text-xs mt-[-1px]" style="border-top: none; margin-top: 0.5px;">
+                <tr class="text-center font-semibold">
+                    <td>MATERIALS NEEDED</td>
+                    <td>QUANTITY</td>
+                    <td>STOCK AVAILABLE</td>
+                    <td>TO BE PURCHASED</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <p class="text-xs italic">Write N/A if not applicable.</p>
+
+            <table class="w-full text-xs mt-[-1px]">
+                <tr>
+                    <td class="w-1/3 align-top-cell h-32 relative">
+                        <p class="font-semibold absolute top-2 left-2">Prepared by:</p>
+                        
+                        <div class="absolute bottom-6 left-0 right-0 px-4">
+                             <div class="border-b border-black w-full mb-1"></div>
+                             <p class="text-center text-[10px]">Signature Over Printed Name</p>
+                        </div>
+                    </td>
+                    <td class="w-1/3 align-top-cell h-32 relative">
+                        <p class="font-semibold absolute top-2 left-2">Reviewed by:</p>
+                        
+                        <div class="absolute bottom-6 left-0 right-0 px-4">
+                             <div class="border-b border-black w-full mb-1"></div>
+                             <p class="text-center text-[10px]">Signature Over Printed Name</p>
+                        </div>
+                    </td>
+                    <td class="w-1/3 align-top-cell h-32 relative">
+                        <p class="font-semibold absolute top-2 left-2">Endorsed by:</p>
+                        
+                        <div class="absolute bottom-6 left-0 right-0 px-4">
+                             <div class="border-b border-black w-full mb-1"></div>
+                             <p class="text-center text-[10px]">Signature Over Printed Name</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="w-1/3 align-top-cell h-32 relative">
+                        <p class="font-semibold absolute top-2 left-2">Accepted by:</p>
+                        
+                        <div class="absolute bottom-6 left-0 right-0 px-4">
+                             <div class="border-b border-black w-full mb-1"></div>
+                             <p class="text-center text-[10px]">Head of Office or Dept. / Date</p>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+
         </div>
     </div>
 </body>
