@@ -188,7 +188,7 @@ UI
     - admin update password ✅
     - buttons in profile admin
     - loading ui
-    - make the feedback card type
+    - make the feedback card type ✅
     - actions in logs should be color coded
 
     Users
@@ -210,7 +210,8 @@ UI
     - status ui in request
     - Schedule and travel history ui
     - dili manggawas ang source of fund sa full details nga gi input sa user
-    - calendar schedule - 2 requests same nag book ug same date of departure and arrival , same vehicle gamit 
+    - calendar schedule 
+    - 2 requests same nag book ug same date of departure and arrival , same vehicle gamit 
     - request 7 days before the travel date not realized
 
         driver
@@ -249,4 +250,4 @@ UI
 
 To add users suggestions
 - make the full view in gsu same with the actual paper format and make it printable or saveable
-- add admin request in motorpool ui
+- add admin request in motorpool ui ✅
