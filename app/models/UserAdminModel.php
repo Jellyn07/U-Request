@@ -14,72 +14,71 @@ class UserAdminModel extends BaseModel{
     /**
      * Get users with search, status, and sort filters
      */
-public function getUsers($search = '', $status = 'all', $sort = 'az') {
+    public function getUsers($search = '', $status = 'all', $sort = 'az') {
 
-    $sql = "
-        SELECT 
-            r.req_id,
-            r.requester_id,
-            r.firstName,
-            r.lastName,
-            CONCAT(r.firstName, ' ', r.lastName) AS full_name,
-            r.email,
-            r.officeOrDept,
-            r.profile_pic,
-            CASE 
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM vw_rqtrack v
-                    WHERE v.req_id = r.req_id
-                    AND v.req_status <> 'Completed'
-                ) THEN 'Active'
-                ELSE 'Inactive'
-            END AS account_status
-        FROM requester r
-        WHERE 1=1
-    ";
+        $sql = "
+            SELECT 
+                r.req_id,
+                r.requester_id,
+                r.firstName,
+                r.lastName,
+                CONCAT(r.firstName, ' ', r.lastName) AS full_name,
+                r.email,
+                r.officeOrDept,
+                r.profile_pic,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM vw_rqtrack v
+                        WHERE v.req_id = r.req_id
+                        AND v.req_status <> 'Completed'
+                    ) THEN 'Active'
+                    ELSE 'Inactive'
+                END AS account_status
+            FROM requester r
+            WHERE 1=1
+        ";
 
-    // 🔍 Search (encrypt search if email is typed)
-    if (!empty($search)) {
-        $escaped = $this->db->real_escape_string($search);
-        $encryptedSearch = encrypt($escaped); // important
-        $sql .= " AND (
-            r.firstName LIKE '%$escaped%' 
-            OR r.lastName LIKE '%$escaped%' 
-            OR r.email = '$encryptedSearch'
-        )";
+        // 🔍 Search (encrypt search if email is typed)
+        if (!empty($search)) {
+            $escaped = $this->db->real_escape_string($search);
+            $encryptedSearch = encrypt($escaped); // important
+            $sql .= " AND (
+                r.firstName LIKE '%$escaped%' 
+                OR r.lastName LIKE '%$escaped%' 
+                OR r.email = '$encryptedSearch'
+            )";
+        }
+
+        // ⚙️ Filter by account status
+        if ($status === 'have_pending') {
+            $sql .= " HAVING account_status = 'Active'";
+        } elseif ($status === 'no_pending') {
+            $sql .= " HAVING account_status = 'Inactive'";
+        }
+
+        // 🔤 Sorting
+        if ($sort === 'az') {
+            $sql .= " ORDER BY full_name ASC";
+        } elseif ($sort === 'za') {
+            $sql .= " ORDER BY full_name DESC";
+        }
+
+        $result = $this->db->query($sql);
+
+        if (!$result) {
+            die('Database query failed: ' . $this->db->error);
+        }
+
+        $users = $result->fetch_all(MYSQLI_ASSOC);
+
+        // 🔓 DECRYPT EMAIL HERE
+        foreach ($users as &$user) {
+            $user['email'] = decrypt($user['email']);
+        }
+
+        return $users;
     }
-
-    // ⚙️ Filter by account status
-    if ($status === 'have_pending') {
-        $sql .= " HAVING account_status = 'Active'";
-    } elseif ($status === 'no_pending') {
-        $sql .= " HAVING account_status = 'Inactive'";
-    }
-
-    // 🔤 Sorting
-    if ($sort === 'az') {
-        $sql .= " ORDER BY full_name ASC";
-    } elseif ($sort === 'za') {
-        $sql .= " ORDER BY full_name DESC";
-    }
-
-    $result = $this->db->query($sql);
-
-    if (!$result) {
-        die('Database query failed: ' . $this->db->error);
-    }
-
-    $users = $result->fetch_all(MYSQLI_ASSOC);
-
-    // 🔓 DECRYPT EMAIL HERE
-    foreach ($users as &$user) {
-        $user['email'] = decrypt($user['email']);
-    }
-
-    return $users;
-}
-
 
     // Get profile data by email
     public function getProfileByEmail($admin_email){

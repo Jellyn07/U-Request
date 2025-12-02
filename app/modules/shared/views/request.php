@@ -555,7 +555,13 @@ $profile = $controller->getProfile($_SESSION['email']);
             </div>
             <div class="flex justify-center pt-2 space-x-2">
               <!-- <button type="button" class="btn btn-primary" @click="viewDetails(selected)">Full Details</button> -->
-              <a class="btn btn-primary" href="gsu_form_export.php">Full Details</a>
+               <button 
+                  type="button" 
+                  class="btn btn-primary"
+                  @click="exportDetails(selected)">
+                  Full Details
+                </button>
+              <!-- <a class="btn btn-primary" href="gsu_form_export.php">Full Details</a> -->
               <button type="submit" class="btn btn-primary" id="saveBtn" name="saveAssignment"  x-show="canSave()" :disabled="isLocked()">Save Changes</button>
             </div>
           </form>

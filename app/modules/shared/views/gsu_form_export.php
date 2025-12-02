@@ -1,3 +1,20 @@
+<?php
+$name        = $_GET['name'] ?? '';
+$office      = $_GET['office'] ?? '';
+$tracking    = $_GET['tracking'] ?? '';
+$date        = $_GET['date'] ?? '';
+$finished    = $_GET['finished'] ?? '';
+$location    = $_GET['location'] ?? '';
+$type        = $_GET['type'] ?? '';
+$unit        = $_GET['unit'] ?? '';
+$priority    = $_GET['priority'] ?? '';
+$desc        = $_GET['description'] ?? '';
+$personnel   = $_GET['personnel'] ?? '';
+$materials   = $_GET['materials'] ?? '';
+$status      = $_GET['status'] ?? '';
+$image       = $_GET['image'] ?? '';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,7 +154,7 @@
                 <tr>
                     <td class="w-36 font-bold bg-header">Requesting Office/ Person:</td>
                     <td colspan="3">
-                        <p>&nbsp;</p>
+                        <p><input type="text" name="requester" value="<?= htmlspecialchars($name) ?>" readonly></p>
                     </td>
                 </tr>
                 <tr>
@@ -147,12 +164,13 @@
                 <tr>
                     <td class="font-bold bg-header">Nature of Request:</td>
                     <td colspan="3">
-                        <p>&nbsp;</p>
+                        <p><input type="text" name="nature" value="<?= htmlspecialchars($type) ?>" readonly></p>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="4" class="text-left align-top-cell h-36">
                         <p class="font-bold mb-2">Request Details:</p>
+                        <textarea name="description"><?= htmlspecialchars($desc) ?></textarea>
                         </td>
                 </tr>
             </table>
@@ -190,7 +208,12 @@
 
             <div class="mt-8">
                 <p class="text-sm text-center mb-4 font-semibold text-gray-700">PHOTO EVIDENCE</p>
-                <img src="/public/assets/img/default-img.png" alt="photo evidence" class="max-h-48 block mx-auto border border-gray-200 rounded p-1">
+                <img src="<?= !empty($image) 
+                        ? '/public/uploads/' . htmlspecialchars($image) 
+                        : '/public/assets/img/default-img.png' ?>"
+                        onerror="this.src='/public/assets/img/default-img.png'"
+                        class="max-h-48 mx-auto block rounded-md border border-gray-200 p-1"
+                        alt="Photo Evidence">
             </div>
             
         </div>
@@ -241,13 +264,13 @@
                         <p class="text-xs">Requested by</p>
                     </div>
                     <div>
+                        <p class="text-xs">: <strong><input type="text" name="requester" value="<?= !empty($date) ? date("F d, Y", strtotime($date)) : '' ?>" readonly></strong></p> 
                         <p class="text-xs">:</p>
-                        <p class="text-xs">:</p>
-                        <p class="text-xs">:</p>
+                        <p class="text-xs">: <strong><input type="text" name="requester" value="<?= htmlspecialchars($name) ?>" readonly></strong></p> </p>
                     </div>
                 </div>
                 <div class="mt-5">
-                    <p class="text-xs">JO No.______________________________</p>
+                    <p class="text-xs">JO No. <strong><?= htmlspecialchars($tracking ?? 'Not Available') ?></strong></p></p>
                     <p class="text-xs">For Maintenance In-charge:</p>
                 </div>
             </div>
@@ -324,10 +347,22 @@
                 </tr>
                 <tr>
                     <td rowspan="2" class="align-top-cell">Remarks:</td>
-                    <td>Repair Started:</td>
+                    <td>Repair Started: </td>
                 </tr>
                 <tr>
-                    <td>Repair Ended:</td>
+             <td>
+                Repair Ended:
+                <strong>
+                    <input type="text" name="date_finished"
+                    value="<?=
+                        !empty($finished)
+                        ? date('F d, Y', strtotime($finished))
+                        : htmlspecialchars($status ?? 'Not Available')
+                    ?>"
+                    readonly
+                    >
+                </strong>
+                </td>
                 </tr>
                 <tr>
                     <td colspan="3">(*Note: Indicate parts number if applicable)</td>
@@ -390,7 +425,7 @@
             <table class="w-full text-xs mt-[-1px]">
                 <tr>
                     <td class="w-1/3 align-top-cell h-32 relative">
-                        <p class="font-semibold absolute top-2 left-2">Diagnosed by:</p>
+                        <p class="font-semibold absolute top-2 left-2">Diagnosed by: </p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
                              <div class="border-b border-black w-full mb-1"></div>
@@ -398,9 +433,10 @@
                         </div>
                     </td>
                     <td class="w-1/3 align-top-cell h-32 relative">
-                        <p class="font-semibold absolute top-2 left-2">Repaired by:</p>
+                        <p class="font-semibold absolute top-2 left-2">Repaired by:</p></p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
+                            <input type="text" name="requester" value="<?= htmlspecialchars($personnel) ?>" readonly>
                              <div class="border-b border-black w-full mb-1"></div>
                              <p class="text-center text-[10px]">Name Over Signature/ Date</p>
                         </div>
@@ -409,6 +445,7 @@
                         <p class="font-semibold absolute top-2 left-2">Verified by:</p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
+                            <input type="text" name="requester" value="Jilmar Montillano" readonly>
                              <div class="border-b border-black w-full mb-1"></div>
                              <p class="text-center text-[10px]">GSU Head/ Date</p>
                         </div>
