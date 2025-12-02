@@ -390,27 +390,27 @@
             <table class="w-full text-xs mt-[-1px]">
                 <tr>
                     <td class="w-1/3 align-top-cell h-32 relative">
-                        <p class="font-semibold absolute top-2 left-2">Prepared by:</p>
+                        <p class="font-semibold absolute top-2 left-2">Diagnosed by:</p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
                              <div class="border-b border-black w-full mb-1"></div>
-                             <p class="text-center text-[10px]">Signature Over Printed Name</p>
+                             <p class="text-center text-[10px]">Name Over Signature/ Date</p>
                         </div>
                     </td>
                     <td class="w-1/3 align-top-cell h-32 relative">
-                        <p class="font-semibold absolute top-2 left-2">Reviewed by:</p>
+                        <p class="font-semibold absolute top-2 left-2">Repaired by:</p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
                              <div class="border-b border-black w-full mb-1"></div>
-                             <p class="text-center text-[10px]">Signature Over Printed Name</p>
+                             <p class="text-center text-[10px]">Name Over Signature/ Date</p>
                         </div>
                     </td>
                     <td class="w-1/3 align-top-cell h-32 relative">
-                        <p class="font-semibold absolute top-2 left-2">Endorsed by:</p>
+                        <p class="font-semibold absolute top-2 left-2">Verified by:</p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
                              <div class="border-b border-black w-full mb-1"></div>
-                             <p class="text-center text-[10px]">Signature Over Printed Name</p>
+                             <p class="text-center text-[10px]">GSU Head/ Date</p>
                         </div>
                     </td>
                 </tr>
