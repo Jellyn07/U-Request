@@ -45,7 +45,7 @@ if (!$details) {
             <?php
               $rawPath = (string) $details['image_path'];
               $fileName = basename($rawPath);
-              $imageSrc = rtrim(PUBLIC_URL, '/') . '/uploads/' . $fileName;
+              $imageSrc = rtrim(PUBLIC_URL, '/') . '/uploads/repair_images/' . $fileName;
               $filePath = $_SERVER['DOCUMENT_ROOT'] . $imageSrc;
             ?>
             <?php if (file_exists($filePath)): ?>

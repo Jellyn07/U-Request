@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
     $profile_picture_path = null;
 
     if (!empty($_FILES['profile_picture']['name']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = __DIR__ . "/../../public/uploads/profile_pics";
+        $upload_dir = __DIR__ . "/../../public/uploads/profile_pics/";
 
         // Create directory if not exists
         if (!is_dir($upload_dir)) {

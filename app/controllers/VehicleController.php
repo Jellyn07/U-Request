@@ -47,7 +47,7 @@ class VehicleController {
 
             // ✅ Handle file upload
             if (!empty($_FILES['picture']['name']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = __DIR__ . "/../../uploads/vehicles";
+                $upload_dir = __DIR__ . "/../../public/uploads/vehicles/";
                 if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
 
                 $fileTmp = $_FILES['picture']['tmp_name'];
@@ -129,7 +129,7 @@ class VehicleController {
 
         // Handle optional file upload
         if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../uploads/vehicles/';
+            $uploadDir = __DIR__ . '/../../public/uploads/vehicles/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
             $fileTmp = $_FILES['picture']['tmp_name'];

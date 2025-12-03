@@ -50,14 +50,14 @@ class RequestController {
                 exit;
             }
 
-            $targetDir = __DIR__ . '/../../public/uploads/';
+            $targetDir = __DIR__ . '/../../public/uploads/repair_images/';
             if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
 
             $newFileName = uniqid("img_", true) . "." . $fileExt;
             $targetPath = $targetDir . $fileName;
 
             if (move_uploaded_file($fileTmp, $targetPath)) {
-                $filePath = '/public/uploads/' . $fileName;
+                $filePath = '/public/uploads/repair_images/' . $fileName;
             } else {
                 $_SESSION['alert'] = [
                     'type'=>'error',

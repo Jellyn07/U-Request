@@ -198,13 +198,13 @@ $profile = $controller->getProfile($_SESSION['email']);
                       contact: '<?= htmlspecialchars($person['contact']) ?>',
                       hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
                       status: '<?= htmlspecialchars($person['status']) ?>',
-                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
+                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : null ?>'
                   }; showDetails = true"
                   class="cursor-pointer hover:bg-gray-100 border-b border-gray-100"
                 >
                   <td class="pl-4 py-2">
                     <img src="<?= !empty($person['profile_picture']) 
-                                  ? '/uploads/profile_pics/' . $person['profile_picture'] 
+                                  ? '/public/uploads/profile_pics/' . $person['profile_picture'] 
                                   : '/public/assets/img/user-default.png' ?>"
                         alt="User" class="size-8 rounded-full object-cover">
                   </td>
@@ -255,21 +255,21 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <!-- Profile Picture Preview -->
               <img 
                   id="profile-preview"
-                  src="<?= isset($person['profile_picture']) && $person['profile_picture'] 
-                      ? '/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
-                      : '/public/assets/img/user-default.png' ?>"
+                  :src="selected.profile_picture 
+                      ? '/public/uploads/profile_pics/' + selected.profile_picture 
+                      : '/public/assets/img/user-default.png'"
                   alt="Profile Picture"
                   class="w-24 h-24 rounded-full object-cover shadow-sm"
-                />
+              />
                 <!-- Edit Button -->
-                <!-- <label for="profile_picture" title="Change Profile Picture"
+                <label for="profile_picture" title="Change Profile Picture"
                   class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036
                         a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
-                </label> -->
+                </label>
 
                 <!-- Hidden File Input -->
                 <input 
