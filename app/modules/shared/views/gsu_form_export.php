@@ -265,9 +265,9 @@ $image       = $_GET['image'] ?? '';
                         <p class="text-xs">Requested by</p>
                     </div>
                     <div>
-                        <p class="text-xs">: <strong><input type="text" name="requester" value="<?= !empty($date) ? date("F d, Y", strtotime($date)) : '' ?>" readonly></strong></p> 
+                        <p class="text-xs">: <strong><?= !empty($date) ? date("F d, Y", strtotime($date)) : '' ?></strong></p> 
                         <p class="text-xs">:</p>
-                        <p class="text-xs">: <strong><input type="text" name="requester" value="<?= htmlspecialchars($name) ?>" readonly></strong></p> </p>
+                        <p class="text-xs">: <strong><?= htmlspecialchars($name) ?></strong></p> </p>
                     </div>
                 </div>
                 <div class="mt-5">
