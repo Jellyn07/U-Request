@@ -154,7 +154,7 @@ $image       = $_GET['image'] ?? '';
                 <tr>
                     <td class="w-36 font-bold bg-header">Requesting Office/ Person:</td>
                     <td colspan="3">
-                        <p><input type="text" name="requester" value="<?= htmlspecialchars($name) ?>" readonly></p>
+                        <p><?= htmlspecialchars($name) ?></p>
                     </td>
                 </tr>
                 <tr>
@@ -164,13 +164,13 @@ $image       = $_GET['image'] ?? '';
                 <tr>
                     <td class="font-bold bg-header">Nature of Request:</td>
                     <td colspan="3">
-                        <p><input type="text" name="nature" value="<?= htmlspecialchars($type) ?>" readonly></p>
+                        <p><?= htmlspecialchars($type) ?></p>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="4" class="text-left align-top-cell h-36">
                         <p class="font-bold mb-2">Request Details:</p>
-                        <textarea name="description"><?= htmlspecialchars($desc) ?></textarea>
+                        <?= htmlspecialchars($desc) ?>
                         </td>
                 </tr>
             </table>
@@ -355,14 +355,11 @@ $image       = $_GET['image'] ?? '';
              <td>
                 Repair Ended:
                 <strong>
-                    <input type="text" name="date_finished"
-                    value="<?=
+                    <?=
                         !empty($finished)
                         ? date('F d, Y', strtotime($finished))
-                        : htmlspecialchars($status ?? 'Not Available')
-                    ?>"
-                    readonly
-                    >
+                        : htmlspecialchars($status ?? 'Not Applicable')
+                    ?>
                 </strong>
                 </td>
                 </tr>
@@ -378,15 +375,6 @@ $image       = $_GET['image'] ?? '';
         <td>STOCK AVAILABLE</td>
         <td>TO BE PURCHASED</td>
     </tr>
-    <!-- 8 empty rows -->
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
 </table>
 
 <script>
@@ -450,8 +438,8 @@ rows.forEach((row, index) => {
                     <td class="w-1/3 align-top-cell h-32 relative">
                         <p class="font-semibold absolute top-2 left-2">Repaired by:</p></p>
                         
-                        <div class="absolute bottom-6 left-0 right-0 px-4">
-                            <input type="text" name="requester" value="<?= htmlspecialchars($personnel) ?>" readonly>
+                        <div class="absolute bottom-6 left-0 right-0 px-4 text-center">
+                            <?= htmlspecialchars($personnel) ?>
                              <div class="border-b border-black w-full mb-1"></div>
                              <p class="text-center text-[10px]">Name Over Signature/ Date</p>
                         </div>
@@ -460,7 +448,7 @@ rows.forEach((row, index) => {
                         <p class="font-semibold absolute top-2 left-2">Verified by:</p>
                         
                         <div class="absolute bottom-6 left-0 right-0 px-4">
-                            <input type="text" name="requester" value="Jilmar Montillano" readonly>
+                             Jilmar Montillano
                              <div class="border-b border-black w-full mb-1"></div>
                              <p class="text-center text-[10px]">GSU Head/ Date</p>
                         </div>
