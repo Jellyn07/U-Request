@@ -171,6 +171,7 @@ class BaseModel {
             } catch (\Exception $e) {
                 error_log("Backup email failed: " . $e->getMessage());
             }
+             $this->cleanOldBackups(5); // keep 5 most recent backups
             return ["success" => true, "file" => $filename];
         } else {
             $errorMessage = implode("\n", $output);
@@ -228,12 +229,23 @@ class BaseModel {
     }
 
     // 🔹 Optional: Delete older backups, keep only N
-    public function cleanOldBackups($keep = 5) {
+    public function cleanOldBackups(int $keep = 5) {
         $files = glob($this->backupFolder . "*.sql");
-        if (count($files) > $keep) {
-            rsort($files);
-            $filesToDelete = array_slice($files, $keep);
-            foreach ($filesToDelete as $file) unlink($file);
+
+        if (!$files) return; // nothing to delete
+
+        // Sort by modification time descending (latest first)
+        usort($files, function($a, $b) {
+            return filemtime($b) <=> filemtime($a);
+        });
+
+        // Get files to delete (everything after the first $keep files)
+        $filesToDelete = array_slice($files, $keep);
+
+        foreach ($filesToDelete as $file) {
+            if (is_file($file)) {
+                @unlink($file); // suppress warnings if file cannot be deleted
+            }
         }
     }
 }
