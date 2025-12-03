@@ -93,40 +93,44 @@ class RequestModel extends BaseModel {
       // Get all requests from vw_requests
       public function getAllRequests() {
         $sql = "SELECT 
-                vw.*,
-                rq.officeOrDept AS requester_officeOrDept,
-                r.*,
-                ra.*,
-                COALESCE(
-                    GROUP_CONCAT(
-                        DISTINCT vwg.full_name SEPARATOR ', '
-                    ),
-                    'No personnel assigned'
-                ) AS assigned_personnel,
-                COALESCE(
-                    GROUP_CONCAT(
-                        DISTINCT CONCAT(m.material_desc, ' (Qty: ', rm.quantity_needed, ')')
-                        SEPARATOR ', '
-                    ),
-                    'No materials used'
-                ) AS materials_needed
-            FROM vw_requests vw
-            INNER JOIN request r 
-                ON vw.request_id = r.request_id
-            LEFT JOIN request_assignment ra
-                ON r.request_id = ra.request_id
-            LEFT JOIN requester rq
-                ON ra.req_id = rq.req_id
-            LEFT JOIN request_assigned_personnel rap
-                ON r.request_id = rap.request_id
-            LEFT JOIN vw_gsu_personnel vwg
-                ON rap.staff_id = vwg.staff_id
-            LEFT JOIN request_materials_needed rm
-                ON ra.reqAssignment_id = rm.reqAssignment_id
-            LEFT JOIN materials m
-                ON rm.material_code = m.material_code
-            GROUP BY r.request_id
-            ORDER BY vw.request_date DESC;
+    vw.*,
+    rq.officeOrDept AS requester_officeOrDept,
+    r.*,
+    ra.*,
+    COALESCE(
+        GROUP_CONCAT(
+            DISTINCT vwg.full_name SEPARATOR ', '
+        ),
+        'No personnel assigned'
+    ) AS assigned_personnel,
+    COALESCE(
+        GROUP_CONCAT(
+            DISTINCT CONCAT(
+                m.material_desc, 
+                ' (Qty: ', rm.quantity_needed, 
+                ', Stock: ', m.qty, ')'
+            ) SEPARATOR ', '
+        ),
+        'No materials used'
+    ) AS materials_needed
+FROM vw_requests vw
+INNER JOIN request r 
+    ON vw.request_id = r.request_id
+LEFT JOIN request_assignment ra
+    ON r.request_id = ra.request_id
+LEFT JOIN requester rq
+    ON ra.req_id = rq.req_id
+LEFT JOIN request_assigned_personnel rap
+    ON r.request_id = rap.request_id
+LEFT JOIN vw_gsu_personnel vwg
+    ON rap.staff_id = vwg.staff_id
+LEFT JOIN request_materials_needed rm
+    ON ra.reqAssignment_id = rm.reqAssignment_id
+LEFT JOIN materials m
+    ON rm.material_code = m.material_code
+GROUP BY r.request_id
+ORDER BY vw.request_date DESC;
+
                 ";
         $result = $this->db->query($sql);
 

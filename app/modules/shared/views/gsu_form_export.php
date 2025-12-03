@@ -294,26 +294,26 @@ $image       = $_GET['image'] ?? '';
                 <tr>
                     <td class="flex">
                         <div class="w-1/2 flex items-center gap-1">
-                            <p class="ml-2">◻</p>
-                            <p  class="align-center">Carpentry</p>
+                            <p class="ml-2"><?= ($type == 'Carpentry') ? '☑' : '◻' ?></p>
+                            <p>Carpentry</p>
                         </div>
                         <div class="w-1/2 flex items-center gap-1">
-                            <p>◻</p>
-                            <p >Masonry</p>
+                            <p><?= ($type == 'Masonry') ? '☑' : '◻' ?></p>
+                            <p>Masonry</p>
                         </div>
                     </td>
                     <td rowspan="6"></td>
-                    <td class="">OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</td>
+                    <td>OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</td>
                 </tr>
                 <tr>
                     <td class="flex">
                         <div class="w-1/2 flex items-center gap-1">
-                            <p class="ml-2">◻</p>
-                            <p  class="align-center">Aircondition</p>
+                            <p class="ml-2"><?= ($type == 'Aircondition') ? '☑' : '◻' ?></p>
+                            <p>Aircondition</p>
                         </div>
                         <div class="w-1/2 flex items-center gap-1">
-                            <p>◻</p>
-                            <p >Electrical</p>
+                            <p><?= ($type == 'Electrical') ? '☑' : '◻' ?></p>
+                            <p>Electrical</p>
                         </div>
                     </td>
                     <td rowspan="3" class="align-top-cell">Not OK : <br>Remarks :</td>
@@ -321,11 +321,11 @@ $image       = $_GET['image'] ?? '';
                 <tr>
                     <td class="flex">
                         <div class="w-1/2 flex items-center gap-1">
-                            <p class="ml-2">◻</p>
-                            <p  class="align-center">Welding</p>
+                            <p class="ml-2"><?= ($type == 'Welding') ? '☑' : '◻' ?></p>
+                            <p>Welding</p>
                         </div>
                         <div class="w-1/2 flex items-center gap-1">
-                            <p>◻</p>
+                            <p><?= ($type == 'Plumbing') ? '☑' : '◻' ?></p>
                             <p>Plumbing</p>
                         </div>
                     </td>
@@ -333,15 +333,17 @@ $image       = $_GET['image'] ?? '';
                 <tr>
                     <td class="flex">
                         <div class="w-1/2 flex items-center gap-1">
-                            <p class="ml-2">◻</p>
-                            <p  class="align-center">Painting</p>
+                            <p class="ml-2"><?= ($type == 'Painting') ? '☑' : '◻' ?></p>
+                            <p>Painting</p>
                         </div>
                         <div class="w-1/2">
-                            <div class=" flex items-center gap-1">
-                                <p>◻</p>
+                            <div class="flex items-center gap-1">
+                                <p><?= (!in_array($type, ['Carpentry','Masonry','Aircondition','Electrical','Welding','Plumbing','Painting'])) ? '☑' : '◻' ?></p>
                                 <p>Others (Please Specify)</p>
                             </div>
-                            <p class="border-b border-black w-full mt-1">&nbsp;</p>
+                            <p class="border-b border-black w-full mt-1">
+                                <?= (!in_array($type, ['Carpentry','Masonry','Aircondition','Electrical','Welding','Plumbing','Painting'])) ? htmlspecialchars($type) : '&nbsp;' ?>
+                            </p>
                         </div>
                     </td>
                 </tr>
@@ -369,56 +371,69 @@ $image       = $_GET['image'] ?? '';
                 </tr>
             </table>
 
-            <table class="pdf-table w-full text-xs mt-[-1px]" style="border-top: none; margin-top: 0.5px;">
-                <tr class="text-center font-semibold">
-                    <td>MATERIALS NEEDED</td>
-                    <td>QUANTITY</td>
-                    <td>STOCK AVAILABLE</td>
-                    <td>TO BE PURCHASED</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
+<table class="pdf-table w-full text-xs mt-[-1px]" id="materials-table" style="border-top: none; margin-top: 0.5px;">
+    <tr class="text-center font-semibold">
+        <td>MATERIALS NEEDED</td>
+        <td>QUANTITY</td>
+        <td>STOCK AVAILABLE</td>
+        <td>TO BE PURCHASED</td>
+    </tr>
+    <!-- 8 empty rows -->
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<script>
+const table = document.getElementById("materials-table");
+
+// Get all rows except header
+const rows = Array.from(table.querySelectorAll("tr")).slice(1); 
+
+// Pass PHP $materials safely
+const materialsString = <?php echo json_encode($materials); ?> || '';
+const materialsArray = materialsString.split(",").map(item => item.trim()).filter(Boolean);
+
+// Fill each row with the material info
+rows.forEach((row, index) => {
+    const data = materialsArray[index];
+    if(data){
+        // Expect format: Material (Qty: 5, Stock: 3)
+        const match = data.match(/^(.*)\s+\(Qty:\s*(\d+),\s*Stock:\s*(\d+)\)$/);
+        if(match){
+            const name = match[1];           // Material Name
+            const qtyNeeded = parseInt(match[2]); // Quantity Needed
+            const stock = parseInt(match[3]);     // Stock Available
+            const toPurchase = Math.max(qtyNeeded - stock, 0); // To Be Purchased
+
+            row.cells[0].textContent = name;
+            row.cells[1].textContent = qtyNeeded;
+            row.cells[2].textContent = stock;
+            row.cells[3].textContent = toPurchase;
+        } else {
+            // fallback if format doesn't match
+            row.cells[0].textContent = data;
+            row.cells[1].textContent = '';
+            row.cells[2].textContent = '';
+            row.cells[3].textContent = '';
+        }
+    } else {
+        // leave remaining rows blank
+        row.cells[0].textContent = '';
+        row.cells[1].textContent = '';
+        row.cells[2].textContent = '';
+        row.cells[3].textContent = '';
+    }
+});
+</script>
+
+
+
 
             <p class="text-xs italic">Write N/A if not applicable.</p>
 
