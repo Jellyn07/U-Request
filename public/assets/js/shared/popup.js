@@ -182,6 +182,7 @@ window.exportDetails = function(selected) {
     : 'default-img.png';
 
   const params = new URLSearchParams({
+    request_id: selected.request_id,
     name: selected.Name,
     office: selected.requester_officeOrDept,
     tracking: selected.tracking_id,
@@ -193,7 +194,7 @@ window.exportDetails = function(selected) {
     priority: selected.priority_status,
     description: selected.request_desc,
     personnel: selected.assigned_personnel,
-    materials: selected.materials_needed,
+    materials: selected.materials_used ?? selected.materials_needed ?? selected.materials ?? '',
     status: selected.req_status,
     image: imagePath   // ✅ ADD THIS
   }).toString();

@@ -1,4 +1,5 @@
 <?php
+$reqid = $_GET['request_id'] ?? 'Not Available';
 $name        = $_GET['name'] ?? '';
 $office      = $_GET['office'] ?? '';
 $tracking    = $_GET['tracking'] ?? '';
@@ -270,7 +271,7 @@ $image       = $_GET['image'] ?? '';
                     </div>
                 </div>
                 <div class="mt-5">
-                    <p class="text-xs">JO No. <strong><?= htmlspecialchars($tracking ?? 'Not Available') ?></strong></p></p>
+                    <p class="text-xs">JO No. <strong><?= htmlspecialchars($reqid ?? 'Not Available') ?></strong></p></p>
                     <p class="text-xs">For Maintenance In-charge:</p>
                 </div>
             </div>
@@ -349,80 +350,92 @@ $image       = $_GET['image'] ?? '';
                 </tr>
                 <tr>
                     <td rowspan="2" class="align-top-cell">Remarks:</td>
-                    <td>Repair Started: </td>
+                    <td>Repair Started:
+                    <strong>
+                        <?=
+                            !empty($date)
+                            ? date('F d, Y', strtotime($date))
+                            : htmlspecialchars($status ?? 'Not Applicable')
+                        ?>
+                    </strong>
+                    </td>
                 </tr>
                 <tr>
-             <td>
-                Repair Ended:
-                <strong>
-                    <?=
-                        !empty($finished)
-                        ? date('F d, Y', strtotime($finished))
-                        : htmlspecialchars($status ?? 'Not Applicable')
+                    <td>
+                    Repair Ended:
+                    <strong>
+                    <?php
+                    if (!empty($finished) && strtotime($finished)) {
+                        echo date('F d, Y', strtotime($finished));
+                    } elseif (!empty($status)) {
+                        echo htmlspecialchars($status);
+                    } else {
+                        echo 'Not Applicable';
+                    }
                     ?>
-                </strong>
-                </td>
+                    </strong>
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="3">(*Note: Indicate parts number if applicable)</td>
                 </tr>
             </table>
 
-<table class="pdf-table w-full text-xs mt-[-1px]" id="materials-table" style="border-top: none; margin-top: 0.5px;">
-    <tr class="text-center font-semibold">
-        <td>MATERIALS NEEDED</td>
-        <td>QUANTITY</td>
-        <td>STOCK AVAILABLE</td>
-        <td>TO BE PURCHASED</td>
-    </tr>
-</table>
+            <table class="pdf-table w-full text-xs mt-[-1px]" id="materials-table" style="border-top: none; margin-top: 0.5px;">
+                <tr class="text-center font-semibold">
+                    <td>MATERIALS NEEDED</td>
+                    <td>QUANTITY</td>
+                    <td>STOCK AVAILABLE</td>
+                    <td>TO BE PURCHASED</td>
+                </tr>
+            </table>
 
-<script>
-const table = document.getElementById("materials-table");
+            <script>
+            const table = document.getElementById("materials-table");
 
-// Get all rows except header
-const rows = Array.from(table.querySelectorAll("tr")).slice(1); 
+            const materialsString = <?php echo json_encode($materials); ?> || '';
 
-// Pass PHP $materials safely
-const materialsString = <?php echo json_encode($materials); ?> || '';
-const materialsArray = materialsString.split(",").map(item => item.trim()).filter(Boolean);
+            // Split by comma OR newline
+            const materialsArray = materialsString
+                .split(/\n|,/)
+                .map(item => item.trim())
+                .filter(Boolean);
 
-// Fill each row with the material info
-rows.forEach((row, index) => {
-    const data = materialsArray[index];
-    if(data){
-        // Expect format: Material (Qty: 5, Stock: 3)
-        const match = data.match(/^(.*)\s+\(Qty:\s*(\d+),\s*Stock:\s*(\d+)\)$/);
-        if(match){
-            const name = match[1];           // Material Name
-            const qtyNeeded = parseInt(match[2]); // Quantity Needed
-            const stock = parseInt(match[3]);     // Stock Available
-            const toPurchase = Math.max(qtyNeeded - stock, 0); // To Be Purchased
+            if (!materialsString || materialsString === "No materials used" || materialsArray.length === 0) {
+                const row = table.insertRow();
+                for (let i = 0; i < 4; i++) {
+                    const cell = row.insertCell();
+                    cell.textContent = "N/A";
+                    cell.className = "text-center";
+                }
+            } else {
+                materialsArray.forEach(item => {
+                    const row = table.insertRow();
 
-            row.cells[0].textContent = name;
-            row.cells[1].textContent = qtyNeeded;
-            row.cells[2].textContent = stock;
-            row.cells[3].textContent = toPurchase;
-        } else {
-            // fallback if format doesn't match
-            row.cells[0].textContent = data;
-            row.cells[1].textContent = '';
-            row.cells[2].textContent = '';
-            row.cells[3].textContent = '';
-        }
-    } else {
-        // leave remaining rows blank
-        row.cells[0].textContent = '';
-        row.cells[1].textContent = '';
-        row.cells[2].textContent = '';
-        row.cells[3].textContent = '';
-    }
-});
-</script>
+            let name = "N/A", qty = "N/A", stock = "N/A", purchase = "N/A";
 
+            let match = item.match(/^(.*?)\s\|\sQty:\s(\d+)\s\|\sStock:\s(\d+)$/);
+            if (!match) {
+                match = item.match(/^(.*)\s+\(Qty:\s*(\d+),\s*Stock:\s*(\d+)\)$/);
+            }
 
+            if (match) {
+                name = match[1];
+                qty = parseInt(match[2]);
+                stock = parseInt(match[3]);
+                purchase = Math.max(qty - stock, 0);
 
-
+                if (qty === 0) qty = "N/A";
+                if (stock === 0) stock = "N/A";
+                if (purchase === 0) purchase = "N/A";
+            }
+                    row.insertCell().textContent = name;
+                    row.insertCell().textContent = qty;
+                    row.insertCell().textContent = stock;
+                    row.insertCell().textContent = purchase;
+                });
+            }
+            </script>
             <p class="text-xs italic">Write N/A if not applicable.</p>
 
             <table class="w-full text-xs mt-[-1px]">
@@ -467,7 +480,6 @@ rows.forEach((row, index) => {
                     <td></td>
                 </tr>
             </table>
-
         </div>
     </div>
 </body>
