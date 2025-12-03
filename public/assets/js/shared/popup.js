@@ -175,6 +175,32 @@ document.addEventListener("alpine:init", () => {
   };
 });
 
+window.exportDetails = function(selected) {
+
+  const imagePath = selected.image_path 
+    ? selected.image_path 
+    : 'default-img.png';
+
+  const params = new URLSearchParams({
+    name: selected.Name,
+    office: selected.requester_officeOrDept,
+    tracking: selected.tracking_id,
+    date: selected.request_date,
+    finished: selected.date_finished,
+    location: selected.location,
+    type: selected.request_Type,
+    unit: selected.unit,
+    priority: selected.priority_status,
+    description: selected.request_desc,
+    personnel: selected.assigned_personnel,
+    materials: selected.materials_needed,
+    status: selected.req_status,
+    image: imagePath   // ✅ ADD THIS
+  }).toString();
+
+  window.location.href = "gsu_form_export.php?" + params;
+};
+
 
 // 🔹 Handle Save Button Confirmation
 document.addEventListener("DOMContentLoaded", () => {
