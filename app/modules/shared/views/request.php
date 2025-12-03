@@ -236,89 +236,10 @@ $profile = $controller->getProfile($_SESSION['email']);
               <input type="text" class="w-full view-field" x-model="selected.Name" readonly />
             </div>
 
-<!-- Location Field with Edit/Save -->
-<div x-data="{ editingLocation: false }" class="flex items-center gap-2 mt-2">
-  
-  <!-- Input Field -->
-  <div class="w-full">
-    <label class="text-xs text-text mb-1">Location</label>
-    <div class="flex gap-2">
-    <input type="text" class="w-full view-field"   x-model="selected.location" :readonly="!editingLocation" />
-<!-- Edit / Save Buttons -->
-<!-- Edit Button -->
-    <button 
-    hidden
-      type="button" 
-      class="btn btn-secondary text-xs mt-1"
-      x-show="!editingLocation"
-      @click="editingLocation = true">
-      Edit
-    </button>
-
-    <!-- Save Button -->
-    <button 
-      type="button" 
-      class="btn btn-primary text-xs mt-1"
-      x-show="editingLocation"
-      @click="
-        if(selected.location.trim() === '') {
-          Swal.fire('Error', 'Location cannot be empty.', 'error');
-          return;
-        }
-        $dispatch('update-location', selected.location); 
-        editingLocation = false;
-      ">
-      Save
-    </button>
-    </div>
-
-  </div>
-  
-  <!-- Edit / Save Buttons -->
-  <div class="flex gap-1">
-    
-  </div>
-
-  <!-- AlpineJS Listener (hidden, just for event handling) -->
-<div x-data 
-     @update-location.window="async (e) => {
-       const newLocation = e.detail;
-       try {
-         console.log('Updating location for', selected.request_id, '->', newLocation);
-         const formData = new FormData();
-         formData.append('request_id', selected.request_id);
-         formData.append('location', newLocation);
-         formData.append('action', 'updateLocation');
-
-         const res = await fetch('../../../controllers/RequestController.php', {
-           method: 'POST',
-           body: formData
-         });
-
-         // optional: log raw text for debugging if JSON parse fails
-         const text = await res.text();
-         try {
-           const data = JSON.parse(text);
-           if (data.success) {
-             Swal.fire('Updated!', 'Location updated successfully.', 'success');
-             selected.location = newLocation;
-           } else {
-             Swal.fire('Error', data.message || 'Failed to update location.', 'error');
-           }
-         } catch (parseErr) {
-           console.error('Invalid JSON response:', text, parseErr);
-           Swal.fire('Error', 'Invalid server response.', 'error');
-         }
-       } catch (err) {
-         console.error(err);
-         Swal.fire('Error', 'An unexpected error occurred.', 'error');
-       }
-     }">
-</div>
-
-</div>
-
-
+            <div>
+              <label class="text-xs text-text mb-1">Location</label>
+              <input type="text" class="w-full view-field" x-model="selected.location" readonly />
+            </div>
 
             <div>
                 <label class="text-xs text-text mb-1">Priority Level</label>

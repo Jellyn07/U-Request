@@ -82,9 +82,9 @@ $profile = $controller->getProfile($_SESSION['email']);
             <button title="Export" id="export" class="btn-upper">
               <img src="/public/assets/img/export.png" alt="User" class="size-4 my-0.5">
             </button>
-            <button title="Add Request" id="add_request" class="btn btn-primary">
+            <!-- <button title="Add Request" id="add_request" class="btn btn-primary">
               <img src="/public/assets/img/add_white.png" alt="User" class="size-4 my-0.5">
-            </button>
+            </button> -->
           </div>
 
           <!-- TABLE -->
