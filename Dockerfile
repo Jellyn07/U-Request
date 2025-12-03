@@ -16,5 +16,8 @@ EXPOSE 10000
 # Make sure Apache has write permissions if needed
 RUN chown -R www-data:www-data /var/www/html/
 
+# Enable Apache headers module
+RUN a2enmod headers
+
 # Start Apache in the foreground
 CMD ["apache2-foreground"]
