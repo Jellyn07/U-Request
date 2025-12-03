@@ -103,50 +103,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 //Update Pic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'upload_picture') {
 
-    $code = $_SESSION['email']; // assuming user ID is stored in session
-
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
 
         $fileTmpPath = $_FILES['profile_picture']['tmp_name'];
         $fileName = $_FILES['profile_picture']['name'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
         $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+
         if (in_array($fileExtension, $allowedExts)) {
 
-            $baseFileName = pathinfo($fileName, PATHINFO_FILENAME); // original filename without extension
-            $newFileName = $baseFileName . '_' . time() . '.' . $fileExtension;
-            $uploadFileDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/profile_pics/';
-            if (!is_dir($uploadFileDir)) {
-                mkdir($uploadFileDir, 0755, true);
-            }
-            $destPath = $uploadFileDir . $newFileName;
+            // Generate unique filename
+            $baseName = pathinfo($fileName, PATHINFO_FILENAME);
+            $newFileName = $baseName . '_' . time() . '.' . $fileExtension;
+
+            // Upload directory (server filesystem path)
+            $uploadDir = __DIR__ . '/../../public/uploads/profile_pics/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+            $destPath = $uploadDir . $newFileName;
+            $relativePath = '/public/uploads/profile_pics/' . $newFileName; // browser-accessible path
 
             if (move_uploaded_file($fileTmpPath, $destPath)) {
-                $relativePath = '/uploads/profile_pics/' . $newFileName;
 
-                // ✅ Use controller method instead of $model
                 $profileController = new ProfileController();
-                $originalFileName = $fileName;
-                if ($profileController->saveProfilePicture($code, $relativePath, $originalFileName)) {
+
+                // Optionally get old profile picture path to delete old file
+                $oldPic = $profileController->getProfile($email);
+                if (!empty($oldPic) && !str_contains($oldPic, 'user-default.png')) {
+                    $oldFile = $_SERVER['DOCUMENT_ROOT'] . $oldPic;
+                    if (file_exists($oldFile)) unlink($oldFile);
+                }
+
+                // Save new profile picture in DB
+                if ($profileController->saveProfilePicture($email, $baseName)) {
                     $_SESSION['success'] = "Profile picture updated successfully.";
                 } else {
                     $_SESSION['error'] = "Failed to update profile picture in database.";
+                    unlink($destPath); // rollback
                 }
+
             } else {
-                $_SESSION['error'] = "Error moving the uploaded file.";
+                $_SESSION['error'] = "Failed to move uploaded file.";
             }
+
         } else {
-            $_SESSION['error'] = "Invalid file type. Allowed: " . implode(", ", $allowedExts);
+            $_SESSION['error'] = "Invalid file type. Allowed types: " . implode(", ", $allowedExts);
         }
+
     } else {
         $_SESSION['error'] = "No file uploaded or upload error.";
     }
 
+    // Redirect back to profile page
     header("Location: /app/modules/user/views/profile.php");
     exit();
 }
+
 
 if (isset($_POST['action'])) {
 

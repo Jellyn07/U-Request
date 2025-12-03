@@ -120,13 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
         if (in_array($fileExtension, $allowedExts)) {
             $newFileName = pathinfo($fileName, PATHINFO_FILENAME) . '_' . time() . '.' . $fileExtension;
-            $uploadFileDir = $_SERVER['DOCUMENT_ROOT'] . '/public/uploads/profile_pics/';
+            $uploadFileDir = __DIR__ . '/../../public/uploads/profile_pics/';
             if (!is_dir($uploadFileDir)) {
                 mkdir($uploadFileDir, 0755, true);
             }
 
             $destPath = $uploadFileDir . $newFileName;
-            $relativePath = '/uploads/profile_pics/' . $fileName;
+            $relativePath = '/uploads/profile_pics/' . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $destPath)) {
                 $controller = new AdminProfileController();
