@@ -315,12 +315,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 ? '/public/uploads/profile_pics/' + selected.profile_picture 
                 : '/public/assets/img/user-default.png'"
               onerror="this.onerror=null;this.src='/assets/img/user-default.png';"
-              class="w-36 h-36 rounded-full object-cover shadow-sm"
+              class="w-32 h-32 rounded-full object-cover shadow-sm"
             />
 
             <!-- Separate Profile Picture Form -->
             <form id="profilePicForm" method="post" action="../../../controllers/AdminController.php" 
-                  enctype="multipart/form-data" class="absolute bottom-2 right-2">
+                  enctype="multipart/form-data" class="relative">
               <input type="hidden" name="update_profile_pic" value="1">
               <input type="hidden" name="admin_email" :value="selected.email">
 
@@ -332,7 +332,7 @@ $profile = $controller->getProfile($_SESSION['email']);
               <!-- Edit Button -->
 
               <label for="profile_picture_input" title="Change Profile Picture"
-                class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition">
+                class="absolute top-6 right-0 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M15.232 5.232l3.536 3.536m-2.036-5.036
