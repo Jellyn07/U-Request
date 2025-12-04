@@ -53,6 +53,22 @@ class PersonnelModel extends BaseModel {
         return $result->fetch_assoc();
     }
 
+    public function updateProfilePicture($staff_id, $filename) {
+        if (isset($_SESSION['staff_id'])) {
+            setCurrentStaff($this->db);
+        }
+
+        $stmt = $this->db->prepare("UPDATE gsu_personnel SET profile_picture = ? WHERE staff_id = ?");
+        if (!$stmt) return false;
+
+        $staff_id = (int) $staff_id;
+        $stmt->bind_param("si", $filename, $staff_id);
+
+        $success = $stmt->execute();
+        $stmt->close();
+
+        return $success;
+    }
     // Add new personnel
     public function addPersonnel($data) {
         if (isset($_SESSION['staff_id'])) {
@@ -160,21 +176,20 @@ class PersonnelModel extends BaseModel {
                 return false;
             }
         }     
-        $stmt = $this->db->prepare("CALL spUpdateGsuPersonnel (?, ?, ?, ?, ?, ?, ?, ?)"); 
+        $stmt = $this->db->prepare("CALL spUpdateGsuPersonnel (?, ?, ?, ?, ?, ?, ?)"); 
         if (!$stmt) {
             $_SESSION['personnel_error'] = "Prepare failed (Update): " . $this->db->error;
             return false;
         }
         $stmt->bind_param(
-            "isssssss",
+            "issssss",
             $staffId,
             $data['firstName'],
             $data['lastName'],
             $data['department'],
             $contact,
             $data['hire_date'],
-            $data['unit'],
-            $data['profile_picture']
+            $data['unit']// can be null
         );
         $ok = $stmt->execute();
         if (!$ok) {

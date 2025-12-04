@@ -284,22 +284,6 @@ class AdministratorModel extends BaseModel {
         return $result;
     }
 
-public function updateProfilePicture($email, $filename) {
-    if (isset($_SESSION['staff_id'])) {
-        setCurrentStaff($this->db); // Use model's connection
-    }
-
-    // Encrypt email
-    $encryptedEmail = encrypt($email);
-
-    $sql = "UPDATE administrator SET profile_picture = :profile_picture WHERE email = :email";
-    $stmt = $this->db->prepare($sql);
-    $stmt->bindParam(':profile_picture', $filename);
-    $stmt->bindParam(':email', $encryptedEmail);
-    return $stmt->execute();
-}
-
-
     public function isRequesterIdExists($requester_id, $email) {
         $sql = "SELECT COUNT(*) AS count FROM requester 
                 WHERE requester_id = ? 

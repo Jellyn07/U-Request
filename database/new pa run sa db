@@ -2038,3 +2038,93 @@ BEGIN
     );
 END$$
 DELIMITER ;
+
+---------------------------------------------------------------------------------------------
+Drop trigger trg_gsu_personnel_update;
+DELIMITER $$
+CREATE TRIGGER trg_gsu_personnel_update
+AFTER UPDATE ON gsu_personnel
+FOR EACH ROW
+BEGIN
+    DECLARE admin_name VARCHAR(150);
+    DECLARE changes TEXT DEFAULT '';
+    -- Get admin name
+    SET admin_name = (
+        SELECT CONCAT(first_name, ' ', last_name)
+        FROM administrator
+        WHERE staff_id = @current_staff_id
+    );
+    -- Build a human-readable description of changes
+    IF OLD.firstName != NEW.firstName THEN
+        SET changes = CONCAT(changes, 'First name changed from "', OLD.firstName, '" to "', NEW.firstName, '"; ');
+    END IF;
+
+    IF OLD.lastName != NEW.lastName THEN
+        SET changes = CONCAT(changes, 'Last name changed from "', OLD.lastName, '" to "', NEW.lastName, '"; ');
+    END IF;
+
+    IF OLD.department != NEW.department THEN
+        SET changes = CONCAT(changes, 'Department changed from "', OLD.department, '" to "', NEW.department, '"; ');
+    END IF;
+
+    IF OLD.contact != NEW.contact THEN
+        SET changes = CONCAT(changes, 'Contact changed from "', OLD.contact, '" to "', NEW.contact, '"; ');
+    END IF;
+
+    IF OLD.hire_date != NEW.hire_date THEN
+        SET changes = CONCAT(changes, 'Hire date changed from "', OLD.hire_date, '" to "', NEW.hire_date, '"; ');
+    END IF;
+
+    -- Check if profile picture updated
+    IF OLD.profile_picture != NEW.profile_picture THEN
+        SET changes = CONCAT(changes, 'Changed Profile Picture; ');
+    END IF;
+
+    -- Only insert if there are changes
+    IF changes != '' THEN
+        INSERT INTO activity_logs(source, name, action, description)
+        VALUES (
+            'GSU Personnel',
+            admin_name,
+            'UPDATE',
+            changes
+        );
+    END IF;
+END$$
+DELIMITER ;
+
+drop procedure spUpdateGsuPersonnel;
+DELIMITER $$
+CREATE PROCEDURE spUpdateGsuPersonnel (
+    IN p_staff_id INT,
+    IN p_first_name VARCHAR(50),
+    IN p_last_name VARCHAR(50),
+    IN p_department VARCHAR(50),
+    IN p_contact VARCHAR(11),
+    IN p_hire_date DATE,
+    IN p_unit VARCHAR(100)
+)
+BEGIN
+    -- ✅ Check for duplicate contact (excluding current record)
+    IF EXISTS (
+        SELECT 1 
+        FROM gsu_personnel 
+        WHERE contact = p_contact 
+        AND staff_id <> p_staff_id
+    ) THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Contact number already exists!';
+    ELSE
+        -- ✅ Update personnel record
+        UPDATE gsu_personnel
+        SET 
+            firstName       = p_first_name,
+            lastName        = p_last_name,
+            department      = p_department,
+            contact         = p_contact,
+            hire_date       = p_hire_date,
+            unit            = p_unit
+        WHERE staff_id = p_staff_id;
+    END IF;
+END$$
+DELIMITER ;

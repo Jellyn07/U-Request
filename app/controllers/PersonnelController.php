@@ -16,6 +16,10 @@ class PersonnelController {
         return $this->model->getPersonnelById($staff_id);
     }
 
+    public function updateProfilePicture($staffId, $filename) {
+        return $this->model-> updateProfilePicture($staffId, $filename);
+    }
+
     // --- ADD PERSONNEL ---
     public function addPersonnel($postData) {
         // ✅ Handle file upload
@@ -74,40 +78,14 @@ class PersonnelController {
 
     // --- UPDATE PERSONNEL ---
     public function updatePersonnel($postData) {
-         // ✅ Handle file upload
-         $profile_picture_path = null;
-    
-         if (!empty($_FILES['profile_picture']['name']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-             $upload_dir = __DIR__ . "/../../public/uploads/profile_pics";
-     
-             // Create directory if not exists
-             if (!is_dir($upload_dir)) {
-                 mkdir($upload_dir, 0755, true);
-             }
-     
-             $filename = basename($_FILES["profile_picture"]["name"]);
-             $target_file = $upload_dir . '/' . $filename;
-     
-             if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
-                 $profile_picture_path = "/public/uploads/profile_pics/" . $filename;
-             } else {
-                 $_SESSION['personnel_error'] = "Failed to upload profile picture.";
-                 $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
-
-                header("Location: $redirect");
-                exit;
-             }
-         }
-
         $data = [
-            'staff_id'  => $postData['staff_id'] ?? null,
-            'firstName' => $postData['first_name'] ?? '',
-            'lastName'  => $postData['last_name'] ?? '',
-            'department'=> $postData['department'] ?? '',
-            'contact'   => $postData['contact_no'] ?? '',
-            'hire_date' => $postData['hire_date'] ?? '',
-            'unit'      => $postData['unit'] ?? '',
-            'profile_picture'=> $profile_picture_path
+            'staff_id'        => $postData['staff_id'] ?? null,
+            'firstName'       => $postData['first_name'] ?? '',
+            'lastName'        => $postData['last_name'] ?? '',
+            'department'      => $postData['department'] ?? '',
+            'contact'         => $postData['contact_no'] ?? '',
+            'hire_date'       => $postData['hire_date'] ?? '',
+            'unit'            => $postData['unit'] ?? '',
         ];
 
         $ok = $this->model->updatePersonnel($data);
@@ -120,13 +98,10 @@ class PersonnelController {
             }
         }
 
-        $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
-
-        header("Location: $redirect");
+        header("Location: " . ($_SERVER['HTTP_REFERER'] ?? '/'));
         exit;
     }
-
-
+    
     // --- DELETE PERSONNEL ---
     public function deletePersonnel($staff_id) {
         $deleted = $this->model->deletePersonnel($staff_id);
@@ -143,8 +118,7 @@ class PersonnelController {
         exit;
     }
 
-    public function getProfile($admin_email)
-    {
+    public function getProfile($admin_email){
         return $this->model->getProfileByEmail($admin_email);
     }
 }
@@ -178,5 +152,46 @@ if (isset($_POST['get_work_history'])) {
     $staff_id = $_POST['staff_id'];
     $history = $personnelModel->getWorkHistory($staff_id);
     echo json_encode($history);
+    exit;
+}
+
+// --- HANDLE AJAX PROFILE PICTURE UPLOAD ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile_pic'])) {
+    header('Content-Type: application/json');
+    $response = ['success' => false, 'message' => 'Update failed'];
+
+    $staffId = $_POST['staff_id'] ?? null;
+    if (!$staffId) {
+        $response['message'] = 'Missing staff_id';
+        echo json_encode($response);
+        exit;
+    }
+
+    if (empty($_FILES['profile_picture']['name']) || $_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
+        $response['message'] = 'No valid file uploaded';
+        echo json_encode($response);
+        exit;
+    }
+
+    $upload_dir = __DIR__ . "/../../public/uploads/profile_pics/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+
+    $filename = basename($_FILES['profile_picture']['name']);
+    $target_file = $upload_dir . $filename;
+
+    if (!move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
+        $response['message'] = 'Failed to move uploaded file';
+        echo json_encode($response);
+        exit;
+    }
+
+    $controller = new PersonnelController();
+    if ($controller->updateProfilePicture($staffId, $filename)) {
+        $response = ['success' => true, 'filename' => $filename];
+    } else {
+        $response['message'] = 'Database update failed';
+    }
+
+    echo json_encode($response);
     exit;
 }

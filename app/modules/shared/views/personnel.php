@@ -212,24 +212,35 @@ if ($_SESSION['access_level'] == 1) {
             <?php if (!empty($personnels)): ?>
               <?php foreach ($personnels as $person): ?>
 
-                <tr 
-                  data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
-                  data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
-                  data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
-                  data-status="<?= htmlspecialchars($person['status']) ?>"
-                  @click="selected = {
-                      staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
-                      firstName: '<?= htmlspecialchars($person['firstName']) ?>',
-                      lastName: '<?= htmlspecialchars($person['lastName']) ?>',
-                      department: '<?= htmlspecialchars($person['department']) ?>',
-                      contact: '<?= htmlspecialchars($person['contact']) ?>',
-                      hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
-                      unit: '<?= htmlspecialchars($person['unit']) ?>',
-                      status: '<?= htmlspecialchars($person['status']) ?>',
-                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
-                  }; showDetails = true"
-                  class="cursor-pointer hover:bg-gray-100 border-b border-gray-100"
-                >
+              <tr 
+                data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
+                data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
+                data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
+                data-status="<?= htmlspecialchars($person['status']) ?>"
+                @click="
+                  selected = {
+                    staff_id: '<?= htmlspecialchars($person['staff_id']) ?>',
+                    firstName: '<?= htmlspecialchars($person['firstName']) ?>',
+                    lastName: '<?= htmlspecialchars($person['lastName']) ?>',
+                    department: '<?= htmlspecialchars($person['department']) ?>',
+                    contact: '<?= htmlspecialchars($person['contact']) ?>',
+                    hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
+                    unit: '<?= htmlspecialchars($person['unit']) ?>',
+                    status: '<?= htmlspecialchars($person['status']) ?>',
+                    profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '/public/assets/img/user-default.png' ?>'
+                  };
+                  showDetails = true;
+                  $nextTick(() => {
+                    const preview = document.getElementById('profile-preview');
+                    preview.dataset.staffid = selected.staff_id;
+                    preview.src = selected.profile_picture.startsWith('/') 
+                        ? selected.profile_picture 
+                        : '/public/uploads/profile_pics/' + selected.profile_picture;
+                  });
+                "
+                class="cursor-pointer hover:bg-gray-100 border-b border-gray-100"
+              >
+
                   <td class="pl-4 py-2">
                     <img src="<?= !empty($person['profile_picture']) 
                                   ? '/public/uploads/profile_pics/' . $person['profile_picture'] 
@@ -272,30 +283,25 @@ if ($_SESSION['access_level'] == 1) {
 
           <h2 class="text-lg font-bold mb-2">Personnel Information</h2>
 
-          <!-- Profile Picture -->
-          <!-- <img id="profile-preview"  
-            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
-            alt=""
-            class="w-24 h-24 rounded-full object-cover shadow-sm mx-auto"
-          /> -->
-
           <!-- Form -->
-          <form id="personnelForm"   class="space-y-2"  method="post" action="../../../controllers/PersonnelController.php">
-            <div class="rounded-xl flex flex-col items-center">
+          <form id="personnelForm" class="space-y-2" method="post" action="../../../controllers/PersonnelController.php" enctype="multipart/form-data">
+           <div class="rounded-xl flex flex-col items-center">
               <div class="relative">
                 <!-- Profile Picture Preview -->
-                <img 
-                  id="profile-preview"
-                  src="<?= isset($person['profile_picture']) && $person['profile_picture'] 
-                      ? '/public/uploads/profile_pics/' . htmlspecialchars($person['profile_picture'])
-                      : '/public/assets/img/user-default.png' ?>"
-                  alt="Profile Picture"
-                  class="w-24 h-24 rounded-full object-cover shadow-sm border border-primary"
-                />
+
+                <img id="profile-preview"  
+                          :src="selected.profile_picture && selected.profile_picture.trim() !== ''
+                            ? '/public/uploads/profile_pics/' + selected.profile_picture 
+                            : '/public/assets/img/user-default.png'"
+                          onerror="this.onerror=null;this.src='/public/assets/img/user-default.png';"
+                          class="w-36 h-36 rounded-full object-cover shadow-sm"
+                          data-staffid="<?= htmlspecialchars($person['staff_id']) ?>"
+                        />
+
 
                 <!-- Edit Button -->
                 <label for="profile_picture" title="Change Profile Picture"
-                  class="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
+                  class="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full cursor-pointer hover:bg-primary/80 transition">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036
@@ -309,8 +315,8 @@ if ($_SESSION['access_level'] == 1) {
                   id="profile_picture" 
                   name="profile_picture" 
                   accept="image/*" 
-                  class="hidden" 
-                  onchange="previewProfile(event)">
+                  class="hidden"
+                >
               </div>
             </div>
             <div>
@@ -391,12 +397,71 @@ if ($_SESSION['access_level'] == 1) {
       filterColumn: 4            
     });
 
-      function previewProfile(event) {
-        const output = document.getElementById('profile-preview');
-        output.src = URL.createObjectURL(event.target.files[0]);
-      }
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/export.js"></script>
 </html>
+<script>
+document.getElementById("profile_picture").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const previewImg = document.getElementById("profile-preview");
+  const oldSrc = previewImg.src;
+  const staffId = previewImg.dataset.staffid; // <- define staffId first
+
+  // Show preview immediately
+  const reader = new FileReader();
+  reader.onload = e => previewImg.src = e.target.result;
+  reader.readAsDataURL(file);
+
+  // Confirm change
+  Swal.fire({
+    title: "Change Profile Picture?",
+    text: "Do you want to save this new profile picture?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, save it",
+    cancelButtonText: "Cancel"
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      previewImg.src = oldSrc;
+      event.target.value = "";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("profile_picture", file);
+    formData.append("staff_id", staffId); // <- now staffId is defined
+    formData.append("update_profile_pic", "1");
+
+    fetch("../../../controllers/PersonnelController.php", {
+      method: "POST",
+      body: formData,
+      credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Profile Picture Updated",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => location.reload());
+      } else {
+        Swal.fire("Error", data.message, "error");
+        previewImg.src = oldSrc;
+        event.target.value = "";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      previewImg.src = oldSrc;
+      event.target.value = "";
+    });
+  });
+});
+
+</script>
