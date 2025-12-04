@@ -85,8 +85,11 @@ class ProfileModel extends BaseModel
     }
 
     // Update profile picture
-    public function updateProfilePicture($email, $fileName)
-    {
+    public function updateProfilePicture($email, $fileName){
+        if (isset($_SESSION['req_id'])) {
+            setCurrentRequester($this->db); // Use model's connection
+        }
+        $email = encrypt($email);
         $sql = "UPDATE requester SET profile_pic = ? WHERE email = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {

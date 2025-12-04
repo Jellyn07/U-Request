@@ -29,9 +29,9 @@ class ProfileController extends BaseModel
     }
 
     // Save new profile picture
-    public function saveProfilePicture($code, $filenameOnly, $originalFileName)
+    public function saveProfilePicture($email, $filenameOnly)
     {
-        return $this->model->updateProfilePicture($code, $filenameOnly, $originalFileName);
+        return $this->model->updateProfilePicture($email, $filenameOnly);
     }
 
 
@@ -110,80 +110,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 //Update Pic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'upload_picture') {
+    $email = $_SESSION['email'];
 
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-
         $fileTmpPath = $_FILES['profile_picture']['tmp_name'];
         $fileName = $_FILES['profile_picture']['name'];
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
         $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
-
         if (in_array($fileExtension, $allowedExts)) {
-
-            // Generate unique filename
-            $baseName = pathinfo($fileName, PATHINFO_FILENAME);
-            $newFileName = $baseName . '_' . time() . '.' . $fileExtension;
-
-            // Upload directory (server filesystem path)
-            $uploadDir = __DIR__ . '/../../public/uploads/profile_pics/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-
-            // Full path for the new file
-            $destPath = $uploadDir . $newFileName;
-            // Relative URL for the file (for use in the browser)
-            $relativePath = '/public/uploads/profile_pics/' . $newFileName;
-
-            $profileController = new ProfileController();
-
-            // Fetch current profile picture filename from DB
-            $currentProfilePic = $profileController->getProfile($code)['profile_pic'] ?? null;
-
-            // If the profile picture already exists, use the existing one (skip upload)
-            if ($currentProfilePic && file_exists($uploadDir . $currentProfilePic)) {
-                // Use the existing profile picture without re-uploading
-                $_SESSION['success'] = "Profile picture is already set.";
-                header("Location: /app/modules/user/views/profile.php");
-                exit();
+            $newFileName = $fileName;
+            $uploadFileDir = __DIR__ . '/../../public/uploads/profile_pics/';
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
             }
 
-            // If the file doesn't exist in the directory, move the uploaded file
+            $destPath = $uploadFileDir . $newFileName;
+            $relativePath = '/uploads/profile_pics/' . $fileName;
+
             if (move_uploaded_file($fileTmpPath, $destPath)) {
+                $controller = new ProfileController();
 
-                // Save the filename in the database
-                $filenameOnly = basename($newFileName); // Just the file name without the directory
+                // Get old picture path from DB before saving new one
+                $oldProfilePic = $controller->getProfile($email);
 
-                // Optionally, delete the old profile picture if it exists
-                if ($currentProfilePic && !str_contains($currentProfilePic, 'user-default.png')) {
-                    $oldFilePath = $uploadDir . $currentProfilePic;
+                // Only try to delete if the old profile pic exists and isn't the default
+                if (!empty($oldProfilePic) && $oldProfilePic !== '/uploads/profile_pics/default.png') {
+                    $oldFilePath = $_SERVER['DOCUMENT_ROOT'] . $oldProfilePic;
                     if (file_exists($oldFilePath)) {
-                        unlink($oldFilePath); // Delete the old file
+                        unlink($oldFilePath);
                     }
                 }
 
-                // Save the new profile picture in DB
-                if ($profileController->saveProfilePicture($email, $filenameOnly, $newFileName) && $profileController->saveProfilePicture($code, $filenameOnly, $newFileName)) {
+                // Save new picture path in DB
+                if ($controller->saveProfilePicture($email, $fileName)) {
                     $_SESSION['success'] = "Profile picture updated successfully.";
                 } else {
-                    $_SESSION['error'] = "Failed to update profile picture in the database.";
-                    unlink($destPath); // Rollback by deleting the uploaded file
+                    $_SESSION['error'] = "Failed to update profile picture in database.";
+                    // Rollback by deleting the newly uploaded file
+                    if (file_exists($destPath)) {
+                        unlink($destPath);
+                    }
                 }
-
             } else {
-                $_SESSION['error'] = "Failed to move uploaded file.";
+                $_SESSION['error'] = "Error moving uploaded file.";
             }
-
         } else {
-            $_SESSION['error'] = "Invalid file type. Allowed types: " . implode(", ", $allowedExts);
+            $_SESSION['error'] = "Invalid file type. Allowed: " . implode(", ", $allowedExts);
         }
-
     } else {
         $_SESSION['error'] = "No file uploaded or upload error.";
     }
 
-    // Redirect back to profile page
-    header("Location: /app/modules/user/views/profile.php");
-    exit();
+    $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
+
+            header("Location: $redirect");
+            exit;
 }
 
 
