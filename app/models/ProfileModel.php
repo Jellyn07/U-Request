@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/../core/BaseModel.php';
-require_once __DIR__ . '/../config/encryption.php'; 
+require_once __DIR__ . '/../config/encryption.php';
 require_once __DIR__ . '/../config/db_helpers.php';
-class ProfileModel extends BaseModel {
+class ProfileModel extends BaseModel
+{
 
     // Get profile data by requester_id
-    public function getProfileByEmail($requester_email) {
+    public function getProfileByEmail($requester_email)
+    {
         $requester_email = encrypt($requester_email);
         $stmt = $this->db->prepare("
             SELECT requester_id, firstName, lastName, contact, email, officeOrDept, profile_pic
@@ -27,7 +29,8 @@ class ProfileModel extends BaseModel {
     }
 
     // Update department/office
-    public function updateOfficeOrDept($email, $officeOrDept) {
+    public function updateOfficeOrDept($email, $officeOrDept)
+    {
         if (isset($_SESSION['req_id'])) {
             setCurrentRequester($this->db); // Use model's connection
         }
@@ -41,7 +44,8 @@ class ProfileModel extends BaseModel {
         return $stmt->execute();
     }
 
-    public function updateContact($req_id, $contact) {
+    public function updateContact($req_id, $contact)
+    {
         if (isset($_SESSION['req_id'])) {
             setCurrentRequester($this->db); // Use model's connection
         }
@@ -52,8 +56,9 @@ class ProfileModel extends BaseModel {
         return $success;
     }
 
-        // Check if contact exists in gsu_personnel, driver, administrator
-    public function contactExistsElsewhere($contact) {
+    // Check if contact exists in gsu_personnel, driver, administrator
+    public function contactExistsElsewhere($contact)
+    {
         $tables = [
             'gsu_personnel' => 'contact',
             'driver'        => 'contact',
@@ -80,25 +85,21 @@ class ProfileModel extends BaseModel {
     }
 
     // Update profile picture
-    public function updateProfilePicture($fileName, $filePath) {
-        if (isset($_SESSION['req_id'])) {
-            setCurrentRequester($this->db); // Use model's connection
-        }
-        $fileName = encrypt($fileName);
-        $sql = "
-            UPDATE requester 
-            SET profile_pic = ? 
-            WHERE email = ?";
+    public function updateProfilePicture($email, $fileName)
+    {
+        $sql = "UPDATE requester SET profile_pic = ? WHERE email = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $this->db->error);
         }
-        $stmt->bind_param("ss", $filePath, $fileName);
+        $stmt->bind_param("ss", $fileName, $email);
         return $stmt->execute();
     }
 
+
     // Update password with encryption
-    public function updatePassword($requester_email, $newPassword) {
+    public function updatePassword($requester_email, $newPassword)
+    {
         if (isset($_SESSION['req_id'])) {
             setCurrentRequester($this->db); // Use model's connection
         }
@@ -114,7 +115,8 @@ class ProfileModel extends BaseModel {
     }
 
     // Verify old password
-    public function verifyPassword($requester_email, $oldPassword) {
+    public function verifyPassword($requester_email, $oldPassword)
+    {
         require_once __DIR__ . '/../config/encryption.php';
         $encrypted_email = encrypt($requester_email);
         $stmt = $this->db->prepare("SELECT pass FROM requester WHERE email = ?");

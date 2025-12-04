@@ -7,30 +7,37 @@ require_once __DIR__ . '/../models/ProfileModel.php';
 require_once __DIR__ . '/../core/BaseModel.php';
 require_once __DIR__ . '/../config/constants.php';
 
-class ProfileController extends BaseModel {
+class ProfileController extends BaseModel
+{
     private $model;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new ProfileModel();
     }
 
     // Load profile info
-        public function getProfile($requester_email) {
+    public function getProfile($requester_email)
+    {
         return $this->model->getProfileByEmail($requester_email);
     }
 
     // Save department/office change
-    public function saveOfficeOrDept($requester_email, $officeOrDept) {
+    public function saveOfficeOrDept($requester_email, $officeOrDept)
+    {
         return $this->model->updateOfficeOrDept($requester_email, $officeOrDept);
     }
 
     // Save new profile picture
-    public function saveProfilePicture($filePath, $originalFileName) {
-        return $this->model->updateProfilePicture( $filePath, $originalFileName);
+    public function saveProfilePicture($code, $filenameOnly, $originalFileName)
+    {
+        return $this->model->updateProfilePicture($code, $filenameOnly, $originalFileName);
     }
 
+
     // Save password update
-    public function savePassword($requester_email, $oldPassword, $newPassword) {
+    public function savePassword($requester_email, $oldPassword, $newPassword)
+    {
         $profile = $this->model->getProfileByEmail($requester_email);
 
         // Verify old password using encryption
@@ -42,7 +49,8 @@ class ProfileController extends BaseModel {
     }
 
     // Update contact number with validation
-    public function saveContact($req_id, $contact) {
+    public function saveContact($req_id, $contact)
+    {
         //  Check uniqueness across other tables
         if ($this->model->contactExistsElsewhere($contact)) {
             $_SESSION['error'] = "Contact number already exists in the system.";
@@ -121,26 +129,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $uploadDir = __DIR__ . '/../../public/uploads/profile_pics/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
+            // Full path for the new file
             $destPath = $uploadDir . $newFileName;
-            $relativePath = '/public/uploads/profile_pics/' . $newFileName; // browser-accessible path
+            // Relative URL for the file (for use in the browser)
+            $relativePath = '/public/uploads/profile_pics/' . $newFileName;
 
+            $profileController = new ProfileController();
+
+            // Fetch current profile picture filename from DB
+            $currentProfilePic = $profileController->getProfile($code)['profile_pic'] ?? null;
+
+            // If the profile picture already exists, use the existing one (skip upload)
+            if ($currentProfilePic && file_exists($uploadDir . $currentProfilePic)) {
+                // Use the existing profile picture without re-uploading
+                $_SESSION['success'] = "Profile picture is already set.";
+                header("Location: /app/modules/user/views/profile.php");
+                exit();
+            }
+
+            // If the file doesn't exist in the directory, move the uploaded file
             if (move_uploaded_file($fileTmpPath, $destPath)) {
 
-                $profileController = new ProfileController();
+                // Save the filename in the database
+                $filenameOnly = basename($newFileName); // Just the file name without the directory
 
-                // Optionally get old profile picture path to delete old file
-                $oldPic = $profileController->getProfile($email);
-                if (!empty($oldPic) && !str_contains($oldPic, 'user-default.png')) {
-                    $oldFile = $_SERVER['DOCUMENT_ROOT'] . $oldPic;
-                    if (file_exists($oldFile)) unlink($oldFile);
+                // Optionally, delete the old profile picture if it exists
+                if ($currentProfilePic && !str_contains($currentProfilePic, 'user-default.png')) {
+                    $oldFilePath = $uploadDir . $currentProfilePic;
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath); // Delete the old file
+                    }
                 }
 
-                // Save new profile picture in DB
-                if ($profileController->saveProfilePicture($email, $baseName)) {
+                // Save the new profile picture in DB
+                if ($profileController->saveProfilePicture($email, $filenameOnly, $newFileName) && $profileController->saveProfilePicture($code, $filenameOnly, $newFileName)) {
                     $_SESSION['success'] = "Profile picture updated successfully.";
                 } else {
-                    $_SESSION['error'] = "Failed to update profile picture in database.";
-                    unlink($destPath); // rollback
+                    $_SESSION['error'] = "Failed to update profile picture in the database.";
+                    unlink($destPath); // Rollback by deleting the uploaded file
                 }
 
             } else {
@@ -219,4 +245,3 @@ if (isset($_POST['action'])) {
     header("Location: /app/modules/user/views/profile.php");
     exit;
 }
-

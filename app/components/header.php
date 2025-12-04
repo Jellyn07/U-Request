@@ -41,11 +41,24 @@ $profile = $requester_email ? $controller->getProfile($requester_email) : null;
         <div class="relative hidden md:block">
           <button id="profile-btn" type="button" class="flex items-center">
             <div class="flex items-center">
+
+              <?php
+              // Default profile picture path
+              $defaultPic = '/public/assets/img/user-default.png';
+
+              // Check if the profile picture exists and is a valid file
+              $profilePicPath = !empty($profile['profile_pic']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/public/uploads/profile_pics/' . $profile['profile_pic'])
+                  ? '/public/uploads/profile_pics/' . $profile['profile_pic']  // Correct relative path
+                  : $defaultPic;
+              ?>
+
               <img 
-                src="<?php echo htmlspecialchars(!empty($profile['profile_pic']) ? $profile['profile_pic'] : '/public/assets/img/user-default.png'); ?>" 
-                alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>" 
-                class="w-9 h-9 rounded-full object-cover border border-primary shadow-sm mr-2" 
+                  id="profile-preview"
+                  src="<?php echo htmlspecialchars($profilePicPath); ?>"
+                  alt="<?php echo htmlspecialchars($profile['cust_name'] ?? 'User Profile'); ?>"
+                  class="w-9 h-9 rounded-full object-cover border border-primary shadow-sm mr-2" 
               />
+              
               <span>
                 <?php echo htmlspecialchars($profile['firstName'] ?? ''); ?>
                 <?php echo htmlspecialchars($profile['lastName'] ?? ''); ?>
