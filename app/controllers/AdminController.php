@@ -279,6 +279,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_admin']) ) {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile_pic'])) {
+    // Must send JSON first
+    header('Content-Type: application/json');
+
+    $controller = new AdminController();
+    $response = ['success' => false, 'message' => 'Upload failed'];
+
+    // Check file
+    if (!empty($_FILES['profile_picture']['name']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = __DIR__ . "/../../public/uploads/profile_pics/";
+
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        // Sanitize filename to prevent issues
+        $originalName = $_FILES['profile_picture']['name'];
+        $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+        $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!in_array(strtolower($ext), $allowedExt)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid file type']);
+            exit;
+        }
+
+        $filename =  $originalName; // unique filename to avoid collisions
+        $target_file = $upload_dir . $filename;
+
+        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
+            $admin_email = $_POST['admin_email'] ?? null;
+
+            if ($admin_email) {
+                $updated = $controller->updateAdmin([
+                    'admin_email' => $admin_email,
+                    'profile_picture' => $filename
+                ]);
+
+                if ($updated) {
+                    $response = ['success' => true, 'filename' => $filename];
+                } else {
+                    $response['message'] = 'Database update failed';
+                }
+            } else {
+                $response['message'] = 'Admin email missing';
+            }
+        } else {
+            $response['message'] = 'Failed to move uploaded file';
+        }
+    } else {
+        $response['message'] = 'No file selected or upload error';
+    }
+
+    echo json_encode($response);
+    exit;
+}
+
 class AdminController {
     private $model;
 
@@ -385,14 +441,12 @@ class AdminController {
     }
 
     // Add quantity to an existing material
-    public function addQuantity($material_id, $quantity)
-    {
+    public function addQuantity($material_id, $quantity){
         return $this->model->increaseQuantity($material_id, $quantity);
     }
     
 
-    public function getProfile($admin_email)
-    {
+    public function getProfile($admin_email){
         return $this->model->getProfileByEmail($admin_email);
     }
 

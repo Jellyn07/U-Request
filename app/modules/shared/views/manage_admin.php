@@ -307,12 +307,40 @@ $profile = $controller->getProfile($_SESSION['email']);
           <h2 class="text-lg font-bold mb-2">Admin Information</h2>
 
           <!-- Profile Picture -->
-          <img id="profile-preview"  
-            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
-            alt=""
-            class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto"
-          />
+          <div class="relative mx-auto flex justify-center items-center">
 
+            <!-- Profile Image -->
+            <img id="profile-preview"  
+              :src="selected.profile_picture && selected.profile_picture.trim() !== ''
+                ? '/public/uploads/profile_pics/' + selected.profile_picture 
+                : '/public/assets/img/user-default.png'"
+              onerror="this.onerror=null;this.src='/assets/img/user-default.png';"
+              class="w-36 h-36 rounded-full object-cover shadow-sm"
+            />
+
+            <!-- Separate Profile Picture Form -->
+            <form id="profilePicForm" method="post" action="../../../controllers/AdminController.php" 
+                  enctype="multipart/form-data" class="absolute bottom-2 right-2">
+              <input type="hidden" name="update_profile_pic" value="1">
+              <input type="hidden" name="admin_email" :value="selected.email">
+
+              <!-- File Input -->
+              <input type="file" name="profile_picture" id="profile_picture_input" class="hidden" accept="image/*"
+                
+              />
+
+              <!-- Edit Button -->
+
+              <label for="profile_picture_input" title="Change Profile Picture"
+                class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md cursor-pointer transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036
+                    a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </label>
+            </form>
+          </div>
           <!-- Form -->
           <form id="adminForm" class="space-y-2" method="post" action="../../../controllers/AdminController.php">
             <input type="hidden" name="admin_email" x-model="selected.email">
@@ -403,6 +431,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   <script src="/public/assets/js/shared/export.js"></script>
   <script src="/public/assets/js/shared/manage-admin.js"></script>
   <script src="/public/assets/js/shared/menus.js"></script>
+  <script src="/public/assets/js/shared/profile.js"></script>
 </body>
 </html>
 
