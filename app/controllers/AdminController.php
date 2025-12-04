@@ -240,6 +240,7 @@ $validAccessLevels = [1,2,3];
     );
 
     if ($result) {
+        unset($_SESSION['admin_form_data']);
         $_SESSION['admin_success'] = "Administrator successfully added.";
         $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
         header("Location: $redirect");
