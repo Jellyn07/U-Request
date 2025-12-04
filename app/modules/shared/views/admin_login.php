@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../../config/constants.php';
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/alert.js"></script>
-    <link rel="stylesheet" href="/public/assets/css/remove-password-eye.css">
+    <link rel="stylesheet" href="/public/assets/css/remove.css">
   </head>
 <body class="min-h-screen flex relative overflow-hidden">
   <div class="md:w-1/2 items-start justify-end relative z-10 text-white hidden md:flex flex-col">

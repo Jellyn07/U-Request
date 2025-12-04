@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../../config/constants.php';
   <title>U-Request | Forgot Password</title>
   <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
   <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
+  <link rel="stylesheet" href="/public/assets/css/remove.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-background min-h-screen flex relative overflow-hidden">
