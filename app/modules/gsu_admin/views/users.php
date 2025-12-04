@@ -85,8 +85,8 @@ $profile = $controller->getProfile($_SESSION['email']);
                     class="hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                   >
                     <td class="px-2 py-2">
-                      <img src="<?= !empty($user['profile_pic']) ? $user['profile_pic'] : '/public/assets/img/user-default.png' ?>" 
-                           class="size-8 rounded-full object-cover mx-auto" alt="User">
+                      <img src="<?= !empty($user['profile_pic']) ? '/public/uploads/profile_pics/' . htmlspecialchars($user['profile_pic']) : '/public/assets/img/user-default.png'; ?>" 
+                        alt="User" class="size-8 rounded-full object-cover">
                     </td>
                     <td class="px-4 py-2"><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?></td>
                     <td class="px-4 py-2"><?= htmlspecialchars($user['email']) ?></td>
@@ -119,8 +119,13 @@ $profile = $controller->getProfile($_SESSION['email']);
           <h2 class="text-lg font-bold mb-2">User Information</h2>
 
           <!-- Profile -->
-          <img :src="selected.profile_pic" alt="Profile"
-            class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto mb-4">
+           <img id="profile-preview"
+              :src="selected.profile_pic && selected.profile_pic.trim() !== ''
+                ? '/public/uploads/profile_pics/' + selected.profile_pic 
+                : '/public/assets/img/user-default.png'"
+              onerror="this.onerror=null;this.src='/public/assets/img/user-default.png';"
+              class="w-36 h-36 rounded-full object-cover shadow-sm mx-auto"
+            />
 
           <form id="userForm" method="post" action="../../../controllers/UserAdminController.php" class="space-y-4">
             <input type="hidden" name="update_user" value="1">
