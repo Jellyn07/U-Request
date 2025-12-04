@@ -1,12 +1,23 @@
 <?php
-// if (!isset($_SESSION['email'])) {
-//     header("Location: /app/modules/shared/views/admin_login.php");
-//     exit;
-// }
-// require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../controllers/AdminController.php';
 $controller = new AdminController();
 $feedbackData = $controller->getAllMotorpoolFeedbacks();
+$ratingCounts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+foreach ($feedbackData as $fb) {
+    $rating = (int)$fb['overall_rating'];
+    if ($rating >= 1 && $rating <= 5) {
+        $ratingCounts[$rating]++;
+    }
+}
+
+// Make it JS-friendly (ordered from 5 to 1 for chart)
+$chartData = [
+    $ratingCounts[5],
+    $ratingCounts[4],
+    $ratingCounts[3],
+    $ratingCounts[2],
+    $ratingCounts[1]
+];
 
 // calculate average rating if needed
 $total = 0;
@@ -50,7 +61,7 @@ $profile = $controller->getProfile($_SESSION['email']);
           <p class="text-xs text-gray-500 font-medium mt-2">Total feedbacks this year</p>
         </div>
         <div>
-          <canvas id="ratingChart" height="110"></canvas>
+          <canvas id="ratingChart" style="width:100%; height:150px;"></canvas>
         </div>
       </div>
 
@@ -161,26 +172,20 @@ $profile = $controller->getProfile($_SESSION['email']);
     document.getElementById('averageStars').innerHTML = renderStars(<?= $averageRating ?>);
 
     // --- Chart.js Horizontal Bar ---
-    const ctx = document.getElementById('ratingChart');
+    const ctx = document.getElementById('ratingChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['⭐ 5', '⭐ 4', '⭐ 3', '⭐ 2', '⭐ 1'],
         datasets: [{
-          data: [
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 5)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 4)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 3)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 2)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 1)); ?>
-          ],
+          data: <?= json_encode($chartData) ?>,
           backgroundColor: ['#81c784', '#fbc02d', '#f57c00', '#d32f2f', '#b71c1c'],
-          borderRadius: 20,
-          barThickness: 6,
+          borderRadius: 15,
+          barThickness: 15
         }]
       },
       options: {
-        indexAxis: 'y',
+        indexAxis: 'y', // horizontal bars
         plugins: {
           legend: {
             display: false
@@ -189,7 +194,7 @@ $profile = $controller->getProfile($_SESSION['email']);
         scales: {
           x: {
             display: false
-          },
+          }, // hide numbers below
           y: {
             grid: {
               display: false

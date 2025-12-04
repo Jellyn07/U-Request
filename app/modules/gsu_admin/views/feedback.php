@@ -1,12 +1,24 @@
 <?php
-// if (!isset($_SESSION['email'])) {
-//     header("Location: /app/modules/shared/views/admin_login.php");
-//     exit;
-// }
-// require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../controllers/AdminController.php';
 $controller = new AdminController();
 $feedbackData = $controller->getAllFeedbacks();
+
+$ratingCounts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+foreach ($feedbackData as $fb) {
+  $rating = (int)$fb['overall_rating'];
+  if ($rating >= 1 && $rating <= 5) {
+    $ratingCounts[$rating]++;
+  }
+}
+
+// Make it JS-friendly (ordered from 5 to 1 for chart)
+$chartData = [
+  $ratingCounts[5],
+  $ratingCounts[4],
+  $ratingCounts[3],
+  $ratingCounts[2],
+  $ratingCounts[1]
+];
 
 // calculate average rating if needed
 $total = 0;
@@ -50,7 +62,7 @@ $profile = $controller->getProfile($_SESSION['email']);
           <p class="text-xs text-gray-500 font-medium mt-2">Total feedbacks this year</p>
         </div>
         <div>
-          <canvas id="ratingChart" height="110"></canvas>
+          <canvas id="ratingChart" style="width:100%; height:150px;"></canvas>
         </div>
       </div>
 
@@ -69,11 +81,11 @@ $profile = $controller->getProfile($_SESSION['email']);
         <!-- Feedback Cards -->
         <div id="feedbackCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4">
 
-        <?php if (empty($feedbackData)): ?>
-          <div class="col-span-4 text-center py-10 font-medium">
-            <p class="text-gray-300">No comments added.</p>
-          </div>
-        <?php endif; ?>
+          <?php if (empty($feedbackData)): ?>
+            <div class="col-span-4 text-center py-10 font-medium">
+              <p class="text-gray-300">No comments added.</p>
+            </div>
+          <?php endif; ?>
 
           <?php foreach ($feedbackData as $feedback): ?>
             <div class="feedback-card p-2" data-rating="<?= htmlspecialchars($feedback['overall_rating']) ?>">
@@ -113,12 +125,12 @@ $profile = $controller->getProfile($_SESSION['email']);
                 </div> -->
                 <?php
                 $comment = $feedback['suggest_overall'] ?: 'No comment added.';
-                $shortComment = strlen($comment) > 240 
-                    ? substr($comment, 0, 240) . "..." 
-                    : $comment;
+                $shortComment = strlen($comment) > 240
+                  ? substr($comment, 0, 240) . "..."
+                  : $comment;
                 ?>
                 <p class="text-xs leading-relaxed text-justify text-gray-700">
-                    <?= htmlspecialchars($shortComment) ?>
+                  <?= htmlspecialchars($shortComment) ?>
                 </p>
 
                 <!-- Button at Bottom -->
@@ -131,7 +143,7 @@ $profile = $controller->getProfile($_SESSION['email']);
               </div>
             </div>
           <?php endforeach; ?>
-          
+
         </div>
       </div>
     </div>
@@ -161,26 +173,20 @@ $profile = $controller->getProfile($_SESSION['email']);
     document.getElementById('averageStars').innerHTML = renderStars(<?= $averageRating ?>);
 
     // --- Chart.js Horizontal Bar ---
-    const ctx = document.getElementById('ratingChart');
+    const ctx = document.getElementById('ratingChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['⭐ 5', '⭐ 4', '⭐ 3', '⭐ 2', '⭐ 1'],
         datasets: [{
-          data: [
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 5)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 4)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 3)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 2)); ?>,
-            <?= count(array_filter($feedbackData, fn($f) => $f['overall_rating'] == 1)); ?>
-          ],
+          data: <?= json_encode($chartData) ?>,
           backgroundColor: ['#81c784', '#fbc02d', '#f57c00', '#d32f2f', '#b71c1c'],
-          borderRadius: 20,
-          barThickness: 6,
+          borderRadius: 15,
+          barThickness: 15
         }]
       },
       options: {
-        indexAxis: 'y',
+        indexAxis: 'y', // horizontal bars
         plugins: {
           legend: {
             display: false
@@ -189,7 +195,7 @@ $profile = $controller->getProfile($_SESSION['email']);
         scales: {
           x: {
             display: false
-          },
+          }, // hide numbers below
           y: {
             grid: {
               display: false
@@ -218,8 +224,8 @@ $profile = $controller->getProfile($_SESSION['email']);
       feedbackContainer.innerHTML = '';
       sorted.forEach(card => feedbackContainer.appendChild(card));
     });
-
   </script>
 </body>
 <script src="/public/assets/js/shared/menus.js"></script>
+
 </html>
