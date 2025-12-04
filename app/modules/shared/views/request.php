@@ -129,7 +129,7 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <!-- Table -->
           <div class="overflow-x-auto h-[545px] overflow-y-auto rounded-b-lg shadow bg-white">
-            <table id="table" class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
+            <table class="min-w-full divide-y divide-gray-200 bg-white rounded-b-lg p-2">
               <thead class="bg-white sticky top-0">
                 <tr>
                   <?php foreach (['Request ID','Requester','Category','Location','Date Request','Status'] as $header): ?>
@@ -154,7 +154,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                         <?php if ($_SESSION['access_level'] == 1): ?>
                             <!-- READ-ONLY STATUS FOR SUPERADMIN -->
                             <?php if ($row['req_status'] === 'Completed'): ?>
-                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span>
+                                <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 text-center">Completed</span>
                                     <?php if (!empty($row['date_finished'])): ?>
                                           <span class="text-xs text-green-800 mt-1" hidden>
                                               <?= date("F d, Y", strtotime($row['date_finished'])) ?>
@@ -169,7 +169,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                               <!-- DROPDOWN FOR ACCESS LEVEL 2 or others -->
                               <?php if ($row['req_status'] === 'Completed'): ?>
                                   <div class="flex flex-col">
-                                      <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span>
+                                      <span class="px-5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 text-center">Completed</span>
 
                                       <?php if (!empty($row['date_finished'])): ?>
                                           <span class="text-xs text-green-800 mt-1" hidden>
@@ -183,14 +183,14 @@ $profile = $controller->getProfile($_SESSION['email']);
                                       data-request-id="<?= $row['request_id'] ?>" data-current-status="<?= $row['req_status'] ?>">
                                       <option hidden disabled value="To Inspect" selected>To Inspect</option>
                                       <option value="In Progress" class="bg-blue-100 text-blue-800">In Progress</option>
-                                      <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                                      <option value="Completed" class="bg-green-100 text-green-800 text-center">Completed</option>
                                   </select>
 
                               <?php else: ?>
                                   <select class="status-dropdown px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" 
                                       data-request-id="<?= $row['request_id'] ?>" data-current-status="<?= $row['req_status'] ?>">
                                       <option hidden disabled value="In Progress" selected>In Progress</option>
-                                      <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                                      <option value="Completed" class="bg-green-100 text-green-800 text-center">Completed</option>
                                   </select>
                               <?php endif; ?>
                           <?php endif; ?>
@@ -492,7 +492,7 @@ $profile = $controller->getProfile($_SESSION['email']);
   </main>
 
   <script src="/public/assets/js/shared/menus.js"></script>
-  <script src="/public/assets/js/shared/export.js"></script>
+  <script src="/public/assets/js/shared/export_repair.js"></script>
   <script type="module">
     import { initTableFilters } from "/public/assets/js/shared/table-filters.js";
 
