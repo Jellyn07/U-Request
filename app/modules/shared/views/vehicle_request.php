@@ -243,51 +243,63 @@ $profile = $controller->getProfile($_SESSION['email']);
               <!-- STATUS + APPROVED BY + REASON -->
               <div>
                  <label class="text-xs text-text mb-1">Status</label>
+
+
                   <!-- STATUS SELECT -->
-                <select 
-                    id="status"  
-                    name="req_status"  
-                    x-model="selected.req_status" 
-                    class="w-full input-field"
-                    :disabled="isLocked()"
-                >
-                    <option value="" disabled>Select Status</option>
+                  <select 
+                      id="status"  
+                      name="req_status"  
+                      x-model="selected.req_status" 
+                      class="w-full input-field"
+                      :disabled="isLocked()"
+                  >
+                      <option value="" disabled>Select Status</option>
 
-                    <option value="Pending" 
-                        x-show="selected.original_status !== 'Approved'" 
-                        x-bind:selected="selected.req_status === 'Pending'">
-                        Pending
-                    </option>
+                      <!-- Pending → can change to Approved, Rejected, Cancelled -->
+                      <option value="Pending"
+                          x-show="selected.original_status === 'Pending'">
+                          Pending
+                      </option>
+                      <option value="Approved"
+                          x-show="selected.original_status === 'Pending'">
+                          Approved
+                      </option>
+                      <option value="Rejected"
+                          x-show="selected.original_status === 'Pending'">
+                          Rejected
+                      </option>
+                      <option value="Cancelled"
+                          x-show="selected.original_status === 'Pending'">
+                          Cancelled
+                      </option>
 
-                    <option value="Approved" 
-                        x-show="selected.original_status !== 'Approved'" 
-                        x-bind:selected="selected.req_status === 'Approved'">
-                        Approved
-                    </option>
+                      <!-- Approved → can change to On Going, Cancelled -->
+                      <!-- <option value="On Going"
+                          x-show="selected.original_status === 'Approved'">
+                          On Going
+                      </option> -->
+                      <option value="Cancelled"
+                          x-show="selected.original_status === 'Approved'">
+                          Cancelled
+                      </option>
 
-                    <option value="On Going" 
-                        x-show="selected.original_status !== 'Approved'" 
-                        x-bind:selected="selected.req_status === 'On Going'">
-                        On Going
-                    </option>
+                      <!-- On Going → can ONLY change to Completed -->
+                       <option value="Cancelled"
+                          x-show="selected.original_status === 'On Going'">
+                          Cancelled
+                      </option>
+                      <option value="Completed"
+                          x-show="selected.original_status === 'On Going'">
+                          Completed
+                      </option>
 
-                    <option value="Rejected" 
-                        x-show="selected.original_status !== 'Approved'" 
-                        x-bind:selected="selected.req_status === 'Rejected'">
-                        Rejected
-                    </option>
+                      <!-- Completed always visible but disabled -->
+                      <option value="Completed"
+                          x-show="selected.original_status === 'Completed'">
+                          Completed
+                      </option>
+                  </select>
 
-                    <option value="Cancelled" 
-                        x-show="selected.original_status !== 'Approved'" 
-                        x-bind:selected="selected.req_status === 'Cancelled'">
-                        Cancelled
-                    </option>
-
-                    <!-- Completed is always visible if original_status is Approved or already Completed -->
-                    <option value="Completed" x-bind:selected="selected.req_status === 'Completed'">
-                        Completed
-                    </option>
-                </select>
 
                 <!-- APPROVED BY -->
                 <div x-show="selected.req_status === 'Approved'" x-cloak>
@@ -332,9 +344,10 @@ $profile = $controller->getProfile($_SESSION['email']);
                       id="vehicleSelect"
                       x-model="selected.vehicle_id"
                       name="vehicle_id"
-                      class="w-full input-field"
-                      :disabled="selected.req_status !== 'Approved'"  <!-- Disable if status is not Approved -->
+                      class="w-full input-field mb-2"
+                      :disabled="selected.req_status !== 'Approved'"  
                   >
+                  <!-- Disable if status is not Approved -->
                       <option value="">Select Vehicle</option>
 
                       <template x-for="v in vehicles" :key="v.vehicle_id">
@@ -346,11 +359,11 @@ $profile = $controller->getProfile($_SESSION['email']);
                       </template>
                   </select>
 
-                <p class="text-xs text-gray-500 mt-1" 
+                <div class="text-xs text-gray-500 mt-1" 
                 x-show="selected.req_status !== 'Pending' && selected.req_status !== 'Rejected' && selected.req_status !== 'Rejected'">
-                  Current Assigned Vehicle:
-                  <span x-text="selected.vehicle_name"></span>
-              </p>
+                  <label class="text-xs text-text mb-5 mt-5">Current Assign Vehicle</label><br>
+                  <p x-text="selected.vehicle_name" class="view-field w-full"></p>
+                </div>
               </div>
 
               <div class="flex justify-center pt-2 space-x-2">

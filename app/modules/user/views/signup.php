@@ -21,6 +21,7 @@ require_once __DIR__ . '/../../../models/UserModel.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>U-Request</title>
     <link rel="stylesheet" href="<?php echo PUBLIC_URL; ?>/assets/css/output.css" />
+    <link rel="stylesheet" href="/public/assets/css/remove.css">
     <link rel="icon" href="<?php echo PUBLIC_URL; ?>/assets/img/upper_logo.png"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/public/assets/js/alert.js"></script>

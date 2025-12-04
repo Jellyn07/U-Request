@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     "Approved": "bg-blue-200 text-blue-800 hover:bg-blue-300",
     "On Going": "bg-orange-100 text-orange-700 hover:bg-orange-300",
     "Rejected/Cancelled": "bg-red-200 text-red-800 hover:bg-red-300",
+    "Cancelled": "bg-red-200 text-red-800 hover:bg-red-300",
+    "Rejected": "bg-red-200 text-red-800 hover:bg-red-300",
     "Completed": "bg-green-200 text-green-800 hover:bg-green-300"
   };
 
