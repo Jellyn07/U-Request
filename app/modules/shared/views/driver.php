@@ -179,27 +179,40 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">&nbsp;</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Driver ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contact No</th>
               </tr>
             </thead>
             <tbody id="usersTable" class="text-sm">
               
             <?php if (!empty($drivers)): ?>
               <?php foreach ($drivers as $person): ?>
-
                 <tr 
                   data-staffid="<?= htmlspecialchars($person['driver_id']) ?>"
                   data-firstname="<?= htmlspecialchars($person['firstName']) ?>"
                   data-lastname="<?= htmlspecialchars($person['lastName']) ?>"
-                  @click="selected = {
+                  @click="
+                    selected = {
                       staff_id: '<?= htmlspecialchars($person['driver_id']) ?>',
                       firstName: '<?= htmlspecialchars($person['firstName']) ?>',
                       lastName: '<?= htmlspecialchars($person['lastName']) ?>',
                       contact: '<?= htmlspecialchars($person['contact']) ?>',
                       hire_date: '<?= htmlspecialchars($person['hire_date']) ?>',
                       status: '<?= htmlspecialchars($person['status']) ?>',
-                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : null ?>'
-                  }; showDetails = true"
+                      profile_picture: '<?= !empty($person['profile_picture']) ? $person['profile_picture'] : '' ?>'
+                    };
+
+                    showDetails = true;
+
+                    $nextTick(() => {
+                      const preview = document.getElementById('profile-preview');
+                      if (!preview) return;
+
+                      preview.dataset.staffid = selected.staff_id;
+                      preview.src = selected.profile_picture 
+                        ? '/public/uploads/profile_pics/' + selected.profile_picture
+                        : '/public/assets/img/user-default.png';
+                    });
+                  "
                   class="cursor-pointer hover:bg-gray-100 border-b border-gray-100"
                 >
                   <td class="pl-4 py-2">
@@ -215,8 +228,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                     <?= htmlspecialchars($person['firstName'] . ' ' . $person['lastName']) ?>
                   </td>
                   <td class="px-4 py-2">
-                    <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full <?= strtolower($person['status']) === 'Available' ? 'bg-gray-200 text-gray-600' : 'bg-green-200 text-green-800 ' ?>">
-                      <?= htmlspecialchars($person['status']) ?>
+                    <?= htmlspecialchars($person['contact']) ?>
                     </span>
                   </td>
                 </tr>
@@ -241,26 +253,21 @@ $profile = $controller->getProfile($_SESSION['email']);
 
           <h2 class="text-lg font-bold mb-2">Driver Information</h2>
 
-          <!-- Profile Picture -->
-          <!-- <img id="profile-preview"  
-            :src="selected.profile_picture ? '/public/uploads/profile_pics/' + selected.profile_picture : '/public/assets/img/user-default.png'"
-            alt=""
-            class="w-24 h-24 rounded-full object-cover shadow-sm mx-auto"
-          /> -->
-
           <!-- Form -->
-          <form id="driverForm"   class="space-y-2"  method="post" action="../../../controllers/DriverController.php">
+          <form id="driverForm"   class="space-y-2"  method="post" action="../../../controllers/DriverController.php" enctype="multipart/form-data">
             <div class="rounded-xl flex flex-col items-center">
               <div class="relative">
-                <!-- Profile Picture Preview -->
+
               <img 
-                  id="profile-preview"
-                  :src="selected.profile_picture 
-                      ? '/public/uploads/profile_pics/' + selected.profile_picture 
-                      : '/public/assets/img/user-default.png'"
-                  alt="Profile Picture"
-                  class="w-24 h-24 rounded-full object-cover shadow-sm"
+                id="profile-preview"
+                data-staffid=""
+                :src="selected.profile_picture && selected.profile_picture.trim() !== ''
+                ? '/public/uploads/profile_pics/' + selected.profile_picture 
+                : '/public/assets/img/user-default.png'"
+                onerror="this.onerror=null;this.src='/public/assets/img/user-default.png';"
+                class="w-36 h-36 rounded-full object-cover shadow-sm"
               />
+
                 <!-- Edit Button -->
                 <label for="profile_picture" title="Change Profile Picture"
                   class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition hover:bg-primary/80">
@@ -352,3 +359,65 @@ $profile = $controller->getProfile($_SESSION['email']);
 <script src="/public/assets/js/shared/menus.js"></script>
 <script src="/public/assets/js/shared/export.js"></script>
 </html>
+<script>
+document.getElementById("profile_picture").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const previewImg = document.getElementById("profile-preview");
+  const oldSrc = previewImg.src;
+  const staffId = previewImg.dataset.staffid; // <- define staffId first
+
+  // Show preview immediately
+  const reader = new FileReader();
+  reader.onload = e => previewImg.src = e.target.result;
+  reader.readAsDataURL(file);
+
+  // Confirm change
+  Swal.fire({
+    title: "Change Profile Picture?",
+    text: "Do you want to save this new profile picture?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, save it",
+    cancelButtonText: "Cancel"
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      previewImg.src = oldSrc;
+      event.target.value = "";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("profile_picture", file);
+    formData.append("staff_id", staffId); // <- now staffId is defined
+    formData.append("update_profile_pic", "1");
+
+    fetch("../../../controllers/DriverController.php", {
+      method: "POST",
+      body: formData,
+      credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Profile Picture Updated",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => location.reload());
+      } else {
+        Swal.fire("Error", data.message, "error");
+        previewImg.src = oldSrc;
+        event.target.value = "";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      previewImg.src = oldSrc;
+      event.target.value = "";
+    });
+  });
+});
+</script>

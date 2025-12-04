@@ -16,6 +16,10 @@ class DriverController {
         return $this->model->getDriverById($staff_id);
     }
 
+    public function updateProfilePicture($staffId, $filename) {
+        return $this->model-> updateProfilePicture($staffId, $filename);
+    }
+
     // --- ADD PERSONNEL ---
     public function addDriver($postData) {
         // ✅ Handle file upload
@@ -171,5 +175,45 @@ if (isset($_POST['get_work_history'])) {
     $staff_id = $_POST['staff_id'];
     $history = $personnelModel->getWorkHistory($staff_id);
     echo json_encode($history);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile_pic'])) {
+    header('Content-Type: application/json');
+    $response = ['success' => false, 'message' => 'Update failed'];
+
+    $staffId = $_POST['staff_id'] ?? null;
+    if (!$staffId) {
+        $response['message'] = 'Missing staff_id';
+        echo json_encode($response);
+        exit;
+    }
+
+    if (empty($_FILES['profile_picture']['name']) || $_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
+        $response['message'] = 'No valid file uploaded';
+        echo json_encode($response);
+        exit;
+    }
+
+    $upload_dir = __DIR__ . "/../../public/uploads/profile_pics/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+
+    $filename = basename($_FILES['profile_picture']['name']);
+    $target_file = $upload_dir . $filename;
+
+    if (!move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
+        $response['message'] = 'Failed to move uploaded file';
+        echo json_encode($response);
+        exit;
+    }
+
+    $controller = new DriverController();
+    if ($controller->updateProfilePicture($staffId, $filename)) {
+        $response = ['success' => true, 'filename' => $filename];
+    } else {
+        $response['message'] = 'Database update failed';
+    }
+
+    echo json_encode($response);
     exit;
 }

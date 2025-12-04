@@ -88,68 +88,89 @@ class DriverModel extends BaseModel {
 
     // Update driver
    public function updateDriver($data) {
-    if (isset($_SESSION['staff_id'])) {
-            setCurrentStaff($this->db); // Use model's connection
-    }
-    // ✅ Require driver_id (the record to update)
-    if (empty($data['driver_id'])) {
-        $_SESSION['driver_error'] = "Missing driver identifier.";
-        return false;
-    }
-
-    // Normalize values
-    $driverId = (int)$data['driver_id'];
-    $contact = isset($data['contact']) ? trim($data['contact']) : '';
-
-    // ✅ Check for duplicate contact numbers
-    if ($contact !== '') {
-        $checkContact = $this->db->prepare(
-            "SELECT COUNT(*) AS cnt FROM driver WHERE contact = ? AND driver_id != ?"
-        );
-        if ($checkContact) {
-            $checkContact->bind_param("si", $contact, $driverId);
-            $checkContact->execute();
-            $contactRes = $checkContact->get_result()->fetch_assoc();
-            $checkContact->close();
-
-            if (!empty($contactRes['cnt']) && $contactRes['cnt'] > 0) {
-                $_SESSION['driver_error'] = "Contact number already exists!";
-                return false;
-            }
-        } else {
-            $_SESSION['driver_error'] = "DB error (contact check): " . $this->db->error;
+        if (isset($_SESSION['staff_id'])) {
+                setCurrentStaff($this->db); // Use model's connection
+        }
+        // ✅ Require driver_id (the record to update)
+        if (empty($data['driver_id'])) {
+            $_SESSION['driver_error'] = "Missing driver identifier.";
             return false;
         }
+
+        // Normalize values
+        $driverId = (int)$data['driver_id'];
+        $contact = isset($data['contact']) ? trim($data['contact']) : '';
+
+        // ✅ Check for duplicate contact numbers
+        if ($contact !== '') {
+            $checkContact = $this->db->prepare(
+                "SELECT COUNT(*) AS cnt FROM driver WHERE contact = ? AND driver_id != ?"
+            );
+            if ($checkContact) {
+                $checkContact->bind_param("si", $contact, $driverId);
+                $checkContact->execute();
+                $contactRes = $checkContact->get_result()->fetch_assoc();
+                $checkContact->close();
+
+                if (!empty($contactRes['cnt']) && $contactRes['cnt'] > 0) {
+                    $_SESSION['driver_error'] = "Contact number already exists!";
+                    return false;
+                }
+            } else {
+                $_SESSION['driver_error'] = "DB error (contact check): " . $this->db->error;
+                return false;
+            }
+        }
+
+        // ✅ Call stored procedure
+        $stmt = $this->db->prepare("CALL spUpdateDriver(?, ?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            $_SESSION['driver_error'] = "Prepare failed (Update): " . $this->db->error;
+            return false;
+        }
+
+        $stmt->bind_param(
+            "isssss",
+            $driverId,
+            $data['firstName'],
+            $data['lastName'],
+            $contact,
+            $data['hire_date'],
+            $data['profile_picture']
+        );
+
+        $ok = $stmt->execute();
+        if ($ok) {
+            $_SESSION['driver_success'] = "Driver successfully updated.";
+        } else {
+            $_SESSION['driver_error'] = "Failed to update driver. " . ($stmt->error ?: $this->db->error);
+        }
+
+        $stmt->close();
+        return $ok;
     }
 
-    // ✅ Call stored procedure
-    $stmt = $this->db->prepare("CALL spUpdateDriver(?, ?, ?, ?, ?, ?)");
-    if (!$stmt) {
-        $_SESSION['driver_error'] = "Prepare failed (Update): " . $this->db->error;
-        return false;
+    public function updateProfilePicture($staff_id, $filename) {
+        if (isset($_SESSION['staff_id'])) {
+                setCurrentStaff($this->db); // Use model's connection
+        }
+        $stmt = $this->db->prepare("UPDATE driver SET profile_picture = ? WHERE driver_id = ?");
+        if (!$stmt) {
+            return false;
+        }
+
+        $staff_id = (int) $staff_id;
+        $stmt->bind_param("si", $filename, $staff_id);
+        $stmt->execute();
+
+        if ($stmt->affected_rows === 0) {
+            $stmt->close();
+            return false; // NOTHING UPDATED
+        }
+
+        $stmt->close();
+        return true;
     }
-
-    $stmt->bind_param(
-        "isssss",
-        $driverId,
-        $data['firstName'],
-        $data['lastName'],
-        $contact,
-        $data['hire_date'],
-        $data['profile_picture']
-    );
-
-    $ok = $stmt->execute();
-    if ($ok) {
-        $_SESSION['driver_success'] = "Driver successfully updated.";
-    } else {
-        $_SESSION['driver_error'] = "Failed to update driver. " . ($stmt->error ?: $this->db->error);
-    }
-
-    $stmt->close();
-    return $ok;
-}
-
 
     // Delete personnel
     public function deleteDriver($staff_id) {
