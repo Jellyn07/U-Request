@@ -210,7 +210,7 @@ $image       = $_GET['image'] ?? '';
             <div class="mt-8">
                 <p class="text-sm text-center mb-4 font-semibold text-gray-700">PHOTO EVIDENCE</p>
                 <img src="<?= !empty($image) 
-                        ? '/public/uploads/' . htmlspecialchars($image) 
+                        ? '/public/uploads/repair_images/' . htmlspecialchars($image) 
                         : '/public/assets/img/default-img.png' ?>"
                         onerror="this.src='/public/assets/img/default-img.png'"
                         class="max-h-48 mx-auto block rounded-md border border-gray-200 p-1"
