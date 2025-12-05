@@ -42,19 +42,37 @@ class VehicleModel extends BaseModel {
     }
 
     public function getVehicles() {
-        $query = "SELECT 
-                    v.vehicle_id,
-                    v.vehicle_name,
-                    v.plate_no,
-                    v.capacity,
-                    v.vehicle_type,
-                    v.photo,
-                    v.status,
-                    v.driver_id,
-                    CONCAT(d.firstName, ' ', d.lastName) AS driver_name
-                  FROM vehicle v
-                  LEFT JOIN driver d ON v.driver_id = d.driver_id
-                  ORDER BY v.vehicle_name ASC";
+        if (isset($_SESSION['staff_id'])) {
+                setCurrentStaff($this->db); // Use model's connection
+            }
+        // 1️⃣ Update vehicle status for today's assignments
+        $updateQuery = "
+            UPDATE vehicle v
+            INNER JOIN vehicle_request_assignment vra 
+                ON v.vehicle_id = vra.vehicle_id
+            INNER JOIN vehicle_request vr 
+                ON vra.req_id = vr.req_id
+            SET v.status = 'In Use'
+            WHERE vr.travel_date = CURDATE()
+        ";
+        mysqli_query($this->db, $updateQuery);
+
+        // 2️⃣ Fetch all vehicles
+        $query = "
+            SELECT 
+                v.vehicle_id,
+                v.vehicle_name,
+                v.plate_no,
+                v.capacity,
+                v.vehicle_type,
+                v.photo,
+                v.status,
+                v.driver_id,
+                CONCAT(d.firstName, ' ', d.lastName) AS driver_name
+            FROM vehicle v
+            LEFT JOIN driver d ON v.driver_id = d.driver_id
+            ORDER BY v.vehicle_name ASC
+        ";
 
         $result = mysqli_query($this->db, $query);
         $vehicles = [];
@@ -77,7 +95,7 @@ class VehicleModel extends BaseModel {
                 CONCAT(d.firstName, ' ', d.lastName) AS driver_name
             FROM vehicle v
             LEFT JOIN driver d ON v.driver_id = d.driver_id
-            WHERE v.status NOT IN ('Under Maintenance', 'In Use', 'Out of Use')
+            WHERE v.status NOT IN ('Under Maintenance', 'Out of Use')
             AND v.vehicle_id NOT IN (
                 SELECT va.vehicle_id
                 FROM vehicle_request_assignment va
