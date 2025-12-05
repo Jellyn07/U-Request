@@ -153,7 +153,7 @@ $list = $trackingController->getFilteredTracking($_SESSION['email'], $type, $sta
             <span class="font-medium">Destination:</span> <?= htmlspecialchars($track['travel_destination']); ?>
         </p>
 
-        <?php if ($status === 'Rejected/Cancelled' && !empty($track['reason'])): ?>
+        <?php if (in_array($status, ['Rejected', 'Cancelled']) && !empty($track['reason'])): ?>
             <p class="mt-2 mb-2 text-xs text-red-700">
                 <span class="font-medium">Reason:</span>
                 <?= htmlspecialchars($track['reason']); ?>
