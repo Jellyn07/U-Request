@@ -323,20 +323,20 @@ class RequestModel extends BaseModel {
         $sql = "
             SELECT gp.staff_id, gp.full_name
             FROM vw_gsu_personnel gp
-            WHERE gp.staff_id NOT IN (
-                SELECT rap.staff_id
+            WHERE NOT EXISTS (
+                SELECT 1
                 FROM request_assigned_personnel rap
                 INNER JOIN request_assignment ra 
                     ON rap.request_id = ra.request_id
-                WHERE ra.date_finished IS NULL
+                WHERE rap.staff_id = gp.staff_id
+                AND ra.date_finished IS NULL
             )
             ORDER BY gp.full_name ASC
         ";
-    
+
         $result = $this->db->query($sql);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
-    
 
     // Get profile data by email
     public function getProfileByEmail($admin_email) {
