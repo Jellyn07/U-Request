@@ -1,8 +1,8 @@
 <?php
- if (!isset($_SESSION['email'])) {
-     header("Location: /app/modules/shared/views/admin_login.php");
-    exit;
-}
+//  if (!isset($_SESSION['email'])) {
+//      header("Location: /app/modules/shared/views/admin_login.php");
+//     exit;
+// }
 require_once __DIR__ . '/../../../config/auth-admin.php';
 require_once __DIR__ . '/../../../controllers/AdminController.php';
 $controller = new AdminController();
