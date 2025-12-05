@@ -144,11 +144,12 @@ class RequestController {
     // In RequestController.php
     public function saveAssignment() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
             $request_id = $_POST['request_id'];
-            $req_status = $_POST['req_status'] ?? null;
+            $req_status = $_POST['req_status'] ?? 'In Progress';
             $prio_level = $_POST['prio_level'] ?? null;
 
-            // Arrays for personnel and materials
+            // Arrays
             $staff_ids = $_POST['staff_id'] ?? [];
             $remove_staff_ids = $_POST['remove_staff_ids'] ?? [];
             $materials_to_add = $_POST['materials'] ?? [];
@@ -160,21 +161,10 @@ class RequestController {
             $materials_to_add = is_array($materials_to_add) ? $materials_to_add : [];
             $materials_to_remove = is_array($materials_to_remove) ? $materials_to_remove : [];
 
-            // Get current assigned personnel
-            $assignedPersonnel = $this->model->getAssignedPersonnel($request_id);
-
-            // ❌ Prevent status update if no personnel assigned and no new staff being added
-            if (($req_status === 'In Progress' || $req_status === 'Completed') && empty($assignedPersonnel) && empty($staff_ids)) {
-                echo json_encode([
-                    "success" => false,
-                    "message" => "Cannot update status to '{$req_status}' because no personnel are assigned."
-                ]);
-                exit;
-            }
-
-            $result = $this->model->addAssignment(
+            // ✅ DO NOT PASS STATUS INTO addAssignment()
+            $this->model->addAssignment(
                 $request_id,
-                $req_status, // Pass null for status so it won't update yet
+                $req_status, // Prevent accidental NULL insert
                 $staff_ids,
                 $prio_level,
                 $materials_to_add,
@@ -182,13 +172,14 @@ class RequestController {
                 $materials_to_remove
             );
 
-            $finalAssignedPersonnel = $this->model->getAssignedPersonnel($request_id);
-            if (!empty($finalAssignedPersonnel) && ($req_status === 'In Progress' || $req_status === 'Completed')) {
+            // ✅ UPDATE STATUS ONLY IF VALID
+            $allowed = ['In Progress', 'Completed'];
+            if (!empty($req_status) && in_array($req_status, $allowed)) {
                 $this->model->updateRequestStatus($request_id, $req_status);
             }
 
-            $redirect = $_SERVER['HTTP_REFERER'] ?? '/'; // Go back to the page where the request came from
-
+            // Redirect
+            $redirect = $_SERVER['HTTP_REFERER'] ?? '/';
             header("Location: $redirect");
             exit;
         }
