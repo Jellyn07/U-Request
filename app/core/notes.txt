@@ -1,7 +1,0 @@
-app/
-│── core/                          # Base classes shared by all modules
-│   ├── BaseController.php         # Common controller methods (render view, redirect, etc.)
-│   ├── BaseModel.php              # Common database methods (query, find, save, etc.)
-│   ├── Router.php                 # Handles request routing (URI → Module → Controller → Method)
-│   └── Helpers.php                # Utility/helper functions
-│
