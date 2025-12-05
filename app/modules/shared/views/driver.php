@@ -89,14 +89,14 @@ $profile = $controller->getProfile($_SESSION['email']);
                 <main class="flex flex-col transition-all duration-300 p-4 space-y-4 px-5">
                   <!-- Profile Picture -->
                   <form method="post" action="../../../controllers/DriverController.php" enctype="multipart/form-data">
-                    <div class="rounded-xl flex flex-col items-center">
+                    <!-- <div class="rounded-xl flex flex-col items-center">
                       <div class="relative">
                         <img id="profile-preview"  
                             src="/public/assets/img/user-default.png" 
                             alt="profile picture"
                             class="w-24 h-24 rounded-full object-cover shadow-sm"
                         />
-                        <!-- Edit button -->
+                        Edit button
                         <label for="profile_picture" title="Change Profile Picture" 
                           class="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full shadow-md cursor-pointer transition">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ $profile = $controller->getProfile($_SESSION['email']);
                         </label>
                         <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewProfile(event)">
                       </div>
-                    </div>
+                    </div> -->
                   
 
                   <!-- Identity Information -->
