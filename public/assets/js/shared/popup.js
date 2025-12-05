@@ -22,14 +22,16 @@ function viewWorkHistory(staff_id) {
       <tr>
         <td class="border px-2 py-1 text-center">${row.request_id}</td>
         <td class="border px-2 py-1">${row.request_Type}</td>
-       <td class="border px-2 py-1 text-center">
-        ${new Date(row.date_finished).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        })}
+        <td class="border px-2 py-1 text-center">
+            ${row.date_finished 
+                ? new Date(row.date_finished).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })
+                : '-'
+            }
         </td>
-
       </tr>
     `).join('');
 
