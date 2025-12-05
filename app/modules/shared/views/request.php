@@ -214,7 +214,7 @@ $profile = $controller->getProfile($_SESSION['email']);
             <input type="hidden" name="action" value="saveAssignment">
 
             <h2 class="text-lg font-bold mb-2">Repair Information</h2>
-            <img :src="selected.image_path ? '/public/uploads/' + selected.image_path : '/public/assets/img/default-img.png'" 
+            <img :src="selected.image_path ? '/public/uploads/repair_images/' + selected.image_path : '/public/assets/img/default-img.png'" 
                  alt="Preview" 
                  class="w-10/12 shadow-lg mx-auto rounded-lg" 
                  @error="$el.src='/public/assets/img/default-img.png'"/>
